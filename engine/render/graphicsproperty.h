@@ -23,11 +23,11 @@ enum MatrixType
 	VIEW
 };
 
-class GraphicsNode
+class GraphicsProperty
 {
 public:
-	GraphicsNode();
-	~GraphicsNode();
+	GraphicsProperty();
+	~GraphicsProperty();
 
 	shared_ptr<MeshResource> getMesh();
 	void setMesh(shared_ptr<MeshResource> inMesh);

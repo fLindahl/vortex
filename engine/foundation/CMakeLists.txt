@@ -3,6 +3,7 @@
 #--------------------------------------------------------------------------
 
 SET(files_foundation_math
+	math/math.h
 	math/matrix3.h
 	math/matrix4.h	
 	math/vector2.h
@@ -12,6 +13,8 @@ SET(files_foundation_math
 
 SET(files_foundation_util
 	util/array.h
+	util/fixedarray.h
+	util/indexedpriorityqueue.h
 	)
 	
 SOURCE_GROUP("math" FILES ${files_foundation_math})
