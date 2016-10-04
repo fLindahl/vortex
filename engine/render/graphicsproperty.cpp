@@ -1,48 +1,48 @@
 #include "config.h"
-#include "graphicsnode.h"
+#include "graphicsproperty.h"
 
 namespace Render
 {
-	GraphicsNode::GraphicsNode()
+	GraphicsProperty::GraphicsProperty()
 	{
 	}
 
-	GraphicsNode::~GraphicsNode()
+	GraphicsProperty::~GraphicsProperty()
 	{
 
 	}
 
-	shared_ptr<MeshResource> GraphicsNode::getMesh()
+	shared_ptr<MeshResource> GraphicsProperty::getMesh()
 	{
 		return this->mesh;
 	}
 
-	void GraphicsNode::setMesh(shared_ptr<MeshResource> inMesh)
+	void GraphicsProperty::setMesh(shared_ptr<MeshResource> inMesh)
 	{
 		this->mesh = inMesh;
 	}
 
-	shared_ptr<TextureResource> GraphicsNode::getTexture()
+	shared_ptr<TextureResource> GraphicsProperty::getTexture()
 	{
 		return this->texture;
 	}
 
-	void GraphicsNode::setTexture(shared_ptr<TextureResource> inTexture)
+	void GraphicsProperty::setTexture(shared_ptr<TextureResource> inTexture)
 	{
 		this->texture = inTexture;
 	}
 
-	shared_ptr<ShaderObject> GraphicsNode::getShader()
+	shared_ptr<ShaderObject> GraphicsProperty::getShader()
 	{
 		return this->shader;
 	}
 
-	void GraphicsNode::setShader(shared_ptr<ShaderObject> inShader)
+	void GraphicsProperty::setShader(shared_ptr<ShaderObject> inShader)
 	{
 		this->shader = inShader;
 	}
 
-	Math::Matrix4 GraphicsNode::getMatrix(MatrixType type)
+	Math::Matrix4 GraphicsProperty::getMatrix(MatrixType type)
 	{
 		if (type == MODEL)
 		{
@@ -58,7 +58,7 @@ namespace Render
 		}
 	}
 
-	void GraphicsNode::setMatrix(MatrixType type, const Math::Matrix4 &mat)
+	void GraphicsProperty::setMatrix(MatrixType type, const Math::Matrix4 &mat)
 	{
 		if (type == MODEL)
 		{
@@ -74,7 +74,7 @@ namespace Render
 		}
 	}
 
-	void GraphicsNode::draw()
+	void GraphicsProperty::draw()
 	{
 
 		this->shader->applyProgram();

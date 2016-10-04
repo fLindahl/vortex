@@ -5,8 +5,8 @@
 SET(files_render_render
 	window.h
 	window.cc
-	graphicsnode.h
-	graphicsnode.cpp
+	graphicsproperty.h
+	graphicsproperty.cpp
 	lightnode.h
 	lightnode.cpp
 	meshresource.h

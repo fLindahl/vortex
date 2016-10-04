@@ -101,12 +101,12 @@ void Rasterizer::clear()
 
 void Rasterizer::setup(Math::Matrix4 pMat, Math::Matrix4 tMat)
 {
-	const std::vector<MeshResource::Vertex>& meshData = mesh->getMesh();
-	const std::vector< GLuint >& meshIndices = mesh->getIndices();
+	const Util::Array<MeshResource::Vertex>& meshData = mesh->getMesh();
+	const Util::Array< GLuint >& meshIndices = mesh->getIndices();
 
 	Math::Vector4 vertPos1, vertPos2, vertPos3;
 
-	for (int i = 0; i < meshIndices.size(); i += 3)
+	for (int i = 0; i < meshIndices.Size(); i += 3)
 	{
 		diffuse1 = vertexShader(pMat, tMat, meshData[meshIndices[i]], vertPos1);
 		diffuse2 = vertexShader(pMat, tMat, meshData[meshIndices[i + 1]], vertPos2);

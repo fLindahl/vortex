@@ -32,6 +32,7 @@ public:
 
 private:
 	GLuint program;
+
 	GLuint vertexShader;
 	GLuint fragmentShader;
 };
