@@ -1,15 +1,16 @@
 #pragma once
 #include <memory>
-#include "meshresource.h"
-#include "shaderobject.h"
-#include "textureresource.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/matrix3.h"
 #include "foundation/math/vector4.h"
 
 namespace Render
 {
-	
+
+class MeshResource;
+class TextureResource;
+class ShaderObject;
+
 enum ShaderType
 {
 	VERTEX,

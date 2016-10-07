@@ -275,7 +275,7 @@ Array<TYPE>::operator=(const Array<TYPE>& rhs)
         if ((this->capacity > 0) && (rhs.size <= this->capacity))
         {
             // source array fits into our capacity, copy in place
-            _assert(0 != this->elements);
+            assert(0 != this->elements);
             uint i;
             for (i = 0; i < rhs.size; i++)
             {
