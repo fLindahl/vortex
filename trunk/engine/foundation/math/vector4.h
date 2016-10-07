@@ -2,7 +2,7 @@
 #include "vector3.h"
 #include <cmath>
 
-using namespace std;
+#pragma pack(push, 1)
 
 namespace Math
 {
@@ -41,6 +41,8 @@ public:
 	float w() { return vec[3]; };
 	
 	Vector3 xyz() { return Vector3(vec[0], vec[1], vec[2]); };
+	
+	static Vector4 lerp(const Vector4& va, const Vector4& vb, const float& t);
 
 private:
 	float vec[4];
@@ -150,4 +152,11 @@ inline Vector4 Vector4::normalized() const
 	return Vector4(vec[0] / l, vec[1] / l, vec[2] / l);
 }
 
+inline Vector4 Vector4::lerp(const Vector4& va, const Vector4& vb, const float& t) 
+{
+  return (va + ((vb-va) * t)); 
 }
+
+}
+
+#pragma pack(pop)

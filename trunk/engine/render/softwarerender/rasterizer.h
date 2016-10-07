@@ -5,14 +5,14 @@ For Software Rendering.
 
 #pragma once
 #include "config.h"
-#include <vector>
-#include "meshresource.h"
+#include "render/resources/meshresource.h"
+#include "foundation/util/array.h"
 #include <memory>
 #include "foundation/math/matrix3.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 #include <functional>
-#include "stb_image.h"
+#include "extlib/stb_image.h"
 
 namespace Render
 {
@@ -76,7 +76,7 @@ public:
 	void clear();
 	
 	void setup(Math::Matrix4 pMat, Math::Matrix4 tMat); // pMat = Perspective Matrix, tMat = transform Matrix
-	std::vector<Color> draw();
+	Util::Array<Color> draw();
 	
 	void setVertexShader(const std::function<Math::Vector3(const Math::Matrix4& pMat, const Math::Matrix4& tMat, const MeshResource::Vertex& vert, Math::Vector4& outVert)>& func);
 	std::function<Math::Vector3(const Math::Matrix4& pMat, const Math::Matrix4& tMat, const MeshResource::Vertex& vert, Math::Vector4& outVert)> vertexShader;
@@ -109,7 +109,7 @@ private:
 	Math::Vector3 diffuse1, diffuse2, diffuse3;
 
 	std::shared_ptr<MeshResource> mesh;
-	std::vector<Color> pixels;
-	std::vector<GLfloat> depthBuffer;
+	Util::Array<Color> pixels;
+	Util::Array<GLfloat> depthBuffer;
 };
 }

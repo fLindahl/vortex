@@ -9,6 +9,7 @@ SET(files_foundation_math
 	math/vector2.h
 	math/vector3.h
 	math/vector4.h
+	math/quaternion.h
 	)
 
 SET(files_foundation_util

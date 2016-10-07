@@ -5,26 +5,80 @@
 SET(files_render_render
 	window.h
 	window.cc
-	graphicsproperty.h
-	graphicsproperty.cpp
-	lightnode.h
-	lightnode.cpp
-	meshresource.h
-	meshresource.cpp
-	rasterizer.h
-	rasterizer.cpp
-	shaderobject.h
-	shaderobject.cpp
-	stb_image.h
-	textureresource.h
-	textureresource.cpp
+	)
+
+SET(files_render_animation
+	animation/animationclip.h
+	animation/animationclip.cpp
+	animation/animationparser.h
+	animation/animationparser.cpp
+	animation/animationresource.h
+	animation/animationresource.cpp
+	animation/animcurve.h
+	animation/animkeybuffer.h
+	animation/naxfileformatstructs.h
+	animation/nvx2fileformatstructs.h
+	)
+
+SET(files_render_character
+	character/characterjoint.h
+	character/characterjoint.cpp
+	character/characterskeleton.h
+	character/characterskeleton.cpp
+	character/skinnedcharacter.h
+	character/skinnedcharacter.cpp	
 	)
 	
+SET(files_render_properties
+	properties/graphicsproperty.h
+	properties/graphicsproperty.cpp
+	)
+
+SET(files_render_resources
+	resources/lightnode.h
+	resources/lightnode.cpp
+	resources/meshresource.h
+	resources/meshresource.cpp
+	resources/shaderobject.h
+	resources/shaderobject.cpp
+	resources/textureresource.h
+	resources/textureresource.cpp
+	resources/vertexcomponent.h
+	)
+
+SET(files_render_server
+	server/graphicsserver.h
+	server/graphicsserver.cpp
+	)
+	
+SET(files_render_softwarerender
+	softwarerender/rasterizer.h
+	softwarerender/rasterizer.cpp
+	)	
+	
 SOURCE_GROUP("render" FILES ${files_render_render})
+
+SOURCE_GROUP("animation" FILES ${files_render_animation})
+
+SOURCE_GROUP("character" FILES ${files_render_character})
+
+SOURCE_GROUP("properties" FILES ${files_render_properties})
+
+SOURCE_GROUP("resources" FILES ${files_render_resources})
+
+SOURCE_GROUP("server" FILES ${files_render_server})
+
+SOURCE_GROUP("softwarerender" FILES ${files_render_softwarerender})
 
 
 SET(files_render
 	${files_render_render}
+	${files_render_animation}
+	${files_render_character}
+	${files_render_properties}
+	${files_render_resources}
+	${files_render_server}
+	${files_render_softwarerender}
 	${files_render_pch})
 
 SET(files_pch ../config.h ../config.cc)
