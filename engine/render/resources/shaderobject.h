@@ -5,6 +5,7 @@
 #include "foundation/math/matrix4.h"
 #include "foundation/math/matrix3.h"
 #include "foundation/math/vector4.h"
+#include "render/server/graphicsserver.h"
 
 namespace Render
 {
@@ -35,6 +36,8 @@ private:
 
 	GLuint vertexShader;
 	GLuint fragmentShader;
+
+	RenderState renderState;
 };
 
 }

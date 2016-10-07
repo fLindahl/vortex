@@ -1,5 +1,9 @@
 #include "config.h"
 #include "graphicsproperty.h"
+#include "render/resources/meshresource.h"
+#include "render/resources/lightnode.h"
+#include "render/resources/textureresource.h"
+
 
 namespace Render
 {

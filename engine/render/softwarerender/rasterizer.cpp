@@ -94,9 +94,9 @@ void Rasterizer::clear()
 	clr.g = 185;
 	clr.b = 185;
 
-	this->pixels.assign(screenwidth*screenheight, clr);
+	this->pixels.Fill(0, screenwidth*screenheight, clr);
 
-	this->depthBuffer.assign(screenwidth*screenheight, 200000000.0f); //WORKAROUND: Should be 0
+	this->depthBuffer.Fill(0, screenwidth*screenheight, 200000000.0f); //WORKAROUND: Should be 0
 }
 
 void Rasterizer::setup(Math::Matrix4 pMat, Math::Matrix4 tMat)
@@ -124,7 +124,7 @@ void Rasterizer::setup(Math::Matrix4 pMat, Math::Matrix4 tMat)
 	}
 }
 
-std::vector<Rasterizer::Color> Rasterizer::draw()
+Util::Array<Rasterizer::Color> Rasterizer::draw()
 {
 	return this->pixels;
 }

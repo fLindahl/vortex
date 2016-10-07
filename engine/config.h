@@ -25,6 +25,7 @@ typedef int8_t		int8;
 typedef uint8_t		uchar;
 
 typedef uint32_t	uint;
+typedef uint16_t ushort;
 
 // eh, windows already defines byte, so don't redefine byte if we are running windows
 #ifndef __WIN32__

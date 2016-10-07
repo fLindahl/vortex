@@ -3,17 +3,13 @@
 #include <cmath>
 #include "vector4.h"
 #include "matrix3.h"
-#include <iostream>
-
-using namespace std;
 
 #define PI  3.14159265358979323846f
-using namespace std;
-
-class Quaternion;
 
 namespace Math
 {
+
+class Quaternion;
 
 /// Constructor start
 class Matrix4{
