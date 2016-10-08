@@ -36,7 +36,13 @@ public:
 	void setupMesh();
 
 	void createQuad();
-	void draw();
+	///Bind VAO
+	void Bind();
+	/// Unbind VAO
+	void Unbind();
+	///Draw elements
+	void Draw();
+
 	Util::Array < MeshResource::Vertex >& getMesh();
 	Util::Array < GLuint >& getIndices();
 

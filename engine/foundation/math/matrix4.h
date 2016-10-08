@@ -6,6 +6,8 @@
 
 #define PI  3.14159265358979323846f
 
+//#pragma pack(push, 1)
+
 namespace Math
 {
 
@@ -43,6 +45,7 @@ public:
 	static Matrix4 identity();	/// returns an identity matrix
 	Matrix4 transpose() const;	/// Transpose Function
 	Matrix4 invert() const;		/// Invert Function 
+	static Matrix4 inverse(const Matrix4& mat);		/// Inverse
 
 	///Init rotational matrices
 	static Matrix4 rotX(const float& angle);
@@ -203,6 +206,51 @@ inline Matrix4 Matrix4::invert() const{
 					invDet * temp[12], invDet * temp[13], invDet * temp[14], invDet * temp[15]);
 }
 
+inline Matrix4 Matrix4::inverse(const Matrix4& mat){
+
+	float det;
+	float invDet;
+
+	float temp[16];
+
+	temp[0] = mat[6] * mat[11] * mat[13] - mat[7] * mat[10] * mat[13] + mat[7] * mat[9] * mat[14] - mat[5] * mat[11] * mat[14] - mat[6] * mat[9] * mat[15] + mat[5] * mat[10] * mat[15];
+	temp[1] = mat[3] * mat[10] * mat[13] - mat[2] * mat[11] * mat[13] - mat[3] * mat[9] * mat[14] + mat[1] * mat[11] * mat[14] + mat[2] * mat[9] * mat[15] - mat[1] * mat[10] * mat[15];
+	temp[2] = mat[2] * mat[7] * mat[13] - mat[3] * mat[6] * mat[13] + mat[3] * mat[5] * mat[14] - mat[1] * mat[7] * mat[14] - mat[2] * mat[5] * mat[15] + mat[1] * mat[6] * mat[15];
+	temp[3] = mat[3] * mat[6] * mat[9] - mat[2] * mat[7] * mat[9] - mat[3] * mat[5] * mat[10] + mat[1] * mat[7] * mat[10] + mat[2] * mat[5] * mat[11] - mat[1] * mat[6] * mat[11];
+	temp[4] = mat[7] * mat[10] * mat[12] - mat[6] * mat[11] * mat[12] - mat[7] * mat[8] * mat[14] + mat[4] * mat[11] * mat[14] + mat[6] * mat[8] * mat[15] - mat[4] * mat[10] * mat[15];
+	temp[5] = mat[2] * mat[11] * mat[12] - mat[3] * mat[10] * mat[12] + mat[3] * mat[8] * mat[14] - mat[0] * mat[11] * mat[14] - mat[2] * mat[8] * mat[15] + mat[0] * mat[10] * mat[15];
+	temp[6] = mat[3] * mat[6] * mat[12] - mat[2] * mat[7] * mat[12] - mat[3] * mat[4] * mat[14] + mat[0] * mat[7] * mat[14] + mat[2] * mat[4] * mat[15] - mat[0] * mat[6] * mat[15];
+	temp[7] = mat[2] * mat[7] * mat[8] - mat[3] * mat[6] * mat[8] + mat[3] * mat[4] * mat[10] - mat[0] * mat[7] * mat[10] - mat[2] * mat[4] * mat[11] + mat[0] * mat[6] * mat[11];
+	temp[8] = mat[5] * mat[11] * mat[12] - mat[7] * mat[9] * mat[12] + mat[7] * mat[8] * mat[13] - mat[4] * mat[11] * mat[13] - mat[5] * mat[8] * mat[15] + mat[4] * mat[9] * mat[15];
+	temp[9] = mat[3] * mat[9] * mat[12] - mat[1] * mat[11] * mat[12] - mat[3] * mat[8] * mat[13] + mat[0] * mat[11] * mat[13] + mat[1] * mat[8] * mat[15] - mat[0] * mat[9] * mat[15];
+	temp[10] = mat[1] * mat[7] * mat[12] - mat[3] * mat[5] * mat[12] + mat[3] * mat[4] * mat[13] - mat[0] * mat[7] * mat[13] - mat[1] * mat[4] * mat[15] + mat[0] * mat[5] * mat[15];
+	temp[11] = mat[3] * mat[5] * mat[8] - mat[1] * mat[7] * mat[8] - mat[3] * mat[4] * mat[9] + mat[0] * mat[7] * mat[9] + mat[1] * mat[4] * mat[11] - mat[0] * mat[5] * mat[11];
+	temp[12] = mat[6] * mat[9] * mat[12] - mat[5] * mat[10] * mat[12] - mat[6] * mat[8] * mat[13] + mat[4] * mat[10] * mat[13] + mat[5] * mat[8] * mat[14] - mat[4] * mat[9] * mat[14];
+	temp[13] = mat[1] * mat[10] * mat[12] - mat[2] * mat[9] * mat[12] + mat[2] * mat[8] * mat[13] - mat[0] * mat[10] * mat[13] - mat[1] * mat[8] * mat[14] + mat[0] * mat[9] * mat[14];
+	temp[14] = mat[2] * mat[5] * mat[12] - mat[1] * mat[6] * mat[12] - mat[2] * mat[4] * mat[13] + mat[0] * mat[6] * mat[13] + mat[1] * mat[4] * mat[14] - mat[0] * mat[5] * mat[14];
+	temp[15] = mat[1] * mat[6] * mat[8] - mat[2] * mat[5] * mat[8] + mat[2] * mat[4] * mat[9] - mat[0] * mat[6] * mat[9] - mat[1] * mat[4] * mat[10] + mat[0] * mat[5] * mat[10];
+
+
+	/// check determinant if it is 0
+	det = mat[3] * mat[6] * mat[9] * mat[12] - mat[2] * mat[7] * mat[9] * mat[12] - mat[3] * mat[5] * mat[10] * mat[12] + mat[1] * mat[7] * mat[10] * mat[12] +
+		mat[2] * mat[5] * mat[11] * mat[12] - mat[1] * mat[6] * mat[11] * mat[12] - mat[3] * mat[6] * mat[8] * mat[13] + mat[2] * mat[7] * mat[8] * mat[13] +
+		mat[3] * mat[4] * mat[10] * mat[13] - mat[0] * mat[7] * mat[10] * mat[13] - mat[2] * mat[4] * mat[11] * mat[13] + mat[0] * mat[6] * mat[11] * mat[13] +
+		mat[3] * mat[5] * mat[8] * mat[14] - mat[1] * mat[7] * mat[8] * mat[14] - mat[3] * mat[4] * mat[9] * mat[14] + mat[0] * mat[7] * mat[9] * mat[14] +
+		mat[1] * mat[4] * mat[11] * mat[14] - mat[0] * mat[5] * mat[11] * mat[14] - mat[2] * mat[5] * mat[8] * mat[15] + mat[1] * mat[6] * mat[8] * mat[15] +
+		mat[2] * mat[4] * mat[9] * mat[15] - mat[0] * mat[6] * mat[9] * mat[15] - mat[1] * mat[4] * mat[10] * mat[15] + mat[0] * mat[5] * mat[10] * mat[15];
+	if (fabs(det) <= 0.00001f) ///Epsilon
+	{
+		return identity(); /// cannot inverse, make it identity matrix
+	}
+
+	/// Divide with determinatn
+	invDet = 1.0f / det;
+
+	return Matrix4(invDet * temp[0], invDet * temp[1], invDet * temp[2], invDet * temp[3],
+		invDet * temp[4], invDet * temp[5], invDet * temp[6], invDet * temp[7],
+		invDet * temp[8], invDet * temp[9], invDet * temp[10], invDet * temp[11],
+		invDet * temp[12], invDet * temp[13], invDet * temp[14], invDet * temp[15]);
+}
 
 inline Matrix4 Matrix4::rotX(const float& angle){
 
@@ -379,3 +427,5 @@ inline Vector4 operator*(const Vector4& vec, const Matrix4& mat)
 }
 
 }
+
+//#pragma pack(pop)

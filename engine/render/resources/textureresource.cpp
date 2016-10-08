@@ -17,11 +17,6 @@ TextureResource::~TextureResource()
 	glDeleteTextures(1, &texture);
 }
 
-void TextureResource::setShader(shared_ptr<ShaderObject> inShader)
-{
-	this->shader = inShader;
-}
-
 void TextureResource::setRasterizer(shared_ptr<Rasterizer> inRaster)
 {
 	this->raster = inRaster;
@@ -72,40 +67,10 @@ void TextureResource::loadFromRasterizer()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void TextureResource::bindTexture(GLuint slot)
+void TextureResource::BindTexture(GLuint slot)
 {
-	this->shader->applyProgram();
-
-	this->shader->setUniVector3fv(this->matAmbientReflectance, "u_matAmbientReflectance");
-	this->shader->setUniVector3fv(this->matDiffuseReflectance, "u_matDiffuseReflectance");
-	this->shader->setUniVector3fv(this->matSpecularReflectance, "u_matSpecularReflectance");
-
-	this->shader->setUni1f(this->matShininess, "u_matShininess");
-
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, this->texture);
-
-
-}
-
-void TextureResource::setAmbientReflectance(GLfloat r, GLfloat g, GLfloat b)
-{
-	matAmbientReflectance.set(r, g, b);
-}
-
-void TextureResource::setDiffuseReflectance(GLfloat r, GLfloat g, GLfloat b)
-{
-	matDiffuseReflectance.set(r, g, b);
-}
-
-void TextureResource::setSpecularReflectance(GLfloat r, GLfloat g, GLfloat b)
-{
-	matSpecularReflectance.set(r, g, b);
-}
-
-void TextureResource::setShininess(GLfloat value)
-{
-	matShininess = value;
 }
 
 }

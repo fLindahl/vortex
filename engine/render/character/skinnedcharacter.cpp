@@ -65,8 +65,9 @@ bool SkinnedCharacter::loadMeshFromFile(const char* filename)
 	{
 		this->SetupVertexBuffer();
 		this->SetupIndexBuffer();
-
 	}
+
+	return true;
 }
 
 void SkinnedCharacter::ReadHeaderData()

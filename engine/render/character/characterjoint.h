@@ -15,7 +15,7 @@ public:
   
   void Setup(const int& parentJointIndex, CharacterJoint* parentJoint, const Math::Vector4& poseTranslation, const std::string& name, const Math::Quaternion& poseRotation, const Math::Vector4& poseScale);
 
-  Math::Matrix4 EvaluateMatrix(const Math::Vector4& scale, const Math::Quaternion& rotation, const Math::Vector4& translation);
+  void EvaluateMatrix(const Math::Vector4& scale, const Math::Quaternion& rotation, const Math::Vector4& translation);
   void ResetMatrix();
   
   CharacterJoint* getParentJoint();
@@ -23,7 +23,7 @@ public:
   Math::Vector4& getPoseTranslation();
   Math::Quaternion& getPoseRotation();
   
-  Math::Matrix4 EvaluateInverseMatrix();
+  void EvaluateInverseMatrix();
   
   Math::Matrix4 GetInversePoseMatrix();
   Math::Matrix4 GetPoseMatrix();
