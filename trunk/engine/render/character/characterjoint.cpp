@@ -24,7 +24,7 @@ void CharacterJoint::Setup(const int& parentJointIndex, CharacterJoint* parentJo
   this->name = name;
 }
 
-Math::Matrix4 CharacterJoint::EvaluateInverseMatrix()
+void CharacterJoint::EvaluateInverseMatrix()
 {
   if(this->parentJointIndex == -1)
   {
@@ -40,7 +40,7 @@ Math::Matrix4 CharacterJoint::EvaluateInverseMatrix()
   }
 }
 
-Math::Matrix4 CharacterJoint::EvaluateMatrix(const Math::Vector4& scale, const Math::Quaternion& rotation, const Math::Vector4& translation)
+void CharacterJoint::EvaluateMatrix(const Math::Vector4& scale, const Math::Quaternion& rotation, const Math::Vector4& translation)
 {
   if(this->parentJointIndex == -1)
   {

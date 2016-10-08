@@ -1,125 +1,63 @@
 #include "config.h"
+#include "GL/glew.h"
 #include "graphicsserver.h"
-//#include "..\..\handlers\GameHandler.h"
-//#include "..\..\player\RTSCamera.h"
-//#include "..\..\basefeatures\BaseEntity.h"
-#include "GL\glew.h"
+#include "render/graphics/camera.h"
+#include "render/resources/shaderobject.h"
+#include "render/shadersemantics.h"
+#include "render/resources/modelinstance.h"
+#include "render/resources/meshresource.h"
+#include "render/resources/textureresource.h"
 
 namespace Render
 {
 
 void GraphicsServer::Render()
 {
-	glUseProgram(this->programID);
-	glUniformMatrix4fv(ViewLocation, 1, GL_FALSE, &Camera::getInstance()->getViewMatrix()[0][0]);
-	glUniformMatrix4fv(ProjectionLocation, 1, GL_FALSE, &Camera::getInstance()->getProjectionMatrix()[0][0]);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (std::unordered_map<std::string, std::vector<std::vector<shared_ptr<GraphicsProperty>>>>::iterator it = sortedGraphicsProperties.begin(); it != sortedGraphicsProperties.end(); it++)
+	//Set global matrix uniform buffer block for this frame
+	
+	//TODO: Get these working!
+	uniformBufferBlock.ViewMatrix = Graphics::MainCamera::Instance()->getViewMatrix().transpose();
+	uniformBufferBlock.ProjectionMatrix = Graphics::MainCamera::Instance()->getProjectionMatrix().transpose();
+
+	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, this->ubo[0]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(uniformBufferBlock), &uniformBufferBlock, GL_STATIC_DRAW);
+	
+	//HACK: Render states should be done per shaderobject (in some cases)
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	for (ShaderObject* shaderObject : shaderObjects)
 	{
-		for (unsigned int i = 0; i < it->second.size(); i++)
+		shaderObject->UseProgram();
+		
+		//HACK: These should be set in a uniform buffer object per frame
+		//GLuint ViewLocation = glGetUniformLocation(shaderObject->GetProgram(), VORTEX_SEMANTIC_VIEW);
+		//GLuint ProjectionLocation = glGetUniformLocation(shaderObject->GetProgram(), VORTEX_SEMANTIC_PROJECTION);
+		//glUniformMatrix4fv(ViewLocation, 1, GL_TRUE, (GLfloat*)Graphics::MainCamera::Instance()->getViewMatrix().get());
+		//glUniformMatrix4fv(ProjectionLocation, 1, GL_TRUE, (GLfloat*)Graphics::MainCamera::Instance()->getProjectionMatrix().get());
+
+		//TODO: Renderstates?
+				
+		for (ModelInstance* modelInstance : shaderObject->getModelInstances())
 		{
-			//TODO: This should be initialized with the sortfunction and only called upon within Render() for each instanced drawcall.
-			glm::mat4 matArray[128];
-
-			//Bind the texture associated with this model
-			it->second[i].front()->getMesh()->getTexture()->bindTexture(0);
-
-			//Put all the transforms in an array
-			for (unsigned int j = 0; j < it->second.at(i).size(); j++)
+			//Bind mesh
+			//TODO: We should probably check and make sure we don't bind these more than once
+			modelInstance->getMesh()->Bind();
+			modelInstance->getTexture()->BindTexture(0); //TODO: slot?
+			
+			for (GraphicsProperty* graphicsProperty : modelInstance->getGraphicsProperties())
 			{
-				matArray[j] = it->second[i][j]->getModelMatrix();
+				shaderObject->setModelMatrix(graphicsProperty->getModelMatrix());
+				modelInstance->getMesh()->Draw();
 			}
 
-			//Send all the transforms to the gpu
-			glUniformMatrix4fv(it->second[i].front()->getModelLocation(), it->second.at(i).size(), false, &matArray[0][0][0]);
-
-			//Draw that shit
-			meshes.find(it->first)->second->drawInstanced(it->second.at(i).size());
+			modelInstance->getMesh()->Unbind();
 		}
 	}
-}
-
-void GraphicsServer::InitShaders()
-{
-	this->programID = LoadShaders("shaders/vertexShader.gsl", "shaders/fragmentShader.gsl");
-	ViewLocation = glGetUniformLocation(this->programID, "ViewMatrix");
-	ProjectionLocation = glGetUniformLocation(this->programID, "ProjectionMatrix");
-
-}
-
-void GraphicsServer::addGraphicsProperty(std::shared_ptr<GraphicsProperty> prop)
-{
-	std::pair<std::shared_ptr<GraphicsProperty>, int> pair(prop, this->graphicscounter);
-	this->graphicscounter++;
-	this->properties.insert(pair);
-}
-
-void GraphicsServer::removeGraphicsProperty(std::shared_ptr<GraphicsProperty> prop)
-{
-	this->properties.erase(prop);
-}
-
-std::shared_ptr<MeshResource> GraphicsServer::LoadMesh(const char* meshpath)
-{
-	//Make sure we've not already loaded this model
-	if (!this->HasModelNamed(meshpath))
-	{
-		std::shared_ptr<MeshResource> nMesh = std::make_shared<MeshResource>();
-		nMesh->loadMeshFromFile(meshpath);
-
-		_assert(nMesh.isValid(), "Could not load mesh!")
-
-
-		std::pair<const char*, std::shared_ptr<MeshResource>> par(meshpath, nMesh);
-		this->meshes.insert(par);
-
-		return nMesh;
-	}
-	else
-	{
-		//Model is already loaded so we can just return that model.
-		return this->meshes.find(meshpath)->second;
-	}
-}
-
-bool GraphicsServer::HasModelNamed(const std::string& nName)
-{
-	//Because unordered_map containers do not allow for duplicate keys, this means that 
-	//count function actually returns 1 if an element with that key exists in the container, and zero otherwise.
-	if (this->meshes.count(nName) > 0)
-		return true;
-	else
-		return false;
-}
-
-std::shared_ptr<TextureResource> GraphicsServer::LoadTexture(const char* filepath)
-{
-	//Make sure we've not already loaded this texture
-	if (!this->HasTextureNamed(filepath))
-	{
-		std::shared_ptr<TextureResource> texture = std::make_shared<TextureResource>();
-		texture->loadFromFile(filepath);
-		std::pair<const char*, std::shared_ptr<TextureResource>> par(filepath, texture);
-		this->textures.insert(par);
-
-		return texture;
-	}
-	else
-	{
-		//texture is already loaded so we can just return that texture.
-		return this->textures.find(filepath)->second;
-	}
-}
-
-
-bool GraphicsServer::HasTextureNamed(const std::string& nName)
-{
-	//Because unordered_map containers do not allow for duplicate keys, this means that 
-	//count function actually returns 1 if an element with that key exists in the container, and zero otherwise.
-	if (this->textures.count(nName) > 0)
-		return true;
-	else
-		return false;
 }
 
 }
