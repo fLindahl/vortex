@@ -17,7 +17,7 @@ AnimationParser::~AnimationParser()
 
 bool AnimationParser::LoadFile(const char* fileName, CharacterSkeleton& character)
 {
-
+	return true;
 }
 
 }

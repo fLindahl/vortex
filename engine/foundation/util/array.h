@@ -70,9 +70,9 @@ public:
     /// reset array (does NOT call destructors)
     void Reset();
     /// return iterator to beginning of array
-    Iterator Begin() const;
+    Iterator begin() const;
     /// return iterator to end of array
-    Iterator End() const;
+    Iterator end() const;
     /// find identical element in array, return iterator
     Iterator Find(const TYPE& elm) const;
     /// find identical element in array, return index, InvalidIndex if not found
@@ -657,7 +657,7 @@ Array<TYPE>::Reset()
 /**
 */
 template<class TYPE> typename Array<TYPE>::Iterator
-Array<TYPE>::Begin() const
+Array<TYPE>::begin() const
 {
     return this->elements;
 }
@@ -666,7 +666,7 @@ Array<TYPE>::Begin() const
 /**
 */
 template<class TYPE> typename Array<TYPE>::Iterator
-Array<TYPE>::End() const
+Array<TYPE>::end() const
 {
     return this->elements + this->size;
 }

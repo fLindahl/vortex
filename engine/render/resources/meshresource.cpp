@@ -5,6 +5,7 @@
 #include <cstring>
 #include <GLFW/glfw3.h>
 
+
 namespace Render
 {
 
@@ -140,7 +141,6 @@ namespace Render
 		glBindBuffer(GL_ARRAY_BUFFER, this->vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, mesh.Size() * sizeof(Vertex), &mesh[0], GL_STATIC_DRAW);
 
-
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
@@ -177,16 +177,21 @@ namespace Render
 		indices.Append(3);
 	}
 
-	void MeshResource::draw()
+	void MeshResource::Bind()
 	{
 		glBindVertexArray(vao[0]); // Bind our Vertex Array Object 
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ib[0]);
-		glDrawElements(GL_TRIANGLES, indices.Size(), GL_UNSIGNED_INT, NULL);
+	}
 
+	void MeshResource::Unbind()
+	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
 
-		glBindVertexArray(0); // Unbind our Vertex Array Object  
+	void MeshResource::Draw()
+	{
+		glDrawElements(GL_TRIANGLES, indices.Size(), GL_UNSIGNED_INT, NULL);
 	}
 
 }

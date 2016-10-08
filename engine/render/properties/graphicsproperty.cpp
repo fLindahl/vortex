@@ -1,9 +1,7 @@
 #include "config.h"
 #include "graphicsproperty.h"
 #include "render/resources/meshresource.h"
-#include "render/resources/lightnode.h"
-#include "render/resources/textureresource.h"
-
+#include "render/resources/modelinstance.h"
 
 namespace Render
 {
@@ -13,84 +11,38 @@ namespace Render
 
 	GraphicsProperty::~GraphicsProperty()
 	{
-
-	}
-
-	shared_ptr<MeshResource> GraphicsProperty::getMesh()
-	{
-		return this->mesh;
-	}
-
-	void GraphicsProperty::setMesh(shared_ptr<MeshResource> inMesh)
-	{
-		this->mesh = inMesh;
-	}
-
-	shared_ptr<TextureResource> GraphicsProperty::getTexture()
-	{
-		return this->texture;
-	}
-
-	void GraphicsProperty::setTexture(shared_ptr<TextureResource> inTexture)
-	{
-		this->texture = inTexture;
-	}
-
-	shared_ptr<ShaderObject> GraphicsProperty::getShader()
-	{
-		return this->shader;
-	}
-
-	void GraphicsProperty::setShader(shared_ptr<ShaderObject> inShader)
-	{
-		this->shader = inShader;
-	}
-
-	Math::Matrix4 GraphicsProperty::getMatrix(MatrixType type)
-	{
-		if (type == MODEL)
+		if (this->modelInstance != nullptr)
 		{
-			return this->modelMat;
-		}
-		else if (type == PROJECTION)
-		{
-			return this->projMat;
-		}
-		else if (type == VIEW)
-		{
-			return this->viewMat;
+			//HACK: Implement this
+			//this->modelInstance->removeGraphicsProperty(this);
 		}
 	}
 
-	void GraphicsProperty::setMatrix(MatrixType type, const Math::Matrix4 &mat)
+	shared_ptr<ModelInstance> GraphicsProperty::getModelInstance() const
 	{
-		if (type == MODEL)
-		{
-			this->modelMat = mat;
-		}
-		else if (type == PROJECTION)
-		{
-			this->projMat = mat;
-		}
-		else if (type == VIEW)
-		{
-			this->viewMat = mat;
-		}
+		return this->modelInstance;
 	}
 
-	void GraphicsProperty::draw()
+	void GraphicsProperty::setModelInstance(shared_ptr<ModelInstance> inModelInstance)
 	{
+		//HACK: Implement this
+		//if (this->modelInstance.get() != nullptr)
+		//{
+		//	this->modelInstance->removeGraphicsProperty(this);
+		//}
 
-		this->shader->applyProgram();
-
-		this->texture->bindTexture(0);
-
-		this->shader->setUniMatrix4fv(this->modelMat, "modelMatrix");
-		this->shader->setUniMatrix4fv(this->viewMat, "viewMatrix");
-		this->shader->setUniMatrix4fv(this->projMat, "projectionMatrix");
-
-		this->mesh->draw();
+		this->modelInstance = inModelInstance;
+		this->modelInstance->addGraphicsProperty(this);
 
 	}
 
+	Math::Matrix4 GraphicsProperty::getModelMatrix() const
+	{
+		return this->modelMat;
+	}
+
+	void GraphicsProperty::setModelMatrix(const Math::Matrix4 &mat)
+	{
+		this->modelMat = mat;
+	}
 }

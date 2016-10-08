@@ -5,8 +5,14 @@
 SET(files_render_render
 	window.h
 	window.cc
+	shadersemantics.h
 	)
 
+SET(files_render_graphics
+	graphics/camera.h
+	graphics/camera.cpp
+	)
+	
 SET(files_render_animation
 	animation/animationclip.h
 	animation/animationclip.cpp
@@ -44,11 +50,17 @@ SET(files_render_resources
 	resources/textureresource.h
 	resources/textureresource.cpp
 	resources/vertexcomponent.h
+	resources/modelinstance.h
+	resources/modelinstance.cpp
 	)
 
 SET(files_render_server
 	server/graphicsserver.h
 	server/graphicsserver.cpp
+	server/shaderserver.h
+	server/shaderserver.cpp
+	server/resourceserver.h
+	server/resourceserver.cpp
 	)
 	
 SET(files_render_softwarerender
@@ -57,6 +69,8 @@ SET(files_render_softwarerender
 	)	
 	
 SOURCE_GROUP("render" FILES ${files_render_render})
+
+SOURCE_GROUP("graphics" FILES ${files_render_graphics})
 
 SOURCE_GROUP("animation" FILES ${files_render_animation})
 
@@ -73,6 +87,7 @@ SOURCE_GROUP("softwarerender" FILES ${files_render_softwarerender})
 
 SET(files_render
 	${files_render_render}
+	${files_render_graphics}
 	${files_render_animation}
 	${files_render_character}
 	${files_render_properties}

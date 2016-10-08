@@ -1,7 +1,11 @@
 #version 430
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrix;
+layout (std140, binding = 0) uniform GlobalBlock
+{
+	mat4 View;
+	mat4 Projection;
+};
+
+uniform mat4 Model;
 
 uniform vec3 lightPosition;
 uniform vec3 cameraPosition;
@@ -18,10 +22,10 @@ layout(location=0) out vec2 Texcoords;
 void main()
 {
 	// position in world space
-	vec4 wPos = modelMatrix * pos;
+	vec4 wPos = Model * pos;
 
 	// normal in world space
-	Normal = vec3(normalize(modelMatrix * vec4(normal, 0)));
+	Normal = vec3(normalize(Model * vec4(normal, 0)));
 
 	// direction to light
 	toLight = normalize(lightPosition - wPos.xyz);
@@ -32,6 +36,6 @@ void main()
 	Texcoords = uv;
 	Texcoords.y = 1 - Texcoords.y;
 
-	gl_Position = viewMatrix * projectionMatrix * wPos;
+	gl_Position = View * Projection * wPos;
 	
 }
