@@ -6,27 +6,9 @@
 #include "exampleapp.h"
 #include <cstring>
 
-const GLchar* vs =
-"#version 430\n"
-"layout(location=0) in vec3 pos;\n"
-"layout(location=1) in vec4 color;\n"
-"layout(location=0) out vec4 Color;\n"
-"void main()\n"
-"{\n"
-"	gl_Position = vec4(pos, 1);\n"
-"	Color = color;\n"
-"}\n";
-
-const GLchar* ps =
-"#version 430\n"
-"layout(location=0) in vec4 color;\n"
-"out vec4 Color;\n"
-"void main()\n"
-"{\n"
-"	Color = color;\n"
-"}\n";
-
 using namespace Display;
+using namespace Render;
+
 namespace Example
 {
 
@@ -54,79 +36,78 @@ ExampleApp::Open()
 {
 	App::Open();
 	this->window = new Display::Window;
-	window->SetKeyPressFunction([this](int32, int32, int32, int32)
-	{
-		this->window->Close();
+
+
+	//Setup keyboard and mouse functions
+	window->SetKeyPressFunction([this](int32 key, int32 scancode, int32 action, int32){
+		if (action == GLFW_PRESS)
+			keyhandler.setKeyStatePressed(key);
+		else if (action == GLFW_RELEASE)
+			keyhandler.setKeyStateReleased(key);
+	});
+	window->SetMousePressFunction([this](int32 key, int32 action, int32){
+		if (action == GLFW_PRESS)
+			keyhandler.setKeyStatePressed(key);
+		if (action == GLFW_RELEASE)
+			keyhandler.setKeyStateReleased(key);
+	});
+	window->SetMouseMoveFunction([this](float64 y, float64 x){
+		if (keyhandler.leftMousePressed == true){
+			this->mouseX += x - oldx;
+			this->mouseY += y - oldy;
+		}
+		if (keyhandler.rightMousePressed == true){
+			this->lightX += x - oldx;
+			this->lightY += y - oldy;
+		}
+		oldx = x;
+		oldy = y;
+	});
+	window->SetMouseScrollFunction([this](float64, float64 y){
+		if (keyhandler.rightMousePressed == true)
+			this->lightZ += y;
+		else
+			this->z += y;
 	});
 
-	GLfloat buf[] =
-	{
-		-0.5f,	-0.5f,	-1,			// pos 0
-		1,		0,		0,		1,	// color 0
-		-0.5,		0.5f,	-1,		// pos 1
-		0,		1,		0,		1,	// color 0
-		0.5f,	-0.5f,	-1,			// pos 2
-		0,		0,		1,		1	// color 0
-	};
-
+	// Initiate everything we need
+	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
 	if (this->window->Open())
 	{
-		// set clear color to gray
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		mesh = std::make_shared<Render::MeshResource>();
+		shader = std::make_shared<Render::ShaderObject>();
+		shader1 = std::make_shared<Render::ShaderObject>();
+		texture = std::make_shared<Render::TextureResource>();
+		modelInstance = std::make_shared<Render::ModelInstance>();
+		modelInstance1 = std::make_shared<Render::ModelInstance>();
+		gProperty = new Render::GraphicsProperty();
+		gProperty1 = new Render::GraphicsProperty();
 
-		// setup vertex shader
-		this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		GLint length = std::strlen(vs);
-		glShaderSource(this->vertexShader, 1, &vs, &length);
-		glCompileShader(this->vertexShader);
+		// Load our shaders
+		shader->loadVertexShader("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/shaders/vertex.vert");
+		shader->loadFragmentShader("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/shaders/phong.frag");
+		shader->LinkShaders();
 
-		// get error log
-		GLint shaderLogSize;
-		glGetShaderiv(this->vertexShader, GL_INFO_LOG_LENGTH, &shaderLogSize);
-		if (shaderLogSize > 0)
-		{
-			GLchar* buf = new GLchar[shaderLogSize];
-			glGetShaderInfoLog(this->vertexShader, shaderLogSize, NULL, buf);
-			printf("[SHADER COMPILE ERROR]: %s", buf);
-			delete[] buf;
-		}
+		// Because we're trying to load the same vertex shader twice, the shaderserver will return the same shader as before, thus not needing to recompile it
+		shader1->loadVertexShader("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/shaders/vertex.vert");
+		shader1->loadFragmentShader("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/shaders/toonshader.frag");
+		shader1->LinkShaders();
 
-		// setup pixel shader
-		this->pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
-		length = std::strlen(ps);
-		glShaderSource(this->pixelShader, 1, &ps, &length);
-		glCompileShader(this->pixelShader);
+		modelInstance->setShaderObject(shader);
+		modelInstance->setMesh(mesh);
+		modelInstance->setTexture(texture);
+		gProperty->setModelInstance(modelInstance);
 
-		// get error log
-		shaderLogSize;
-		glGetShaderiv(this->pixelShader, GL_INFO_LOG_LENGTH, &shaderLogSize);
-		if (shaderLogSize > 0)
-		{
-			GLchar* buf = new GLchar[shaderLogSize];
-			glGetShaderInfoLog(this->pixelShader, shaderLogSize, NULL, buf);
-			printf("[SHADER COMPILE ERROR]: %s", buf);
-			delete[] buf;
-		}
+		modelInstance1->setShaderObject(shader1);
+		modelInstance1->setMesh(mesh);
+		modelInstance1->setTexture(texture);
+		gProperty1->setModelInstance(modelInstance1);
 
-		// create a program object
-		this->program = glCreateProgram();
-		glAttachShader(this->program, this->vertexShader);
-		glAttachShader(this->program, this->pixelShader);
-		glLinkProgram(this->program);
-		glGetProgramiv(this->program, GL_INFO_LOG_LENGTH, &shaderLogSize);
-		if (shaderLogSize > 0)
-		{
-			GLchar* buf = new GLchar[shaderLogSize];
-			glGetProgramInfoLog(this->program, shaderLogSize, NULL, buf);
-			printf("[PROGRAM LINK ERROR]: %s", buf);
-			delete[] buf;
-		}
+		mesh->loadMeshFromFile("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/models/cat.obj");
+		mesh->setupMesh();
 
-		// setup vbo
-		glGenBuffers(1, &this->triangle);
-		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(buf), buf, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		texture->loadFromFile("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/textures/cat_diff.tga");
+
 		return true;
 	}
 	return false;
@@ -138,20 +119,43 @@ ExampleApp::Open()
 void
 ExampleApp::Run()
 {
+	// set clear color to gray
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+	int xangle = 0;
+	int yangle = 0;
+	float radians = 0.0f;
+	bool decrease = false;
+	float speed = 0.1f;
+
+	float x = 0.0f;
+	float y = 0.0f;
+	//float z = 0.0f;
+
 	while (this->window->IsOpen())
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
 		this->window->Update();
 
-		// do stuff
-		glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
-		glUseProgram(this->program);
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float32) * 7, NULL);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float32) * 7, (GLvoid*)(sizeof(float32) * 3));
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		if (keyhandler.tUP == true)
+			y = y + speed;
+		if (keyhandler.tDOWN == true)
+			y = y - speed;
+		if (keyhandler.tLEFT == true)
+			x = x - speed;
+		if (keyhandler.tRIGHT == true)
+			x = x + speed;
+		if (keyhandler.quit == true)
+			this->window->Close();
+
+		// Rotation och translation med mus och tangentbord för model
+		Math::Matrix4 transf = Math::Matrix4::translation(0.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)mouseY) * Math::Matrix4::rotX((float)mouseX) * Math::Matrix4::translation(x, y, (float)z * -0.1f - 1.0f);
+
+		Math::Matrix4 transf2 = Math::Matrix4::translation(1.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)lightY) * Math::Matrix4::rotX((float)lightX) * Math::Matrix4::translation(x, y, (float)lightZ * -0.1f - 1.0f);
+		
+		gProperty->setModelMatrix(transf);
+		gProperty1->setModelMatrix(transf2);
+
+		GraphicsServer::Instance()->Render();
 
 		this->window->SwapBuffers();
 	}

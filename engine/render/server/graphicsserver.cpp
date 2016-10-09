@@ -34,12 +34,6 @@ void GraphicsServer::Render()
 	{
 		shaderObject->UseProgram();
 		
-		//HACK: These should be set in a uniform buffer object per frame
-		//GLuint ViewLocation = glGetUniformLocation(shaderObject->GetProgram(), VORTEX_SEMANTIC_VIEW);
-		//GLuint ProjectionLocation = glGetUniformLocation(shaderObject->GetProgram(), VORTEX_SEMANTIC_PROJECTION);
-		//glUniformMatrix4fv(ViewLocation, 1, GL_TRUE, (GLfloat*)Graphics::MainCamera::Instance()->getViewMatrix().get());
-		//glUniformMatrix4fv(ProjectionLocation, 1, GL_TRUE, (GLfloat*)Graphics::MainCamera::Instance()->getProjectionMatrix().get());
-
 		//TODO: Renderstates?
 				
 		for (ModelInstance* modelInstance : shaderObject->getModelInstances())
