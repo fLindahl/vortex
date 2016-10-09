@@ -10,15 +10,15 @@ uniform sampler2D texSampler;
 //////////////////////////////////////////////////////////
 
 // parameters of the light and possible values
-uniform vec3 u_lightAmbientIntensity;
-uniform vec3 u_lightDiffuseIntensity; 
-uniform vec3 u_lightSpecularIntensity; 
+const vec3 u_lightAmbientIntensity = vec3(0.1f, 0.1f, 0.1f);
+const vec3 u_lightDiffuseIntensity = vec3(0.8f, 0.8f, 0.8f);
+const vec3 u_lightSpecularIntensity = vec3(1.0f, 1.0f, 1.0f);
 
 // parameters of the material and possible values
-uniform vec3 u_matAmbientReflectance; 
-uniform vec3 u_matDiffuseReflectance;
-uniform vec3 u_matSpecularReflectance;
-uniform float u_matShininess;
+const vec3 u_matAmbientReflectance = vec3(1); 
+const vec3 u_matDiffuseReflectance = vec3(1);
+const vec3 u_matSpecularReflectance = vec3(1);
+const float u_matShininess = 64;
 
 
 /////////////////////////////////////////////////////////
