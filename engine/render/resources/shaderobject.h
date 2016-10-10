@@ -45,7 +45,7 @@ public:
 	void loadVertexShader(const std::string& vertFile);
 	void loadFragmentShader(const std::string& fragFile);
 
-	void setModelMatrix(Math::Matrix4& model);
+	void setModelMatrix(Math::Matrix4 model);
 
 	void setUniMatrix4fv(Math::Matrix4& mat4, const char* uniformName);
 	void setUniMatrix3fv(Math::Matrix3& mat3, const char* uniformName);

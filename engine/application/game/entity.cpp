@@ -1,3 +1,6 @@
+#include "config.h"
+
+/*
 #include "entity.h"
 #include "messages/MsgHandler.h"
 #include "render/server/graphicsserver.h"
@@ -60,3 +63,5 @@ void BaseEntity::setPos(Math::Vector2 nPos)
 }
 
 }
+
+ */
