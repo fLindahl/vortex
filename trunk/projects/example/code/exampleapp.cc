@@ -84,13 +84,13 @@ ExampleApp::Open()
 		gProperty1 = new Render::GraphicsProperty();
 
 		// Load our shaders
-		shader->loadVertexShader("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/shaders/vertex.vert");
-		shader->loadFragmentShader("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/shaders/phong.frag");
+		shader->loadVertexShader("resources/shaders/vertex.vert");
+		shader->loadFragmentShader("resources/shaders/phong.frag");
 		shader->LinkShaders();
 
 		// Because we're trying to load the same vertex shader twice, the shaderserver will return the same shader as before, thus not needing to recompile it
-		shader1->loadVertexShader("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/shaders/vertex.vert");
-		shader1->loadFragmentShader("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/shaders/toonshader.frag");
+		shader1->loadVertexShader("resources/shaders/vertex.vert");
+		shader1->loadFragmentShader("resources/shaders/toonshader.frag");
 		shader1->LinkShaders();
 
 		modelInstance->setShaderObject(shader);
@@ -103,10 +103,10 @@ ExampleApp::Open()
 		modelInstance1->setTexture(texture);
 		gProperty1->setModelInstance(modelInstance1);
 
-		mesh->loadMeshFromFile("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/models/cat.obj");
+		mesh->loadMeshFromFile("resources/models/cat.obj");
 		mesh->setupMesh();
 
-		texture->loadFromFile("D:/Game Projects/VS2013 Projects/Vortex/projects/example/resources/textures/cat_diff.tga");
+		texture->loadFromFile("resources/textures/cat_diff.tga");
 
 		return true;
 	}
@@ -147,7 +147,7 @@ ExampleApp::Run()
 		if (keyhandler.quit == true)
 			this->window->Close();
 
-		// Rotation och translation med mus och tangentbord för model
+		// Rotation och translation med mus och tangentbord fï¿½r model
 		Math::Matrix4 transf = Math::Matrix4::translation(0.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)mouseY) * Math::Matrix4::rotX((float)mouseX) * Math::Matrix4::translation(x, y, (float)z * -0.1f - 1.0f);
 
 		Math::Matrix4 transf2 = Math::Matrix4::translation(1.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)lightY) * Math::Matrix4::rotX((float)lightX) * Math::Matrix4::translation(x, y, (float)lightZ * -0.1f - 1.0f);

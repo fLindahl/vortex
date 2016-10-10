@@ -7,6 +7,7 @@
 #include "render/resources/modelinstance.h"
 #include "render/resources/meshresource.h"
 #include "render/resources/textureresource.h"
+#include "render/properties/graphicsproperty.h"
 
 namespace Render
 {
