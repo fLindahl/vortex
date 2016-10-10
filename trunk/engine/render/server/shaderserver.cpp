@@ -2,6 +2,7 @@
 #include "shaderserver.h"
 #include <fstream>
 #include <string>
+#include "shaderconstants.h"
 
 namespace Render
 {
@@ -45,6 +46,9 @@ GLuint ShaderServer::LoadVertexShader(const std::string& file)
 		{
 			return false;
 		}
+
+		//Attach Header
+		content = VertexShaderHeader + content;
 
 		const char* vs = content.c_str();
 
@@ -99,7 +103,10 @@ GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 		{
 			return false;
 		}
-	
+
+		//Attach Header
+		content = FragmentShaderHeader + content;
+
 		const char* fs = content.c_str();
 	
 		// setup fragment shader

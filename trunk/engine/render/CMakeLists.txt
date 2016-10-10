@@ -61,7 +61,8 @@ SET(files_render_server
 	server/shaderserver.cpp
 	server/resourceserver.h
 	server/resourceserver.cpp
-	)
+	server/shaderconstants.h
+)
 	
 SET(files_render_softwarerender
 	softwarerender/rasterizer.h

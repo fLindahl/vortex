@@ -1,4 +1,3 @@
-#version 430
 layout(location=0) in vec2 Texcoords;
 in vec3 Normal;
 in vec3 toLight;
