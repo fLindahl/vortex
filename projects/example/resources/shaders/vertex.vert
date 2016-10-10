@@ -1,12 +1,3 @@
-#version 430
-layout (std140, binding = 0) uniform GlobalBlock
-{
-	mat4 View;
-	mat4 Projection;
-};
-
-uniform mat4 Model;
-
 uniform vec3 lightPosition;
 uniform vec3 cameraPosition;
 
