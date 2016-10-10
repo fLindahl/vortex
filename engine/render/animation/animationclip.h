@@ -1,7 +1,7 @@
 #pragma once
 #include "foundation/util/array.h"
 #include "foundation/math/quaternion.h"
-#include "AnimCurve.h"
+#include "animcurve.h"
 #include <string>
 
 namespace Render

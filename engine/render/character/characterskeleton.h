@@ -1,6 +1,6 @@
 #pragma once
 #include "characterjoint.h"
-#include "extlib/tinyxml2.h"
+#include "tinyxml2.h"
 #include <vector>
 #include <map>
 #include "render/properties/graphicsproperty.h"

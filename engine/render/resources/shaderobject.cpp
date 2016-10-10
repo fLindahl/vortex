@@ -26,7 +26,7 @@ namespace Render
 		this->fragmentShader = ShaderServer::Instance()->LoadFragmentShader(fragFile);
 	}
 
-	void ShaderObject::setModelMatrix(Math::Matrix4 &model)
+	void ShaderObject::setModelMatrix(Math::Matrix4 model)
 	{
 		GLuint matLoc = glGetUniformLocation(this->program, VORTEX_SEMANTIC_MODEL);
 		glUniformMatrix4fv(matLoc, 1, true, (GLfloat*)model.get());

@@ -12,7 +12,7 @@ For Software Rendering.
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 #include <functional>
-#include "extlib/stb_image.h"
+#include "stb_image.h"
 
 namespace Render
 {

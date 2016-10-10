@@ -94,11 +94,11 @@ SET(files_render
 	${files_render_resources}
 	${files_render_server}
 	${files_render_softwarerender}
-	${files_render_pch})
+	)
 
 SET(files_pch ../config.h ../config.cc)
 SOURCE_GROUP("pch" FILES ${files_pch})
 ADD_LIBRARY(render STATIC ${files_render} ${files_pch})
 TARGET_PCH(render ../)	
-ADD_DEPENDENCIES(render glew glfw)
-TARGET_LINK_LIBRARIES(render PUBLIC engine exts glew glfw ${OPENGL_LIBS})
+ADD_DEPENDENCIES(render glew glfw misc)
+TARGET_LINK_LIBRARIES(render PUBLIC engine exts glew glfw ${OPENGL_LIBS} misc)
