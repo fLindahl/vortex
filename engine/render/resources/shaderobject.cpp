@@ -1,6 +1,7 @@
 #include "config.h"
 #include "shaderobject.h"
 #include <fstream>
+#include <render/server/renderdevice.h>
 #include "render/shadersemantics.h"
 
 namespace Render
@@ -24,6 +25,16 @@ namespace Render
 	void ShaderObject::loadFragmentShader(const std::string &fragFile)
 	{
 		this->fragmentShader = ShaderServer::Instance()->LoadFragmentShader(fragFile);
+	}
+
+	void ShaderObject::setVertexShader(const GLuint& in)
+	{
+		this->vertexShader = in;
+	}
+
+	void ShaderObject::setFragmentShader(const GLuint &in)
+	{
+		this->fragmentShader = in;
 	}
 
 	void ShaderObject::setModelMatrix(Math::Matrix4 model)
@@ -78,7 +89,7 @@ namespace Render
 			delete[] buf;
 		}
 
-		GraphicsServer::Instance()->addShaderObject(this);
+		RenderDevice::Instance()->addShaderObject(this);
 	}
 
 	void ShaderObject::UseProgram()

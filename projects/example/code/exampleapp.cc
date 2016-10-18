@@ -5,6 +5,7 @@
 #include "config.h"
 #include "exampleapp.h"
 #include <cstring>
+#include <render/server/renderdevice.h>
 
 using namespace Display;
 using namespace Render;
@@ -74,24 +75,29 @@ ExampleApp::Open()
 	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
 	if (this->window->Open())
 	{
-		mesh = std::make_shared<Render::MeshResource>();
-		shader = std::make_shared<Render::ShaderObject>();
-		shader1 = std::make_shared<Render::ShaderObject>();
-		texture = std::make_shared<Render::TextureResource>();
+        mesh = ResourceServer::Instance()->LoadMesh("resources/models/cat.obj");
+        texture = ResourceServer::Instance()->LoadTexture("resources/textures/cat_diff.tga");
+
+
+
+		//shader = std::make_shared<Render::ShaderObject>();
+		//shader1 = std::make_shared<Render::ShaderObject>();
+
 		modelInstance = std::make_shared<Render::ModelInstance>();
 		modelInstance1 = std::make_shared<Render::ModelInstance>();
+
 		gProperty = new Render::GraphicsProperty();
 		gProperty1 = new Render::GraphicsProperty();
 
 		// Load our shaders
-		shader->loadVertexShader("resources/shaders/vertex.vert");
-		shader->loadFragmentShader("resources/shaders/phong.frag");
-		shader->LinkShaders();
+		ShaderServer::Instance()->LoadShader("resources/shaders/vertex.vert");
+		ShaderServer::Instance()->LoadShader("resources/shaders/phong.frag");
+		ShaderServer::Instance()->LoadShader("resources/shaders/toonshader.frag");
 
-		// Because we're trying to load the same vertex shader twice, the shaderserver will return the same shader as before, thus not needing to recompile it
-		shader1->loadVertexShader("resources/shaders/vertex.vert");
-		shader1->loadFragmentShader("resources/shaders/toonshader.frag");
-		shader1->LinkShaders();
+        // Because we're trying to load the same vertex shader twice, the shaderserver will return the same shader as before, thus not needing to recompile it
+        // If we we're to ty to load the same shader object twice it's the same principle.
+        shader = ShaderServer::Instance()->LoadShaderObject("resources/shaders/vertex.vert", "resources/shaders/phong.frag");
+        shader1 = ShaderServer::Instance()->LoadShaderObject("resources/shaders/vertex.vert", "resources/shaders/toonshader.frag");
 
 		modelInstance->setShaderObject(shader);
 		modelInstance->setMesh(mesh);
@@ -103,7 +109,6 @@ ExampleApp::Open()
 		modelInstance1->setTexture(texture);
 		gProperty1->setModelInstance(modelInstance1);
 
-		mesh->loadMeshFromFile("resources/models/cat.obj");
 		mesh->setupMesh();
 
 		texture->loadFromFile("resources/textures/cat_diff.tga");
@@ -155,7 +160,7 @@ ExampleApp::Run()
 		gProperty->setModelMatrix(transf);
 		gProperty1->setModelMatrix(transf2);
 
-		GraphicsServer::Instance()->Render();
+		RenderDevice::Instance()->Render();
 
 		this->window->SwapBuffers();
 	}
