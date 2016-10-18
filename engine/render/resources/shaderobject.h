@@ -20,23 +20,23 @@ public:
 	struct RenderState
 	{
 		//GL_CULL_FACE
-		GLboolean cullFaces = GL_FALSE;
-		GLenum frontFace = GL_CW;
-		GLenum cullMode = GL_BACK;
+		GLboolean cullface = GL_FALSE;
+		GLenum frontface = GL_CW;
+		GLenum cullmode = GL_BACK;
 
 		//GL_BLEND 
 		GLboolean blend = GL_FALSE;
-		GLenum blendSourceFunc = GL_ONE;
-		GLenum blendDestinationFunc = GL_ZERO;
+		GLenum blendsourcefunc = GL_ONE;
+		GLenum blenddestinationfunc = GL_ZERO;
 
 		//GL_ALPHA_TEST
-		GLboolean alphaTest = GL_FALSE;
-		GLenum alphaFunc = GL_ALWAYS;
-		GLclampf alphaClamp = 0.0f;
+		GLboolean alphatest = GL_FALSE;
+		GLenum alphafunc = GL_ALWAYS;
+		GLclampf alphaclamp = 0.0f;
 
 		//GL_DEPTH_TEST
-		GLboolean depthTest = GL_FALSE;
-		GLenum depthFunc = GL_LESS;
+		GLboolean depthtest = GL_FALSE;
+		GLenum depthfunc = GL_LESS;
 	};
 
 	ShaderObject();
@@ -44,6 +44,9 @@ public:
 
 	void loadVertexShader(const std::string& vertFile);
 	void loadFragmentShader(const std::string& fragFile);
+
+    void setVertexShader(const GLuint& in);
+    void setFragmentShader(const GLuint& in);
 
 	void setModelMatrix(Math::Matrix4 model);
 
@@ -68,7 +71,8 @@ private:
 	GLuint vertexShader;
 	GLuint fragmentShader;
 
-	RenderState renderState;
+	// TODO: Add renderstates to the rendering system
+	//RenderState renderState;
 
 	Util::Array<ModelInstance*> modelInstances;
 };

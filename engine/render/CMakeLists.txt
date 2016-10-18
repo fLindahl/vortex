@@ -45,14 +45,14 @@ SET(files_render_resources
 	resources/lightnode.cpp
 	resources/meshresource.h
 	resources/meshresource.cpp
-	resources/shaderobject.h
-	resources/shaderobject.cpp
+		resources/shaderobject.h
+		resources/shaderobject.cpp
 	resources/textureresource.h
 	resources/textureresource.cpp
 	resources/vertexcomponent.h
 	resources/modelinstance.h
 	resources/modelinstance.cpp
-	)
+		)
 
 SET(files_render_server
 	server/graphicsserver.h
@@ -62,7 +62,7 @@ SET(files_render_server
 	server/resourceserver.h
 	server/resourceserver.cpp
 	server/shaderconstants.h
-)
+        server/renderdevice.h server/renderdevice.cpp)
 	
 SET(files_render_softwarerender
 	softwarerender/rasterizer.h

@@ -30,6 +30,79 @@ std::string ShaderServer::ReadFromFile(const std::string &filename)
 	return content;
 }
 
+
+GLuint ShaderServer::LoadShader(const std::string& file)
+{
+    //Make sure we've not already loaded this shader
+    if (!this->hasShaderLoaded(file))
+    {
+        GLenum shaderType;
+        if (file.substr(file.find_last_of(".")) == ".vert")
+        {
+            shaderType = GL_VERTEX_SHADER;
+        }
+        else if (file.substr(file.find_last_of(".")) != ".vert")
+        {
+            shaderType = GL_FRAGMENT_SHADER;
+        }
+        else
+        {
+            printf("[SHADER LOAD ERROR]: File is not a .vert or .frag file!");
+            return false;
+        }
+
+        std::string content = ReadFromFile(file);
+        if (content.empty())
+        {
+            return false;
+        }
+
+        //Attach Header
+        if(shaderType == GL_VERTEX_SHADER)
+        {
+            content = VertexShaderHeader + content;
+        }
+        else
+        {
+            content = FragmentShaderHeader + content;
+        }
+
+        const char* s = content.c_str();
+
+        // setup fragment shader
+        GLuint shader = glCreateShader(shaderType);
+        GLint length = (GLint)content.length();
+        glShaderSource(shader, 1, &s, &length);
+        glCompileShader(shader);
+
+        // get error log
+        GLint shaderLogSize;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &shaderLogSize);
+        if (shaderLogSize > 0)
+        {
+            char* buf = new char[shaderLogSize];
+            glGetShaderInfoLog(shader, shaderLogSize, NULL, buf);
+            printf("[SHADER COMPILE ERROR]: %s", buf);
+            delete[] buf;
+
+#ifdef _DEBUG
+            assert(false);
+#endif
+        }
+
+        //Insert to our shader list
+        std::pair<std::string, GLuint> par(file, shader);
+        this->shaders.insert(par);
+
+        return shader;
+    }
+    else
+    {
+        //Shader is already loaded so we can just return it.
+        return this->shaders.find(file)->second;
+    }
+}
+
 GLuint ShaderServer::LoadVertexShader(const std::string& file)
 {
 	//Make sure we've not already loaded this shader
@@ -141,6 +214,30 @@ GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 		//Shader is already loaded so we can just return it.
 		return this->shaders.find(file)->second;
 	}
+}
+std::shared_ptr<ShaderObject> ShaderServer::LoadShaderObject(const std::string &vertFile, const std::string &fragFile)
+{
+    GLuint vert = this->LoadVertexShader(vertFile);
+    GLuint frag = this->LoadFragmentShader(fragFile);
+
+    std::pair<GLuint, GLuint> pair = std::make_pair(vert, frag);
+
+    std::shared_ptr<ShaderObject> shdObj = this->shaderObjects.find(pair)->second;
+
+    if(shdObj.use_count() != 0)
+    {
+        return shdObj;
+    }
+    else
+    {
+        //We need to create a new shader object!
+        shdObj = std::make_shared<ShaderObject>();
+        shdObj->setVertexShader(vert);
+        shdObj->setFragmentShader(frag);
+        shdObj->LinkShaders();
+        this->shaderObjects.insert(std::make_pair(pair, shdObj));
+        return shdObj;
+    }
 }
 
 bool ShaderServer::hasShaderLoaded(const std::string& file)
