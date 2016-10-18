@@ -23,7 +23,6 @@ SET(files_render_animation
 	animation/animcurve.h
 	animation/animkeybuffer.h
 	animation/naxfileformatstructs.h
-	animation/nvx2fileformatstructs.h
 	)
 
 SET(files_render_character
@@ -45,14 +44,16 @@ SET(files_render_resources
 	resources/lightnode.cpp
 	resources/meshresource.h
 	resources/meshresource.cpp
-		resources/shaderobject.h
-		resources/shaderobject.cpp
+	resources/shaderobject.h
+	resources/shaderobject.cpp
 	resources/textureresource.h
 	resources/textureresource.cpp
 	resources/vertexcomponent.h
 	resources/modelinstance.h
 	resources/modelinstance.cpp
-		)
+	
+	resources/nvx2fileformatstructs.h
+	)
 
 SET(files_render_server
 	server/graphicsserver.h
@@ -62,7 +63,8 @@ SET(files_render_server
 	server/resourceserver.h
 	server/resourceserver.cpp
 	server/shaderconstants.h
-        server/renderdevice.h server/renderdevice.cpp)
+    server/renderdevice.h server/renderdevice.cpp
+)
 	
 SET(files_render_softwarerender
 	softwarerender/rasterizer.h

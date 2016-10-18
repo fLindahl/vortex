@@ -12,8 +12,6 @@ std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const char* meshpath)
 		std::shared_ptr<MeshResource> nMesh = std::make_shared<MeshResource>();
 		nMesh->loadMeshFromFile(meshpath);
 
-		nMesh->setupMesh();
-
 		//_assert(nMesh.isValid(), "Could not load mesh!")
 
 		std::pair<const char*, std::shared_ptr<MeshResource>> par(meshpath, nMesh);

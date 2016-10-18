@@ -9,6 +9,7 @@
 #include <map>
 #include <utility>
 #include "foundation/util/array.h"
+#include "vertexcomponent.h"
 
 namespace Render
 {
@@ -26,14 +27,13 @@ public:
 			return (pos == rhs.pos && uv == rhs.uv && normal == rhs.normal);
 		}
 
-		Math::Vector3 pos;
-		Math::Vector2 uv;
+		Math::Vector4 pos;
 		Math::Vector3 normal;
+		Math::Vector2 uv;
 	};
 
 	bool loadMeshFromFile(const char* filename);
-
-	void setupMesh();
+	bool loadMeshFromOBJ(const char* filename);
 
 	void createQuad();
 	///Bind VAO
@@ -43,16 +43,47 @@ public:
 	///Draw elements
 	void Draw();
 
-	Util::Array < MeshResource::Vertex >& getMesh();
-	Util::Array < GLuint >& getIndices();
+	void* getMesh();
+	void* getIndices();
 
 private:
 	GLuint vao[1];
 	GLuint ib[1];
 	GLuint vbo[1];
 
-	Util::Array < MeshResource::Vertex > mesh;
-	Util::Array < GLuint > indices;
+	void* mesh;
+	void* indices;
+
+	//Util::Array < MeshResource::Vertex > mesh;
+	//Util::Array < GLuint > indices;
+
+	bool rawMode;
+
+	void ReadHeaderData();
+	void ReadPrimitiveGroups();
+	void SetupVertices();
+
+	void SetupVertexBuffer();
+	void SetupIndexBuffer();
+
+	uchar* mapPtr;
+	void* groupDataPtr;
+	void* vertexDataPtr;
+	void* indexDataPtr;
+
+	uint numGroups;
+	uint numVertices;
+	uint vertexWidth;
+	uint numIndices;
+	uint numEdges;
+	uint vertexComponentMask;
+
+	size_t groupDataSize;
+	size_t vertexDataSize;
+	size_t indexDataSize;
+
+	Util::Array<VertexComponent> vertexComponents;
+
 };
 
 }

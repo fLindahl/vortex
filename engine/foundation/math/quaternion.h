@@ -5,7 +5,6 @@
 */
 
 #include "vector4.h"
-#include "matrix4.h"
 //------------------------------------------------------------------------------
 
 namespace Math
@@ -82,7 +81,7 @@ public:
     /// build quaternion from axis and clockwise rotation angle in radians
     static Quaternion rotationaxis(const Vector4& axis, float angle);
     /// build quaternion from rotation matrix
-    static Quaternion rotationmatrix(const Matrix4& m);
+    //static Quaternion rotationmatrix(const Matrix4& m);
     /// build quaternion from yaw, pitch and roll
     static Quaternion rotationyawpitchroll(float yaw, float pitch, float roll);
     
@@ -278,6 +277,7 @@ inline Quaternion Quaternion::rotationaxis(const Vector4& axis, float angle)
     return Quaternion(0,0,0,0);//Vectormath::Aos::Quat::rotation(angle, Vectormath::Aos::Vector3(axis.vec));
 }
 
+/*
 inline Quaternion Quaternion::rotationmatrix(const Matrix4& m)
 {
 	// FIXME write own implementation
@@ -318,6 +318,7 @@ inline Quaternion Quaternion::rotationmatrix(const Matrix4& m)
 	Quaternion q(temp[0],temp[1],temp[2],temp[3]);
 	return q;
 }
+*/
 
 inline Quaternion Quaternion::rotationyawpitchroll(float yaw, float pitch, float roll)
 {
