@@ -3,6 +3,7 @@
 #include "render/resources/shaderobject.h"
 #include "render/resources/meshresource.h"
 #include "render/resources/textureresource.h"
+#include "render/server/resourceserver.h"
 
 namespace Render
 {
@@ -45,9 +46,9 @@ shared_ptr<MeshResource> ModelInstance::getMesh()
 	return this->mesh;
 }
 
-void ModelInstance::setMesh(shared_ptr<MeshResource> inMesh)
+void ModelInstance::setMesh(const char* file)
 {
-	this->mesh = inMesh;
+	this->mesh = ResourceServer::Instance()->LoadMesh(file);
 }
 
 shared_ptr<TextureResource> ModelInstance::getTexture()
@@ -55,9 +56,9 @@ shared_ptr<TextureResource> ModelInstance::getTexture()
 	return this->texture;
 }
 
-void ModelInstance::setTexture(shared_ptr<TextureResource> inTexture)
+void ModelInstance::setTexture(const char* file)
 {
-	this->texture = inTexture;
+	this->texture = ResourceServer::Instance()->LoadTexture(file);
 }
 
 void ModelInstance::addGraphicsProperty(GraphicsProperty* gp)

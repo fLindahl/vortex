@@ -20,10 +20,10 @@ public:
 	void setShaderObject(std::shared_ptr<ShaderObject> inShaderObject);
 
 	std::shared_ptr<MeshResource> getMesh();
-	void setMesh(std::shared_ptr<MeshResource> inMesh);
+	void setMesh(const char* file);
 
 	std::shared_ptr<TextureResource> getTexture();
-	void setTexture(std::shared_ptr<TextureResource> inTexture);
+	void setTexture(const char* file);
 	
 	void addGraphicsProperty(GraphicsProperty* gp);
 

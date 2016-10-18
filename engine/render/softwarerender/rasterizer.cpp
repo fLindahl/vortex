@@ -101,6 +101,7 @@ void Rasterizer::clear()
 
 void Rasterizer::setup(Math::Matrix4 pMat, Math::Matrix4 tMat)
 {
+	/*
 	const Util::Array<MeshResource::Vertex>& meshData = mesh->getMesh();
 	const Util::Array< GLuint >& meshIndices = mesh->getIndices();
 
@@ -122,6 +123,7 @@ void Rasterizer::setup(Math::Matrix4 pMat, Math::Matrix4 tMat)
 
 		RenderTriangle();
 	}
+	*/
 }
 
 Util::Array<Rasterizer::Color> Rasterizer::draw()

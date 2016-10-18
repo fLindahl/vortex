@@ -7,6 +7,8 @@
 #include <cstring>
 #include <render/server/renderdevice.h>
 
+#include "application/basegamefeature/keyhandler.h"
+
 using namespace Display;
 using namespace Render;
 
@@ -38,51 +40,14 @@ ExampleApp::Open()
 	App::Open();
 	this->window = new Display::Window;
 
-
-	//Setup keyboard and mouse functions
-	window->SetKeyPressFunction([this](int32 key, int32 scancode, int32 action, int32){
-		if (action == GLFW_PRESS)
-			keyhandler.setKeyStatePressed(key);
-		else if (action == GLFW_RELEASE)
-			keyhandler.setKeyStateReleased(key);
-	});
-	window->SetMousePressFunction([this](int32 key, int32 action, int32){
-		if (action == GLFW_PRESS)
-			keyhandler.setKeyStatePressed(key);
-		if (action == GLFW_RELEASE)
-			keyhandler.setKeyStateReleased(key);
-	});
-	window->SetMouseMoveFunction([this](float64 y, float64 x){
-		if (keyhandler.leftMousePressed == true){
-			this->mouseX += x - oldx;
-			this->mouseY += y - oldy;
-		}
-		if (keyhandler.rightMousePressed == true){
-			this->lightX += x - oldx;
-			this->lightY += y - oldy;
-		}
-		oldx = x;
-		oldy = y;
-	});
-	window->SetMouseScrollFunction([this](float64, float64 y){
-		if (keyhandler.rightMousePressed == true)
-			this->lightZ += y;
-		else
-			this->z += y;
-	});
+	
+	keyhandler = BaseGameFeature::KeyHandler::Instance();
+	keyhandler->Init(this->window);
 
 	// Initiate everything we need
 	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
 	if (this->window->Open())
 	{
-        mesh = ResourceServer::Instance()->LoadMesh("resources/models/cat.obj");
-        texture = ResourceServer::Instance()->LoadTexture("resources/textures/cat_diff.tga");
-
-
-
-		//shader = std::make_shared<Render::ShaderObject>();
-		//shader1 = std::make_shared<Render::ShaderObject>();
-
 		modelInstance = std::make_shared<Render::ModelInstance>();
 		modelInstance1 = std::make_shared<Render::ModelInstance>();
 
@@ -93,25 +58,21 @@ ExampleApp::Open()
 		ShaderServer::Instance()->LoadShader("resources/shaders/vertex.vert");
 		ShaderServer::Instance()->LoadShader("resources/shaders/phong.frag");
 		ShaderServer::Instance()->LoadShader("resources/shaders/toonshader.frag");
-
+	
         // Because we're trying to load the same vertex shader twice, the shaderserver will return the same shader as before, thus not needing to recompile it
         // If we we're to ty to load the same shader object twice it's the same principle.
         shader = ShaderServer::Instance()->LoadShaderObject("resources/shaders/vertex.vert", "resources/shaders/phong.frag");
         shader1 = ShaderServer::Instance()->LoadShaderObject("resources/shaders/vertex.vert", "resources/shaders/toonshader.frag");
 
 		modelInstance->setShaderObject(shader);
-		modelInstance->setMesh(mesh);
-		modelInstance->setTexture(texture);
+		modelInstance->setMesh("resources/models/player.nvx2");
+		modelInstance->setTexture("resources/textures/player.png");
 		gProperty->setModelInstance(modelInstance);
 
 		modelInstance1->setShaderObject(shader1);
-		modelInstance1->setMesh(mesh);
-		modelInstance1->setTexture(texture);
+		modelInstance1->setMesh("resources/models/player.nvx2");
+		modelInstance1->setTexture("resources/textures/player.png");
 		gProperty1->setModelInstance(modelInstance1);
-
-		mesh->setupMesh();
-
-		texture->loadFromFile("resources/textures/cat_diff.tga");
 
 		return true;
 	}
@@ -141,21 +102,9 @@ ExampleApp::Run()
 	{
 		this->window->Update();
 
-		if (keyhandler.tUP == true)
-			y = y + speed;
-		if (keyhandler.tDOWN == true)
-			y = y - speed;
-		if (keyhandler.tLEFT == true)
-			x = x - speed;
-		if (keyhandler.tRIGHT == true)
-			x = x + speed;
-		if (keyhandler.quit == true)
-			this->window->Close();
-
-		// Rotation och translation med mus och tangentbord f�r model
-		Math::Matrix4 transf = Math::Matrix4::translation(0.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)mouseY) * Math::Matrix4::rotX((float)mouseX) * Math::Matrix4::translation(x, y, (float)z * -0.1f - 1.0f);
-
-		Math::Matrix4 transf2 = Math::Matrix4::translation(1.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)lightY) * Math::Matrix4::rotX((float)lightX) * Math::Matrix4::translation(x, y, (float)lightZ * -0.1f - 1.0f);
+		// Rotation and translation
+		Math::Matrix4 transf = Math::Matrix4::translation(0.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)keyhandler->mouseY) * Math::Matrix4::rotX((float)keyhandler->mouseX) * Math::Matrix4::translation(x, y, (float)keyhandler->scroll * -0.1f - 1.0f);
+		Math::Matrix4 transf2 = Math::Matrix4::translation(1.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)keyhandler->mouseY) * Math::Matrix4::rotX((float)keyhandler->mouseX) * Math::Matrix4::translation(x, y, (float)keyhandler->scroll * -0.1f - 1.0f);
 		
 		gProperty->setModelMatrix(transf);
 		gProperty1->setModelMatrix(transf2);

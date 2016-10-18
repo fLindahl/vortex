@@ -1,46 +1,45 @@
 #include "config.h"
-
-/*
 #include "entity.h"
-#include "messages/MsgHandler.h"
+#include "foundation/messaging/messagehandler.h"
 #include "render/server/graphicsserver.h"
 
 namespace Game
 {
 
-BaseEntity::BaseEntity()
+Entity::Entity()
 {
 	//Create graphics object and add it to graphicsserver.
-	this->graphics = std::make_shared<Render::GraphicsProperty>(this);
-	GraphicsServer::getInstance()->addGraphicsProperty(this->graphics);
+	//this->graphics = std::make_shared<Render::GraphicsProperty>(this);
+	
+	//GraphicsServer::getInstance()->addGraphicsProperty(this->graphics);
 }
 
-BaseEntity::~BaseEntity()
+Entity::~Entity()
 {
-	GraphicsServer::getInstance()->removeGraphicsProperty(this->graphics);
+	//GraphicsServer::getInstance()->removeGraphicsProperty(this->graphics);
 }
 	
-void BaseEntity::FixedUpdate()
+void Entity::FixedUpdate()
 {
 
 }
 
-void BaseEntity::Update()
+void Entity::Update()
 {
 
 }
 
-void BaseEntity::HandleMsg(Msg msg)
+void Entity::HandleMsg(Msg msg)
 {
 
 }
 
-void BaseEntity::SendMsg(Msg msg)
+void Entity::SendMsg(Msg msg)
 {
 	MsgHandler::getInstance()->RecvMsg(msg);
 }
 
-void BaseEntity::SendMsg(int recipientID, MsgType message, float delay)
+void Entity::SendMsg(int recipientID, MsgType message, float delay)
 {
 	Msg newMsg;
 	newMsg.recipientID = recipientID;
@@ -51,17 +50,15 @@ void BaseEntity::SendMsg(int recipientID, MsgType message, float delay)
 	MsgHandler::getInstance()->RecvMsg(newMsg);
 }
 
-Math::Vector2& BaseEntity::getPos()
+Math::Vector4& Entity::getPos()
 {
 	return pos;
 }
 
-void BaseEntity::setPos(Math::Vector2 nPos)
+void Entity::setPos(Math::Vector4 nPos)
 {
 	this->pos = nPos;
-	graphics->updateModelMatrix();
 }
 
 }
 
- */

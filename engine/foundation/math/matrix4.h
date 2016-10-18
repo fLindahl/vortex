@@ -1,8 +1,8 @@
 #pragma once
-#include "config.h"
 #include <cmath>
 #include "vector4.h"
 #include "matrix3.h"
+#include "quaternion.h"
 
 #define PI  3.14159265358979323846f
 
@@ -11,7 +11,6 @@
 namespace Math
 {
 
-class Quaternion;
 
 /// Constructor start
 class Matrix4{
@@ -424,6 +423,46 @@ inline Matrix4 operator*(float scalar, const Matrix4& rhs)
 inline Vector4 operator*(const Vector4& vec, const Matrix4& mat)
 {
 	return Vector4(vec[0] * mat[0] + vec[1] * mat[1] + vec[2] * mat[2] + vec[3] * mat[3], vec[0] * mat[4] + vec[1] * mat[5] + vec[2] * mat[6] + vec[3] * mat[7], vec[0] * mat[8] + vec[1] * mat[9] + vec[2] * mat[10] + vec[3] * mat[11], vec[0] * mat[12] + vec[1] * mat[13] + vec[2] * mat[14] + vec[3] * mat[15]);
+}
+
+inline Matrix4 Matrix4::RotationQuaternion(const Quaternion& q)
+{
+	float xx = q.x() * q.x();
+	float xy = q.x() * q.y();
+	float xz = q.x() * q.z();
+	float xw = q.x() * q.w();
+
+	float yy = q.y() * q.y();
+	float yz = q.y() * q.z();
+	float yw = q.y() * q.w();
+
+	float zz = q.z() * q.z();
+	float zw = q.z() * q.w();
+
+	float m00 = 1 - 2 * (yy + zz);
+	float m01 = 2 * (xy - zw);
+	float m02 = 2 * (xz + yw);
+
+	float m10 = 2 * (xy + zw);
+	float m11 = 1 - 2 * (xx + zz);
+	float m12 = 2 * (yz - xw);
+
+	float m20 = 2 * (xz - yw);
+	float m21 = 2 * (yz + xw);
+	float m22 = 1 - 2 * (xx + yy);
+
+	float m03 = 0;
+	float m13 = 0;
+	float m23 = 0;
+	float m30 = 0;
+	float m31 = 0;
+	float m32 = 0;
+	float m33 = 1;
+
+	return Matrix4(m00, m01, m02, m03
+		, m10, m11, m12, m13
+		, m20, m21, m22, m23
+		, m30, m31, m32, m33);
 }
 
 }
