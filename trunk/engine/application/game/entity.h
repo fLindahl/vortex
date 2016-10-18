@@ -1,9 +1,7 @@
-
-/*
 #pragma once
 #include "config.h"
-#include "messages/MsgHandler.h"
-#include "foundation/math/vector2.h"
+#include "foundation/messaging/messagehandler.h"
+#include "foundation/math/vector4.h"
 #include "render/properties/graphicsproperty.h"
 
 struct Msg;
@@ -11,13 +9,13 @@ struct Msg;
 namespace Game
 {
 
-class BaseEntity
+class Entity
 {
 public:
-	BaseEntity();
-	~BaseEntity();
+	Entity();
+	~Entity();
 
-	const int getID() { return ID; };
+	int getID() { return ID; };
 	void setID(const int id) { ID = id; };
 
 	virtual void FixedUpdate();
@@ -27,19 +25,16 @@ public:
 	virtual void SendMsg(Msg msg);
 	virtual void SendMsg(int recipientID, MsgType message, float delay);
 
-	virtual Math::Vector2& getPos();
-	virtual void setPos(Math::Vector2 nPos);
+	virtual Math::Vector4& getPos();
+	virtual void setPos(Math::Vector4 nPos);
 
 	std::shared_ptr<Render::GraphicsProperty> getGraphicsProperty() { return graphics; }
 
 protected:
 	int ID;
-	Math::Vector2 pos;
+	Math::Vector4 pos;
 
 	std::shared_ptr<Render::GraphicsProperty> graphics;
-
 };
 
 }
-
- */

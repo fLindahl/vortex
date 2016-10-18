@@ -5,7 +5,7 @@
 #include <cstring>
 #include "foundation/math/vector4.h"
 #include <GLFW/glfw3.h>
-#include "render/animation/nvx2fileformatstructs.h"
+#include "render/resources/nvx2fileformatstructs.h"
 
 namespace Render
 {

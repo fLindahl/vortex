@@ -222,16 +222,15 @@ std::shared_ptr<ShaderObject> ShaderServer::LoadShaderObject(const std::string &
 
     std::pair<GLuint, GLuint> pair = std::make_pair(vert, frag);
 
-    std::shared_ptr<ShaderObject> shdObj = this->shaderObjects.find(pair)->second;
-
-    if(shdObj.use_count() != 0)
-    {
-        return shdObj;
+	if (this->shaderObjects.count(pair))
+	{
+		std::shared_ptr<ShaderObject> shdObj = this->shaderObjects.find(pair)->second;
+		return shdObj;
     }
     else
     {
         //We need to create a new shader object!
-        shdObj = std::make_shared<ShaderObject>();
+		std::shared_ptr<ShaderObject> shdObj = std::make_shared<ShaderObject>();
         shdObj->setVertexShader(vert);
         shdObj->setFragmentShader(frag);
         shdObj->LinkShaders();
