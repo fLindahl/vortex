@@ -18,6 +18,9 @@ public:
 	float x(){ return vec[0]; }
 	float y(){ return vec[1]; }
 
+	float x() const { return vec[0]; }
+	float y() const { return vec[1]; }
+
 	bool operator==(const Vector2& rhs) const;
 	Vector2 operator+(const Vector2& rhs) const;
 	Vector2 operator-(const Vector2& rhs) const;

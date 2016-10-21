@@ -40,6 +40,11 @@ public:
 	float z() { return vec[2]; };
 	float w() { return vec[3]; };
 	
+	float x() const { return vec[0]; };
+	float y() const { return vec[1]; };
+	float z() const { return vec[2]; };
+	float w() const { return vec[3]; };
+
 	Vector3 xyz() { return Vector3(vec[0], vec[1], vec[2]); };
 	
 	static Vector4 lerp(const Vector4& va, const Vector4& vb, const float& t);
