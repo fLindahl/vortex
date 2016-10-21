@@ -4,8 +4,8 @@
 //  Copyright (c) 2016
 //
 
-#ifndef __BWLIB__String__
-#define __BWLIB__String__
+#ifndef __String__
+#define __String__
 
 #ifdef _MSC_VER
 // disable _s warnings
@@ -24,6 +24,8 @@ int vasprintf(char ** ret, const char * format, va_list ap);
 #include <cstdarg>
 #include <cctype>
 #include <memory>
+#include <vector>
+#include "config.h"
 
 #define STRING_MAX_LEN 65535
 #define STRING_MAX_SPLIT 1023
@@ -85,20 +87,20 @@ namespace Util
 
         // utility methods
         bool HaveValue() const;
-        size_t Length() const { return str_len; }
-        size_t Size() const { return str_len; }
-        String & Format( const char * format, ... );
-        String & Trim();
-        String Lower() const;
-        String Upper() const;
-        const char & Back() const;
-        const char & Front() const;
+        size_t length() const { return str_len; }
+        size_t size() const { return str_len; }
+        String & format( const char * format, ... );
+        String & trim();
+        String lower() const;
+        String upper() const;
+        const char & back() const;
+        const char & front() const;
 
         // find and replace methods
         long int CharFind( const char & match ) const;
         const String & CharRepl( const char & match, const char & repl );
         String Substr( size_t start, size_t length );
-        long Find( const String & match ) const;
+        long Find( const String & match, index_t index = 0 ) const;
         const String Replace( const String & match, const String & repl );
 
         // split methods
@@ -107,6 +109,11 @@ namespace Util
         const splitPtr & Split( const char * match, int max_split ) const;
         const String & SplitItem( size_t index ) const;
         size_t SplitCount() const { return splitCount; }
+
+        //Tokenize
+        static std::vector<Util::String> Tokenize(Util::String str, Util::String delim);
+
+        static const size_t npos = -1;
     };
 
     inline String::String( )
@@ -290,7 +297,7 @@ namespace Util
     }
 
 // string format
-    inline String & String::Format( const char * format , ... )
+    inline String & String::format( const char * format , ... )
     {
         char * buffer;
 
@@ -304,7 +311,7 @@ namespace Util
     }
 
 // trim leading and trailing spaces
-    inline String & String::Trim()
+    inline String & String::trim()
     {
         const static char * whitespace = "\x20\x1b\t\r\n\v\b\f\a";
 
@@ -312,7 +319,7 @@ namespace Util
             return *this; // make sure we have a string
 
         size_t begin = 0;
-        size_t end = Length() - 1;
+        size_t end = length() - 1;
 
         for (begin = 0; begin <= end; ++begin)
         {
@@ -346,7 +353,7 @@ namespace Util
         return *this;
     }
 
-    inline String String::Lower() const {
+    inline String String::lower() const {
         String rs = *this;
         for (size_t i = 0; rs.str[i]; ++i) {
             rs.str[i] = tolower(rs.str[i]);
@@ -354,7 +361,7 @@ namespace Util
         return rs;
     }
 
-    inline String String::Upper() const {
+    inline String String::upper() const {
         String rs = *this;
         for (size_t i = 0; rs.str[i]; ++i)
         {
@@ -363,11 +370,11 @@ namespace Util
         return rs;
     }
 
-    inline const char & String::Back() const {
-        return str[Length() - 1];
+    inline const char & String::back() const {
+        return str[length() - 1];
     }
 
-    inline const char & String::Front() const {
+    inline const char & String::front() const {
         return str[0];
     }
 
@@ -391,10 +398,9 @@ namespace Util
         return *this;
     }
 
-    inline String String::Substr( size_t start, size_t length )
-    {
+    inline String String::Substr( size_t start, size_t length ) {
         String rs;
-        char * buf;
+        char *buf;
         if ((length + 1) > STRING_MAX_LEN || (start + length) > STRING_MAX_LEN)
             return rs;
         if (length > str_len - start)
@@ -405,14 +411,14 @@ namespace Util
         buf = new char[length + 1]();
         memcpy(buf, str + start, length);
         rs = buf;
-        delete [] buf;
+        delete[] buf;
 
         return rs;
     }
 
-    inline long String::Find( const String & match ) const
+    inline long String::Find( const String & match, index_t index) const
     {
-        char * pos = strstr(str, match.c_str());
+        char * pos = strchr(match.c_str()+index, match);
         if(pos)
             return (long) ( pos - str );
         else
@@ -426,9 +432,9 @@ namespace Util
         if (f1 >= 0)
         {
             size_t pos1 = (size_t) f1;
-            size_t pos2 = pos1 + match.Length();
+            size_t pos2 = pos1 + match.length();
             String s1 = pos1 > 0 ? Substr(0, pos1) : "";
-            String s2 = Substr(pos2, Length() - pos2);
+            String s2 = Substr(pos2, length() - pos2);
             rs = s1 + repl + s2;
         }
         return rs;
@@ -449,7 +455,7 @@ namespace Util
     inline const String::splitPtr & String::Split( const char * match, int max_split ) const
     {
         ResetSplitArr();
-        if (Length() < 1)
+        if (length() < 1)
             return splitArray;
         if (max_split < 0)
             max_split = STRING_MAX_SPLIT;
@@ -487,6 +493,25 @@ namespace Util
             return *splitArray[index];
         else
             return *this;
+    }
+
+    inline std::vector<Util::String> String::Tokenize(Util::String str, Util::String delim)
+    {
+        std::vector<Util::String> tokens;
+
+        int i = 0;
+        auto pos = str.Find(delim);
+        while(pos != Util::String::npos)
+        {
+            tokens.push_back(str.Substr(i, pos-i));
+            i = ++pos;
+            pos = str.Find(delim, pos);
+
+            if (pos == Util::String::npos)
+                tokens.push_back(str.Substr(i, str.length()));
+        }
+
+        return tokens;
     }
 
     inline String operator + ( const String & lhs, const String & rhs ) {
