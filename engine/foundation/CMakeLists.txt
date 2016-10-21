@@ -17,6 +17,7 @@ SET(files_foundation_util
 	util/array.h
 	util/fixedarray.h
 	util/indexedpriorityqueue.h
+	util/variable.h
 	)
 
 SET(files_foundation_messaging

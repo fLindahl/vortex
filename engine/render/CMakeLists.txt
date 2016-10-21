@@ -51,7 +51,10 @@ SET(files_render_resources
 	resources/vertexcomponent.h
 	resources/modelinstance.h
 	resources/modelinstance.cpp
-	
+	resources/material.h
+	resources/material.cpp
+	resources/surface.h
+	resources/surface.cpp	
 	resources/nvx2fileformatstructs.h
 	)
 

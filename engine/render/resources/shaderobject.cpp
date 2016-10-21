@@ -39,6 +39,7 @@ namespace Render
 
 	void ShaderObject::setModelMatrix(Math::Matrix4 model)
 	{
+		//TODO: glUniform is deprecated. we should be using uniform buffer objects instead
 		GLuint matLoc = glGetUniformLocation(this->program, VORTEX_SEMANTIC_MODEL);
 		glUniformMatrix4fv(matLoc, 1, true, (GLfloat*)model.get());
 	}
