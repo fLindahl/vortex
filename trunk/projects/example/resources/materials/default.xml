@@ -1,6 +1,14 @@
 <Vortex>
     <Materials>
-        <Material name="Static" shader="" desc="Material used for the default variables available to an object">
+        <Material name="Static" desc="A lit opaque material">
+            <!-- material textures -->
+            <Param name="AlbedoMap" type="string" defaultValue="tex:system/placeholder"/>
+
+            <!-- various parameters -->
+            <Param name="AlbedoIntensity" type="float4" defaultValue="1.0f, 1.0f, 1.0f, 1.0f" min="0.0f, 0.0f, 0.0f, 0.0f" max="1.0f, 1.0f, 1.0f, 1.0f" edit="color" desc="Material albedo multiplier"/>
+            <Param name="SpecularIntensity" type="float4" defaultValue="0.0f, 0.0f, 0.0f, 0.0f" min="0.0f, 0.0f, 0.0f, 0.0f" max="1.0f, 1.0f, 1.0f, 1.0f" edit="color" desc="Material specular reflectivity index"/>
+        </Material>
+        <Material name="Toon" shader="" desc="Generic toon-shader material">
             <!-- material textures -->
             <Param name="AlbedoMap" type="string" defaultValue="tex:system/placeholder"/>
 

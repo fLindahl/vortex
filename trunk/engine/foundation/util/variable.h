@@ -155,7 +155,7 @@ namespace Util
 	{
 	}
 
-	Variable::~Variable()
+	inline Variable::~Variable()
 	{
 		this->Delete();
 	}
