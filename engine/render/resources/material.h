@@ -21,6 +21,20 @@ class Material
 public:
 	Material();
 	~Material();
+/*
+    void SetName();
+    std::string GetName();
+
+    void SetShaderObject();
+    std::shared_ptr<ShaderObject> GetShaderObject();
+
+    Util::Array<std::shared_ptr<TextureResource>>& TextureList();
+
+    MaterialParameter& GetParameterByName(const std::string& name);
+
+    Util::Array<Surface>& SurfaceList();
+*/
+
 
 private:
 	// name of the material
@@ -38,11 +52,11 @@ private:
 	Util::Array<Surface> surfaces;
 };
 
-Material::Material()
+inline Material::Material()
 {
 }
 
-Material::~Material()
+inline Material::~Material()
 {
 }
 

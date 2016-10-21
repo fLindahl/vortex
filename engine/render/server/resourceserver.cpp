@@ -1,5 +1,6 @@
 #include "config.h"
 #include "resourceserver.h"
+#include "tinyxml2.h"
 
 namespace Render
 {
@@ -64,6 +65,36 @@ bool ResourceServer::HasTextureNamed(const std::string& nName)
 		return true;
 	else
 		return false;
+}
+
+bool ResourceServer::LoadMaterials(const char *fileName)
+{
+	tinyxml2::XMLDocument data;
+	data.LoadFile(fileName);
+
+	tinyxml2::XMLElement* materials = data.RootElement()->FirstChildElement();
+	tinyxml2::XMLElement* material = materials->FirstChildElement();
+
+
+	//First we check if the specified material is already loaded.
+	const tinyxml2::XMLAttribute* nameAttr = material->FirstAttribute();
+
+	if (this->HasMaterialNamed(nameAttr->Value()))
+	{
+		printf("WARNING: Duplicate material loaded: \" %s \". Using previously loaded material...", nameAttr->Value());
+	}
+	else
+	{
+		// Load material!
+
+
+	}
+
+}
+
+bool ResourceServer::HasMaterialNamed(const std::string &nName)
+{
+
 }
 
 }

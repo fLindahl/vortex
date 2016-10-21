@@ -11,6 +11,7 @@ Contains all compiled resources and is used to load, store and retrieve them.
 #include "render/resources/meshresource.h"
 #include "render/resources/textureresource.h"
 #include "GLFW/glfw3.h"
+#include "render/resources/material.h"
 
 namespace Render
 {
@@ -41,7 +42,9 @@ public:
 	std::shared_ptr<TextureResource> LoadTexture(const char* filepath);
 	bool HasTextureNamed(const std::string& nName);
 
-
+	//Loads a material .xml file and adds all materials to the list if they're not already defined
+	bool LoadMaterials(const char* fileName);
+	bool HasMaterialNamed(const std::string& nName);
 
 private:
 	//This contains all ModelInstances currently in-game.
@@ -54,6 +57,10 @@ private:
 	//This contains all textures.
 	//Key must be unique to each texture. the key is the texture name loaded
 	std::unordered_map<std::string, std::shared_ptr<TextureResource>> textures;
+
+	//Contains all Materials.
+	//Key must be unique to each Material. the key is the material name
+	std::unordered_map<std::string, std::shared_ptr<Material>> materials;
 };
 
 }
