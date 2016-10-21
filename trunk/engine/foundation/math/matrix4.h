@@ -12,134 +12,151 @@ namespace Math
 {
 
 
-/// Constructor start
-class Matrix4{
-public:
-	///Initiate identity matrix
-	Matrix4();
+	/// Constructor start
+	class Matrix4{
+	public:
+		///Initiate identity matrix
+		Matrix4();
 
-	///initiate 4D Matrix with all inputs.
-	Matrix4(float m0, float m1, float m2, float m3,	
-			float m4, float m5, float m6, float m7,	
+		///initiate 4D Matrix with all inputs.
+		Matrix4(float m0, float m1, float m2, float m3,
+			float m4, float m5, float m6, float m7,
 			float m8, float m9, float m10, float m11,
 			float m12, float m13, float m14, float m15);
 
-	///Initiate homogenous 4d matrix.
-	Matrix4(float m0, float m1, float m2,	///take only the 9 first variables since we only want to initiate those in an homogenous 4D Matrix.
+		///Initiate homogenous 4d matrix.
+		Matrix4(float m0, float m1, float m2,	///take only the 9 first variables since we only want to initiate those in an homogenous 4D Matrix.
 			float m4, float m5, float m6,	///Notice the names too.
-			float m8, float m9,	float m10);
+			float m8, float m9, float m10);
 
-	~Matrix4();
+		~Matrix4();
 
-	void set(float m0, float m1, float m2, float m4, float m5, float m6, float m8, float m9, float m10, float m3, float m7, float m11, float m12, float m13, float m14, float m15);		///Set values
-	const float* get();		///Get array
-	Matrix3 get3x3();		///Get array
+		void set(float m0, float m1, float m2, float m4, float m5, float m6, float m8, float m9, float m10, float m3, float m7, float m11, float m12, float m13, float m14, float m15);		///Set values
+		const float* get();		///Get array
+		Matrix3 get3x3();		///Get array
 
-	Vector4 operator*(const Vector4& rhs) const;	///product Mat*VectA = VectB
-	Matrix4 operator*(const Matrix4& rhs) const;	///product MatA*MatB = MatC
-	Matrix4 operator+(const Matrix4& rhs) const;	///addition MatA+MatB = MatC
+		Vector4 operator*(const Vector4& rhs) const;	///product Mat*VectA = VectB
+		Matrix4 operator*(const Matrix4& rhs) const;	///product MatA*MatB = MatC
+		Matrix4 operator+(const Matrix4& rhs) const;	///addition MatA+MatB = MatC
 
-	float operator[](const int& i) const;
+		bool operator==(const Matrix4& rhs) const;	///equality operator
+		bool operator!=(const Matrix4& rhs) const;	///inequality operator
 
-	static Matrix4 identity();	/// returns an identity matrix
-	Matrix4 transpose() const;	/// Transpose Function
-	Matrix4 invert() const;		/// Invert Function 
-	static Matrix4 inverse(const Matrix4& mat);		/// Inverse
+		float operator[](const int& i) const;
 
-	///Init rotational matrices
-	static Matrix4 rotX(const float& angle);
-	static Matrix4 rotY(const float& angle);
-	static Matrix4 rotZ(const float& angle);
-	static Matrix4 rotVector(const float& angle, const Vector4& vec);
-	static Matrix4 translation(const float& x, const float& y, const float& z);
-	static Matrix4 translation(const Vector4& vec);
-	static Matrix4 scale(const float& x, const float& y, const float& z);
-	static Matrix4 scale(const Vector4& v);
-	
-	Vector4 getPosition();
+		static Matrix4 identity();	/// returns an identity matrix
+		Matrix4 transpose() const;	/// Transpose Function
+		Matrix4 invert() const;		/// Invert Function 
+		static Matrix4 inverse(const Matrix4& mat);		/// Inverse
 
-	static Matrix4 perspectiveMatrix(const float& farZ, const float& nearZ, const float& aspect, const float& fov);
-	static Matrix4 viewMatrix(const float& pitch, const float& yaw, const Vector3& camerapos);
-	friend Matrix4 operator*(float scalar, const Matrix4& m);		///Scalar product
-	friend Vector4 operator*(const Vector4& vec, const Matrix4& m);	///Vector Product
+		///Init rotational matrices
+		static Matrix4 rotX(const float& angle);
+		static Matrix4 rotY(const float& angle);
+		static Matrix4 rotZ(const float& angle);
+		static Matrix4 rotVector(const float& angle, const Vector4& vec);
+		static Matrix4 translation(const float& x, const float& y, const float& z);
+		static Matrix4 translation(const Vector4& vec);
+		static Matrix4 scale(const float& x, const float& y, const float& z);
+		static Matrix4 scale(const Vector4& v);
 
-	static Matrix4 RotationQuaternion(const Quaternion& q);
-	
-private:
-	float m[16];
-};
-/// end of constructor
+		Vector4 getPosition();
 
-inline Matrix4::Matrix4(){
-	///Create Identity-matrix if no arguments are provided
-	set(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-}
+		static Matrix4 perspectiveMatrix(const float& farZ, const float& nearZ, const float& aspect, const float& fov);
+		static Matrix4 viewMatrix(const float& pitch, const float& yaw, const Vector3& camerapos);
+		friend Matrix4 operator*(float scalar, const Matrix4& m);		///Scalar product
+		friend Vector4 operator*(const Vector4& vec, const Matrix4& m);	///Vector Product
 
-inline Matrix4::Matrix4(float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8, float m9, float m10, float m11, float m12, float m13, float m14, float m15){
-	set(m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15); ///Set private array from arguments
+		static Matrix4 RotationQuaternion(const Quaternion& q);
 
-}
+	private:
+		float m[16];
+	};
+	/// end of constructor
 
-inline Matrix4::Matrix4(float m0, float m1, float m2, float m4, float m5, float m6, float m8, float m9, float m10){
-	float m3 = 0;
-	float m7 = 0;
-	float m11 = 0;
-	float m12 = 0;
-	float m13 = 0;
-	float m14 = 0;
-	float m15 = 1;
+	inline Matrix4::Matrix4(){
+		///Create Identity-matrix if no arguments are provided
+		set(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	}
 
-	set(m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15); ///Set private array from arguments
-}
-inline Matrix4::~Matrix4(){
+	inline Matrix4::Matrix4(float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8, float m9, float m10, float m11, float m12, float m13, float m14, float m15){
+		set(m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15); ///Set private array from arguments
 
-}
+	}
 
-inline void Matrix4::set(float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8, float m9, float m10, float m11, float m12, float m13, float m14, float m15){
-	m[0] = m0;
-	m[1] = m1;
-	m[2] = m2;
-	m[3] = m3;
-	m[4] = m4;
-	m[5] = m5;
-	m[6] = m6;
-	m[7] = m7;
-	m[8] = m8;
-	m[9] = m9;
-	m[10] = m10;
-	m[11] = m11;
-	m[12] = m12;
-	m[13] = m13;
-	m[14] = m14;
-	m[15] = m15;
-}
+	inline Matrix4::Matrix4(float m0, float m1, float m2, float m4, float m5, float m6, float m8, float m9, float m10){
+		float m3 = 0;
+		float m7 = 0;
+		float m11 = 0;
+		float m12 = 0;
+		float m13 = 0;
+		float m14 = 0;
+		float m15 = 1;
 
-inline const float* Matrix4::get(){
-	return m;
-}
+		set(m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15); ///Set private array from arguments
+	}
+	inline Matrix4::~Matrix4(){
 
-inline Matrix3 Matrix4::get3x3()
-{
-	return Matrix3(m[0], m[1], m[2], m[4], m[5], m[6], m[8], m[9], m[10]);
-}
+	}
 
-inline Vector4 Matrix4::operator*(const Vector4& rhs) const{
+	inline void Matrix4::set(float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8, float m9, float m10, float m11, float m12, float m13, float m14, float m15){
+		m[0] = m0;
+		m[1] = m1;
+		m[2] = m2;
+		m[3] = m3;
+		m[4] = m4;
+		m[5] = m5;
+		m[6] = m6;
+		m[7] = m7;
+		m[8] = m8;
+		m[9] = m9;
+		m[10] = m10;
+		m[11] = m11;
+		m[12] = m12;
+		m[13] = m13;
+		m[14] = m14;
+		m[15] = m15;
+	}
+
+	inline const float* Matrix4::get(){
+		return m;
+	}
+
+	inline Matrix3 Matrix4::get3x3()
+	{
+		return Matrix3(m[0], m[1], m[2], m[4], m[5], m[6], m[8], m[9], m[10]);
+	}
+
+	inline Vector4 Matrix4::operator*(const Vector4& rhs) const{
 		return Vector4(rhs[0] * m[0] + rhs[1] * m[1] + rhs[2] * m[2] + rhs[3] * m[3], rhs[0] * m[4] + rhs[1] * m[5] + rhs[2] * m[6] + rhs[3] * m[7], rhs[0] * m[8] + rhs[1] * m[9] + rhs[2] * m[10] + rhs[3] * m[11], rhs[0] * m[12] + rhs[1] * m[13] + rhs[2] * m[14] + rhs[3] * m[15]);
-}
+	}
 
 
-inline Matrix4 Matrix4::operator*(const Matrix4& rhs) const{
-	return Matrix4( m[0] * rhs[0] + m[4] * rhs[1] + m[8] * rhs[2] + m[12] * rhs[3], m[1] * rhs[0] + m[5] * rhs[1] + m[9] * rhs[2] + m[13] * rhs[3], m[2] * rhs[0] + m[6] * rhs[1] + m[10] * rhs[2] + m[14] * rhs[3], m[3] * rhs[0] + m[7] * rhs[1] + m[11] * rhs[2] + m[15] * rhs[3],
-					m[0] * rhs[4] + m[4] * rhs[5] + m[8] * rhs[6] + m[12] * rhs[7], m[1] * rhs[4] + m[5] * rhs[5] + m[9] * rhs[6] + m[13] * rhs[7], m[2] * rhs[4] + m[6] * rhs[5] + m[10] * rhs[6] + m[14] * rhs[7], m[3] * rhs[4] + m[7] * rhs[5] + m[11] * rhs[6] + m[15] * rhs[7],
-					m[0] * rhs[8] + m[4] * rhs[9] + m[8] * rhs[10] + m[12] * rhs[11], m[1] * rhs[8] + m[5] * rhs[9] + m[9] * rhs[10] + m[13] * rhs[11], m[2] * rhs[8] + m[6] * rhs[9] + m[10] * rhs[10] + m[14] * rhs[11], m[3] * rhs[8] + m[7] * rhs[9] + m[11] * rhs[10] + m[15] * rhs[11],
-					m[0] * rhs[12] + m[4] * rhs[13] + m[8] * rhs[14] + m[12] * rhs[15], m[1] * rhs[12] + m[5] * rhs[13] + m[9] * rhs[14] + m[13] * rhs[15], m[2] * rhs[12] + m[6] * rhs[13] + m[10] * rhs[14] + m[14] * rhs[15], m[3] * rhs[12] + m[7] * rhs[13] + m[11] * rhs[14] + m[15] * rhs[15]);
-}
+	inline Matrix4 Matrix4::operator*(const Matrix4& rhs) const{
+		return Matrix4(m[0] * rhs[0] + m[4] * rhs[1] + m[8] * rhs[2] + m[12] * rhs[3], m[1] * rhs[0] + m[5] * rhs[1] + m[9] * rhs[2] + m[13] * rhs[3], m[2] * rhs[0] + m[6] * rhs[1] + m[10] * rhs[2] + m[14] * rhs[3], m[3] * rhs[0] + m[7] * rhs[1] + m[11] * rhs[2] + m[15] * rhs[3],
+			m[0] * rhs[4] + m[4] * rhs[5] + m[8] * rhs[6] + m[12] * rhs[7], m[1] * rhs[4] + m[5] * rhs[5] + m[9] * rhs[6] + m[13] * rhs[7], m[2] * rhs[4] + m[6] * rhs[5] + m[10] * rhs[6] + m[14] * rhs[7], m[3] * rhs[4] + m[7] * rhs[5] + m[11] * rhs[6] + m[15] * rhs[7],
+			m[0] * rhs[8] + m[4] * rhs[9] + m[8] * rhs[10] + m[12] * rhs[11], m[1] * rhs[8] + m[5] * rhs[9] + m[9] * rhs[10] + m[13] * rhs[11], m[2] * rhs[8] + m[6] * rhs[9] + m[10] * rhs[10] + m[14] * rhs[11], m[3] * rhs[8] + m[7] * rhs[9] + m[11] * rhs[10] + m[15] * rhs[11],
+			m[0] * rhs[12] + m[4] * rhs[13] + m[8] * rhs[14] + m[12] * rhs[15], m[1] * rhs[12] + m[5] * rhs[13] + m[9] * rhs[14] + m[13] * rhs[15], m[2] * rhs[12] + m[6] * rhs[13] + m[10] * rhs[14] + m[14] * rhs[15], m[3] * rhs[12] + m[7] * rhs[13] + m[11] * rhs[14] + m[15] * rhs[15]);
+	}
 
-inline Matrix4 Matrix4::operator+(const Matrix4& rhs) const{
-	return Matrix4( m[0] + rhs[0], m[1] + rhs[1], m[2] + rhs[2], m[3] + rhs[3], 
-					m[4] + rhs[4], m[5] + rhs[5], m[6] + rhs[6], m[7] + rhs[7], 
-					m[8] + rhs[8], m[9] + rhs[9], m[10] + rhs[10], m[11] + rhs[11],
-					m[12] + rhs[12], m[13] + rhs[13], m[14] + rhs[14], m[15] + rhs[15] );
+	inline Matrix4 Matrix4::operator+(const Matrix4& rhs) const{
+		return Matrix4(m[0] + rhs[0], m[1] + rhs[1], m[2] + rhs[2], m[3] + rhs[3],
+			m[4] + rhs[4], m[5] + rhs[5], m[6] + rhs[6], m[7] + rhs[7],
+			m[8] + rhs[8], m[9] + rhs[9], m[10] + rhs[10], m[11] + rhs[11],
+			m[12] + rhs[12], m[13] + rhs[13], m[14] + rhs[14], m[15] + rhs[15]);
+	}
+
+	inline bool Matrix4::operator==(const Matrix4& rhs) const{
+		return (m[0] == rhs[0] && m[1] == rhs[1] && m[2] == rhs[2] && m[3] == rhs[3] &&
+			m[4] == rhs[4] && m[5] == rhs[5] && m[6] == rhs[6] && m[7] == rhs[7] &&
+			m[8] == rhs[8] && m[9] == rhs[9] && m[10] == rhs[10] && m[11] == rhs[11] &&
+			m[12] == rhs[12] && m[13] == rhs[13] && m[14] == rhs[14] && m[15] == rhs[15]);
+	}
+
+	inline bool Matrix4::operator!=(const Matrix4& rhs) const{
+		return (m[0] != rhs[0] || m[1] != rhs[1] || m[2] != rhs[2] || m[3] != rhs[3] ||
+			m[4] != rhs[4] || m[5] != rhs[5] || m[6] != rhs[6] || m[7] != rhs[7] ||
+			m[8] != rhs[8] || m[9] != rhs[9] || m[10] != rhs[10] || m[11] != rhs[11] ||
+			m[12] != rhs[12] || m[13] != rhs[13] || m[14] != rhs[14] || m[15] != rhs[15]);
 }
 
 inline float Matrix4::operator[](const int& i) const

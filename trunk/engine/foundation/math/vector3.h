@@ -15,6 +15,14 @@ public:
 
 	float operator[](int i) const;
 
+	float x() { return vec[0]; };
+	float y() { return vec[1]; };
+	float z() { return vec[2]; };
+
+	float x() const { return vec[0]; };
+	float y() const { return vec[1]; };
+	float z() const { return vec[2]; };
+
 	bool operator==(const Vector3& rhs) const;
 	bool operator!=(const Vector3& rhs) const;
 	const float* get();
