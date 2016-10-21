@@ -1,9 +1,8 @@
 #pragma once
-#include "material.h"
 
 namespace Render
 {
-	class Surface : public Material
+	class Surface
 	{
 	public:
 		Surface();

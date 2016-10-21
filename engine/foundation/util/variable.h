@@ -753,7 +753,7 @@ namespace Util
 			case Int:
 				return (this->i == rhs.i);
 			case UInt:
-				return (this->u == rhs.u);
+				return (this->ui == rhs.ui);
 			case Bool:
 				return (this->b == rhs.b);
 			case Float:

@@ -5,18 +5,22 @@
 #include "foundation/util/array.h"
 #include "surface.h"
 #include <map>
+#include "foundation/util/variable.h"
+
 
 namespace Render
 {
+	struct MaterialParameter
+	{
+		std::string name;
+		Util::Variable var;
+	};
 
 class Material
 {
 public:
 	Material();
 	~Material();
-
-
-
 
 private:
 	// name of the material

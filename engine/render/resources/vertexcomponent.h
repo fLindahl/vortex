@@ -270,7 +270,7 @@ VertexComponent::StringToSemanticName(const std::string& str)
     else if (str == "SkinJIndices") return SkinJIndices;
     else
     {
-        std::printf("VertexComponent::StringToSemanticName(): invalid string '%s'!", str);
+        //std::printf("VertexComponent::StringToSemanticName(): invalid string '%s'!", str);
         return Invalid;
     }
 }
@@ -318,7 +318,7 @@ VertexComponent::StringToFormat(const std::string& str)
     else if (str == "Short4N") return Short4N;
     else
     {
-        std::printf("VertexComponent::StringToFormat(): invalid string '%s'!\n", str);
+        //std::printf("VertexComponent::StringToFormat(): invalid string '%s'!\n", str);
         return Float;
     }
 }
