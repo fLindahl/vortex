@@ -100,7 +100,7 @@ namespace Util
         long int CharFind( const char & match ) const;
         const String & CharRepl( const char & match, const char & repl );
         String Substr( size_t start, size_t length );
-        long Find( const String & match, index_t index = 0 ) const;
+        long Find(const String & match) const;
         const String Replace( const String & match, const String & repl );
 
         // split methods
@@ -416,9 +416,9 @@ namespace Util
         return rs;
     }
 
-    inline long String::Find( const String & match, index_t index) const
+    inline long String::Find(const String & match) const
     {
-        char * pos = strchr(match.c_str()+index, match);
+        const char * pos = strstr(str, match.c_str());
         if(pos)
             return (long) ( pos - str );
         else
@@ -495,20 +495,16 @@ namespace Util
             return *this;
     }
 
-    inline std::vector<Util::String> String::Tokenize(Util::String str, Util::String delim)
+    inline std::vector<String> String::Tokenize(Util::String str, Util::String delim)
     {
-        std::vector<Util::String> tokens;
+        std::vector<String> tokens;
 
-        int i = 0;
-        auto pos = str.Find(delim);
-        while(pos != Util::String::npos)
+        char* ptr = const_cast<char*>(str.c_str());
+        const char* token;
+        while (0 != (token = strtok(ptr, delim.c_str())))
         {
-            tokens.push_back(str.Substr(i, pos-i));
-            i = ++pos;
-            pos = str.Find(delim, pos);
-
-            if (pos == Util::String::npos)
-                tokens.push_back(str.Substr(i, str.length()));
+            tokens.push_back(token);
+            ptr = 0;
         }
 
         return tokens;
