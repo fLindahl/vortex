@@ -59,10 +59,11 @@ namespace Util
 
     void String::AppendSplitArr(const String &s) const
     {
-        if (splitCount >= STRING_MAX_SPLIT) return;
+        if (splitCount >= STRING_MAX_SPLIT)
+            return;
         if (!splitCount)
         {
-            splitArray.reset(new _bwsp[STRING_MAX_SPLIT + 1]);
+            splitArray.reset(new stringSp[STRING_MAX_SPLIT + 1]);
         }
         splitArray[splitCount] = std::make_shared<String>(s);
         ++splitCount;

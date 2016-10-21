@@ -66,8 +66,8 @@ namespace Util
 
         // utility methods
         bool HaveValue() const;
-        size_t Length() const { return _str_len; }
-        size_t Size() const { return _str_len; }
+        size_t Length() const { return str_len; }
+        size_t Size() const { return str_len; }
         String & Format( const char * format, ... );
         String & Trim();
         String Lower() const;
@@ -87,7 +87,7 @@ namespace Util
         const split_ptr & Split( const char match ) const;
         const split_ptr & Split( const char * match, int max_split ) const;
         const String & SplitItem( size_t index ) const;
-        size_t SplitCount() const { return _split_count; }
+        size_t SplitCount() const { return splitCount; }
 
     private:
         char * str = nullptr;
