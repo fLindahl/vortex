@@ -12,11 +12,11 @@ namespace Render
 
 	};
 
-	Surface::Surface()
+	inline Surface::Surface()
 	{
 	}
 
-	Surface::~Surface()
+	inline Surface::~Surface()
 	{
 	}
 
