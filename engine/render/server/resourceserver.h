@@ -43,7 +43,8 @@ public:
 	bool HasTextureNamed(const std::string& nName);
 
 	//Loads a material .xml file and adds all materials to the list if they're not already defined
-	bool LoadMaterials(const char* fileName);
+	std::shared_ptr<Material> GetMaterial(const Util::String& name);
+	bool SetupMaterials(const char* fileName);
 	bool HasMaterialNamed(const std::string& nName);
 
 private:

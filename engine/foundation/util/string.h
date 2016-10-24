@@ -1,11 +1,9 @@
+#pragma once
 //  String.h
 //  A String class for the Vortex Engine
 //  by Anton Grönberg
 //  Copyright (c) 2016
 //
-
-#ifndef __String__
-#define __String__
 
 #ifdef _MSC_VER
 // disable _s warnings
@@ -19,13 +17,6 @@ int vasprintf(char ** ret, const char * format, va_list ap);
 #define _NOEXCEPT noexcept
 #endif
 
-#include <cstdlib>
-#include <cstring>
-#include <cstdarg>
-#include <cctype>
-#include <memory>
-#include <vector>
-#include "config.h"
 
 #define STRING_MAX_LEN 65535
 #define STRING_MAX_SPLIT 1023
@@ -76,6 +67,7 @@ namespace Util
 
         // comparison operators
         bool operator == ( const String & ) const;
+		bool operator == (const char* ) const;
         bool operator != ( const String & ) const;
         bool operator > ( const String & ) const;
         bool operator < ( const String & ) const;
@@ -86,6 +78,9 @@ namespace Util
         operator const char * () const;             // c-string type
 
         // utility methods
+		bool Append(const char*);
+		bool Append(const String&);
+
         bool HaveValue() const;
         size_t length() const { return str_len; }
         size_t size() const { return str_len; }
@@ -111,7 +106,7 @@ namespace Util
         size_t SplitCount() const { return splitCount; }
 
         //Tokenize
-        static std::vector<Util::String> Tokenize(Util::String str, Util::String delim);
+        static Util::Array<Util::String> Tokenize(Util::String str, Util::String delim);
 
         static const size_t npos = -1;
     };
@@ -258,6 +253,11 @@ namespace Util
         else return false;
     }
 
+	inline bool String::operator == (const char* rhs) const {
+		if (std::strncmp(this->c_str(), rhs, STRING_MAX_LEN) == 0) return true;
+		else return false;
+	}
+
     inline bool String::operator != ( const String & rhs ) const {
         if( std::strncmp(this->c_str(), rhs.c_str(), STRING_MAX_LEN) != 0 ) return true;
         else return false;
@@ -282,6 +282,18 @@ namespace Util
         if( std::strncmp(this->c_str(), rhs.c_str(), STRING_MAX_LEN) <= 0 ) return true;
         else return false;
     }
+
+	inline bool String::Append(const char* cstr)
+	{
+		this->operator+=(cstr);
+		return true;
+	}
+	
+	inline bool String::Append(const String& rhs)
+	{
+		this->operator+=(rhs.c_str());
+		return true;
+	}
 
     inline String::operator const char * () const
     {
@@ -495,15 +507,15 @@ namespace Util
             return *this;
     }
 
-    inline std::vector<String> String::Tokenize(Util::String str, Util::String delim)
+    inline Util::Array<String> String::Tokenize(Util::String str, Util::String delim)
     {
-        std::vector<String> tokens;
+        Util::Array<String> tokens;
 
         char* ptr = const_cast<char*>(str.c_str());
         const char* token;
         while (0 != (token = strtok(ptr, delim.c_str())))
         {
-            tokens.push_back(token);
+            tokens.Append(token);
             ptr = 0;
         }
 
@@ -535,6 +547,3 @@ inline int vasprintf(char ** ret, const char * format, va_list ap)
 
 #endif
 }
-
-
-#endif  // __BWLIB__String__

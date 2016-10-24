@@ -4,7 +4,7 @@ in vec3 toLight;
 in vec3 toCamera;
 
 out vec4 outColor;
-uniform sampler2D texSampler;
+uniform sampler2D AlbedoMap;
 
 void main()
 {	
@@ -15,7 +15,7 @@ void main()
 	float intensity2 = dot(toCamera, normalize(Normal));
 	
 	// diffuse color of the object from texture
-	vec3 diffuseColor = texture(texSampler,Texcoords).rgb;
+	vec3 diffuseColor = texture(AlbedoMap,Texcoords).rgb;
 	
 	if (intensity > 0.95)
 		color = vec4(intensity2,intensity2,intensity2,1.0);

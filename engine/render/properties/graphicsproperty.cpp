@@ -32,7 +32,7 @@ namespace Render
 		//}
 
 		this->modelInstance = inModelInstance;
-		this->modelInstance->addGraphicsProperty(this);
+		this->modelInstance->AddGraphicsProperty(this);
 
 	}
 

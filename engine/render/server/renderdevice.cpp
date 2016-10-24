@@ -1,6 +1,7 @@
 #include "config.h"
 #include "GL/glew.h"
 #include "renderdevice.h"
+#include "resourceserver.h"
 #include "render/graphics/camera.h"
 #include "render/resources/shaderobject.h"
 #include "render/shadersemantics.h"
@@ -8,6 +9,7 @@
 #include "render/resources/meshresource.h"
 #include "render/resources/textureresource.h"
 #include "render/properties/graphicsproperty.h"
+#include "foundation/util/variable.h"
 
 namespace Render
 {
@@ -30,26 +32,61 @@ void RenderDevice::Render()
     glEnable(GL_CULL_FACE);
     //glCullFace(GL_BACK);
 
-    for (ShaderObject* shaderObject : shaderObjects)
+    for (Material* material: materials)
     {
-        shaderObject->UseProgram();
+		if (material->GetShader()->GetProgram() != currentProgram)
+		{
+			glUseProgram(material->GetShader()->GetProgram());
+			currentProgram = material->GetShader()->GetProgram();
+		}
+        
+		for (int i = 0; i < material->TextureList().Size(); i++)
+		{
+			material->TextureList()[i]->BindTexture(i); //TODO: slot?
+		}
 
         //TODO: Renderstates?
 
-        for (ModelInstance* modelInstance : shaderObject->getModelInstances())
+
+		//TODO: Per surface
+		for (int i = 0; i < material->ParameterList().Size(); i++)
+		{
+			//TODO: Move this elsewhere
+			switch (material->ParameterList()[i]->var.GetType())
+			{
+			case Util::Variable::Type::Float:
+				material->GetShader()->setUni1f(*material->ParameterList()[i]->var.GetFloat(), material->ParameterList()[i]->name);
+				break;
+
+			case Util::Variable::Type::Vector3:
+				material->GetShader()->setUniVector3fv(Math::Vector3(material->ParameterList()[i]->var.GetVector3()), material->ParameterList()[i]->name);
+				break;
+
+			case Util::Variable::Type::Vector4:
+				material->GetShader()->setUniVector4fv(Math::Vector4(material->ParameterList()[i]->var.GetVector4()), material->ParameterList()[i]->name);
+				break;
+
+			default:
+				printf("ERROR : Parameter might not be fully implemented! \n");
+				assert(false);
+				break;
+			}
+		}
+
+        for (ModelInstance* modelInstance : material->getModelInstances())
         {
             //Bind mesh
             //TODO: We should probably check and make sure we don't bind these more than once
-            modelInstance->getMesh()->Bind();
-            modelInstance->getTexture()->BindTexture(0); //TODO: slot?
+            modelInstance->GetMesh()->Bind();
+            
 
-            for (GraphicsProperty* graphicsProperty : modelInstance->getGraphicsProperties())
+            for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
             {
-                shaderObject->setModelMatrix(graphicsProperty->getModelMatrix());
-                modelInstance->getMesh()->Draw();
+                material->GetShader()->setModelMatrix(graphicsProperty->getModelMatrix());
+                modelInstance->GetMesh()->Draw();
             }
 
-            modelInstance->getMesh()->Unbind();
+            modelInstance->GetMesh()->Unbind();
         }
     }
 }

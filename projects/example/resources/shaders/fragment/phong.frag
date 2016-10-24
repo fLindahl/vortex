@@ -4,7 +4,7 @@ in vec3 toLight;
 in vec3 toCamera;
 
 out vec4 Texture;
-uniform sampler2D texSampler;
+uniform sampler2D AlbedoMap;
 
 //////////////////////////////////////////////////////////
 
@@ -14,10 +14,10 @@ const vec3 u_lightDiffuseIntensity = vec3(0.8f, 0.8f, 0.8f);
 const vec3 u_lightSpecularIntensity = vec3(1.0f, 1.0f, 1.0f);
 
 // parameters of the material and possible values
-const vec3 u_matAmbientReflectance = vec3(1); 
-const vec3 u_matDiffuseReflectance = vec3(1);
-const vec3 u_matSpecularReflectance = vec3(1);
-const float u_matShininess = 64;
+uniform vec3 AmbientReflectance; 
+uniform vec3 DiffuseReflectance;
+uniform vec3 SpecularReflectance;
+uniform float Shininess;
 
 
 /////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ const float u_matShininess = 64;
 // returns intensity of reflected ambient lighting
 vec3 ambientLighting()
 {
-   return u_matAmbientReflectance * u_lightAmbientIntensity;
+   return AmbientReflectance * u_lightAmbientIntensity;
 }
 
 // returns intensity of diffuse reflection
@@ -33,7 +33,7 @@ vec3 diffuseLighting(in vec3 N, in vec3 L)
 {
    // calculation as for Lambertian reflection
    float diffuseTerm = clamp(dot(N, L), 0, 1) ;
-   return u_matDiffuseReflectance * u_lightDiffuseIntensity * diffuseTerm;
+   return DiffuseReflectance * u_lightDiffuseIntensity * diffuseTerm;
 }
 
 // returns intensity of specular reflection
@@ -47,9 +47,9 @@ vec3 specularLighting(in vec3 N, in vec3 L, in vec3 V)
    {
       // half vector
       vec3 H = normalize(L + V);
-      specularTerm = pow(max(dot(N, H), 0.0), u_matShininess);
+      specularTerm = pow(max(dot(N, H), 0.0), Shininess);
    }
-   return u_matSpecularReflectance * u_lightSpecularIntensity * specularTerm;
+   return SpecularReflectance * u_lightSpecularIntensity * specularTerm;
 }
 
 void main()
@@ -65,7 +65,7 @@ void main()
 	vec3 Ispe = specularLighting(N, L, V);
 
 	// diffuse color of the object from texture
-	vec3 diffuseColor = texture(texSampler,Texcoords).rgb;
+	vec3 diffuseColor = texture(AlbedoMap,Texcoords).rgb;
 
 	// combination of all components and diffuse color of the object
 	Texture.xyz = diffuseColor * (Iamb + Idif + Ispe);

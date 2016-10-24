@@ -10,28 +10,29 @@
 
 namespace Math
 {
-
-
 	/// Constructor start
 	class Matrix4{
 	public:
 		///Initiate identity matrix
 		Matrix4();
 
+		///construct from float array
+		Matrix4(const float f[16]);
+
 		///initiate 4D Matrix with all inputs.
-		Matrix4(float m0, float m1, float m2, float m3,
-			float m4, float m5, float m6, float m7,
-			float m8, float m9, float m10, float m11,
-			float m12, float m13, float m14, float m15);
+		Matrix4(const float& m0, const float& m1, const float& m2, const float& m3,
+			const float& m4, const float& m5, const float& m6, const float& m7,
+			const float& m8, const float& m9, const float& m10, const float& m11,
+			const float& m12, const float& m13, const float& m14, const float& m15);
 
 		///Initiate homogenous 4d matrix.
-		Matrix4(float m0, float m1, float m2,	///take only the 9 first variables since we only want to initiate those in an homogenous 4D Matrix.
-			float m4, float m5, float m6,	///Notice the names too.
-			float m8, float m9, float m10);
+		Matrix4(const float& m0, const float& m1, const float& m2,	///take only the 9 first variables since we only want to initiate those in an homogenous 4D Matrix.
+			const float& m4, const float& m5, const float& m6,	///Notice the names too.
+			const float& m8, const float& m9, const float& m10);
 
 		~Matrix4();
 
-		void set(float m0, float m1, float m2, float m4, float m5, float m6, float m8, float m9, float m10, float m3, float m7, float m11, float m12, float m13, float m14, float m15);		///Set values
+		void set(const float& m0, const float& m1, const float& m2, const float& m4, const float& m5, const float& m6, const float& m8, const float& m9, const float& m10, const float& m3, const float& m7, const float& m11, const float& m12, const float& m13, const float& m14, const float& m15);		///Set values
 		const float* get();		///Get array
 		Matrix3 get3x3();		///Get array
 
@@ -63,7 +64,7 @@ namespace Math
 
 		static Matrix4 perspectiveMatrix(const float& farZ, const float& nearZ, const float& aspect, const float& fov);
 		static Matrix4 viewMatrix(const float& pitch, const float& yaw, const Vector3& camerapos);
-		friend Matrix4 operator*(float scalar, const Matrix4& m);		///Scalar product
+		friend Matrix4 operator*(const float& scalar, const Matrix4& m);		///Scalar product
 		friend Vector4 operator*(const Vector4& vec, const Matrix4& m);	///Vector Product
 
 		static Matrix4 RotationQuaternion(const Quaternion& q);
@@ -78,12 +79,32 @@ namespace Math
 		set(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	inline Matrix4::Matrix4(float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8, float m9, float m10, float m11, float m12, float m13, float m14, float m15){
+	inline Matrix4::Matrix4(const float f[16])
+	{
+		this->m[0] = f[0];
+		this->m[1] = f[1];
+		this->m[2] = f[2];
+		this->m[3] = f[3];
+		this->m[4] = f[4];
+		this->m[5] = f[5];
+		this->m[6] = f[6];
+		this->m[7] = f[7];
+		this->m[8] = f[8];
+		this->m[9] = f[9];
+		this->m[10] = f[10];
+		this->m[11] = f[11];
+		this->m[12] = f[12];
+		this->m[13] = f[13];
+		this->m[14] = f[14];
+		this->m[15] = f[15];
+	}
+
+	inline Matrix4::Matrix4(const float& m0, const float& m1, const float& m2, const float& m3, const float& m4, const float& m5, const float& m6, const float& m7, const float& m8, const float& m9, const float& m10, const float& m11, const float& m12, const float& m13, const float& m14, const float& m15){
 		set(m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15); ///Set private array from arguments
 
 	}
 
-	inline Matrix4::Matrix4(float m0, float m1, float m2, float m4, float m5, float m6, float m8, float m9, float m10){
+	inline Matrix4::Matrix4(const float& m0, const float& m1, const float& m2, const float& m4, const float& m5, const float& m6, const float& m8, const float& m9, const float& m10){
 		float m3 = 0;
 		float m7 = 0;
 		float m11 = 0;
@@ -98,7 +119,7 @@ namespace Math
 
 	}
 
-	inline void Matrix4::set(float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8, float m9, float m10, float m11, float m12, float m13, float m14, float m15){
+	inline void Matrix4::set(const float& m0, const float& m1, const float& m2, const float& m3, const float& m4, const float& m5, const float& m6, const float& m7, const float& m8, const float& m9, const float& m10, const float& m11, const float& m12, const float& m13, const float& m14, const float& m15){
 		m[0] = m0;
 		m[1] = m1;
 		m[2] = m2;
@@ -432,7 +453,7 @@ inline Matrix4 Matrix4::viewMatrix(const float& pitch, const float& yaw, const V
 }
 
 ///  Friend Functions
-inline Matrix4 operator*(float scalar, const Matrix4& rhs)
+inline Matrix4 operator*(const float& scalar, const Matrix4& rhs)
 {
 	return Matrix4(scalar*rhs[0], scalar*rhs[1], scalar*rhs[2], scalar*rhs[3], scalar*rhs[4], scalar*rhs[5], scalar*rhs[6], scalar*rhs[7], scalar*rhs[8], scalar*rhs[9], scalar*rhs[10], scalar*rhs[11], scalar*rhs[12], scalar*rhs[13], scalar*rhs[14], scalar*rhs[15]);
 }

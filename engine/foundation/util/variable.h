@@ -5,13 +5,13 @@ A variable that can act as any type.
  -- Do not use unless there's a good reason for it! --
  ----------------------------------------------------------
  */
-#include "config.h"
+//#include "config.h"
 #include "array.h"
 #include "foundation/math/vector2.h"
 #include "foundation/math/vector3.h"
 #include "foundation/math/vector4.h"
 #include "foundation/math/matrix4.h"
-#include <string>
+//#include "foundation/util/string.h"
 
 namespace Util
 {
@@ -45,6 +45,7 @@ namespace Util
 		Variable();
 
 		// Various constructors for directly setting values
+		Variable(const Type& type, const Util::String& value);
 		Variable(int value);
 		Variable(uint value);
 		Variable(float value);
@@ -52,7 +53,7 @@ namespace Util
 		Variable(const Math::Vector2& value);
 		Variable(const Math::Vector3& value);
 		Variable(const Math::Vector4& value);
-		Variable(const std::string& value);
+		Variable(const Util::String& value);
 		Variable(const Math::Matrix4& value);
 		Variable(void* value);
 		Variable(const Array<int>& value);
@@ -61,12 +62,14 @@ namespace Util
 		Variable(const Array<Math::Vector2>& value);
 		Variable(const Array<Math::Vector3>& value);
 		Variable(const Array<Math::Vector4>& value);
-		Variable(const Array<std::string>& value);
+		Variable(const Array<Util::String>& value);
 		Variable(const Array<Math::Matrix4>& value);
 		Variable(const Variable& value);
 
 		// destructor
 		~Variable();
+
+		static Variable::Type StringToType(const Util::String& str);
 
 		// set type of attribute
 		void SetType(Type t);
@@ -75,6 +78,13 @@ namespace Util
 		// clear content, sets to undefined value / void type
 		void Clear();
 
+		//Get functions!
+		Util::String* GetString() const;
+		float* GetFloat();
+		float* GetVector3();
+		float* GetVector4();
+
+		//Operators!
 		void operator=(const Variable& rhs);
 		void operator=(int val);
 		void operator=(uint val);
@@ -84,7 +94,7 @@ namespace Util
 		void operator=(const Math::Vector3& val);
 		void operator=(const Math::Vector4& val);
 		void operator=(const Math::Matrix4& val);
-		void operator=(const std::string& s);
+		void operator=(const Util::String& s);
 		void operator=(void* ptr);
 		void operator=(const Util::Array<int>& rhs);
 		void operator=(const Util::Array<float>& rhs);
@@ -93,7 +103,7 @@ namespace Util
 		void operator=(const Util::Array<Math::Vector3>& rhs);
 		void operator=(const Util::Array<Math::Vector4>& rhs);
 		void operator=(const Util::Array<Math::Matrix4>& rhs);
-		void operator=(const Util::Array<std::string>& rhs);
+		void operator=(const Util::Array<Util::String>& rhs);
 		
 		bool operator==(const Variable& rhs) const;
 		bool operator==(int rhs) const;
@@ -103,7 +113,7 @@ namespace Util
 		bool operator==(const Math::Vector2& rhs) const;
 		bool operator==(const Math::Vector3& rhs) const;
 		bool operator==(const Math::Vector4& rhs) const;
-		bool operator==(const std::string& rhs) const;
+		bool operator==(const Util::String& rhs) const;
 		bool operator==(void* ptr) const;
 
 		bool operator!=(const Variable& rhs) const;
@@ -114,7 +124,7 @@ namespace Util
 		bool operator!=(const Math::Vector2& rhs) const;
 		bool operator!=(const Math::Vector3& rhs) const;
 		bool operator!=(const Math::Vector4& rhs) const;
-		bool operator!=(const std::string& rhs) const;
+		bool operator!=(const Util::String& rhs) const;
 		bool operator!=(void* ptr) const;
 
 		bool operator>(const Variable& rhs) const;
@@ -136,7 +146,7 @@ namespace Util
 			bool b;
 			float f[4];
 			Math::Matrix4* m;
-			std::string* string;
+			Util::String* string;
 			void* voidPtr;
 			Util::Array<int>* intArray;
 			Util::Array<float>* floatArray;
@@ -145,7 +155,7 @@ namespace Util
 			Util::Array<Math::Vector3>* vector3Array;
 			Util::Array<Math::Vector4>* vector4Array;
 			Util::Array<Math::Matrix4>* matrix4Array;
-			Util::Array<std::string>* stringArray;
+			Util::Array<Util::String>* stringArray;
 		};
 	};
 
@@ -158,6 +168,155 @@ namespace Util
 	inline Variable::~Variable()
 	{
 		this->Delete();
+	}
+
+	inline Variable::Variable(const Type& type, const Util::String& value) :
+		type(type)
+	{
+		switch (type)
+		{
+		case String:
+			this->string = new Util::String(value);
+			return;
+
+		case Matrix4:
+			float flts[16];
+			sscanf(value.c_str(), "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", &flts[0], &flts[1], &flts[2], &flts[3], &flts[4], &flts[5], &flts[6], &flts[7], &flts[8], &flts[9], &flts[10], &flts[11], &flts[12], &flts[13], &flts[14], &flts[15]);
+			
+			this->m = new Math::Matrix4(flts);
+			
+			return;
+
+		case Float:
+			float flt;
+			sscanf(value.c_str(), "%f", &flt);
+
+			this->f[0] = flt;
+
+			return;
+
+		case Vector2:
+			float flts2[2];
+			sscanf(value.c_str(), "%f, %f", &flts2[0], &flts2[1]);
+
+			this->f[0] = flts2[0];
+			this->f[1] = flts2[1];
+
+			return;
+
+		case Vector3:
+			float flts3[3];
+			sscanf(value.c_str(), "%f, %f, %f", &flts3[0], &flts3[1], &flts3[2]);
+
+			this->f[0] = flts3[0];
+			this->f[1] = flts3[1];
+			this->f[2] = flts3[2];
+
+			return;
+
+		case Vector4:
+			float flts4[4];
+			sscanf(value.c_str(), "%f, %f, %f, %f", &flts4[0], &flts4[1], &flts4[2], &flts4[3]);
+
+			this->f[0] = flts4[0];
+			this->f[1] = flts4[1];
+			this->f[2] = flts4[2];
+			this->f[3] = flts4[3];
+
+			return;
+
+		default:
+			printf("ERROR: Variable constructor not implemented\n");
+			assert(false);
+			return;
+		}
+	}
+
+	inline Variable::Type Variable::StringToType(const Util::String& str)
+	{
+		if (str == "string")
+		{
+			return String;
+		}
+		else if (str == "void")
+		{
+			return Void;
+		}
+		else if (str == "int")
+		{
+			return Int;
+		}
+		else if (str == "uint")
+		{
+			return UInt;
+		}
+		else if (str == "float")
+		{
+			return Float;
+		}
+		else if (str == "bool")
+		{
+			return Bool;
+		}
+		else if (str == "vector2")
+		{
+			return Vector2;
+		}
+		else if (str == "vector3")
+		{
+			return Vector3;
+		}
+		else if (str == "vector4")
+		{
+			return Vector4;
+		}
+		else if (str == "matrix4")
+		{
+			return Matrix4;
+		}
+		else if (str == "voidPtr")
+		{
+			return VoidPtr;
+		}
+		else if (str == "intArray")
+		{
+			return IntArray;
+		}
+		else if (str == "floatArray")
+		{
+			return FloatArray;
+		}
+		else if (str == "boolArray")
+		{
+			return BoolArray;
+		}
+		else if (str == "vector2Array")
+		{
+			return Vector2Array;
+		}
+		else if (str == "vector3Array")
+		{
+			return Vector3Array;
+		}
+		else if (str == "vector4Array")
+		{
+			return Vector4Array;
+		}
+		else if (str == "stringArray")
+		{
+			return StringArray;
+		}
+		else if (str == "matrix4Array")
+		{
+			return Matrix4Array;
+		}
+		else
+		{
+			printf("ERROR: No such variable!");
+			assert(false);
+		}
+		
+		return Void;
 	}
 
 	inline void Variable::Delete()
@@ -217,10 +376,11 @@ namespace Util
 			delete this->stringArray;
 			this->stringArray = 0;
 			break;
+			
+		case Void:
+			break;
 
 		default:
-			//Something is not implemented...
-			assert(false);
 			break;
 		}
 
@@ -231,6 +391,26 @@ namespace Util
 	inline void	Variable::Clear()
 	{
 		this->Delete();
+	}
+
+	inline Util::String* Variable::GetString() const
+	{
+		return this->string;
+	}
+
+	inline float* Variable::GetFloat()
+	{
+		return f;
+	}
+
+	inline float* Variable::GetVector3()
+	{
+		return this->f;
+	}
+
+	inline float* Variable::GetVector4()
+	{
+		return this->f;
 	}
 
 	inline void Variable::Copy(const Variable& rhs)
@@ -268,67 +448,47 @@ namespace Util
 			this->f[3] = rhs.f[3];
 			break;
 		case String:
-			if (this->string != nullptr)
-				delete this->string;
-
-			this->string = new std::string(*rhs.string);
+			this->Delete();
+			this->string = new Util::String(*rhs.string);
 			break;
 		case Matrix4:
-			if (this->m != nullptr)
-				delete this->m;
-
+			this->Delete();
 			this->m = new Math::Matrix4(*rhs.m);
 			break;
 		case VoidPtr:
 			this->voidPtr = rhs.voidPtr;
 			break;
 		case IntArray:
-			if (this->intArray != nullptr)
-				delete this->intArray;
-
+			this->Delete();
 			this->intArray = new Util::Array<int>(*rhs.intArray);
 			break;
 		case FloatArray:
-			if (this->floatArray != nullptr)
-				delete this->floatArray;
-
+			this->Delete();
 			this->floatArray = new Util::Array<float>(*rhs.floatArray);
 			break;
 		case BoolArray:
-			if (this->boolArray != nullptr)
-				delete this->boolArray;
-
+			this->Delete();
 			this->boolArray = new Util::Array<bool>(*rhs.boolArray);
 			break;
 		case Vector2Array:
-			if (this->vector2Array != nullptr)
-				delete this->vector2Array;
-
+			this->Delete();
 			this->vector2Array = new Util::Array<Math::Vector2>(*rhs.vector2Array);
 			break;
 		case Vector3Array:
-			if (this->vector3Array != nullptr)
-				delete this->vector3Array;
-
+			this->Delete();
 			this->vector3Array = new Util::Array<Math::Vector3>(*rhs.vector3Array);
 			break;
 		case Vector4Array:
-			if (this->vector4Array!= nullptr)
-				delete this->vector4Array;
-
+			this->Delete();
 			this->vector4Array = new Util::Array<Math::Vector4>(*rhs.vector4Array);
 			break;
 		case Matrix4Array:
-			if (this->matrix4Array!= nullptr)
-				delete this->matrix4Array;
-
+			this->Delete();
 			this->matrix4Array = new Util::Array<Math::Matrix4>(*rhs.matrix4Array);
 			break;
 		case StringArray:
-			if (this->stringArray != nullptr)
-				delete this->stringArray;
-
-			this->stringArray = new Util::Array<std::string>(*rhs.stringArray);
+			this->Delete();
+			this->stringArray = new Util::Array<Util::String>(*rhs.stringArray);
 			break;
 		default:
 			//invalid type!
@@ -391,13 +551,13 @@ namespace Util
 		this->f[3] = rhs.w();
 	}
 
-	inline Variable::Variable(const std::string& rhs) :
+	inline Variable::Variable(const Util::String& rhs) :
 		type(String)
 	{
 		if (this->string != nullptr)
 			delete this->string;
 
-		this->string = new std::string(rhs);
+		this->string = new Util::String(rhs);
 	}
 
 	inline Variable::Variable(void* ptr) :
@@ -475,13 +635,13 @@ namespace Util
 		this->matrix4Array = new Util::Array<Math::Matrix4>(rhs);
 	}
 
-	inline Variable::Variable(const Util::Array<std::string>& rhs) :
+	inline Variable::Variable(const Util::Array<Util::String>& rhs) :
 		type(StringArray)
 	{
 		if (this->stringArray != nullptr)
 			delete this->stringArray;
 
-		this->stringArray = new Util::Array<std::string>(rhs);
+		this->stringArray = new Util::Array<Util::String>(rhs);
 	}
 
 	inline void	Variable::SetType(Type t)
@@ -491,7 +651,7 @@ namespace Util
 		switch (t)
 		{
 		case String:
-			this->string = new std::string();
+			this->string = new Util::String();
 			break;
 		case Matrix4:
 			this->m = new Math::Matrix4();
@@ -521,7 +681,7 @@ namespace Util
 			this->matrix4Array = new Util::Array<Math::Matrix4>();
 			break;
 		case StringArray:
-			this->stringArray = new Util::Array<std::string>();
+			this->stringArray = new Util::Array<Util::String>();
 			break;
 		default:
 			break;
@@ -595,7 +755,7 @@ namespace Util
 		this->f[3] = val.w();
 	}
 
-	inline void	Variable::operator=(const std::string& s)
+	inline void	Variable::operator=(const Util::String& s)
 	{
 		if (String == this->type)
 		{
@@ -604,7 +764,7 @@ namespace Util
 		else
 		{
 			this->Delete();
-			this->string = new std::string(s);
+			this->string = new Util::String(s);
 		}
 		this->type = String;
 	}
@@ -728,7 +888,7 @@ namespace Util
 		this->type = Matrix4Array;
 	}
 
-	inline void	Variable::operator=(const Util::Array<std::string>& val)
+	inline void	Variable::operator=(const Util::Array<Util::String>& val)
 	{
 		if (StringArray == this->type)
 		{
@@ -737,7 +897,7 @@ namespace Util
 		else
 		{
 			this->Delete();
-			this->stringArray = new Util::Array<std::string>(val);
+			this->stringArray = new Util::Array<Util::String>(val);
 		}
 		this->type = StringArray;
 	}
@@ -960,7 +1120,7 @@ namespace Util
 		return (this->b == rhs);
 	}
 
-	inline bool	Variable::operator==(const std::string& rhs) const
+	inline bool	Variable::operator==(const Util::String& rhs) const
 	{
 		assert(String == this->type);
 		return ((*this->string) == rhs);
@@ -1017,7 +1177,7 @@ namespace Util
 		return (this->b != rhs);
 	}
 
-	inline bool	Variable::operator!=(const std::string& rhs) const
+	inline bool	Variable::operator!=(const Util::String& rhs) const
 	{
 		assert(String == this->type);
 		return (*this->string) != rhs;

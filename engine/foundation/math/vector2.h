@@ -9,8 +9,8 @@ namespace Math
 class Vector2 {
 public: 
 	Vector2();
-	Vector2(float*);
-	Vector2(float,float);
+	Vector2(const float*);
+	Vector2(const float&, const float&);
 	~Vector2();
 
 	float operator[](const int& i) const;
@@ -41,12 +41,12 @@ inline Vector2::Vector2(){
 	vec[0] = vec[1] = 0.0f;
 }
 
-inline Vector2::Vector2(float* arr){
+inline Vector2::Vector2(const float* arr){
 	vec[0] = arr[0];
 	vec[1] = arr[1];
 }
 
-inline Vector2::Vector2(float a, float b){
+inline Vector2::Vector2(const float& a, const float& b){
 	vec[0] = a, vec[1] = b;
 }
 
