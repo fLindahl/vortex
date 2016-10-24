@@ -1,6 +1,7 @@
 #include "config.h"
 #include "resourceserver.h"
 #include "tinyxml2.h"
+#include "renderdevice.h"
 
 namespace Render
 {
@@ -67,34 +68,111 @@ bool ResourceServer::HasTextureNamed(const std::string& nName)
 		return false;
 }
 
-bool ResourceServer::LoadMaterials(const char *fileName)
+std::shared_ptr<Material> ResourceServer::GetMaterial(const Util::String& name)
 {
+	if (this->HasMaterialNamed(name.c_str()))
+	{
+		//HACK: We shouldn't need to cast here
+		return this->materials[std::string(name)];
+	}
+	else
+	{
+		printf("ERROR: No such material!");
+		return nullptr;
+	}
+}
+
+bool ResourceServer::SetupMaterials(const char *fileName)
+{
+	//TODO: should this really be here?
+
 	tinyxml2::XMLDocument data;
-	data.LoadFile(fileName);
+	int result = data.LoadFile(fileName);
+	
+
+	if (result != 0)
+	{
+		printf("ERROR: Could not load materials file!");
+
+#ifdef DEBUG
+		assert(false);
+#endif // DEBUG		
+
+		return false;
+	}
 
 	tinyxml2::XMLElement* materials = data.RootElement()->FirstChildElement();
 	tinyxml2::XMLElement* material = materials->FirstChildElement();
 
-
-	//First we check if the specified material is already loaded.
-	const tinyxml2::XMLAttribute* nameAttr = material->FirstAttribute();
-
-	if (this->HasMaterialNamed(nameAttr->Value()))
+	while (true)
 	{
-		printf("WARNING: Duplicate material loaded: \" %s \". Using previously loaded material...", nameAttr->Value());
+		const tinyxml2::XMLAttribute* nameAttr = material->FirstAttribute();
+
+		//First we check if the specified material is already loaded.
+		if (this->HasMaterialNamed(nameAttr->Value()))
+		{
+			printf("WARNING: Duplicate material loaded: \" %s \". Using previously loaded material...", nameAttr->Value());
+		}
+		else // Load material!
+		{
+			// Create our material
+			shared_ptr<Material> mat = make_shared<Material>();
+
+			// Set name
+			mat->SetName(nameAttr->Value());
+
+			// Get which frame pass we render in
+			const tinyxml2::XMLElement* pass = material->FirstChildElement("Pass");
+			mat->SetFramePass(pass->FindAttribute("name")->Value());
+
+			// Load shader
+			mat->SetShader(pass->FindAttribute("shader")->Value());
+
+			// Get all parameters that this material contains
+			const tinyxml2::XMLElement* param = material->FirstChildElement("Param");
+			while (true)
+			{
+				Util::String type = param->FindAttribute("type")->Value();
+								
+				Util::Variable var = Util::Variable(Util::Variable::StringToType(type), Util::String(param->FindAttribute("defaultValue")->Value()));
+				
+				mat->AddParameter(param->FindAttribute("name")->Value(), var);
+				
+				if (param->NextSiblingElement("Param") != nullptr)
+				{
+					param = param->NextSiblingElement("Param");
+				}
+				else
+				{
+					// out of parameters
+					break;
+				}
+			}
+			
+			this->materials.insert(std::make_pair(nameAttr->Value(), mat));
+			RenderDevice::Instance()->AddMaterial(mat.get());
+		}
+
+		if (material->NextSiblingElement() != nullptr)
+		{
+			material = material->NextSiblingElement();
+		}
+		else
+		{
+			// end of materials
+			break;
+		}
 	}
-	else
-	{
-		// Load material!
 
-
-	}
-
+	return true;
 }
 
 bool ResourceServer::HasMaterialNamed(const std::string &nName)
 {
-
+	if (this->materials.count(nName) > 0)
+		return true;
+	else
+		return false;
 }
 
 }

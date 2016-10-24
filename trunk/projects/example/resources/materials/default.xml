@@ -1,20 +1,32 @@
 <Vortex>
     <Materials>
         <Material name="Static" desc="A lit opaque material">
+			<!-- Examples of future frame passes -->
+			<!--
+			<Pass batch="Picking" shader="picking" variation="Static"/>
+			<Pass batch="SpotLightShadow" shader="shadow" variation="Static|Spot"/>
+			<Pass batch="PointLightShadow" shader="shadow" variation="Static|Point"/>
+			<Pass batch="GlobalShadow" shader="shadow" variation="Static|Global"/>
+			-->
+			
+			<Pass name="FlatGeometryLit" shader="defaultLit"/>
+			
             <!-- material textures -->
-            <Param name="AlbedoMap" type="string" defaultValue="tex:system/placeholder"/>
+            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/player.png"/>
 
             <!-- various parameters -->
-            <Param name="AlbedoIntensity" type="float4" defaultValue="1.0f, 1.0f, 1.0f, 1.0f" min="0.0f, 0.0f, 0.0f, 0.0f" max="1.0f, 1.0f, 1.0f, 1.0f" edit="color" desc="Material albedo multiplier"/>
-            <Param name="SpecularIntensity" type="float4" defaultValue="0.0f, 0.0f, 0.0f, 0.0f" min="0.0f, 0.0f, 0.0f, 0.0f" max="1.0f, 1.0f, 1.0f, 1.0f" edit="color" desc="Material specular reflectivity index"/>
+			<Param name="AmbientReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material ambience multiplier"/>
+            <Param name="DiffuseReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material albedo multiplier"/>
+            <Param name="SpecularReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material specular reflectivity multiplier"/>
+            <Param name="Shininess" type="float" defaultValue="64" desc="Material shininess"/>
         </Material>
-        <Material name="Toon" shader="" desc="Generic toon-shader material">
-            <!-- material textures -->
-            <Param name="AlbedoMap" type="string" defaultValue="tex:system/placeholder"/>
-
-            <!-- various parameters -->
-            <Param name="AlbedoIntensity" type="float4" defaultValue="1.0f, 1.0f, 1.0f, 1.0f" min="0.0f, 0.0f, 0.0f, 0.0f" max="1.0f, 1.0f, 1.0f, 1.0f" edit="color" desc="Material albedo multiplier"/>
-            <Param name="SpecularIntensity" type="float4" defaultValue="0.0f, 0.0f, 0.0f, 0.0f" min="0.0f, 0.0f, 0.0f, 0.0f" max="1.0f, 1.0f, 1.0f, 1.0f" edit="color" desc="Material specular reflectivity index"/>
+		
+        <Material name="Toon" desc="Generic toon-shader material">
+            
+			<Pass name="FlatGeometryLit" shader="toonShader"/>
+			
+			<!-- material textures -->
+            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/player.png"/>
         </Material>
     </Materials>
 </Vortex>

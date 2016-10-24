@@ -942,9 +942,6 @@ Array<TYPE>::InsertSorted(const TYPE& elm)
             } 
             else 
             {
-                #if NEBULA3_BOUNDSCHECKS
-                n_assert(0 == lo);
-                #endif
                 this->Insert(lo, elm);
                 return lo;
             }

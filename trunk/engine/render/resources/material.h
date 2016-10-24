@@ -6,13 +6,13 @@
 #include "surface.h"
 #include <map>
 #include "foundation/util/variable.h"
-
+//#include "foundation/util/string.h"
 
 namespace Render
 {
 	struct MaterialParameter
 	{
-		std::string name;
+		Util::String name;
 		Util::Variable var;
 	};
 
@@ -21,43 +21,52 @@ class Material
 public:
 	Material();
 	~Material();
-/*
-    void SetName();
-    std::string GetName();
 
-    void SetShaderObject();
-    std::shared_ptr<ShaderObject> GetShaderObject();
+	// Used for sorting by shaderobject.
+	bool operator<(const Material& rhs) const;
+
+    void SetName(const Util::String& name);
+	Util::String GetName();
+
+    void SetShader(const Util::String& name);
+    std::shared_ptr<ShaderObject> GetShader() const;
 
     Util::Array<std::shared_ptr<TextureResource>>& TextureList();
 
-    MaterialParameter& GetParameterByName(const std::string& name);
-
+	MaterialParameter* GetParameterByName(const Util::String& name);
+	void AddParameter(const Util::String& name, const Util::Variable& variable);
+	
     Util::Array<Surface>& SurfaceList();
-*/
 
+	void SetFramePass(const Util::String& pass);
+	index_t GetFramePass();
+
+	Util::Array<ModelInstance*>& getModelInstances() { return this->modelInstances; }
+
+	Util::Array<MaterialParameter*>& ParameterList() { return this->parameters; }
 
 private:
 	// name of the material
-	std::string name;
+	Util::String name;
 
 	// loaded shader object
 	std::shared_ptr<ShaderObject> shader;
 
+	// What framepass are we rendering this material in?
+	// TODO: this should probably be it's own class that we just point to... maybe...
+	index_t framePass;
+
 	// loaded textures
 	Util::Array<std::shared_ptr<TextureResource>> textures;
 	
-	std::map<std::string, MaterialParameter> parametersByName;
+	std::map<Util::String, MaterialParameter*> parametersByName;
+	Util::Array<MaterialParameter*> parameters;
 
 	// all surfaces that currently use this material
 	Util::Array<Surface> surfaces;
+
+	//TODO: This should be surfaces, not models, since models should hold their own surfaces with specific parameters
+	Util::Array<ModelInstance*> modelInstances;
 };
-
-inline Material::Material()
-{
-}
-
-inline Material::~Material()
-{
-}
 
 }

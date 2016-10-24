@@ -2,12 +2,16 @@
 #include <memory>
 #include "foundation/util/array.h"
 
+namespace Util
+{
+	class String;
+}
+
 namespace Render
 {
 
 class MeshResource;
-class TextureResource;
-class ShaderObject;
+class Material;
 class GraphicsProperty;
 
 class ModelInstance
@@ -16,23 +20,19 @@ public:
 	ModelInstance();
 	~ModelInstance();
 
-	std::shared_ptr<ShaderObject> getShaderObject();
-	void setShaderObject(std::shared_ptr<ShaderObject> inShaderObject);
-
-	std::shared_ptr<MeshResource> getMesh();
-	void setMesh(const char* file);
-
-	std::shared_ptr<TextureResource> getTexture();
-	void setTexture(const char* file);
+	std::shared_ptr<MeshResource> GetMesh();
+	void SetMesh(const char* file);
 	
-	void addGraphicsProperty(GraphicsProperty* gp);
+	void AddGraphicsProperty(GraphicsProperty* gp);
 
-	Util::Array<GraphicsProperty*>& getGraphicsProperties();
+	void SetMaterial(const Util::String& name);
+	std::shared_ptr<Material> GetMaterial();
+
+	Util::Array<GraphicsProperty*>& GetGraphicsProperties();
 
 private:
 	std::shared_ptr<MeshResource> mesh;
-	std::shared_ptr<TextureResource> texture;
-	std::shared_ptr<ShaderObject> shaderObject;
+	std::shared_ptr<Material> material;
 
 	Util::Array<GraphicsProperty*> graphicsProperties;
 };
