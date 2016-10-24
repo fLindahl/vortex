@@ -54,24 +54,18 @@ ExampleApp::Open()
 		gProperty = new Render::GraphicsProperty();
 		gProperty1 = new Render::GraphicsProperty();
 
-		// Load our shaders
-		ShaderServer::Instance()->LoadShader("resources/shaders/vertex.vert");
-		ShaderServer::Instance()->LoadShader("resources/shaders/phong.frag");
-		ShaderServer::Instance()->LoadShader("resources/shaders/toonshader.frag");
-	
-        // Because we're trying to load the same vertex shader twice, the shaderserver will return the same shader as before, thus not needing to recompile it
-        // If we we're to ty to load the same shader object twice it's the same principle.
-        shader = ShaderServer::Instance()->LoadShaderObject("resources/shaders/vertex.vert", "resources/shaders/phong.frag");
-        shader1 = ShaderServer::Instance()->LoadShaderObject("resources/shaders/vertex.vert", "resources/shaders/toonshader.frag");
+		//Always setup shaders before materials!
+		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
 
-		modelInstance->setShaderObject(shader);
-		modelInstance->setMesh("resources/models/player.nvx2");
-		modelInstance->setTexture("resources/textures/player.png");
+		//Load all materials
+		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
+
+		modelInstance->SetMaterial("Static");
+		modelInstance->SetMesh("resources/models/player.nvx2");
 		gProperty->setModelInstance(modelInstance);
 
-		modelInstance1->setShaderObject(shader1);
-		modelInstance1->setMesh("resources/models/player.nvx2");
-		modelInstance1->setTexture("resources/textures/player.png");
+		modelInstance1->SetMaterial("Toon");
+		modelInstance1->SetMesh("resources/models/player.nvx2");
 		gProperty1->setModelInstance(modelInstance1);
 
 		return true;

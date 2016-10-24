@@ -9,14 +9,14 @@ namespace Render
 
 	ShaderObject::ShaderObject()
 	{
-		
+
 	}
 
 	ShaderObject::~ShaderObject()
 	{
 
 	}
-	
+
 	void ShaderObject::loadVertexShader(const std::string &vertFile)
 	{
 		this->vertexShader = ShaderServer::Instance()->LoadVertexShader(vertFile);
@@ -35,6 +35,11 @@ namespace Render
 	void ShaderObject::setFragmentShader(const GLuint &in)
 	{
 		this->fragmentShader = in;
+	}
+
+	void ShaderObject::SetRenderState(const RenderState& state)
+	{
+		this->renderState = state;
 	}
 
 	void ShaderObject::setModelMatrix(Math::Matrix4 model)
@@ -89,13 +94,6 @@ namespace Render
 			printf("[PROGRAM LINK ERROR]: %s", buf);
 			delete[] buf;
 		}
-
-		RenderDevice::Instance()->addShaderObject(this);
-	}
-
-	void ShaderObject::UseProgram()
-	{
-		glUseProgram(this->program);
 	}
 
 	GLuint ShaderObject::GetProgram()

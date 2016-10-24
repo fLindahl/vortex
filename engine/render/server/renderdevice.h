@@ -10,6 +10,7 @@
 #include "GLFW/glfw3.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/util/array.h"
+#include "render/resources/material.h"
 
 
 namespace Render
@@ -23,6 +24,7 @@ namespace Render
         RenderDevice()
         {
             glGenBuffers(1, this->ubo);
+			currentProgram = 0;
         }
 
         struct UniformBufferBlock
@@ -48,13 +50,15 @@ namespace Render
         void operator=(RenderDevice const&) = delete;
 
 
-        void addShaderObject(ShaderObject* obj) { this->shaderObjects.Append(obj); }
+		void AddMaterial(Material* obj) { this->materials.InsertSorted(obj); }
         //This renders all graphicsproperties.
         void Render();
 
     private:
+		GLuint currentProgram;
+
         //contains all the shader objects that we've loaded
-        Util::Array<ShaderObject*> shaderObjects;
+        Util::Array<Material*> materials;
     };
 
 

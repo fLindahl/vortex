@@ -3,6 +3,8 @@
 #include <fstream>
 #include <string>
 #include "shaderconstants.h"
+#include "tinyxml2.h"
+#include "render/resources/shaderobject.h"
 
 namespace Render
 {
@@ -30,83 +32,124 @@ std::string ShaderServer::ReadFromFile(const std::string &filename)
 	return content;
 }
 
-
-GLuint ShaderServer::LoadShader(const std::string& file)
+std::shared_ptr<ShaderObject> ShaderServer::LoadShader(const std::string& shader)
 {
-    //Make sure we've not already loaded this shader
-    if (!this->hasShaderLoaded(file))
-    {
-        GLenum shaderType;
-        if (file.substr(file.find_last_of(".")) == ".vert")
-        {
-            shaderType = GL_VERTEX_SHADER;
-        }
-        else if (file.substr(file.find_last_of(".")) != ".vert")
-        {
-            shaderType = GL_FRAGMENT_SHADER;
-        }
-        else
-        {
-            printf("[SHADER LOAD ERROR]: File is not a .vert or .frag file!");
-            return false;
-        }
+	if (this->HasShaderNamed(shader))
+	{
+		return this->shaderObjects[shader];
+	}
+	else
+	{
+		printf("[SHADER LOAD ERROR]: Could not retrieve shader!");
+		assert(false);
+		return nullptr;
+	}
+}
 
-        std::string content = ReadFromFile(file);
-        if (content.empty())
-        {
-            return false;
-        }
+bool ShaderServer::SetupShaders(const std::string& file)
+{
+	tinyxml2::XMLDocument data;
+	int result = data.LoadFile(file.c_str());
+	
+	if (result != 0)
+	{
+		printf("ERROR: Could not load materials file!");
 
-        //Attach Header
-        if(shaderType == GL_VERTEX_SHADER)
-        {
-            content = VertexShaderHeader + content;
-        }
-        else
-        {
-            content = FragmentShaderHeader + content;
-        }
+#ifdef DEBUG
+		assert(false);
+#endif // DEBUG		
 
-        const char* s = content.c_str();
+		return false;
+	}
 
-        // setup fragment shader
-        GLuint shader = glCreateShader(shaderType);
-        GLint length = (GLint)content.length();
-        glShaderSource(shader, 1, &s, &length);
-        glCompileShader(shader);
+	tinyxml2::XMLElement* shaders = data.RootElement()->FirstChildElement();
+	tinyxml2::XMLElement* shader = shaders->FirstChildElement();
 
-        // get error log
-        GLint shaderLogSize;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &shaderLogSize);
-        if (shaderLogSize > 0)
-        {
-            char* buf = new char[shaderLogSize];
-            glGetShaderInfoLog(shader, shaderLogSize, NULL, buf);
-            printf("[SHADER COMPILE ERROR]: %s", buf);
-            delete[] buf;
+	while (true)
+	{
+		//First we check if the specified material is already loaded.
+		const tinyxml2::XMLAttribute* nameAttr = shader->FirstAttribute();
 
-#ifdef _DEBUG
-            assert(false);
-#endif
-        }
+		Util::String name = nameAttr->Value();
 
-        //Insert to our shader list
-        std::pair<std::string, GLuint> par(file, shader);
-        this->shaders.insert(par);
+		if (this->HasShaderNamed(nameAttr->Value()))
+		{
+			printf("WARNING: Duplicate shader loaded: \" %s \". Using previously loaded shader...", nameAttr->Value());
+		}
+		else // Load shader!
+		{
+			// Create our shader
+			shared_ptr<ShaderObject> shd = make_shared<ShaderObject>();
 
-        return shader;
-    }
-    else
-    {
-        //Shader is already loaded so we can just return it.
-        return this->shaders.find(file)->second;
-    }
+			// Set name
+			shd->SetName(nameAttr->Value());
+
+			const tinyxml2::XMLElement* vertexshader = shader->FirstChildElement("VertexShader");
+			const tinyxml2::XMLElement* fragmentshader = shader->FirstChildElement("FragmentShader");
+			const tinyxml2::XMLElement* renderstate = shader->FirstChildElement("RenderState");
+
+			GLuint vert = this->LoadVertexShader(vertexshader->FirstAttribute()->Value());
+			GLuint frag = this->LoadFragmentShader(fragmentshader->FirstAttribute()->Value());
+
+			shd->setVertexShader(vert);
+			shd->setFragmentShader(frag);
+
+			Render::RenderState states = LoadRenderState(renderstate->FirstAttribute()->Value());
+			shd->SetRenderState(states);
+
+			shd->LinkShaders();
+
+			this->shaderObjects.insert(std::make_pair(nameAttr->Value(), shd));
+		}
+
+		if (shader->NextSiblingElement() != nullptr)
+		{
+			shader = shader->NextSiblingElement();
+		}
+		else
+		{
+			// end of shaders
+			break;
+		}
+	}
+
+	return true;
+}
+
+RenderState ShaderServer::LoadRenderState(const std::string& file)
+{
+	//Make sure we've not already loaded this render state
+	if (!this->HasRenderStateLoaded(file))
+	{
+		if (file.substr(file.find_last_of(".")) != ".state")
+		{
+			printf("[SHADER LOAD ERROR]: File is not a .state file!");
+			assert(false);
+			return RenderState();
+		}
+
+		std::string content = ReadFromFile(file);
+		if (content.empty())
+		{
+			return RenderState();
+		}
+
+		//TODO: Implement loader / we should handle the state file here.
+		//HACK: returning default renderstate until this has been implemented
+		return RenderState();
+
+	}
+}
+
+bool ShaderServer::HasRenderStateLoaded(const std::string& nName)
+{
+	return this->renderStates.count(nName);
 }
 
 GLuint ShaderServer::LoadVertexShader(const std::string& file)
 {
 	//Make sure we've not already loaded this shader
-	if (!this->hasShaderLoaded(file))
+	if (!this->HasShaderProgramLoaded(file))
 	{
 		if (file.substr(file.find_last_of(".")) != ".vert")
 		{
@@ -148,7 +191,7 @@ GLuint ShaderServer::LoadVertexShader(const std::string& file)
 
 		//Insert to our shader list
 		std::pair<std::string, GLuint> par(file, vertexShader);
-		this->shaders.insert(par);
+		this->shaderPrograms.insert(par);
 
 		return vertexShader;
 
@@ -156,14 +199,14 @@ GLuint ShaderServer::LoadVertexShader(const std::string& file)
 	else
 	{
 		//Shader is already loaded so we can just return it.
-		return this->shaders.find(file)->second;
+		return this->shaderPrograms.find(file)->second;
 	}
 }
 
 GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 {
 	//Make sure we've not already loaded this shader
-	if (!this->hasShaderLoaded(file))
+	if (!this->HasShaderProgramLoaded(file))
 	{
 		if (file.substr(file.find_last_of(".")) != ".frag")
 		{
@@ -205,43 +248,25 @@ GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 
 		//Insert to our shader list
 		std::pair<std::string, GLuint> par(file, fragmentShader);
-		this->shaders.insert(par);
+		this->shaderPrograms.insert(par);
 
 		return fragmentShader;
 	}
 	else
 	{
 		//Shader is already loaded so we can just return it.
-		return this->shaders.find(file)->second;
+		return this->shaderPrograms.find(file)->second;
 	}
 }
-std::shared_ptr<ShaderObject> ShaderServer::LoadShaderObject(const std::string &vertFile, const std::string &fragFile)
+
+bool ShaderServer::HasShaderProgramLoaded(const std::string& file)
 {
-    GLuint vert = this->LoadVertexShader(vertFile);
-    GLuint frag = this->LoadFragmentShader(fragFile);
-
-    std::pair<GLuint, GLuint> pair = std::make_pair(vert, frag);
-
-	if (this->shaderObjects.count(pair))
-	{
-		std::shared_ptr<ShaderObject> shdObj = this->shaderObjects.find(pair)->second;
-		return shdObj;
-    }
-    else
-    {
-        //We need to create a new shader object!
-		std::shared_ptr<ShaderObject> shdObj = std::make_shared<ShaderObject>();
-        shdObj->setVertexShader(vert);
-        shdObj->setFragmentShader(frag);
-        shdObj->LinkShaders();
-        this->shaderObjects.insert(std::make_pair(pair, shdObj));
-        return shdObj;
-    }
+	return this->shaderPrograms.count(file);
 }
 
-bool ShaderServer::hasShaderLoaded(const std::string& file)
+bool ShaderServer::HasShaderNamed(const std::string& nName)
 {
-	return this->shaders.count(file);
+	return this->shaderObjects.count(nName);
 }
 
 }
