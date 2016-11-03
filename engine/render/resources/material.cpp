@@ -82,7 +82,7 @@ namespace Render
 		}
 	}
 
-	Util::Array<Surface>& Material::SurfaceList()
+	Util::Array<std::shared_ptr<Surface>>& Material::SurfaceList()
 	{
 		return this->surfaces;
 	}

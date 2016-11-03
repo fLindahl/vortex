@@ -1,0 +1,9 @@
+<Vortex>
+	<Surface material="Static">
+		<!-- Textures -->
+		<Param name="AlbedoMap" value="resources/textures/rock.png"/>
+		
+		<!-- Specific Parameters -->
+		<Param name="Shininess" type="float" value="0" desc="Material shininess"/>
+	</Surface>
+</Vortex>

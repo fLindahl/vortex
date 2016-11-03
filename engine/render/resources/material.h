@@ -36,13 +36,11 @@ public:
 	MaterialParameter* GetParameterByName(const Util::String& name);
 	void AddParameter(const Util::String& name, const Util::Variable& variable);
 	
-    Util::Array<Surface>& SurfaceList();
+    Util::Array<std::shared_ptr<Surface>>& SurfaceList();
 
 	void SetFramePass(const Util::String& pass);
 	index_t GetFramePass();
-
-	Util::Array<ModelInstance*>& getModelInstances() { return this->modelInstances; }
-
+	
 	Util::Array<MaterialParameter*>& ParameterList() { return this->parameters; }
 
 private:
@@ -63,10 +61,7 @@ private:
 	Util::Array<MaterialParameter*> parameters;
 
 	// all surfaces that currently use this material
-	Util::Array<Surface> surfaces;
-
-	//TODO: This should be surfaces, not models, since models should hold their own surfaces with specific parameters
-	Util::Array<ModelInstance*> modelInstances;
+	Util::Array<std::shared_ptr<Surface>> surfaces;
 };
 
 }
