@@ -56,14 +56,13 @@ ExampleApp::Open()
 
 		//Always setup shaders before materials!
 		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
-
 		//Load all materials
 		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
-
+		
 		modelInstance->SetMaterial("Static");
 		modelInstance->SetMesh("resources/models/player.nvx2");
 		gProperty->setModelInstance(modelInstance);
-
+		
 		modelInstance1->SetMaterial("Toon");
 		modelInstance1->SetMesh("resources/models/player.nvx2");
 		gProperty1->setModelInstance(modelInstance1);

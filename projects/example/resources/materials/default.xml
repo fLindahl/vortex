@@ -3,16 +3,16 @@
         <Material name="Static" desc="A lit opaque material">
 			<!-- Examples of future frame passes -->
 			<!--
-			<Pass batch="Picking" shader="picking" variation="Static"/>
-			<Pass batch="SpotLightShadow" shader="shadow" variation="Static|Spot"/>
-			<Pass batch="PointLightShadow" shader="shadow" variation="Static|Point"/>
-			<Pass batch="GlobalShadow" shader="shadow" variation="Static|Global"/>
+			<Pass name="Picking" shader="picking"/>
+			<Pass name="SpotLightShadow" shader="shadow"/>
+			<Pass name="PointLightShadow" shader="shadow"/>
+			<Pass name="GlobalShadow" shader="shadow"/>
 			-->
 			
 			<Pass name="FlatGeometryLit" shader="defaultLit"/>
 			
             <!-- material textures -->
-            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/player.png"/>
+            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
 
             <!-- various parameters -->
 			<Param name="AmbientReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material ambience multiplier"/>
@@ -26,7 +26,7 @@
 			<Pass name="FlatGeometryLit" shader="toonShader"/>
 			
 			<!-- material textures -->
-            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/player.png"/>
+            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
         </Material>
     </Materials>
 </Vortex>
