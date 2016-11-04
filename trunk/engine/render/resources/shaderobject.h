@@ -9,8 +9,8 @@
 #include "render/resources/modelinstance.h"
 #include "foundation/util/array.h"
 #include "render/server/shaderserver.h"
-#include "foundation/util/string.h"
 #include "render/server/shaderconstants.h"
+#include "foundation/util/string.h"
 
 namespace Render
 {
@@ -36,8 +36,8 @@ public:
 
 	void setUniMatrix4fv(Math::Matrix4& mat4, const char* uniformName);
 	void setUniMatrix3fv(Math::Matrix3& mat3, const char* uniformName);
-	void setUniVector4fv(Math::Vector4& vec4, const char* uniformName);
-	void setUniVector3fv(Math::Vector3& vec3, const char* uniformName);
+	void setUniVector4fv(const float* vec4, const char* uniformName);
+	void setUniVector3fv(const float* vec3, const char* uniformName);
 
 	void setUni1f(const float& f, const char* uniformName);
 

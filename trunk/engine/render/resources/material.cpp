@@ -54,7 +54,7 @@ namespace Render
 		}
 		else
 		{
-			printf("ERROR: Could not find parameter with name %s!", name);
+			printf("ERROR: Could not find parameter with name %s!", name.c_str());
 
 #ifdef _DEBUG
 			assert(false);

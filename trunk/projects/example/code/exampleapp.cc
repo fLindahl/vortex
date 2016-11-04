@@ -6,6 +6,7 @@
 #include "exampleapp.h"
 #include <cstring>
 #include <render/server/renderdevice.h>
+#include "imgui.h"
 
 #include "application/basegamefeature/keyhandler.h"
 
@@ -67,9 +68,66 @@ ExampleApp::Open()
 		modelInstance1->SetMesh("resources/models/player.nvx2");
 		gProperty1->setModelInstance(modelInstance1);
 
+		// set ui rendering function
+		this->window->SetUiRender([this]()
+		  {
+			  this->RenderUI();
+		  });
+
+		this->window->SetNanoVGRender([this](NVGcontext * vg)
+		  {
+			  this->RenderNano(vg);
+		  });
+
 		return true;
 	}
 	return false;
+}
+
+void ExampleApp::RenderUI()
+{
+	if (this->window->IsOpen())
+	{
+		bool show = true;
+		// create a new window
+		ImGui::Begin("Shader Sources", &show, ImGuiWindowFlags_NoSavedSettings);
+
+		// create text editors for shader code
+		//ImGui::InputTextMultiline("Vertex Shader", vsBuffer, STRING_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
+		//						  ImGuiInputTextFlags_AllowTabInput);
+
+		//ImGui::InputTextMultiline("Pixel Shader", fsBuffer, STRING_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
+		//						  ImGuiInputTextFlags_AllowTabInput);
+
+		// apply button
+		if (ImGui::Button("Apply"))
+		{
+			// if pressed we compile the shaders
+		//	this->CompileShaders();
+		}
+		//if (this->compilerLog.length())
+		//{
+			// if compilation produced any output we display it here
+		//	ImGui::TextWrapped(this->compilerLog.c_str());
+		//}
+		// close window
+		ImGui::End();
+	}
+}
+
+void ExampleApp::RenderNano(NVGcontext * vg)
+{
+	nvgSave(vg);
+	/*
+	nvgBeginPath(vg);
+	nvgCircle(vg,600, 100, 50);
+	NVGpaint paint;
+	paint = nvgLinearGradient(vg, 600, 100, 650, 150, nvgRGBA(255, 0, 0, 255), nvgRGBA(0, 255, 0, 255));
+	nvgFillPaint(vg, paint);
+	nvgFill(vg);
+
+	*/
+	nvgRestore(vg);
 }
 
 //------------------------------------------------------------------------------

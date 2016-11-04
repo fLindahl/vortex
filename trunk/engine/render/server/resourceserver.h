@@ -47,6 +47,11 @@ public:
 	bool SetupMaterials(const char* fileName);
 	bool HasMaterialNamed(const std::string& nName);
 
+	//Loads a surface .surface file and adds all files to the list if they're not already defined
+
+	std::shared_ptr<Surface> LoadSurface(const char* filepath);
+	bool HasSurfaceNamed(const std::string& nName);
+
 private:
 	//This contains all ModelInstances currently in-game.
 	Util::Array<ModelInstance> modelInstances;
@@ -62,6 +67,10 @@ private:
 	//Contains all Materials.
 	//Key must be unique to each Material. the key is the material name
 	std::unordered_map<std::string, std::shared_ptr<Material>> materials;
+
+	//Contains all Surfaces.
+	//Key must be unique to each Surface. the key is the surface filename
+	std::unordered_map<std::string, std::shared_ptr<Surface>> surfaces;
 };
 
 }
