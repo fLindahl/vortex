@@ -33,6 +33,12 @@ public:
 	void Run();
 private:
 
+	/// show some ui things
+	void RenderUI();
+
+	// show some nanovg stuff
+	void RenderNano(NVGcontext * vg);
+
 	shared_ptr<Render::MeshResource> mesh;
 	shared_ptr<Render::TextureResource> texture;
 	shared_ptr<Render::ModelInstance> modelInstance;

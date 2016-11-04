@@ -3,18 +3,19 @@
 #include "shaderobject.h"
 #include "textureresource.h"
 #include "foundation/util/array.h"
-#include "surface.h"
 #include <map>
 #include "foundation/util/variable.h"
 //#include "foundation/util/string.h"
 
 namespace Render
 {
-	struct MaterialParameter
-	{
-		Util::String name;
-		Util::Variable var;
-	};
+class Surface;
+
+struct MaterialParameter
+{
+	Util::String name;
+	Util::Variable var;
+};
 
 class Material
 {
@@ -43,7 +44,15 @@ public:
 	
 	Util::Array<MaterialParameter*>& ParameterList() { return this->parameters; }
 
+	//TEMPORARY
+	Util::Array<ModelInstance*>& getModelInstances() { return this->modelInstances; }
+
 private:
+	friend class ResourceServer;
+
+	//TEMPORARY
+	Util::Array<ModelInstance*> modelInstances;
+
 	// name of the material
 	Util::String name;
 

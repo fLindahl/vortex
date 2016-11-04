@@ -61,16 +61,16 @@ namespace Render
 		glUniformMatrix3fv(matLoc, 1, true, (GLfloat*)mat3.get());
 	}
 
-	void ShaderObject::setUniVector4fv(Math::Vector4 &vec4, const char* uniformName)
+	void ShaderObject::setUniVector4fv(const float* vec4, const char* uniformName)
 	{
 		GLuint matLoc = glGetUniformLocation(this->program, uniformName);
-		glUniform4fv(matLoc, 1, (GLfloat*)vec4.get());
+		glUniform4fv(matLoc, 1, (GLfloat*)vec4);
 	}
 
-	void ShaderObject::setUniVector3fv(Math::Vector3 &vec3, const char* uniformName)
+	void ShaderObject::setUniVector3fv(const float* vec3, const char* uniformName)
 	{
 		GLuint matLoc = glGetUniformLocation(this->program, uniformName);
-		glUniform3fv(matLoc, 1, (GLfloat*)vec3.get());
+		glUniform3fv(matLoc, 1, (GLfloat*)vec3);
 	}
 
 	void ShaderObject::setUni1f(const float& f, const char* uniformName)

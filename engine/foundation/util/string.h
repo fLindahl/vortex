@@ -17,7 +17,8 @@ int vasprintf(char ** ret, const char * format, va_list ap);
 #define _NOEXCEPT noexcept
 #endif
 
-
+#include <cstring>
+#include <cstdarg>
 #define STRING_MAX_LEN 65535
 #define STRING_MAX_SPLIT 1023
 

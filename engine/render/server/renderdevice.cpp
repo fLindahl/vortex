@@ -59,11 +59,11 @@ void RenderDevice::Render()
 				break;
 
 			case Util::Variable::Type::Vector3:
-				material->GetShader()->setUniVector3fv(Math::Vector3(material->ParameterList()[i]->var.GetVector3()), material->ParameterList()[i]->name);
+				material->GetShader()->setUniVector3fv(material->ParameterList()[i]->var.GetVector3(), material->ParameterList()[i]->name);
 				break;
 
 			case Util::Variable::Type::Vector4:
-				material->GetShader()->setUniVector4fv(Math::Vector4(material->ParameterList()[i]->var.GetVector4()), material->ParameterList()[i]->name);
+				material->GetShader()->setUniVector4fv(material->ParameterList()[i]->var.GetVector4(), material->ParameterList()[i]->name);
 				break;
 
 			default:

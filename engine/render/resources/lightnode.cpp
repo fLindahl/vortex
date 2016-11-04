@@ -46,12 +46,12 @@ void LightNode::setSpecularIntensity(GLfloat r, GLfloat g, GLfloat b)
 
 void LightNode::applyToShader(std::shared_ptr<ShaderObject> shader)
 {
-	shader->setUniVector3fv(this->lightPosition, "lightPosition");
-	shader->setUniVector3fv(this->cameraPosition, "cameraPosition");
+	//shader->setUniVector3fv(this->lightPosition, "lightPosition");
+	//shader->setUniVector3fv(this->cameraPosition, "cameraPosition");
 
-	shader->setUniVector3fv(this->lightAmbientIntensity, "u_lightAmbientIntensity");
-	shader->setUniVector3fv(this->lightDiffuseIntensity, "u_lightDiffuseIntensity");
-	shader->setUniVector3fv(this->lightSpecularIntensity, "u_lightSpecularIntensity");
+	//shader->setUniVector3fv(this->lightAmbientIntensity, "u_lightAmbientIntensity");
+	//shader->setUniVector3fv(this->lightDiffuseIntensity, "u_lightDiffuseIntensity");
+	//shader->setUniVector3fv(this->lightSpecularIntensity, "u_lightSpecularIntensity");
 }
 
 }

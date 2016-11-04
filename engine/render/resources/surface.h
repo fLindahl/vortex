@@ -27,6 +27,7 @@ namespace Render
 
 	private:
 		friend class Material;
+        friend class ResourceServer;
 
 		// name of the surface
 		Util::String name;
@@ -46,5 +47,6 @@ namespace Render
 
 		Util::Array<ModelInstance*> modelInstances;
 
-	};
+        void AddParameter(const Util::String &name, const Util::Variable &variable);
+    };
 }
