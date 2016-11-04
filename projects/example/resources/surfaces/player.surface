@@ -1,9 +1,9 @@
 <Vortex>
 	<Surface material="Static">
-		<!-- Textures -->
+		<!-- override textures -->
 		<Param name="AlbedoMap" value="resources/textures/player.png"/>
 		
-		<!-- Specific Parameters -->
+		<!-- override specific parameters -->
 		<Param name="Shininess" type="float" value="16" desc="Material shininess"/>
 	</Surface>
 </Vortex>

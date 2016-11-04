@@ -1,8 +1,12 @@
 #include "config.h"
 #include "textureresource.h"
+
+#ifndef  STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#include "render/softwarerender/rasterizer.h"
+#endif
+
+//#include "stb_image.h"
+//#include "render/softwarerender/rasterizer.h"
 
 namespace Render
 {

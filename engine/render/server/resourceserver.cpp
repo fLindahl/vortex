@@ -2,6 +2,7 @@
 #include "resourceserver.h"
 #include "tinyxml2.h"
 #include "renderdevice.h"
+#include "render/resources/surface.h"
 
 namespace Render
 {
@@ -174,6 +175,94 @@ bool ResourceServer::HasMaterialNamed(const std::string &nName)
 	else
 		return false;
 }
+
+std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
+{
+    //TODO: should loader this really be here?
+
+    if(this->HasSurfaceNamed(filepath))
+        return this->surfaces[filepath];
+
+    tinyxml2::XMLDocument data;
+    int result = data.LoadFile(filepath);
+
+    if (result != 0)
+    {
+        printf("ERROR: Could not load materials file!");
+
+#ifdef DEBUG
+        assert(false);
+#endif // DEBUG
+
+        return false;
+    }
+
+    tinyxml2::XMLElement* surface = data.RootElement()->FirstChildElement();
+
+    const tinyxml2::XMLAttribute* materialTemplate = surface->FirstAttribute();
+
+    shared_ptr<Surface> sur = nullptr;
+
+    //First we check if the specified material is loaded.
+    if (!this->HasMaterialNamed(materialTemplate->Value()))
+    {
+        printf("ERROR: No material with name: %s!\n", materialTemplate->Value());
+        assert(false);
+    }
+    else // Load surface!
+    {
+        // get material
+        shared_ptr<Material> mat = this->GetMaterial(materialTemplate->Value());
+
+        // create our surface
+        sur = make_shared<Surface>();
+
+        sur->name = filepath;
+        sur->material = mat;
+
+        // Get all parameters that this surface overrides
+        const tinyxml2::XMLElement* param = surface->FirstChildElement("Param");
+        while (true)
+        {
+            Util::String type = param->FindAttribute("type")->Value();
+
+            Util::Variable var = Util::Variable(Util::Variable::StringToType(type), Util::String(param->FindAttribute("defaultValue")->Value()));
+
+            sur->AddParameter(param->FindAttribute("name")->Value(), var);
+
+            if (param->NextSiblingElement("Param") != nullptr)
+            {
+                param = param->NextSiblingElement("Param");
+            }
+            else
+            {
+                // out of parameters
+                break;
+            }
+        }
+
+        // Now we add the additional parameters that we've not overloaded.
+        for (MaterialParameter* param : mat->parameters)
+        {
+            if (!sur->parametersByName.count(param->name))
+            {
+                sur->parameters.Append(param);
+                sur->parametersByName.insert(make_pair(param->name, param));
+            }
+        }
+    }
+
+    return sur;
+}
+
+bool ResourceServer::HasSurfaceNamed(const std::string &nName)
+{
+    if (this->surfaces.count(nName) > 0)
+        return true;
+    else
+        return false;
+}
+
 
 }
 

@@ -4,7 +4,7 @@ set (MISC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${MISC_DIR})
 
 set(MISC_HEAD 
-	${MISC_DIR}/stb_image.h
+	#${MISC_DIR}/stb_image.h
 	${MISC_DIR}/tinyxml2.h)
 
 set(MISC_SRC
