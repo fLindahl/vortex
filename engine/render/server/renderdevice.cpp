@@ -40,7 +40,7 @@ void RenderDevice::Render()
 			currentProgram = material->GetShader()->GetProgram();
 		}
         
-		for (int i = 0; i < material->TextureList().Size(); i++)
+		for (index_t i = 0; i < material->TextureList().Size(); i++)
 		{
 			material->TextureList()[i]->BindTexture(i); //TODO: slot?
 		}
@@ -49,7 +49,7 @@ void RenderDevice::Render()
 
 
 		//TODO: Per surface
-		for (int i = 0; i < material->ParameterList().Size(); i++)
+		for (index_t i = 0; i < material->ParameterList().Size(); i++)
 		{
 			//TODO: Move this elsewhere
 			switch (material->ParameterList()[i]->var.GetType())

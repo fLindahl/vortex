@@ -11,12 +11,10 @@
 #include "foundation/math/matrix4.h"
 #include "render/resources/lightnode.h"
 #include "render/softwarerender/rasterizer.h"
-#include "render/server/graphicsserver.h"
 #include "render/server/resourceserver.h"
 #include "render/server/shaderserver.h"
 #include "render/graphics/camera.h"
 #include "application/basegamefeature/keyhandler.h"
-
 namespace Example
 {
 class ExampleApp : public Core::App
@@ -52,5 +50,7 @@ private:
 	Render::GraphicsProperty* gProperty1;
 
 	Display::Window* window;
+
+	char* consoleBuffer;
 };
 } // namespace Example

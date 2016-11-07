@@ -5,7 +5,6 @@
 #include "foundation/math/matrix4.h"
 #include "foundation/math/matrix3.h"
 #include "foundation/math/vector4.h"
-#include "render/server/graphicsserver.h"
 #include "render/resources/modelinstance.h"
 #include "foundation/util/array.h"
 #include "render/server/shaderserver.h"

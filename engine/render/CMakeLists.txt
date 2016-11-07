@@ -59,8 +59,6 @@ SET(files_render_resources
 	)
 
 SET(files_render_server
-	server/graphicsserver.h
-	server/graphicsserver.cpp
 	server/shaderserver.h
 	server/shaderserver.cpp
 	server/resourceserver.h

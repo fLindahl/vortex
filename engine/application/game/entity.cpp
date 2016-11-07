@@ -1,7 +1,6 @@
 #include "config.h"
 #include "entity.h"
 #include "foundation/messaging/messagehandler.h"
-#include "render/server/graphicsserver.h"
 
 namespace Game
 {

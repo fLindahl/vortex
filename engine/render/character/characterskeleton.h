@@ -28,9 +28,9 @@ private:
   std::vector<CharacterJoint*> jointArray;
   int* skin;
   
-  int animationFrame;
-  float time;
-  float frameTime;
+  index_t animationFrame;
+  double time;
+  double frameTime;
   
   void Setup(const int& jointArraySize);
   void SetupJoint(const int& jointIndex, const Math::Vector4& position, const std::string& jointName /*, const Quaternion& rotation, const Vector4& scale*/);
