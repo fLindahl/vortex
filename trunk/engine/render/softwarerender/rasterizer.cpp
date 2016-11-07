@@ -25,21 +25,21 @@ Edge::Edge(Math::Vector4 v1, Math::Vector4 v2)
 {
 	if (v1[1] < v2[1])
 	{
-		xb = floor(v1[0]);
-		yb = floor(v1[1]);
-		zb = floor(v1[2]);
-		xe = floor(v2[0]);
-		ye = floor(v2[1]);
-		ze = floor(v2[2]);
+		xb = (int)floor(v1[0]);
+		yb = (int)floor(v1[1]);
+		zb = (int)floor(v1[2]);
+		xe = (int)floor(v2[0]);
+		ye = (int)floor(v2[1]);
+		ze = (int)floor(v2[2]);
 	}
 	else
 	{
-		xb = floor(v2[0]);
-		yb = floor(v2[1]);
-		zb = floor(v2[2]);
-		xe = floor(v1[0]);
-		ye = floor(v1[1]);
-		ze = floor(v1[2]);
+		xb = (int)floor(v2[0]);
+		yb = (int)floor(v2[1]);
+		zb = (int)floor(v2[2]);
+		xe = (int)floor(v1[0]);
+		ye = (int)floor(v1[1]);
+		ze = (int)floor(v1[2]);
 	}
 
 	dx = (xe - xb);
@@ -314,7 +314,7 @@ void Rasterizer::addPixel(const int& x, const int& y)
 	float v;
 	float w;
 
-	barycentric(Math::Vector2(x, y), Math::Vector2(floor(v1.pos[0]), floor(v1.pos[1])), Math::Vector2(floor(v2.pos[0]), floor(v2.pos[1])), Math::Vector2(floor(v3.pos[0]), floor(v3.pos[1])), u, v, w);
+	barycentric(Math::Vector2((float)x, (float)y), Math::Vector2(floor(v1.pos[0]), floor(v1.pos[1])), Math::Vector2(floor(v2.pos[0]), floor(v2.pos[1])), Math::Vector2(floor(v3.pos[0]), floor(v3.pos[1])), u, v, w);
 	float corrW = (u / w1 + v / w2 + w / w3); // TODO: UVW FÅR INTE VARA NEGATIVA!
 
 
@@ -336,9 +336,9 @@ void Rasterizer::addPixel(const int& x, const int& y)
 
 	Math::Vector3 diffuseColor = ((diffuse1 * u) / w1 + (diffuse2 * v) / w2 + (diffuse3 * w) / w3) / corrW;
 	
-	float R = floor(clr.r);
-	float G = floor(clr.g);
-	float B = floor(clr.b);
+	float R = (float)floor(clr.r);
+	float G = (float)floor(clr.g);
+	float B = (float)floor(clr.b);
 
 	// Factor Diffusecolor
 	clr.r = (int)(R * diffuseColor[0]);
@@ -354,12 +354,12 @@ void Rasterizer::barycentric(const Math::Vector2& p, const Math::Vector2& a, con
 {
 	//TODO: Optimize. some of this can be done once per triangle
 	Math::Vector2 v0 = b - a, v1 = c - a, v2 = p - a;
-	int d00 = v0.dot(v0);
-	int d01 = v0.dot(v1);
-	int d11 = v1.dot(v1);
-	int d20 = v2.dot(v0);
-	int d21 = v2.dot(v1);
-	float denom = d00 * d11 - d01 * d01;
+	int d00 = (int)v0.dot(v0);
+	int d01 = (int)v0.dot(v1);
+	int d11 = (int)v1.dot(v1);
+	int d20 = (int)v2.dot(v0);
+	int d21 = (int)v2.dot(v1);
+	float denom = (float)(d00 * d11 - d01 * d01);
 	v = (d11 * d20 - d01 * d21) / denom;
 	w = (d00 * d21 - d01 * d20) / denom;
 	u = 1.0f - v - w;

@@ -514,7 +514,8 @@ namespace Util
 
         char* ptr = const_cast<char*>(str.c_str());
         const char* token;
-        while (0 != (token = strtok(ptr, delim.c_str())))
+		char *next_token = NULL;
+		while (0 != (token = strtok_s(ptr, delim.c_str(), &next_token)))
         {
             tokens.Append(token);
             ptr = 0;

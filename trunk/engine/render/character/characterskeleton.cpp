@@ -98,19 +98,19 @@ void CharacterSkeleton::Load(const char* fileName)
     attribute = attribute->Next();
     value = attribute->Value();
     float x,y,z,w;
-    sscanf(value, "%f,%f,%f,%f", &x, &y, &z, &w);
+    sscanf_s(value, "%f,%f,%f,%f", &x, &y, &z, &w);
     position = Math::Vector4(x,y,z,w);
     
     //ROTATION
     attribute = attribute->Next();
     value = attribute->Value();
-    sscanf(value, "%f,%f,%f,%f", &x, &y, &z, &w);
+    sscanf_s(value, "%f,%f,%f,%f", &x, &y, &z, &w);
     rotation = Math::Quaternion(x,y,z,w);
     
     //SCALE
     attribute = attribute->Next();
     value = attribute->Value();
-    sscanf(value, "%f,%f,%f,%f", &x, &y, &z, &w);
+    sscanf_s(value, "%f,%f,%f,%f", &x, &y, &z, &w);
     scale = Math::Vector4(x,y,z,w);
     
     
@@ -141,7 +141,7 @@ void CharacterSkeleton::Load(const char* fileName)
   
   const char* list = element->GetText();
   
-  sscanf(list, "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i",
+  sscanf_s(list, "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i",
 	 &skin[0], &skin[1], &skin[2], &skin[3], &skin[4], &skin[5], &skin[6], &skin[7], &skin[8], &skin[9], &skin[10],
 	 &skin[11], &skin[12], &skin[13], &skin[14], &skin[15], &skin[16], &skin[17], &skin[18], &skin[19], &skin[20]);
   
@@ -169,7 +169,7 @@ std::vector<Math::Matrix4> CharacterSkeleton::EvaluateSkeleton(const int &animIn
 {
   AnimationClip clip = animator->GetClipByIndex(animIndex);
   
-  float frameTime = (glfwGetTime() - time) * 1000.0f;
+  double frameTime = (glfwGetTime() - time) * 1000.0f;
   if(frameTime > clip.GetKeyDuration())
   {
     time = glfwGetTime();
@@ -179,9 +179,9 @@ std::vector<Math::Matrix4> CharacterSkeleton::EvaluateSkeleton(const int &animIn
   
   const AnimKeyBuffer* keyBuffer = animator->GetKeyBuffer();
     
-  float t = frameTime / clip.GetKeyDuration();
+  double t = frameTime / clip.GetKeyDuration();
   
-  for (int index = 0; index < this->jointArray.size(); index++)
+  for (index_t index = 0; index < this->jointArray.size(); index++)
   {
     CharacterJoint* joint = this->jointArray[index];
     //joint->ResetMatrix();
@@ -233,16 +233,16 @@ std::vector<Math::Matrix4> CharacterSkeleton::EvaluateSkeleton(const int &animIn
       
     }
     
-    jointRotation = Math::Quaternion::slerp(jointRotation, nextJointRotation, t);
+	jointRotation = Math::Quaternion::slerp(jointRotation, nextJointRotation, (float)t);
     
-	jointTranslation = Math::Vector4::lerp(jointTranslation, nextJointTranslation, t);
+	jointTranslation = Math::Vector4::lerp(jointTranslation, nextJointTranslation, (float)t);
     
     joint->EvaluateMatrix(jointScale, jointRotation, jointTranslation);
   }
   
   std::vector<Math::Matrix4> ret;
   
-  for (int index = 0; index < this->jointArray.size(); index++)
+  for (index_t index = 0; index < this->jointArray.size(); index++)
   { 
     CharacterJoint* joint = this->jointArray[skin[index]];    
     
