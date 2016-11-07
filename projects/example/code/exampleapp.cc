@@ -13,6 +13,8 @@
 using namespace Display;
 using namespace Render;
 
+#define CONSOLE_BUFFER_SIZE 8096
+
 namespace Example
 {
 
@@ -49,6 +51,8 @@ ExampleApp::Open()
 	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
 	if (this->window->Open())
 	{
+		this->consoleBuffer = new char[CONSOLE_BUFFER_SIZE];
+
 		modelInstance = std::make_shared<Render::ModelInstance>();
 		modelInstance1 = std::make_shared<Render::ModelInstance>();
 
@@ -90,11 +94,11 @@ void ExampleApp::RenderUI()
 	{
 		bool show = true;
 		// create a new window
-		ImGui::Begin("Shader Sources", &show, ImGuiWindowFlags_NoSavedSettings);
+		ImGui::Begin("Console", &show, ImGuiWindowFlags_NoSavedSettings);
 
 		// create text editors for shader code
-		//ImGui::InputTextMultiline("Vertex Shader", vsBuffer, STRING_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
-		//						  ImGuiInputTextFlags_AllowTabInput);
+		ImGui::InputTextMultiline("Vertex Shader", consoleBuffer, CONSOLE_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
+								  ImGuiInputTextFlags_AllowTabInput);
 
 		//ImGui::InputTextMultiline("Pixel Shader", fsBuffer, STRING_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
 		//						  ImGuiInputTextFlags_AllowTabInput);
@@ -103,7 +107,7 @@ void ExampleApp::RenderUI()
 		if (ImGui::Button("Apply"))
 		{
 			// if pressed we compile the shaders
-		//	this->CompileShaders();
+			//	this->CompileShaders();
 		}
 		//if (this->compilerLog.length())
 		//{

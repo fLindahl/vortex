@@ -136,14 +136,19 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 
 		//TODO: Implement loader / we should handle the state file here.
 		//HACK: returning default renderstate until this has been implemented
-		return RenderState();
-
+		
 	}
+
+	return RenderState();
+
 }
 
 bool ShaderServer::HasRenderStateLoaded(const std::string& nName)
 {
-	return this->renderStates.count(nName);
+	if (this->renderStates.count(nName) > 0)
+		return true;
+	else
+		return false;
 }
 
 GLuint ShaderServer::LoadVertexShader(const std::string& file)
@@ -261,12 +266,18 @@ GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 
 bool ShaderServer::HasShaderProgramLoaded(const std::string& file)
 {
-	return this->shaderPrograms.count(file);
+	if (this->shaderPrograms.count(file) > 0)
+		return true;
+	else
+		return false;
 }
 
 bool ShaderServer::HasShaderNamed(const std::string& nName)
 {
-	return this->shaderObjects.count(nName);
+	if (this->shaderObjects.count(nName) > 0)
+		return true;
+	else
+		return false;
 }
 
 }

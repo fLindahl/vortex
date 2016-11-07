@@ -10,6 +10,11 @@
 #include "win32/pch.h"
 #endif
 
+#ifdef _MSC_VER
+// disable _s warnings
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <stdint.h>
 #include <atomic>
 #include <xmmintrin.h>

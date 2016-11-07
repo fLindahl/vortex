@@ -349,7 +349,8 @@ inline Quaternion Quaternion::slerp(const Quaternion& q0, const Quaternion& q1, 
 {
 	Quaternion q = Quaternion();
 	
-  	double cosHalfTheta = q0.x()*q1.x()+q0.y()*q1.y()+q0.z()*q1.z()+q0.w()*q1.w();
+	//These were doubles, but since we want to suppress warnings, I decided to change them to floats. If we get too much precision error, this might be the cause
+  	float cosHalfTheta = q0.x()*q1.x()+q0.y()*q1.y()+q0.z()*q1.z()+q0.w()*q1.w();
 	// if qa=qb or qa=-qb then theta = 0 and we can return qa
 	if (abs(cosHalfTheta) == 1.0)
 	{
@@ -362,8 +363,9 @@ inline Quaternion Quaternion::slerp(const Quaternion& q0, const Quaternion& q1, 
 		cosHalfTheta = -cosHalfTheta;
 	}
 	// Calculate temporary values.
-	const double halfTheta = acos(cosHalfTheta);
-	const double sinHalfTheta = std::sqrt(1.0 - (cosHalfTheta * cosHalfTheta));
+	//These were doubles, but since we want to suppress warnings, I decided to change them to floats. If we get too much precision error, this might be the cause
+	const float halfTheta = acos(cosHalfTheta);
+	const float sinHalfTheta = (float)std::sqrt(1.0 - (cosHalfTheta * cosHalfTheta));
 	// if theta = 180 degrees then result is not fully defined
 	// we could rotate around any axis normal to qa or qb
 	if (std::abs(sinHalfTheta) < 0.001)
@@ -373,8 +375,9 @@ inline Quaternion Quaternion::slerp(const Quaternion& q0, const Quaternion& q1, 
 		else for (int i=0;i < 4;i++) q.vec[i] = (1-t)*q0.vec[i] - t*q1.vec[i];
 		return q;
 	}
-	const double A = sin((1-t) * halfTheta)/sinHalfTheta;
-	const double B = sin(t*halfTheta)/sinHalfTheta;
+	//These were doubles, but since we want to suppress warnings, I decided to change them to floats. If we get too much precision error, this might be the cause
+	const float A = sin((1-t) * halfTheta)/sinHalfTheta;
+	const float B = sin(t*halfTheta)/sinHalfTheta;
 	if (!reverse_q1)
 		 for (int i=0;i < 4;i++) q.vec[i] = A*q0.vec[i] + B*q1.vec[i];
 	else for (int i=0;i < 4;i++) q.vec[i] = A*q0.vec[i] - B*q1.vec[i];

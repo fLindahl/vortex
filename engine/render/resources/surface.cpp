@@ -1,5 +1,5 @@
-#include "render/server/resourceserver.h"
 #include "config.h"
+#include "render/server/resourceserver.h"
 #include "surface.h"
 
 namespace Render
@@ -43,7 +43,7 @@ Util::Array<std::shared_ptr<TextureResource>>& Surface::TextureList()
 
 MaterialParameter* Surface::GetParameterByName(const Util::String &name)
 {
-
+	return this->parametersByName[name];
 }
 
 std::shared_ptr<Material> Surface::GetMaterial()
