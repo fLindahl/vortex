@@ -52,9 +52,7 @@ bool AnimationResource::LoadAnimations(const char* fileName)
     uchar* buffer;
     size_t result;
 
-    errno_t errorcode = fopen_s ( &file, fileName , "rb" );
-    
-	assert(errorcode == 0);
+	file = fopen(fileName , "rb" );
 
     // obtain file size:
     fseek (file , 0 , SEEK_END);
