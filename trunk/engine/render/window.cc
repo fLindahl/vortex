@@ -67,7 +67,7 @@ namespace Display
 			window(nullptr),
 			vg(nullptr),
 			width(1024),
-			height(768),
+			height(1024),
 			title("gscept Lab Environment")
 	{
 		// empty

@@ -21,6 +21,19 @@
             <Param name="Shininess" type="float" defaultValue="64" desc="Material shininess"/>
         </Material>
 		
+        <Material name="OBJStatic" desc="A lit opaque material for .OBJ meshes">			
+	    	<Pass name="FlatGeometryLit" shader="defaultLitObj"/>
+			
+            <!-- material textures -->
+            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
+
+            <!-- various parameters -->
+	    	<Param name="AmbientReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material ambience multiplier"/>
+            <Param name="DiffuseReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material albedo multiplier"/>
+            <Param name="SpecularReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material specular reflectivity multiplier"/>
+            <Param name="Shininess" type="float" defaultValue="64" desc="Material shininess"/>
+        </Material>
+
         <Material name="Toon" desc="Generic toon-shader material">
             
 			<Pass name="FlatGeometryLit" shader="toonShader"/>

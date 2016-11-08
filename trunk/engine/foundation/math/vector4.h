@@ -10,16 +10,26 @@ namespace Math
 class Vector4 
 {
 public:
+	///Sets all values to 0.0f except w that becomes 1.0f
 	Vector4();
+	///Sets all values to param except w that becomes 1.0f
+	Vector4(const float&);
+	///construct from vector3
 	Vector4(const Vector3&, float);
+	///construct from float array
+    Vector4(const float*);
+	///construct from 4 floats
 	Vector4(float, float, float, float);
+
+	///destructor
 	~Vector4();
 
+	///subscript operator
 	float operator[](int i) const;
-
 	float& operator[](int i);
-	
-	const float* get();		///Get array
+
+	///Get float array
+	const float* get();
 
 	bool operator==(const Vector4& rhs) const;
 	Vector4 operator+(const Vector4& rhs) const;
@@ -66,9 +76,19 @@ inline Vector4::Vector4()
 	vec[3] = 1.0f;
 }
 
+inline Vector4::Vector4(const float& f)
+{
+	vec[0] = f, vec[1] = f, vec[2] = f, vec[3] = 1.0f;
+}
+
 inline Vector4::Vector4(const Vector3& v, float w = 1.0f)
 {
 	vec[0] = v[0], vec[1] = v[1], vec[2] = v[2], vec[3] = w;
+}
+
+inline Vector4::Vector4(const float* v)
+{
+    vec[0] = v[0], vec[1] = v[1], vec[2] = v[2], vec[3] = 1.0f;
 }
 
 inline Vector4::Vector4(float a, float b, float c, float d = 1.0f)
@@ -169,13 +189,13 @@ inline float Vector4::lengthsq() const
 inline Vector4 Vector4::normalized() const
 {
 	float l = 1 / this->length();
-	return Vector4(vec[0] * l, vec[1] * l, vec[2] * l, 1);
+	return Vector4(vec[0] * l, vec[1] * l, vec[2] * l, vec[3]);
 }
 
 inline Vector4 Vector4::normalize(const Vector4& vec)
 {
     float l = 1 / vec.length();
-    return Vector4(vec[0] * l, vec[1] * l, vec[2] * l, 1);
+    return Vector4(vec[0] * l, vec[1] * l, vec[2] * l, vec[3]);
 }
 
 inline Vector4 Vector4::lerp(const Vector4& va, const Vector4& vb, const float& t) 
