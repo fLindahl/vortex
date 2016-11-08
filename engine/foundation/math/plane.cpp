@@ -7,7 +7,6 @@ namespace Math
     Plane::Plane(const Vector4& a, const Vector4& b, const Vector4& c)
     {
         this->vec = Vector4::normalize(Vector4::cross(b - a, c - a));
-        this->vec[3] = 1.0f;
         this->vec[3] = Vector4::dot(vec, a);
     }
 
@@ -16,9 +15,9 @@ namespace Math
 
     }
 
-    const float& Plane::d() const
+    float Plane::d() const
     {
-        return this->vec.w();
+        return this->vec[3];
     }
 
     Vector4 Plane::n() const

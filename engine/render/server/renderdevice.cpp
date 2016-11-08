@@ -29,7 +29,7 @@ void RenderDevice::Render()
 
     //HACK: Render states should be done per shaderobject (in some cases)
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     //glCullFace(GL_BACK);
 
     for (Material* material: materials)
