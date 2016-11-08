@@ -35,7 +35,7 @@ public:
 	void operator=(ResourceServer const&) = delete;
 
 	//Returns a mesh if it exists, otherwise loads it and then returns the new mesh
-	std::shared_ptr<MeshResource> LoadMesh(const char* modelpath);
+	std::shared_ptr<MeshResource> LoadMesh(const std::string& modelpath);
 	bool HasMeshNamed(const std::string& nName);
 
 	//Returns a texture if it exists, otherwise loads it and then returns the new texture

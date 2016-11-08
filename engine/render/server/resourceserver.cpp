@@ -7,17 +7,30 @@
 namespace Render
 {
 
-std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const char* meshpath)
+std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const std::string& meshpath)
 {
 	//Make sure we've not already loaded this model
 	if (!this->HasMeshNamed(meshpath))
 	{
 		std::shared_ptr<MeshResource> nMesh = std::make_shared<MeshResource>();
-		nMesh->loadMeshFromFile(meshpath);
 
-		//_assert(nMesh.isValid(), "Could not load mesh!")
+        std::string fileExtension = meshpath.substr(meshpath.find_last_of("."));
 
-		std::pair<const char*, std::shared_ptr<MeshResource>> par(meshpath, nMesh);
+        if(fileExtension == ".obj")
+        {
+            nMesh->loadMeshFromOBJ(meshpath.c_str());
+        }
+        else if(fileExtension == ".nvx2")
+        {
+            nMesh->loadMeshFromFile(meshpath.c_str());
+        }
+        else
+        {
+            printf("Could not load mesh! Invalid file extension!");
+            assert(false);
+            //_assert(false, "Could not load mesh!");
+        }
+		std::pair<const char*, std::shared_ptr<MeshResource>> par(meshpath.c_str(), nMesh);
 		this->meshes.insert(par);
 
 		return nMesh;

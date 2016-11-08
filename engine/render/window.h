@@ -57,6 +57,11 @@ namespace Display
 		/// set optional nanovg render function
 		void SetNanoVGRender(const std::function<void(NVGcontext *)> & func);
 
+		GLFWwindow* GetGLFWWindow() { return this->window; }
+
+		int32 GetWidth() { return this->width; }
+		int32 GetHeight() { return this->height; }
+
 	private:
 
 		/// static key press callback

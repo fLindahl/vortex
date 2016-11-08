@@ -7,6 +7,12 @@
 			<RenderState name="resources/shaders/states/opaque.state"/>
         </Shader>
 		
+	<Shader name="defaultLitObj" desc="OBJ FILES ONLY: Default shader for rendering opaque lit geometry">            
+			<VertexShader name="resources/shaders/vertex/static_obj.vert"/>
+			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+        </Shader>
+
         <Shader name="toonShader" desc="Shader for rendering cartoon-like lit geometry">    
 			<VertexShader name="resources/shaders/vertex/static.vert"/>
 			<FragmentShader name="resources/shaders/fragment/toonshader.frag"/>

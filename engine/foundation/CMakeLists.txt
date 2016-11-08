@@ -11,7 +11,11 @@ SET(files_foundation_math
 	math/vector3.h
 	math/vector4.h
 	math/quaternion.h
-        math/plane.h math/line.h math/line.cpp math/plane.cpp)
+	math/plane.cpp
+	math/plane.h
+	math/line.cpp
+	math/line.h
+	math/shapes/quad.h)
 
 SET(files_foundation_util
 	util/array.h

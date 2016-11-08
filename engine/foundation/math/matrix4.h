@@ -50,6 +50,12 @@ namespace Math
 		Matrix4 invert() const;		/// Invert Function 
 		static Matrix4 inverse(const Matrix4& mat);		/// Inverse
 
+		Vector4 get_xaxis() const;
+		Vector4 get_yaxis() const;
+		Vector4 get_zaxis() const;
+		Vector4 getPosition() const;
+
+
 		///Init rotational matrices
 		static Matrix4 rotX(const float& angle);
 		static Matrix4 rotY(const float& angle);
@@ -60,7 +66,7 @@ namespace Math
 		static Matrix4 scale(const float& x, const float& y, const float& z);
 		static Matrix4 scale(const Vector4& v);
 
-		Vector4 getPosition();
+
 
 		static Matrix4 perspectiveMatrix(const float& farZ, const float& nearZ, const float& aspect, const float& fov);
 		static Matrix4 viewMatrix(const float& pitch, const float& yaw, const Vector3& camerapos);
@@ -413,12 +419,25 @@ inline Matrix4 Matrix4::scale(const Vector4& v)
 			0,     0,     0,     1);
 }
 
-inline Vector4 Matrix4::getPosition()
+inline Vector4 Matrix4::get_xaxis() const
 {
-  return Vector4(m[3], m[7], m[11], m[15]);
+	return Vector4(m[0], m[4], m[8], m[12]);
 }
 
+inline Vector4 Matrix4::get_yaxis() const
+{
+	return Vector4(m[1], m[5], m[9], m[13]);
+}
 
+inline Vector4 Matrix4::get_zaxis() const
+{
+	return Vector4(m[2], m[6], m[10], m[14]);
+}
+
+inline Vector4 Matrix4::getPosition() const
+{
+	return Vector4(m[3], m[7], m[11], m[15]);
+}
 
 inline Matrix4 Matrix4::perspectiveMatrix(const float& farZ, const float& nearZ, const float& aspect, const float& fov)
 {

@@ -6,6 +6,8 @@
 #include "exampleapp.h"
 #include <cstring>
 #include <render/server/renderdevice.h>
+#include <fysik/physicsserver.h>
+#include "foundation/math/plane.h"
 #include "imgui.h"
 
 #include "application/basegamefeature/keyhandler.h"
@@ -68,9 +70,15 @@ ExampleApp::Open()
 		modelInstance->SetMesh("resources/models/player.nvx2");
 		gProperty->setModelInstance(modelInstance);
 		
-		modelInstance1->SetMaterial("Toon");
-		modelInstance1->SetMesh("resources/models/player.nvx2");
+		modelInstance1->SetMaterial("OBJStatic");
+		modelInstance1->SetMesh("resources/models/quad_tris.obj");
 		gProperty1->setModelInstance(modelInstance1);
+
+		quad = Math::Quad();
+		quad.v1 = Math::Vector4(-0.5f, 0.5f, 0.0f, 1.0f);
+		quad.v2 = Math::Vector4(0.5f, 0.5f, 0.0f, 1.0f);
+		quad.v3 = Math::Vector4(-0.5f, -0.5f, 0.0f, 1.0f);
+		quad.v4 = Math::Vector4(0.5f, -0.5f, 0.0f, 1.0f);
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -153,16 +161,97 @@ ExampleApp::Run()
 	float y = 0.0f;
 	//float z = 0.0f;
 
+	Math::Matrix4 transf = Math::Matrix4::translation(-0.3f, -1.0f, -2.0f);
+	Math::Matrix4 transf2 = Math::Matrix4::translation(0.0f, -0.0f, -1.0f);
+
+	Math::Matrix4 projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
+    Math::Matrix4 invProj = projection.invert();
+	Math::Matrix4 view = Graphics::MainCamera::Instance()->getViewMatrix();
+    Math::Matrix4 invView = view.invert();
+	Math::Matrix4 invProjView = invProj * invView;
+
+	quad.v1 = transf2 * quad.v1;
+	quad.v2 = transf2 * quad.v2;
+	quad.v3 = transf2 * quad.v3;
+	quad.v4 = transf2 * quad.v4;
+
+    Math::Plane plane = Math::Plane(quad.v2, quad.v3, quad.v1);
+
+    quad.v1 = projection * quad.v1;
+    quad.v2 = projection * quad.v2;
+    quad.v3 = projection * quad.v3;
+    quad.v4 = projection * quad.v4;
+
+
+    printf("quad1 position : %f, %f, %f, %f\n", quad.v1.x(), quad.v1.y(), quad.v1.z(), quad.v1.w());
+    printf("quad2 position : %f, %f, %f, %f\n", quad.v2.x(), quad.v2.y(), quad.v2.z(), quad.v2.w());
+    printf("quad3 position : %f, %f, %f, %f\n", quad.v3.x(), quad.v3.y(), quad.v3.z(), quad.v3.w());
+    printf("quad4 position : %f, %f, %f, %f\n", quad.v4.x(), quad.v4.y(), quad.v4.z(), quad.v4.w());
+
+	double cursorPosX = 0.0f;
+	double cursorPosY = 0.0f;
+
 	while (this->window->IsOpen())
 	{
 		this->window->Update();
 
 		// Rotation and translation
-		Math::Matrix4 transf = Math::Matrix4::translation(0.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)keyhandler->mouseY) * Math::Matrix4::rotX((float)keyhandler->mouseX) * Math::Matrix4::translation(x, y, (float)keyhandler->scroll * -0.1f - 1.0f);
-		Math::Matrix4 transf2 = Math::Matrix4::translation(1.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)keyhandler->mouseY) * Math::Matrix4::rotX((float)keyhandler->mouseX) * Math::Matrix4::translation(x, y, (float)keyhandler->scroll * -0.1f - 1.0f);
-		
+		//transf = Math::Matrix4::translation(0.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)keyhandler->mouseY) * Math::Matrix4::rotX((float)keyhandler->mouseX) * Math::Matrix4::translation(x, y, (float)keyhandler->scroll * -0.1f - 1.0f);
+		//transf2 = Math::Matrix4::translation(1.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)keyhandler->mouseY) * Math::Matrix4::rotX((float)keyhandler->mouseX) * Math::Matrix4::translation(x, y, (float)keyhandler->scroll * -0.1f - 1.0f);
+
 		gProperty->setModelMatrix(transf);
 		gProperty1->setModelMatrix(transf2);
+
+		if(keyhandler->leftMousePressed)
+		{
+            printf("\n\n\n\n\n\n\n\n");
+			glfwGetCursorPos(this->window->GetGLFWWindow(), &cursorPosX, &cursorPosY);
+
+			// Transform to world coordinates
+			cursorPosX = ((2.0f * cursorPosX) / this->window->GetWidth()) -1.0f;
+			cursorPosY = 1.0f-((2.0f*cursorPosY) / this->window->GetHeight());
+
+            Math::Vector4 cursorTransform = Math::Vector4(cursorPosX, cursorPosY, 1.0, 1.0f);
+
+            printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
+
+            cursorTransform =  cursorTransform * invProj;
+
+            //Pl = Pv * NearPlane * (1,-1,1,1)
+            Math::Vector4 ray = (cursorTransform * 0.01f);
+            //ray.x() = ray.x() * -1.0f;
+
+            Math::Vector4 rayWorld = ray * invView;
+
+            Math::Vector4 rayDirection = rayWorld - invView.getPosition();
+
+            rayDirection = Math::Vector4::normalize(rayDirection);
+
+            Math::Vector4 hit;
+
+			if(Physics::PhysicsServer::Raycast(hit, rayWorld, rayDirection, 100.0f, plane))
+            {
+                printf("Hit plane at %f, %f, %f, %f\n", hit.x(), hit.y(), hit.z(), hit.w());
+
+                Math::Vector4 modelMid = gProperty1->getModelMatrix().getPosition();
+
+                Math::Vector4 rightEdgeTop = modelMid;
+                rightEdgeTop.x() += 0.5f;
+                rightEdgeTop.y() += 0.5f;
+
+                //modelMid = projection * modelMid;
+
+                //modelMid = modelMid / modelMid.w();
+                //rightEdgeTop = projection * rightEdgeTop;
+
+                //rightEdgeTop = rightEdgeTop / rightEdgeTop.w();
+
+                printf("Model mid: %f, %f, %f, %f\n", modelMid.x(), modelMid.y(), modelMid.z(), modelMid.w());
+                printf("Model right top: %f, %f, %f, %f\n", rightEdgeTop.x(), rightEdgeTop.y(), rightEdgeTop.z(), rightEdgeTop.w());
+            }
+
+
+		}
 
 		RenderDevice::Instance()->Render();
 

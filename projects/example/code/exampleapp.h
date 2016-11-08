@@ -5,6 +5,7 @@
 	(C) 2015 Individual contributors, see AUTHORS file
 */
 //------------------------------------------------------------------------------
+#include <foundation/math/shapes/quad.h>
 #include "core/app.h"
 #include "render/window.h"
 #include "render/properties/graphicsproperty.h"
@@ -43,6 +44,8 @@ private:
 	shared_ptr<Render::ModelInstance> modelInstance1;
 	shared_ptr<Render::ShaderObject> shader;
 	shared_ptr<Render::ShaderObject> shader1;
+
+	Math::Quad quad;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 
