@@ -31,6 +31,7 @@ namespace Render
         {
             Math::Matrix4 View;
             Math::Matrix4 Projection;
+            Math::Matrix4 ViewProjection;
 
         } uniformBufferBlock;
 

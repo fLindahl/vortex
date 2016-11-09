@@ -20,8 +20,9 @@ void RenderDevice::Render()
     //Set global matrix uniform buffer block for this frame
 
     //TODO: Get these working!
-    uniformBufferBlock.View = Graphics::MainCamera::Instance()->getViewMatrix().transpose();
-    uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjectionMatrix().transpose();
+    uniformBufferBlock.View = Graphics::MainCamera::Instance()->getViewMatrix();
+    uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
+	uniformBufferBlock.ViewProjection = (Graphics::MainCamera::Instance()->getProjectionMatrix() * Graphics::MainCamera::Instance()->getViewMatrix());
 
     glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, this->ubo[0]);
