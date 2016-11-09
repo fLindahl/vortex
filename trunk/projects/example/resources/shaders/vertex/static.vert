@@ -26,6 +26,6 @@ void main()
 
 	Texcoords = uv;
 
-	gl_Position = Projection * View * wPos;
+	gl_Position = ViewProjection * wPos;
 	
 }

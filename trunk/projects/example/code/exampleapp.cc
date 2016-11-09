@@ -161,49 +161,75 @@ ExampleApp::Run()
 	float y = 0.0f;
 	//float z = 0.0f;
 
-	Math::Matrix4 transf = Math::Matrix4::translation(-0.3f, -1.0f, -2.0f);
-	Math::Matrix4 transf2 = Math::Matrix4::translation(0.0f, -0.0f, -1.0f);
-
 	Math::Matrix4 projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
     Math::Matrix4 invProj = projection.invert();
-	Math::Matrix4 view = Graphics::MainCamera::Instance()->getViewMatrix();
-    Math::Matrix4 invView = view.invert();
-	Math::Matrix4 invProjView = invProj * invView;
 
-	quad.v1 = transf2 * quad.v1;
-	quad.v2 = transf2 * quad.v2;
-	quad.v3 = transf2 * quad.v3;
-	quad.v4 = transf2 * quad.v4;
+    Math::Matrix4 transf = Math::Matrix4::translation(0.0f, 0.0f, -2.0f);
+    Math::Matrix4 transf2 = Math::Matrix4::translation(2.0f, 0.0f, -1.0f);
+
+    gProperty->setModelMatrix(transf);
+    gProperty1->setModelMatrix(transf2);
+
+	//quad.v1 = transf2 * quad.v1;
+	//quad.v2 = transf2 * quad.v2;
+	//quad.v3 = transf2 * quad.v3;
+	//quad.v4 = transf2 * quad.v4;
 
     Math::Plane plane = Math::Plane(quad.v2, quad.v3, quad.v1);
 
-    quad.v1 = projection * quad.v1;
-    quad.v2 = projection * quad.v2;
-    quad.v3 = projection * quad.v3;
-    quad.v4 = projection * quad.v4;
-
-
-    printf("quad1 position : %f, %f, %f, %f\n", quad.v1.x(), quad.v1.y(), quad.v1.z(), quad.v1.w());
-    printf("quad2 position : %f, %f, %f, %f\n", quad.v2.x(), quad.v2.y(), quad.v2.z(), quad.v2.w());
-    printf("quad3 position : %f, %f, %f, %f\n", quad.v3.x(), quad.v3.y(), quad.v3.z(), quad.v3.w());
-    printf("quad4 position : %f, %f, %f, %f\n", quad.v4.x(), quad.v4.y(), quad.v4.z(), quad.v4.w());
-
 	double cursorPosX = 0.0f;
 	double cursorPosY = 0.0f;
+
+    Math::Vector4 cameraPos = Math::Vector4();
+
+    Util::Array<std::pair<Math::Vector4, Math::Vector4>> rays;
 
 	while (this->window->IsOpen())
 	{
 		this->window->Update();
 
-		// Rotation and translation
-		//transf = Math::Matrix4::translation(0.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)keyhandler->mouseY) * Math::Matrix4::rotX((float)keyhandler->mouseX) * Math::Matrix4::translation(x, y, (float)keyhandler->scroll * -0.1f - 1.0f);
-		//transf2 = Math::Matrix4::translation(1.0f, 0.0f, 0.0f) * Math::Matrix4::rotY((float)keyhandler->mouseY) * Math::Matrix4::rotX((float)keyhandler->mouseX) * Math::Matrix4::translation(x, y, (float)keyhandler->scroll * -0.1f - 1.0f);
+        x = 0.0f;
+        y = 0.0f;
 
-		gProperty->setModelMatrix(transf);
-		gProperty1->setModelMatrix(transf2);
+        if(keyhandler->W)
+        {
+            y += 0.02f;
+        }
+        if(keyhandler->S)
+        {
+            y -= 0.015f;
+        }
+        if(keyhandler->A)
+        {
+            x += 0.02f;
+        }
+        if(keyhandler->D)
+        {
+            x -= 0.02f;
+        }
+
+        Math::Matrix4 roty = Math::Matrix4::rotY(-keyhandler->mouseY);
+        Math::Matrix4 rotx = Math::Matrix4::rotX(keyhandler->mouseX);
+
+        Math::Matrix4 rotation = rotx * roty;
+
+        const Math::Vector4& left = rotation.get_xaxis();
+        const Math::Vector4& up = rotation.get_yaxis();
+        const Math::Vector4& forward = rotation.get_zaxis();
+
+        cameraPos = cameraPos + (left * x);
+        cameraPos = cameraPos + (forward * y);
+
+        Graphics::MainCamera::Instance()->setViewMatrix(Graphics::MainCamera::LookAt(cameraPos, cameraPos + forward, up));
+
+        Math::Matrix4 view = Graphics::MainCamera::Instance()->getViewMatrix();
+        Math::Matrix4 invView = view.invert();
+        Math::Matrix4 invProjView = invProj * invView;
 
 		if(keyhandler->leftMousePressed)
 		{
+            Math::Plane plane = Math::Plane(projection * view * quad.v1, projection * view * quad.v2, projection * view * quad.v3);
+
             printf("\n\n\n\n\n\n\n\n");
 			glfwGetCursorPos(this->window->GetGLFWWindow(), &cursorPosX, &cursorPosY);
 
@@ -221,15 +247,19 @@ ExampleApp::Run()
             Math::Vector4 ray = (cursorTransform * 0.01f);
             //ray.x() = ray.x() * -1.0f;
 
-            Math::Vector4 rayWorld = ray * invView;
+            Math::Vector4 rayWorldPos = ray * invView;
 
-            Math::Vector4 rayDirection = rayWorld - invView.getPosition();
+            Math::Vector4 rayDirection = rayWorldPos - invView.getPosition();
 
             rayDirection = Math::Vector4::normalize(rayDirection);
 
+            //Create ray to render
+            std:pair<Math::Vector4, Math::Vector4> r = std::make_pair(rayWorldPos, rayWorldPos + (rayDirection*100.0f));
+            rays.Append(r);
+
             Math::Vector4 hit;
 
-			if(Physics::PhysicsServer::Raycast(hit, rayWorld, rayDirection, 100.0f, plane))
+			if(Physics::PhysicsServer::Raycast(hit, rayWorldPos, rayDirection, 100.0f, plane))
             {
                 printf("Hit plane at %f, %f, %f, %f\n", hit.x(), hit.y(), hit.z(), hit.w());
 
@@ -254,6 +284,52 @@ ExampleApp::Run()
 		}
 
 		RenderDevice::Instance()->Render();
+
+        // Render LINES
+        glUseProgram(0);
+        glEnable(GL_DEPTH_TEST);
+
+        // DRAW QUAD
+        glBegin(GL_LINES);
+        glColor3f(0.0f, 0.0f, 1.0f);
+
+        Math::Matrix4 t = (projection * view * transf2);
+
+        Math::Vector4 v1 = t * quad.v1;
+        Math::Vector4 v2 = t * quad.v2;
+        Math::Vector4 v3 = t * quad.v3;
+
+        glVertex3f(v1[0], v1[1], v1[2]);
+        glVertex3f(v2[0], v2[1], v2[2]);
+
+        glVertex3f(v2[0], v2[1], v2[2]);
+        glVertex3f(v3[0], v3[1], v3[2]);
+
+        glVertex3f(v3[0], v3[1], v3[2]);
+        glVertex3f(v1[0], v1[1], v1[2]);
+        glEnd();
+
+
+        //glMatrixMode(GL_MODELVIEW);
+        //glLoadMatrixf(view.transpose().get());
+
+        //glMatrixMode(GL_PROJECTION);
+        //glLoadMatrixf(projection.transpose().get());
+
+        for (int i = 0; i < rays.Size(); ++i)
+        {
+            glBegin(GL_LINES);
+            glColor3f(1.0f, 0.0f, 0.0f);
+
+            Math::Vector4 v1 = rays[i].first;
+            Math::Vector4 v2 = rays[i].second;
+
+            glVertex3f(v1[0], v1[1], v1[2]);
+            glVertex3f(v2[0], v2[1], v2[2]);
+
+            glEnd();
+        }
+
 
 		this->window->SwapBuffers();
 	}

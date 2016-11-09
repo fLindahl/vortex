@@ -30,6 +30,9 @@ public:
 	void operator=(MainCamera const&) = delete;
 
 	Math::Matrix4 getViewMatrix() const { return viewMatrix; }
+
+	static Math::Matrix4 LookAt(const Math::Vector4 &eye, const Math::Vector4 &target, const Math::Vector4 &up);
+
 	void setViewMatrix(const Math::Matrix4& mat) { this->viewMatrix = mat; }
 
 	Math::Matrix4 getProjectionMatrix() const { return projectionMatrix; }
@@ -42,6 +45,7 @@ private:
 
 	Math::Matrix4 viewMatrix;
 	Math::Matrix4 projectionMatrix;
+
 };
 
 }
