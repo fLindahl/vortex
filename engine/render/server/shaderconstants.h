@@ -34,6 +34,7 @@ namespace Render
             "{\n"
             "mat4 View;\n"
             "mat4 Projection;\n"
+			"mat4 ViewProjection;\n"
             "};\n"
             "\n"
             "uniform mat4 Model;\n";
