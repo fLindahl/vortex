@@ -18,7 +18,7 @@ public:
     
   void Load(const char* fileName);
   
-  std::vector<Math::Matrix4> EvaluateSkeleton(const int& animIndex);
+  std::vector<Math::mat4> EvaluateSkeleton(const int& animIndex);
   
   void SetAnimationResource(AnimationResource* a);
   
@@ -33,7 +33,7 @@ private:
   double frameTime;
   
   void Setup(const int& jointArraySize);
-  void SetupJoint(const int& jointIndex, const Math::Vector4& position, const std::string& jointName /*, const Quaternion& rotation, const Vector4& scale*/);
+  void SetupJoint(const int& jointIndex, const Math::vec4& position, const std::string& jointName /*, const Quaternion& rotation, const vec4& scale*/);
     
 };
 }

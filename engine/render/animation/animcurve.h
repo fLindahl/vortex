@@ -69,9 +69,9 @@ public:
   /// return true if the curve is static
   bool IsStatic() const;
   /// set the static key of the curve
-  void SetStaticKey(const Math::Vector4& staticKey);
+  void SetStaticKey(const Math::vec4& staticKey);
   /// get the static key of the curve
-  const Math::Vector4& GetStaticKey() const;
+  const Math::vec4& GetStaticKey() const;
   /// set index of the first key in the AnimKeyBuffer
   void SetFirstKeyIndex(int index);
   /// get index of the first key in the AnimKeyBuffer
@@ -83,7 +83,7 @@ public:
   
   
 private:
-	Math::Vector4 staticKey;
+	Math::vec4 staticKey;
   int firstKeyIndex;
   CurveType::Code curveType;
   bool isActive;
@@ -127,12 +127,12 @@ inline bool AnimCurve::IsStatic() const
     return this->isStatic;
 }
 
-inline void AnimCurve::SetStaticKey(const Math::Vector4& key)
+inline void AnimCurve::SetStaticKey(const Math::vec4& key)
 {
     this->staticKey = key;
 }
 
-inline const Math::Vector4& AnimCurve::GetStaticKey() const
+inline const Math::vec4& AnimCurve::GetStaticKey() const
 {
     return this->staticKey;
 }

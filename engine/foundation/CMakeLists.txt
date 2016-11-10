@@ -4,12 +4,12 @@
 
 SET(files_foundation_math
 	math/math.h
-	math/matrix3.h
 	math/matrix4.h	
 	math/matrix4.cpp	
-	math/vector2.h
-	math/vector3.h
+	math/vector.h
 	math/vector4.h
+	math/vector4.cpp
+	math/point.h
 	math/quaternion.h
 	math/plane.cpp
 	math/plane.h

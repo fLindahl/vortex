@@ -236,15 +236,15 @@ namespace Render
 
 	bool MeshResource::loadMeshFromOBJ(const char* filename)
 	{
-		Util::Array<Vertex> vertexBuffer;
+		Util::Array<OBJVertex> vertexBuffer;
 		Util::Array<unsigned int> indexBuffer;
 
 		Util::Array< unsigned int > vertexIndices, uvIndices, normalIndices;
-		Util::Array< Math::Vector4 > temp_vertices;
-		Util::Array< Math::Vector2 > temp_uvs;
-		Util::Array< Math::Vector3 > temp_normals;
+		Util::Array< Util::Array<GLfloat> > temp_vertices;
+		Util::Array< Util::Array<GLfloat> > temp_uvs;
+		Util::Array< Util::Array<GLfloat> > temp_normals;
 
-		std::map <unsigned long, Vertex*> indexBitToVertexMap;
+		std::map <unsigned long, OBJVertex*> indexBitToVertexMap;
 		std::map <unsigned int, unsigned int> vertexMemoryAdressToIndex;
 
 		FILE * file = fopen(filename, "r");
@@ -267,20 +267,31 @@ namespace Render
 			{
 				GLfloat vertex[3];
 				fscanf(file, "%f %f %f\n", &vertex[0], &vertex[1], &vertex[2]);
-				temp_vertices.Append(vertex);
+				Util::Array<GLfloat> a;
+				a.Append(vertex[0]);
+				a.Append(vertex[1]);
+				a.Append(vertex[2]);
+				temp_vertices.Append(a);
 			}
 			else if (strcmp(lineHeader, "vt") == 0)
 			{
 				GLfloat uv[2];
 				fscanf(file, "%f %f\n", &uv[0], &uv[1]);
-				temp_uvs.Append(uv);
+				Util::Array<GLfloat> a;
+				a.Append(uv[0]);
+				a.Append(uv[1]);
+				temp_uvs.Append(a);
 			}
 
 			else if (strcmp(lineHeader, "vn") == 0)
 			{
 				GLfloat normal[3];
 				fscanf(file, "%f %f %f\n", &normal[0], &normal[1], &normal[2]);
-				temp_normals.Append(normal);
+				Util::Array<GLfloat> a;
+				a.Append(normal[0]);
+				a.Append(normal[1]);
+				a.Append(normal[2]);
+				temp_normals.Append(a);
 			}
 			else if (strcmp(lineHeader, "f") == 0)
 			{
@@ -302,7 +313,7 @@ namespace Render
 
 				// for each vertex in face
 				unsigned long long indexBit;
-				Vertex* tempVertex;
+				OBJVertex* tempVertex;
 
 				for (GLuint u = 0; u < 3; u++)
 				{
@@ -316,11 +327,18 @@ namespace Render
 					else
 					{
 						//Create a new vertex
-						tempVertex = new Vertex();
+						tempVertex = new OBJVertex();
 
-						tempVertex->pos = temp_vertices[vertexIndex[u]];
-						tempVertex->uv = temp_uvs[uvIndex[u]];
-						tempVertex->normal = temp_normals[normalIndex[u]];
+						tempVertex->pos[0] = temp_vertices[vertexIndex[u]][0];
+						tempVertex->pos[1] = temp_vertices[vertexIndex[u]][1];
+						tempVertex->pos[2] = temp_vertices[vertexIndex[u]][2];
+
+						tempVertex->uv[0] = temp_uvs[uvIndex[u]][0];
+						tempVertex->uv[1] = temp_uvs[uvIndex[u]][1];
+
+						tempVertex->normal[0] = temp_normals[normalIndex[u]][0];
+						tempVertex->normal[1] = temp_normals[normalIndex[u]][1];
+						tempVertex->normal[2] = temp_normals[normalIndex[u]][2];
 
 						indexBitToVertexMap[indexBit] = tempVertex;
 
@@ -335,24 +353,26 @@ namespace Render
 			}
 		}
 
+		this->numIndices = indexBuffer.Size();
+
 		glGenVertexArrays(1, &vao[0]); // Create our Vertex Array Object  
 		glBindVertexArray(vao[0]); // Bind our Vertex Array Object so we can use it  
 
 		glGenBuffers(1, this->vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, this->vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer.Size() * sizeof(Vertex), &vertexBuffer[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertexBuffer.Size() * sizeof(OBJVertex), &vertexBuffer[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 9, NULL);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 9, (GLvoid*)(sizeof(float32) * 4));
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 9, (GLvoid*)(sizeof(float32) * 6));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, NULL);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)(sizeof(float32) * 3));
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)(sizeof(float32) * 5));
 
 		glGenBuffers(1, this->ib);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ib[0]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.Size() * sizeof(GLuint), &indexBuffer[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(GLuint), &indexBuffer[0], GL_STATIC_DRAW);
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

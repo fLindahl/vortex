@@ -1,6 +1,5 @@
 #pragma once
 #include "GL/glew.h"
-#include "foundation/math/vector3.h"
 #include <memory>
 #include "shaderobject.h"
 #include "render/softwarerender/rasterizer.h"
@@ -14,15 +13,15 @@ public:
 	TextureResource();
 	~TextureResource();
 
-	void setRasterizer(shared_ptr<Rasterizer> inRaster);
+	//void setRasterizer(std::shared_ptr<Rasterizer> inRaster);
 
 	void loadFromFile(const char * filename);
-	void loadFromRasterizer();
+	//void loadFromRasterizer();
 	void BindTexture(GLuint slot);
 
 private:
-	shared_ptr<ShaderObject> shader;
-	shared_ptr<Rasterizer> raster;
+	std::shared_ptr<ShaderObject> shader;
+	//std::shared_ptr<Rasterizer> raster;
 
 	GLuint texture;
 };

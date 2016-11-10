@@ -17,14 +17,14 @@ public:
     ~PhysicsServer();
 
     //Shoot a ray and return first object that it intersects.
-    bool Raycast(shared_ptr<Game::Entity> out, const Math::Vector4& position, const Math::Vector4& direction, const float& length /*, const ExcludeSet& exclude*/);
+    bool Raycast(std::shared_ptr<Game::Entity> out, const Math::vec4& position, const Math::vec4& direction, const float& length /*, const ExcludeSet& exclude*/);
 
     // TEMPORARY: Raycast and check against a list of specific objects.
-    static bool Raycast(Math::Vector4& out, const Math::Vector4& position, const Math::Vector4& direction, const float& length, const Math::Plane& plane);
+    static bool Raycast(Math::vec4& out, const Math::vec4& position, const Math::vec4& direction, const float& length, const Math::plane& plane);
 
 
     //Shoot a ray and return all objects that it intersects.
-    //bool Raycast(Util::Array<shared_ptr<Game::Entity>> out, const Math::Vector4& position, const Math::Vector4& direction /*, const ExcludeSet& exclude*/);
+    //bool Raycast(Util::Array<shared_ptr<Game::Entity>> out, const Math::vec4& position, const Math::vec4& direction /*, const ExcludeSet& exclude*/);
 
 
 private:

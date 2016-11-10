@@ -18,12 +18,12 @@ namespace Render
 		}
 	}
 
-	shared_ptr<ModelInstance> GraphicsProperty::getModelInstance() const
+	std::shared_ptr<ModelInstance> GraphicsProperty::getModelInstance() const
 	{
 		return this->modelInstance;
 	}
 
-	void GraphicsProperty::setModelInstance(shared_ptr<ModelInstance> inModelInstance)
+	void GraphicsProperty::setModelInstance(std::shared_ptr<ModelInstance> inModelInstance)
 	{
 		//HACK: Implement this
 		//if (this->modelInstance.get() != nullptr)
@@ -36,12 +36,12 @@ namespace Render
 
 	}
 
-	Math::Matrix4 GraphicsProperty::getModelMatrix() const
+	Math::mat4 GraphicsProperty::getModelMatrix() const
 	{
 		return this->modelMat;
 	}
 
-	void GraphicsProperty::setModelMatrix(const Math::Matrix4 &mat)
+	void GraphicsProperty::setModelMatrix(const Math::mat4 &mat)
 	{
 		this->modelMat = mat;
 	}

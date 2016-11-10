@@ -79,7 +79,7 @@ bool ShaderServer::SetupShaders(const std::string& file)
 		else // Load shader!
 		{
 			// Create our shader
-			shared_ptr<ShaderObject> shd = make_shared<ShaderObject>();
+			std::shared_ptr<ShaderObject> shd = std::make_shared<ShaderObject>();
 
 			// Set name
 			shd->SetName(nameAttr->Value());

@@ -13,35 +13,35 @@ public:
   CharacterJoint();
   ~CharacterJoint();
   
-  void Setup(const int& parentJointIndex, CharacterJoint* parentJoint, const Math::Vector4& poseTranslation, const std::string& name, const Math::Quaternion& poseRotation, const Math::Vector4& poseScale);
+  void Setup(const int& parentJointIndex, CharacterJoint* parentJoint, const Math::vec4& poseTranslation, const std::string& name, const Math::quaternion& poseRotation, const Math::vec4& poseScale);
 
-  void EvaluateMatrix(const Math::Vector4& scale, const Math::Quaternion& rotation, const Math::Vector4& translation);
+  void EvaluateMatrix(const Math::vec4& scale, const Math::quaternion& rotation, const Math::vec4& translation);
   void ResetMatrix();
   
   CharacterJoint* getParentJoint();
   
-  Math::Vector4& getPoseTranslation();
-  Math::Quaternion& getPoseRotation();
+  Math::vec4& getPoseTranslation();
+  Math::quaternion& getPoseRotation();
   
   void EvaluateInverseMatrix();
   
-  Math::Matrix4 GetInversePoseMatrix();
-  Math::Matrix4 GetPoseMatrix();
+  Math::mat4 GetInversePoseMatrix();
+  Math::mat4 GetPoseMatrix();
   
   
-  Math::Matrix4 GetEvaluatedMatrix();
+  Math::mat4 GetEvaluatedMatrix();
   
 private:
   std::string name;
     
-  Math::Vector4 poseTranslation;
-  Math::Quaternion poseRotation;
-  Math::Vector4 poseScale;
+  Math::vec4 poseTranslation;
+  Math::quaternion poseRotation;
+  Math::vec4 poseScale;
   
-  Math::Matrix4 currentMatrix;
+  Math::mat4 currentMatrix;
   
-  Math::Matrix4 poseMatrix;
-  Math::Matrix4 invPoseMatrix;
+  Math::mat4 poseMatrix;
+  Math::mat4 invPoseMatrix;
   
   int parentJointIndex;
   CharacterJoint* parentJoint;    

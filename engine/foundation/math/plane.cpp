@@ -4,30 +4,30 @@
 namespace Math
 {
 
-    Plane::Plane(const Vector4& a, const Vector4& b, const Vector4& c)
+	plane::plane(const vec4& a, const vec4& b, const vec4& c)
     {
-        this->vec = Vector4::normalize(Vector4::cross(b - a, c - a));
-        this->vec[3] = Vector4::dot(vec, a);
+        this->vec = vec4::normalize(vec4::cross3(b - a, c - a));
+        this->vec.w() = vec4::dot(vec, a);
     }
 
-    Plane::~Plane()
+	plane::~plane()
     {
 
     }
 
-    float Plane::d() const
+	float plane::d() const
     {
-        return this->vec[3];
+        return this->vec.w();
     }
 
-    Vector4 Plane::n() const
+	vec4 plane::n() const
     {
-        return Vector4(this->vec[0], this->vec[1], this->vec[2], 1);
+        return vec4(this->vec.x(), this->vec.y(), this->vec.z(), 1);
     }
 
-    Vector4 Plane::p() const
+	vec4 plane::p() const
     {
-        Vector4 ret = Vector4(this->vec * this->vec[3]);
+        vec4 ret = vec4(this->vec * this->vec.w());
         ret.w() = 1.0f;
         return ret;
     }
