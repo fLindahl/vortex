@@ -1,7 +1,7 @@
-uniform vec3 lightPosition;
-uniform vec3 cameraPosition;
+uniform vec4 lightPosition;
+uniform vec4 cameraPosition;
 
-layout(location=0) in vec4 pos;
+layout(location=0) in vec3 pos;
 layout(location=1) in vec3 normal;
 layout(location=2) in vec2 uv;
 
@@ -13,19 +13,19 @@ layout(location=0) out vec2 Texcoords;
 void main()
 {
 	// position in world space
-	vec4 wPos = Model * pos;
+	vec4 wPos = Model * vec4(pos, 1.0f);
 
 	// normal in world space
 	Normal = vec3(normalize(Model * vec4(normal, 0)));
 
 	// direction to light
-	toLight = normalize(lightPosition - wPos.xyz);
+	toLight = normalize(lightPosition.xyz - wPos.xyz);
 
 	// direction to camera
-	toCamera = normalize(cameraPosition - wPos.xyz);
+	toCamera = normalize(cameraPosition.xyz - wPos.xyz);
 
 	Texcoords = uv;
 
-	gl_Position = ViewProjection * wPos;
+	gl_Position = Projection * View * wPos;
 	
 }

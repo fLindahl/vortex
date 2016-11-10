@@ -75,10 +75,10 @@ ExampleApp::Open()
 		gProperty1->setModelInstance(modelInstance1);
 
 		quad = Math::Quad();
-		quad.v1 = Math::Vector4(-0.5f, 0.5f, 0.0f, 1.0f);
-		quad.v2 = Math::Vector4(0.5f, 0.5f, 0.0f, 1.0f);
-		quad.v3 = Math::Vector4(-0.5f, -0.5f, 0.0f, 1.0f);
-		quad.v4 = Math::Vector4(0.5f, -0.5f, 0.0f, 1.0f);
+		quad.v1 = Math::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
+		quad.v2 = Math::vec4(0.5f, 0.5f, 0.0f, 1.0f);
+		quad.v3 = Math::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+		quad.v4 = Math::vec4(0.5f, -0.5f, 0.0f, 1.0f);
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -161,11 +161,11 @@ ExampleApp::Run()
 	float y = 0.0f;
 	//float z = 0.0f;
 
-	Math::Matrix4 projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
-    Math::Matrix4 invProj = projection.invert();
+	Math::mat4 projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
+    Math::mat4 invProj = Math::mat4::inverse(projection);
 
-    Math::Matrix4 transf = Math::Matrix4::translation(0.0f, 0.0f, -2.0f);
-    Math::Matrix4 transf2 = Math::Matrix4::translation(2.0f, 0.0f, -1.0f);
+    Math::mat4 transf = Math::mat4::translation(0.0f, 0.0f, -2.0f);
+    Math::mat4 transf2 = Math::mat4::translation(2.0f, 0.0f, -1.0f);
 
     gProperty->setModelMatrix(transf);
     gProperty1->setModelMatrix(transf2);
@@ -175,60 +175,61 @@ ExampleApp::Run()
 	//quad.v3 = transf2 * quad.v3;
 	//quad.v4 = transf2 * quad.v4;
 
-    Math::Plane plane = Math::Plane(quad.v2, quad.v3, quad.v1);
+    Math::plane plane = Math::plane(quad.v2, quad.v3, quad.v1);
 
 	double cursorPosX = 0.0f;
 	double cursorPosY = 0.0f;
 
-    Math::Vector4 cameraPos = Math::Vector4();
+    Math::point cameraPos = Math::vec4::zerovector();
 
-    Util::Array<std::pair<Math::Vector4, Math::Vector4>> rays;
+    Util::Array<std::pair<Math::vec4, Math::vec4>> rays;
 
 	while (this->window->IsOpen())
 	{
 		this->window->Update();
 
-        x = 0.0f;
-        y = 0.0f;
-
+		Math::vec4 translation = Math::vec4::zerovector();
         if(keyhandler->W)
         {
-            y += 0.02f;
+            translation.z() += 0.02f;
         }
         if(keyhandler->S)
         {
-            y -= 0.015f;
+            translation.z() -= 0.015f;
         }
         if(keyhandler->A)
         {
-            x += 0.02f;
+            translation.x() -= 0.02f;
         }
         if(keyhandler->D)
         {
-            x -= 0.02f;
+            translation.x() += 0.02f;
         }
 
-        Math::Matrix4 roty = Math::Matrix4::rotY(-keyhandler->mouseY);
-        Math::Matrix4 rotx = Math::Matrix4::rotX(keyhandler->mouseX);
+		Math::mat4 xMat = Math::mat4::rotationx(-keyhandler->mouseX * 0.01f);
+		Math::mat4 yMat = Math::mat4::rotationy(-keyhandler->mouseY * 0.01f);
+		Math::mat4 rotation = Math::mat4::multiply(xMat, yMat);
 
-        Math::Matrix4 rotation = rotx * roty;
+		//Math::mat4 rotation = Math::mat4::rotationyawpitchroll(nvgDegToRad(keyhandler->mouseY) * 0.5f, nvgDegToRad(keyhandler->mouseX) * 0.5f, 0.0f);
 
-        const Math::Vector4& left = rotation.get_xaxis();
-        const Math::Vector4& up = rotation.get_yaxis();
-        const Math::Vector4& forward = rotation.get_zaxis();
+		const Math::point& left = rotation.get_xaxis();
+		const Math::point& up = rotation.get_yaxis();
+        const Math::point& forward = rotation.get_zaxis();
 
-        cameraPos = cameraPos + (left * x);
-        cameraPos = cameraPos + (forward * y);
+		translation = Math::mat4::transform(translation, rotation);
+		cameraPos += translation;
 
-        Graphics::MainCamera::Instance()->setViewMatrix(Graphics::MainCamera::LookAt(cameraPos, cameraPos + forward, up));
+        Graphics::MainCamera::Instance()->setViewMatrix(Math::mat4::lookatrh(cameraPos, cameraPos + forward, up));
 
-        Math::Matrix4 view = Graphics::MainCamera::Instance()->getViewMatrix();
-        Math::Matrix4 invView = view.invert();
-        Math::Matrix4 invProjView = invProj * invView;
+        Math::mat4 view = Graphics::MainCamera::Instance()->getViewMatrix();
+        Math::mat4 invView = Math::mat4::inverse(view);
+		Math::mat4 invViewProj = Math::mat4::multiply(invView, invProj);
+		Math::mat4 viewProj = Math::mat4::multiply(view, projection);
+
 
 		if(keyhandler->leftMousePressed)
 		{
-            Math::Plane plane = Math::Plane(projection * view * quad.v1, projection * view * quad.v2, projection * view * quad.v3);
+            //Math::plane plane = Math::plane(projection * view * quad.v1, projection * view * quad.v2, projection * view * quad.v3);
 
             printf("\n\n\n\n\n\n\n\n");
 			glfwGetCursorPos(this->window->GetGLFWWindow(), &cursorPosX, &cursorPosY);
@@ -237,35 +238,35 @@ ExampleApp::Run()
 			cursorPosX = ((2.0f * cursorPosX) / this->window->GetWidth()) -1.0f;
 			cursorPosY = 1.0f-((2.0f*cursorPosY) / this->window->GetHeight());
 
-            Math::Vector4 cursorTransform = Math::Vector4(cursorPosX, cursorPosY, 1.0, 1.0f);
+            Math::vec4 cursorTransform = Math::vec4(cursorPosX, cursorPosY, 1.0, 1.0f);
 
             printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
 
-            cursorTransform =  cursorTransform * invProj;
+			cursorTransform = Math::mat4::transform(cursorTransform, invProj);
 
-            //Pl = Pv * NearPlane * (1,-1,1,1)
-            Math::Vector4 ray = (cursorTransform * 0.01f);
-            //ray.x() = ray.x() * -1.0f;
+			//Pl = Pv * NearPlane * (1,-1,1,1)
+            Math::vec4 ray = (cursorTransform * 0.01f);
+            ray.x() = ray.x() * -1.0f;
 
-            Math::Vector4 rayWorldPos = ray * invView;
+			Math::vec4 rayWorldPos = Math::mat4::transform(ray, invView);
 
-            Math::Vector4 rayDirection = rayWorldPos - invView.getPosition();
+            Math::vec4 rayDirection = rayWorldPos - invView.get_position();
 
-            rayDirection = Math::Vector4::normalize(rayDirection);
+            rayDirection = Math::vec4::normalize(rayDirection);
 
             //Create ray to render
-            std:pair<Math::Vector4, Math::Vector4> r = std::make_pair(rayWorldPos, rayWorldPos + (rayDirection*100.0f));
+            std::pair<Math::vec4, Math::vec4> r = std::make_pair(rayWorldPos, rayWorldPos + (rayDirection*100.0f));
             rays.Append(r);
 
-            Math::Vector4 hit;
+            Math::vec4 hit;
 
 			if(Physics::PhysicsServer::Raycast(hit, rayWorldPos, rayDirection, 100.0f, plane))
             {
                 printf("Hit plane at %f, %f, %f, %f\n", hit.x(), hit.y(), hit.z(), hit.w());
 
-                Math::Vector4 modelMid = gProperty1->getModelMatrix().getPosition();
+                Math::vec4 modelMid = gProperty1->getModelMatrix().get_position();
 
-                Math::Vector4 rightEdgeTop = modelMid;
+                Math::vec4 rightEdgeTop = modelMid;
                 rightEdgeTop.x() += 0.5f;
                 rightEdgeTop.y() += 0.5f;
 
@@ -282,54 +283,54 @@ ExampleApp::Run()
 
 
 		}
-
+		
 		RenderDevice::Instance()->Render();
 
         // Render LINES
         glUseProgram(0);
         glEnable(GL_DEPTH_TEST);
-
+		
         // DRAW QUAD
         glBegin(GL_LINES);
         glColor3f(0.0f, 0.0f, 1.0f);
 
-        Math::Matrix4 t = (projection * view * transf2);
+		Math::mat4 t = Math::mat4::multiply(transf2, viewProj);
 
-        Math::Vector4 v1 = t * quad.v1;
-        Math::Vector4 v2 = t * quad.v2;
-        Math::Vector4 v3 = t * quad.v3;
+        Math::vec4 v1 = Math::mat4::transform(quad.v1, t);
+		Math::vec4 v2 = Math::mat4::transform(quad.v2, t);
+		Math::vec4 v3 = Math::mat4::transform(quad.v3, t);
 
-        glVertex3f(v1[0], v1[1], v1[2]);
-        glVertex3f(v2[0], v2[1], v2[2]);
+        glVertex4f(v1[0], v1[1], v1[2], v1[3]);
+		glVertex4f(v2[0], v2[1], v2[2], v2[3]);
 
-        glVertex3f(v2[0], v2[1], v2[2]);
-        glVertex3f(v3[0], v3[1], v3[2]);
+		glVertex4f(v2[0], v2[1], v2[2], v2[3]);
+		glVertex4f(v3[0], v3[1], v3[2], v3[3]);
 
-        glVertex3f(v3[0], v3[1], v3[2]);
-        glVertex3f(v1[0], v1[1], v1[2]);
+		glVertex4f(v3[0], v3[1], v3[2], v3[3]);
+		glVertex4f(v1[0], v1[1], v1[2], v1[3]);
         glEnd();
+		
+		glMatrixMode(GL_MODELVIEW);
+		glLoadMatrixf((GLfloat*)&view.mat.m[0][0]);
 
-
-        //glMatrixMode(GL_MODELVIEW);
-        //glLoadMatrixf(view.transpose().get());
-
-        //glMatrixMode(GL_PROJECTION);
-        //glLoadMatrixf(projection.transpose().get());
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf((GLfloat*)&projection.mat.m[0][0]);
 
         for (int i = 0; i < rays.Size(); ++i)
         {
             glBegin(GL_LINES);
-            glColor3f(1.0f, 0.0f, 0.0f);
+			
+            Math::vec4 v1 = rays[i].first;
+			Math::vec4 v2 = rays[i].second;
 
-            Math::Vector4 v1 = rays[i].first;
-            Math::Vector4 v2 = rays[i].second;
-
-            glVertex3f(v1[0], v1[1], v1[2]);
-            glVertex3f(v2[0], v2[1], v2[2]);
+			glColor3f(0.0f, 1.0f, 0.0f);
+			glVertex4f(v1[0], v1[1], v1[2], v1[3]);
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glVertex4f(v2[0], v2[1], v2[2], v2[3]);
 
             glEnd();
         }
-
+		
 
 		this->window->SwapBuffers();
 	}

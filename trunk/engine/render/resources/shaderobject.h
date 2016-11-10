@@ -3,7 +3,6 @@
 #include <string>
 #include <iostream>
 #include "foundation/math/matrix4.h"
-#include "foundation/math/matrix3.h"
 #include "foundation/math/vector4.h"
 #include "render/resources/modelinstance.h"
 #include "foundation/util/array.h"
@@ -31,10 +30,9 @@ public:
 
 	void SetRenderState(const RenderState& state);
 
-	void setModelMatrix(Math::Matrix4 model);
+	void setModelMatrix(const Math::mat4& model);
 
-	void setUniMatrix4fv(Math::Matrix4& mat4, const char* uniformName);
-	void setUniMatrix3fv(Math::Matrix3& mat3, const char* uniformName);
+	void setUniMatrix4fv(const Math::mat4& mat4, const char* uniformName);
 	void setUniVector4fv(const float* vec4, const char* uniformName);
 	void setUniVector3fv(const float* vec3, const char* uniformName);
 

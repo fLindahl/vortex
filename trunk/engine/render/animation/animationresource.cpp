@@ -118,13 +118,13 @@ bool AnimationResource::LoadAnimations(const char* fileName)
 			    animCurve.SetActive(naxCurve->isActive != 0);
 			    animCurve.SetStatic(naxCurve->isStatic != 0);
 			    animCurve.SetCurveType((CurveType::Code)naxCurve->curveType);
-			    animCurve.SetStaticKey(Math::Vector4(naxCurve->staticKeyX, naxCurve->staticKeyY, naxCurve->staticKeyZ, naxCurve->staticKeyW));
+			    animCurve.SetStaticKey(Math::vec4(naxCurve->staticKeyX, naxCurve->staticKeyY, naxCurve->staticKeyZ, naxCurve->staticKeyW));
 		    }
 	    }
 
 	    // load keys
 	    const AnimKeyBuffer* animKeyBuffer = this->SetupKeyBuffer(naxHeader->numKeys);
-		Math::Vector4* keyPtr = animKeyBuffer->GetKeyBufferPointer();
+		Math::vec4* keyPtr = animKeyBuffer->GetKeyBufferPointer();
 	    std::memcpy(keyPtr, ptr, animKeyBuffer->GetByteSize());
 	    
 	    

@@ -22,7 +22,7 @@ void RenderDevice::Render()
     //TODO: Get these working!
     uniformBufferBlock.View = Graphics::MainCamera::Instance()->getViewMatrix();
     uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
-	uniformBufferBlock.ViewProjection = (Graphics::MainCamera::Instance()->getProjectionMatrix() * Graphics::MainCamera::Instance()->getViewMatrix());
+	uniformBufferBlock.ViewProjection = Math::mat4::multiply(Graphics::MainCamera::Instance()->getViewMatrix(), Graphics::MainCamera::Instance()->getProjectionMatrix());
 
     glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, this->ubo[0]);
@@ -57,10 +57,6 @@ void RenderDevice::Render()
 			{
 			case Util::Variable::Type::Float:
 				material->GetShader()->setUni1f(*material->ParameterList()[i]->var.GetFloat(), material->ParameterList()[i]->name);
-				break;
-
-			case Util::Variable::Type::Vector3:
-				material->GetShader()->setUniVector3fv(material->ParameterList()[i]->var.GetVector3(), material->ParameterList()[i]->name);
 				break;
 
 			case Util::Variable::Type::Vector4:

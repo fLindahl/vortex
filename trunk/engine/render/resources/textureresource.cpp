@@ -1,7 +1,7 @@
 #include "config.h"
 #include "textureresource.h"
 
-//#include "stb_image.h"
+#include "stb_image.h"
 //#include "render/softwarerender/rasterizer.h"
 
 namespace Render
@@ -17,10 +17,12 @@ TextureResource::~TextureResource()
 	glDeleteTextures(1, &texture);
 }
 
+/*
 void TextureResource::setRasterizer(shared_ptr<Rasterizer> inRaster)
 {
 	this->raster = inRaster;
 }
+*/
 
 void TextureResource::loadFromFile(const char * filename)
 {
@@ -49,7 +51,7 @@ void TextureResource::loadFromFile(const char * filename)
 	stbi_image_free(image);
 
 }
-
+/*
 void TextureResource::loadFromRasterizer()
 {
 	int w = raster->screenwidth;
@@ -66,7 +68,7 @@ void TextureResource::loadFromRasterizer()
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-
+*/
 void TextureResource::BindTexture(GLuint slot)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);

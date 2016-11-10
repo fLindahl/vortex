@@ -99,12 +99,12 @@ inline size_t AnimationClip::GetNumKeys() const
   return this->numKeys;
 }
 
-inline void AnimationClip::SetName(const string& n)
+inline void AnimationClip::SetName(const std::string& n)
 {
   this->name = n;
 }
 
-inline const string& AnimationClip::GetName() const
+inline const std::string& AnimationClip::GetName() const
 {
   return this->name;
 }

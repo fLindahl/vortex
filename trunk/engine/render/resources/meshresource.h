@@ -4,8 +4,6 @@
 #include <string>
 #include <fstream>
 #include "foundation/math/vector4.h"
-#include "foundation/math/vector3.h"
-#include "foundation/math/vector2.h"
 #include <map>
 #include <utility>
 #include "foundation/util/array.h"
@@ -20,19 +18,21 @@ public:
 	MeshResource();
 	~MeshResource();
 
-	struct Vertex
+	struct OBJVertex
 	{
-		bool operator==(const Vertex& rhs) const
+		bool operator==(const OBJVertex& rhs) const
 		{
 			return (pos == rhs.pos && uv == rhs.uv && normal == rhs.normal);
 		}
 
-		Math::Vector4 pos;
-		Math::Vector3 normal;
-		Math::Vector2 uv;
+		GLfloat pos[3];
+		GLfloat uv[2];
+		GLfloat normal[3];
 	};
 
 	bool loadMeshFromFile(const char* filename);
+
+	/// DEPRECATED AND OBSOLETE. DO NOT USE AS IT WILL PROBABLY CAUSE MEMLEAKS
 	bool loadMeshFromOBJ(const char* filename);
 
 	void createQuad();
