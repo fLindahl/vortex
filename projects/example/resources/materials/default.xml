@@ -15,9 +15,9 @@
             <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
 
             <!-- various parameters -->
-			<Param name="AmbientReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material ambience multiplier"/>
-            <Param name="DiffuseReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material albedo multiplier"/>
-            <Param name="SpecularReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material specular reflectivity multiplier"/>
+			<Param name="AmbientReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material ambience multiplier"/>
+            <Param name="DiffuseReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material albedo multiplier"/>
+            <Param name="SpecularReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material specular reflectivity multiplier"/>
             <Param name="Shininess" type="float" defaultValue="64" desc="Material shininess"/>
         </Material>
 		
@@ -28,9 +28,9 @@
             <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
 
             <!-- various parameters -->
-	    	<Param name="AmbientReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material ambience multiplier"/>
-            <Param name="DiffuseReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material albedo multiplier"/>
-            <Param name="SpecularReflectance" type="vector3" defaultValue="1.0, 1.0, 1.0" desc="Material specular reflectivity multiplier"/>
+	    	<Param name="AmbientReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material ambience multiplier"/>
+            <Param name="DiffuseReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material albedo multiplier"/>
+            <Param name="SpecularReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material specular reflectivity multiplier"/>
             <Param name="Shininess" type="float" defaultValue="64" desc="Material shininess"/>
         </Material>
 

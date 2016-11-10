@@ -25,14 +25,14 @@ public:
 	virtual void SendMsg(Msg msg);
 	virtual void SendMsg(int recipientID, MsgType message, float delay);
 
-	virtual Math::Vector4& getPos();
-	virtual void setPos(Math::Vector4 nPos);
+	virtual Math::point getPos();
+	virtual void setPos(const Math::point& nPos);
 
 	std::shared_ptr<Render::GraphicsProperty> getGraphicsProperty() { return graphics; }
 
 protected:
+	Math::point* pos;
 	int ID;
-	Math::Vector4 pos;
 
 	std::shared_ptr<Render::GraphicsProperty> graphics;
 };

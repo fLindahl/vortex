@@ -75,9 +75,9 @@ void CharacterSkeleton::Load(const char* fileName)
     std::string name;
     int index;
     int parent;
-    Math::Vector4 position;
-    Math::Quaternion rotation;
-	Math::Vector4 scale;
+    Math::vec4 position;
+    Math::quaternion rotation;
+	Math::vec4 scale;
     
     //NAME
     const tinyxml2::XMLAttribute* attribute = element->FirstAttribute();
@@ -99,19 +99,19 @@ void CharacterSkeleton::Load(const char* fileName)
     value = attribute->Value();
     float x,y,z,w;
     sscanf(value, "%f,%f,%f,%f", &x, &y, &z, &w);
-    position = Math::Vector4(x,y,z,w);
+    position = Math::vec4(x,y,z,w);
     
     //ROTATION
     attribute = attribute->Next();
     value = attribute->Value();
     sscanf(value, "%f,%f,%f,%f", &x, &y, &z, &w);
-    rotation = Math::Quaternion(x,y,z,w);
+    rotation = Math::quaternion(x,y,z,w);
     
     //SCALE
     attribute = attribute->Next();
     value = attribute->Value();
     sscanf(value, "%f,%f,%f,%f", &x, &y, &z, &w);
-    scale = Math::Vector4(x,y,z,w);
+    scale = Math::vec4(x,y,z,w);
     
     
     CharacterJoint* parentJoint;
@@ -160,12 +160,12 @@ void CharacterSkeleton::Setup(const int& jointArraySize)
 
 }
 
-void CharacterSkeleton::SetupJoint(const int& jointIndex, const Math::Vector4& position, const string& jointName)
+void CharacterSkeleton::SetupJoint(const int& jointIndex, const Math::vec4& position, const std::string& jointName)
 {
 
 }
 
-std::vector<Math::Matrix4> CharacterSkeleton::EvaluateSkeleton(const int &animIndex)
+std::vector<Math::mat4> CharacterSkeleton::EvaluateSkeleton(const int &animIndex)
 {
   AnimationClip clip = animator->GetClipByIndex(animIndex);
   
@@ -188,17 +188,17 @@ std::vector<Math::Matrix4> CharacterSkeleton::EvaluateSkeleton(const int &animIn
     
     int numJointCurves = clip.GetNumCurves() / jointArray.size();
     
-	Math::Vector4 jointTranslation;
-	Math::Vector4 nextJointTranslation;
+	Math::vec4 jointTranslation;
+	Math::vec4 nextJointTranslation;
 
-	Math::Quaternion jointRotation;
-	Math::Quaternion nextJointRotation;
+	Math::quaternion jointRotation;
+	Math::quaternion nextJointRotation;
     
-	Math::Vector4 jointScale;
-	Math::Vector4 nextJointScale;
+	Math::vec4 jointScale;
+	Math::vec4 nextJointScale;
     
-	Math::Vector4 jointVelocity;
-	Math::Vector4 nextJointVelocity;
+	Math::vec4 jointVelocity;
+	Math::vec4 nextJointVelocity;
     
     int nextAnimationFrame = (animationFrame + 1 >= clip.GetNumKeys() ? 0 : animationFrame + 1);
     
@@ -206,9 +206,9 @@ std::vector<Math::Matrix4> CharacterSkeleton::EvaluateSkeleton(const int &animIn
     {
 		AnimCurve jointCurve = clip.CurveByIndex((index * numJointCurves) + i);
       
-		Math::Vector4* key = (keyBuffer->GetKeyBufferPointer() + (jointCurve.GetFirstKeyIndex() + animationFrame * clip.GetKeyStride()));
+		Math::vec4* key = (keyBuffer->GetKeyBufferPointer() + (jointCurve.GetFirstKeyIndex() + animationFrame * clip.GetKeyStride()));
       
-		Math::Vector4* nextKey = (keyBuffer->GetKeyBufferPointer() + (jointCurve.GetFirstKeyIndex() + nextAnimationFrame * clip.GetKeyStride()));
+		Math::vec4* nextKey = (keyBuffer->GetKeyBufferPointer() + (jointCurve.GetFirstKeyIndex() + nextAnimationFrame * clip.GetKeyStride()));
       
 		if(jointCurve.GetCurveType() == CurveType::Code::Translation)
 		{
@@ -217,8 +217,8 @@ std::vector<Math::Matrix4> CharacterSkeleton::EvaluateSkeleton(const int &animIn
 		}
 		else if(jointCurve.GetCurveType() == CurveType::Code::Rotation)
 		{
-			jointRotation = Math::Quaternion(*key);
-			nextJointRotation = Math::Quaternion(*nextKey);
+			jointRotation = Math::quaternion(*key);
+			nextJointRotation = Math::quaternion(*nextKey);
 		}
 		else if(jointCurve.GetCurveType() == CurveType::Code::Scale)
 		{
@@ -233,20 +233,20 @@ std::vector<Math::Matrix4> CharacterSkeleton::EvaluateSkeleton(const int &animIn
       
     }
     
-	jointRotation = Math::Quaternion::slerp(jointRotation, nextJointRotation, (float)t);
+	jointRotation = Math::quaternion::slerp(jointRotation, nextJointRotation, (float)t);
     
-	jointTranslation = Math::Vector4::lerp(jointTranslation, nextJointTranslation, (float)t);
+	jointTranslation = Math::vec4::lerp(jointTranslation, nextJointTranslation, (float)t);
     
     joint->EvaluateMatrix(jointScale, jointRotation, jointTranslation);
   }
   
-  std::vector<Math::Matrix4> ret;
+  std::vector<Math::mat4> ret;
   
   for (index_t index = 0; index < this->jointArray.size(); index++)
   { 
     CharacterJoint* joint = this->jointArray[skin[index]];    
     
-    ret.push_back((joint->GetInversePoseMatrix() * joint->GetEvaluatedMatrix()));
+    ret.push_back((Math::mat4::multiply(joint->GetInversePoseMatrix(), joint->GetEvaluatedMatrix())));
   }
   
   return ret;

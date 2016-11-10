@@ -7,6 +7,8 @@ namespace Game
 
 Entity::Entity()
 {
+	this->pos = new Math::point;
+
 	//Create graphics object and add it to graphicsserver.
 	//this->graphics = std::make_shared<Render::GraphicsProperty>(this);
 	
@@ -15,6 +17,7 @@ Entity::Entity()
 
 Entity::~Entity()
 {
+	delete this->pos;
 	//GraphicsServer::getInstance()->removeGraphicsProperty(this->graphics);
 }
 	
@@ -49,14 +52,14 @@ void Entity::SendMsg(int recipientID, MsgType message, float delay)
 	MsgHandler::getInstance()->RecvMsg(newMsg);
 }
 
-Math::Vector4& Entity::getPos()
+Math::point Entity::getPos()
 {
-	return pos;
+	return *pos;
 }
 
-void Entity::setPos(Math::Vector4 nPos)
+void Entity::setPos(const Math::point& nPos)
 {
-	this->pos = nPos;
+	this->pos->set(nPos.x(), nPos.y(), nPos.z());
 }
 
 }

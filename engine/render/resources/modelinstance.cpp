@@ -21,7 +21,7 @@ ModelInstance::~ModelInstance()
 	}
 }
 
-shared_ptr<Material> ModelInstance::GetMaterial()
+std::shared_ptr<Material> ModelInstance::GetMaterial()
 {
 	return this->material;
 }
@@ -38,7 +38,7 @@ void ModelInstance::SetMaterial(const Util::String& name)
 	this->material->getModelInstances().Append(this);
 }
 
-shared_ptr<MeshResource> ModelInstance::GetMesh()
+std::shared_ptr<MeshResource> ModelInstance::GetMesh()
 {
 	return this->mesh;
 }

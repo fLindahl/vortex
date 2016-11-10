@@ -38,12 +38,12 @@ private:
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
 
-	shared_ptr<Render::MeshResource> mesh;
-	shared_ptr<Render::TextureResource> texture;
-	shared_ptr<Render::ModelInstance> modelInstance;
-	shared_ptr<Render::ModelInstance> modelInstance1;
-	shared_ptr<Render::ShaderObject> shader;
-	shared_ptr<Render::ShaderObject> shader1;
+	std::shared_ptr<Render::MeshResource> mesh;
+	std::shared_ptr<Render::TextureResource> texture;
+	std::shared_ptr<Render::ModelInstance> modelInstance;
+	std::shared_ptr<Render::ModelInstance> modelInstance1;
+	std::shared_ptr<Render::ShaderObject> shader;
+	std::shared_ptr<Render::ShaderObject> shader1;
 
 	Math::Quad quad;
 

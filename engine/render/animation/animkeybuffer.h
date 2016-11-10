@@ -19,7 +19,7 @@ public:
   
   size_t GetByteSize() const;
   
-  Math::Vector4* GetKeyBufferPointer() const;
+  Math::vec4* GetKeyBufferPointer() const;
   
 private:
   size_t numKeys;
@@ -42,13 +42,13 @@ inline AnimKeyBuffer::~AnimKeyBuffer()
 inline void AnimKeyBuffer::Setup(size_t numKeys)
 {
   this->numKeys = numKeys;
-  this->keyBuffer = new Math::Vector4[numKeys];
+  this->keyBuffer = new Math::vec4[numKeys];
     
 }
 
 inline size_t AnimKeyBuffer::GetByteSize() const
 {
-	return this->numKeys * sizeof(Math::Vector4);
+	return this->numKeys * sizeof(Math::vec4);
 }
 
 inline size_t AnimKeyBuffer::GetNumKeys() const
@@ -64,9 +64,9 @@ inline void AnimKeyBuffer::Discard()
 }
 
 
-inline Math::Vector4* AnimKeyBuffer::GetKeyBufferPointer() const
+inline Math::vec4* AnimKeyBuffer::GetKeyBufferPointer() const
 {
-  return (Math::Vector4*) this->keyBuffer;
+  return (Math::vec4*) this->keyBuffer;
 }
 
 }

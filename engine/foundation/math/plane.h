@@ -4,19 +4,20 @@
 namespace Math
 {
 
-class Plane
+class plane
 {
 public:
     ///Construct plane from 3 points
-    Plane(const Vector4& a, const Vector4& b, const Vector4& c);
-    ~Plane();
+    plane(const vec4& a, const vec4& b, const vec4& c);
+    ~plane();
 
     float d() const;
-    Vector4 n() const;
-    Vector4 p() const;
+    vec4 n() const;
+    vec4 p() const;
 
 private:
-    Vector4 vec;
+	friend class mat4;
+    vec4 vec;
 };
 
 }

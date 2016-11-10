@@ -130,7 +130,7 @@ bool ResourceServer::SetupMaterials(const char *fileName)
 		else // Load material!
 		{
 			// Create our material
-			shared_ptr<Material> mat = make_shared<Material>();
+			std::shared_ptr<Material> mat = std::make_shared<Material>();
 
 			// Set name
 			mat->SetName(nameAttr->Value());
@@ -214,7 +214,7 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
 
     const tinyxml2::XMLAttribute* materialTemplate = surface->FirstAttribute();
 
-    shared_ptr<Surface> sur = nullptr;
+    std::shared_ptr<Surface> sur = nullptr;
 
     //First we check if the specified material is loaded.
     if (!this->HasMaterialNamed(materialTemplate->Value()))
@@ -225,10 +225,10 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
     else // Load surface!
     {
         // get material
-        shared_ptr<Material> mat = this->GetMaterial(materialTemplate->Value());
+        std::shared_ptr<Material> mat = this->GetMaterial(materialTemplate->Value());
 
         // create our surface
-        sur = make_shared<Surface>();
+        sur = std::make_shared<Surface>();
 
         sur->name = filepath;
         sur->material = mat;
@@ -260,7 +260,7 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
             if (!sur->parametersByName.count(param->name))
             {
                 sur->parameters.Append(param);
-                sur->parametersByName.insert(make_pair(param->name, param));
+                sur->parametersByName.insert(std::make_pair(param->name, param));
             }
         }
     }

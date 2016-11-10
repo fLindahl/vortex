@@ -29,9 +29,9 @@ namespace Render
 
         struct UniformBufferBlock
         {
-            Math::Matrix4 View;
-            Math::Matrix4 Projection;
-            Math::Matrix4 ViewProjection;
+            Math::mat4 View;
+            Math::mat4 Projection;
+            Math::mat4 ViewProjection;
 
         } uniformBufferBlock;
 

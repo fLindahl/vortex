@@ -5,8 +5,6 @@
 #include <fstream>
 #include <vector>
 #include "foundation/math/vector4.h"
-#include "foundation/math/vector3.h"
-#include "foundation/math/vector2.h"
 #include <map>
 #include <utility>
 #include "foundation/util/array.h"
@@ -52,11 +50,11 @@ public:
 
 	struct Vertex
 	{
-		Math::Vector3 pos;
-		Math::Vector2 uv;
-		Math::Vector3 normal;
-		Math::Vector4 weights;
-		Math::Vector4 jIndices;
+		float pos[3];
+		float uv[2];
+		float normal[3];
+		Math::vec4 weights;
+		Math::vec4 jIndices;
 	};
 
 	bool loadMeshFromFile(const char* filename);

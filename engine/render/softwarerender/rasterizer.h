@@ -3,12 +3,14 @@ Rasterizer
 For Software Rendering.
 **/
 
+/*
+
+
 #pragma once
 #include "config.h"
 #include "render/resources/meshresource.h"
 #include "foundation/util/array.h"
 #include <memory>
-#include "foundation/math/matrix3.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 #include <functional>
@@ -37,7 +39,7 @@ public:
 class Edge
 {
 public:
-	Edge(Math::Vector4 v1, Math::Vector4 v2);
+	Edge(Math::vec4 v1, Math::vec4 v2);
 
 	Octant type;
 	int xb;
@@ -75,11 +77,11 @@ public:
 
 	void clear();
 	
-	void setup(Math::Matrix4 pMat, Math::Matrix4 tMat); // pMat = Perspective Matrix, tMat = transform Matrix
+	void setup(Math::mat4 pMat, Math::mat4 tMat); // pMat = Perspective Matrix, tMat = transform Matrix
 	Util::Array<Color> draw();
 	
-	void setVertexShader(const std::function<Math::Vector3(const Math::Matrix4& pMat, const Math::Matrix4& tMat, const MeshResource::Vertex& vert, Math::Vector4& outVert)>& func);
-	std::function<Math::Vector3(const Math::Matrix4& pMat, const Math::Matrix4& tMat, const MeshResource::Vertex& vert, Math::Vector4& outVert)> vertexShader;
+	void setVertexShader(const std::function<Math::Vector3(const Math::mat4& pMat, const Math::mat4& tMat, const MeshResource::Vertex& vert, Math::vec4& outVert)>& func);
+	std::function<Math::Vector3(const Math::mat4& pMat, const Math::mat4& tMat, const MeshResource::Vertex& vert, Math::vec4& outVert)> vertexShader;
 
 	void setFragmentShader(const std::function<Color(const Math::Vector2& uv, const Texture& texture)>& func);
 	std::function<Color(const Math::Vector2& uv, const Texture& texture)> fragmentShader;
@@ -113,3 +115,5 @@ private:
 	Util::Array<GLfloat> depthBuffer;
 };
 }
+
+*/

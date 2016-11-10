@@ -16,32 +16,27 @@ LightNode::~LightNode()
 
 void LightNode::setLightPosition(GLfloat x, GLfloat y, GLfloat z)
 {
-	lightPosition.set(x, y, z);
+	//lightPosition.set(x, y, z);
 }
 
 void LightNode::setCameraPosition(GLfloat x, GLfloat y, GLfloat z)
 {
-	cameraPosition.set(x, y, z);
-}
-
-Math::Vector3 LightNode::getCameraPosition()
-{
-	return cameraPosition;
+	//cameraPosition.set(x, y, z);
 }
 
 void LightNode::setAmbientIntensity(GLfloat r, GLfloat g, GLfloat b)
 {
-	lightAmbientIntensity.set(r,g,b);
+	//lightAmbientIntensity.set(r,g,b);
 }
 
 void LightNode::setDiffuseIntensity(GLfloat r, GLfloat g, GLfloat b)
 {
-	lightDiffuseIntensity.set(r, g, b);
+	//lightDiffuseIntensity.set(r, g, b);
 }
 
 void LightNode::setSpecularIntensity(GLfloat r, GLfloat g, GLfloat b)
 {
-	lightSpecularIntensity.set(r, g, b);
+	//lightSpecularIntensity.set(r, g, b);
 }
 
 void LightNode::applyToShader(std::shared_ptr<ShaderObject> shader)

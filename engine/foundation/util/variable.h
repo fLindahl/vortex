@@ -7,8 +7,6 @@ A variable that can act as any type.
  */
 //#include "config.h"
 #include "array.h"
-#include "foundation/math/vector2.h"
-#include "foundation/math/vector3.h"
 #include "foundation/math/vector4.h"
 #include "foundation/math/matrix4.h"
 //#include "foundation/util/string.h"
@@ -50,20 +48,16 @@ namespace Util
 		Variable(uint value);
 		Variable(float value);
 		Variable(bool value);
-		Variable(const Math::Vector2& value);
-		Variable(const Math::Vector3& value);
-		Variable(const Math::Vector4& value);
+		Variable(const Math::vec4& value);
 		Variable(const Util::String& value);
-		Variable(const Math::Matrix4& value);
+		Variable(const Math::mat4& value);
 		Variable(void* value);
 		Variable(const Array<int>& value);
 		Variable(const Array<float>& value);
 		Variable(const Array<bool>& value);
-		Variable(const Array<Math::Vector2>& value);
-		Variable(const Array<Math::Vector3>& value);
-		Variable(const Array<Math::Vector4>& value);
+		Variable(const Array<Math::vec4>& value);
 		Variable(const Array<Util::String>& value);
-		Variable(const Array<Math::Matrix4>& value);
+		Variable(const Array<Math::mat4>& value);
 		Variable(const Variable& value);
 
 		// destructor
@@ -81,7 +75,6 @@ namespace Util
 		//Get functions!
 		Util::String* GetString() const;
 		float* GetFloat();
-		float* GetVector3();
 		float* GetVector4();
 
 		//Operators!
@@ -90,19 +83,15 @@ namespace Util
 		void operator=(uint val);
 		void operator=(float val);
 		void operator=(bool val);
-		void operator=(const Math::Vector2& val);
-		void operator=(const Math::Vector3& val);
-		void operator=(const Math::Vector4& val);
-		void operator=(const Math::Matrix4& val);
+		void operator=(const Math::vec4& val);
+		void operator=(const Math::mat4& val);
 		void operator=(const Util::String& s);
 		void operator=(void* ptr);
 		void operator=(const Util::Array<int>& rhs);
 		void operator=(const Util::Array<float>& rhs);
 		void operator=(const Util::Array<bool>& rhs);
-		void operator=(const Util::Array<Math::Vector2>& rhs);
-		void operator=(const Util::Array<Math::Vector3>& rhs);
-		void operator=(const Util::Array<Math::Vector4>& rhs);
-		void operator=(const Util::Array<Math::Matrix4>& rhs);
+		void operator=(const Util::Array<Math::vec4>& rhs);
+		void operator=(const Util::Array<Math::mat4>& rhs);
 		void operator=(const Util::Array<Util::String>& rhs);
 		
 		bool operator==(const Variable& rhs) const;
@@ -110,9 +99,7 @@ namespace Util
 		bool operator==(uint rhs) const;
 		bool operator==(float rhs) const;
 		bool operator==(bool rhs) const;
-		bool operator==(const Math::Vector2& rhs) const;
-		bool operator==(const Math::Vector3& rhs) const;
-		bool operator==(const Math::Vector4& rhs) const;
+		bool operator==(const Math::vec4& rhs) const;
 		bool operator==(const Util::String& rhs) const;
 		bool operator==(void* ptr) const;
 
@@ -121,9 +108,7 @@ namespace Util
 		bool operator!=(uint rhs) const;
 		bool operator!=(float rhs) const;
 		bool operator!=(bool rhs) const;
-		bool operator!=(const Math::Vector2& rhs) const;
-		bool operator!=(const Math::Vector3& rhs) const;
-		bool operator!=(const Math::Vector4& rhs) const;
+		bool operator!=(const Math::vec4& rhs) const;
 		bool operator!=(const Util::String& rhs) const;
 		bool operator!=(void* ptr) const;
 
@@ -145,16 +130,14 @@ namespace Util
 			uint ui;
 			bool b;
 			float f[4];
-			Math::Matrix4* m;
+			Math::mat4* m;
 			Util::String* string;
 			void* voidPtr;
 			Util::Array<int>* intArray;
 			Util::Array<float>* floatArray;
 			Util::Array<bool>* boolArray;
-			Util::Array<Math::Vector2>* vector2Array;
-			Util::Array<Math::Vector3>* vector3Array;
-			Util::Array<Math::Vector4>* vector4Array;
-			Util::Array<Math::Matrix4>* matrix4Array;
+			Util::Array<Math::vec4>* vector4Array;
+			Util::Array<Math::mat4>* matrix4Array;
 			Util::Array<Util::String>* stringArray;
 		};
 	};
@@ -183,7 +166,7 @@ namespace Util
 			float flts[16];
 			sscanf(value.c_str(), "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", &flts[0], &flts[1], &flts[2], &flts[3], &flts[4], &flts[5], &flts[6], &flts[7], &flts[8], &flts[9], &flts[10], &flts[11], &flts[12], &flts[13], &flts[14], &flts[15]);
 			
-			this->m = new Math::Matrix4(flts);
+			this->m = new Math::mat4(flts);
 			
 			return;
 
@@ -352,16 +335,6 @@ namespace Util
 			this->boolArray = 0;
 			break;
 			
-		case Vector2Array:
-			delete this->vector2Array;
-			this->vector2Array = 0;
-			break;
-
-		case Vector3Array:
-			delete this->vector3Array;
-			this->vector3Array = 0;
-			break;
-
 		case Vector4Array:
 			delete this->vector4Array;
 			this->vector4Array = 0;
@@ -401,11 +374,6 @@ namespace Util
 	inline float* Variable::GetFloat()
 	{
 		return f;
-	}
-
-	inline float* Variable::GetVector3()
-	{
-		return this->f;
 	}
 
 	inline float* Variable::GetVector4()
@@ -453,7 +421,7 @@ namespace Util
 			break;
 		case Matrix4:
 			this->Delete();
-			this->m = new Math::Matrix4(*rhs.m);
+			this->m = new Math::mat4(*rhs.m);
 			break;
 		case VoidPtr:
 			this->voidPtr = rhs.voidPtr;
@@ -470,21 +438,13 @@ namespace Util
 			this->Delete();
 			this->boolArray = new Util::Array<bool>(*rhs.boolArray);
 			break;
-		case Vector2Array:
-			this->Delete();
-			this->vector2Array = new Util::Array<Math::Vector2>(*rhs.vector2Array);
-			break;
-		case Vector3Array:
-			this->Delete();
-			this->vector3Array = new Util::Array<Math::Vector3>(*rhs.vector3Array);
-			break;
 		case Vector4Array:
 			this->Delete();
-			this->vector4Array = new Util::Array<Math::Vector4>(*rhs.vector4Array);
+			this->vector4Array = new Util::Array<Math::vec4>(*rhs.vector4Array);
 			break;
 		case Matrix4Array:
 			this->Delete();
-			this->matrix4Array = new Util::Array<Math::Matrix4>(*rhs.matrix4Array);
+			this->matrix4Array = new Util::Array<Math::mat4>(*rhs.matrix4Array);
 			break;
 		case StringArray:
 			this->Delete();
@@ -527,22 +487,7 @@ namespace Util
 	{
 	}
 
-	inline Variable::Variable(const Math::Vector2& rhs) :
-		type(Vector2)
-	{
-		this->f[0] = rhs.x();
-		this->f[1] = rhs.y();
-	}
-
-	inline Variable::Variable(const Math::Vector3& rhs) :
-		type(Vector3)
-	{
-		this->f[0] = rhs.x();
-		this->f[1] = rhs.y();
-		this->f[2] = rhs.z();
-	}
-
-	inline Variable::Variable(const Math::Vector4& rhs) :
+	inline Variable::Variable(const Math::vec4& rhs) :
 		type(Vector4)
 	{
 		this->f[0] = rhs.x();
@@ -566,13 +511,13 @@ namespace Util
 		this->voidPtr = ptr;
 	}
 
-	inline Variable::Variable(const Math::Matrix4& rhs) :
+	inline Variable::Variable(const Math::mat4& rhs) :
 		type(Matrix4)
 	{
 		if (this->matrix4Array != nullptr)
 			delete this->matrix4Array;
 
-		this->m = new Math::Matrix4(rhs);
+		this->m = new Math::mat4(rhs);
 	}
 
 	inline Variable::Variable(const Util::Array<int>& rhs) :
@@ -602,37 +547,19 @@ namespace Util
 		this->boolArray = new Util::Array<bool>(rhs);
 	}
 
-	inline Variable::Variable(const Util::Array<Math::Vector2>& rhs) :
-		type(Vector2Array)
-	{
-		if (this->vector2Array != nullptr)
-			delete this->vector2Array;
-
-		this->vector2Array = new Util::Array<Math::Vector2>(rhs);
-	}
-
-	inline Variable::Variable(const Util::Array<Math::Vector3>& rhs) :
-		type(Vector3Array)
-	{
-		if (this->vector3Array != nullptr)
-			delete this->vector3Array;
-
-		this->vector3Array = new Util::Array<Math::Vector3>(rhs);
-	}
-
-	inline Variable::Variable(const Util::Array<Math::Vector4>& rhs) :
+	inline Variable::Variable(const Util::Array<Math::vec4>& rhs) :
 		type(Vector4Array)
 	{
-		this->vector4Array = new Util::Array<Math::Vector4>(rhs);
+		this->vector4Array = new Util::Array<Math::vec4>(rhs);
 	}
 
-	inline Variable::Variable(const Util::Array<Math::Matrix4>& rhs) :
+	inline Variable::Variable(const Util::Array<Math::mat4>& rhs) :
 		type(Matrix4Array)
 	{
 		if (this->matrix4Array != nullptr)
 			delete this->matrix4Array;
 
-		this->matrix4Array = new Util::Array<Math::Matrix4>(rhs);
+		this->matrix4Array = new Util::Array<Math::mat4>(rhs);
 	}
 
 	inline Variable::Variable(const Util::Array<Util::String>& rhs) :
@@ -654,7 +581,7 @@ namespace Util
 			this->string = new Util::String();
 			break;
 		case Matrix4:
-			this->m = new Math::Matrix4();
+			this->m = new Math::mat4();
 			break;
 		case VoidPtr:
 			this->voidPtr = 0;
@@ -668,17 +595,11 @@ namespace Util
 		case BoolArray:
 			this->boolArray = new Util::Array<bool>();
 			break;
-		case Vector2Array:
-			this->vector2Array = new Util::Array<Math::Vector2>();
-			break;
-		case Vector3Array:
-			this->vector3Array = new Util::Array<Math::Vector3>();
-			break;
 		case Vector4Array:
-			this->vector4Array = new Util::Array<Math::Vector4>();
+			this->vector4Array = new Util::Array<Math::vec4>();
 			break;
 		case Matrix4Array:
-			this->matrix4Array = new Util::Array<Math::Matrix4>();
+			this->matrix4Array = new Util::Array<Math::mat4>();
 			break;
 		case StringArray:
 			this->stringArray = new Util::Array<Util::String>();
@@ -728,24 +649,7 @@ namespace Util
 		this->b = val;
 	}
 
-	inline void	Variable::operator=(const Math::Vector2& val)
-	{
-		this->Delete();
-		this->type = Vector2;
-		this->f[0] = val.x();
-		this->f[1] = val.y();
-	}
-
-	inline void	Variable::operator=(const Math::Vector3& val)
-	{
-		this->Delete();
-		this->type = Vector3;
-		this->f[0] = val.x();
-		this->f[1] = val.y();
-		this->f[2] = val.z();		
-	}
-
-	inline void	Variable::operator=(const Math::Vector4& val)
+	inline void	Variable::operator=(const Math::vec4& val)
 	{
 		this->Delete();
 		this->type = Vector4;
@@ -769,7 +673,7 @@ namespace Util
 		this->type = String;
 	}
 
-	inline void	Variable::operator=(const Math::Matrix4& val)
+	inline void	Variable::operator=(const Math::mat4& val)
 	{
 		if (Matrix4 == this->type)
 		{
@@ -778,7 +682,7 @@ namespace Util
 		else
 		{
 			this->Delete();
-			this->m = new Math::Matrix4(val);
+			this->m = new Math::mat4(val);
 		}
 		this->type = Matrix4;
 	}
@@ -832,35 +736,7 @@ namespace Util
 		this->type = BoolArray;
 	}
 
-	inline void	Variable::operator=(const Util::Array<Math::Vector2>& rhs)
-	{
-		if (Vector2Array == this->type)
-		{
-			*this->vector2Array = rhs;
-		}
-		else
-		{
-			this->Delete();
-			this->vector2Array = new Util::Array<Math::Vector2>(rhs);
-		}
-		this->type = Vector2Array;
-	}
-
-	inline void Variable::operator=(const Util::Array<Math::Vector3>& val)
-	{
-		if (Vector3Array == this->type)
-		{
-			*this->vector3Array = val;
-		}
-		else
-		{
-			this->Delete();
-			this->vector3Array = new Util::Array<Math::Vector3>(val);
-		}
-		this->type = Vector3Array;
-	}
-
-	inline void Variable::operator=(const Util::Array<Math::Vector4>& val)
+	inline void Variable::operator=(const Util::Array<Math::vec4>& val)
 	{
 		if (Vector4Array == this->type)
 		{
@@ -869,12 +745,12 @@ namespace Util
 		else
 		{
 			this->Delete();
-			this->vector4Array = new Util::Array<Math::Vector4>(val);
+			this->vector4Array = new Util::Array<Math::vec4>(val);
 		}
 		this->type = Vector4Array;
 	}
 
-	inline void	Variable::operator=(const Util::Array<Math::Matrix4>& val)
+	inline void	Variable::operator=(const Util::Array<Math::mat4>& val)
 	{
 		if (Matrix4Array == this->type)
 		{
@@ -883,7 +759,7 @@ namespace Util
 		else
 		{
 			this->Delete();
-			this->matrix4Array = new Util::Array<Math::Matrix4>(val);
+			this->matrix4Array = new Util::Array<Math::mat4>(val);
 		}
 		this->type = Matrix4Array;
 	}
@@ -1125,20 +1001,8 @@ namespace Util
 		assert(String == this->type);
 		return ((*this->string) == rhs);
 	}
-
-	inline bool	Variable::operator==(const Math::Vector2& rhs) const
-	{
-		assert(Vector2 == this->type);
-		return (this->f[0] == rhs.x() && this->f[1] == rhs.y());
-	}
-
-	inline bool	Variable::operator==(const Math::Vector3& rhs) const
-	{
-		assert(Vector3 == this->type);
-		return (this->f[0] == rhs.x() && this->f[1] == rhs.y() && this->f[2] == rhs.z());
-	}
-
-	inline bool	Variable::operator==(const Math::Vector4& rhs) const
+		
+	inline bool	Variable::operator==(const Math::vec4& rhs) const
 	{
 		assert(Vector4 == this->type);
 		return ((this->f[0] == rhs.x()) &&
@@ -1183,19 +1047,7 @@ namespace Util
 		return (*this->string) != rhs;
 	}
 
-	inline bool Variable::operator!=(const Math::Vector2& rhs) const
-	{
-		assert(Vector2 == this->type);
-		return (this->f[0] != rhs.x() || this->f[1] != rhs.y());
-	}
-
-	inline bool Variable::operator!=(const Math::Vector3& rhs) const
-	{
-		assert(Vector3 == this->type);
-		return (this->f[0] != rhs.x() || this->f[1] != rhs.y() || this->f[2] != rhs.z());
-	}
-
-	inline bool	Variable::operator!=(const Math::Vector4& rhs) const
+	inline bool	Variable::operator!=(const Math::vec4& rhs) const
 	{
 		assert(Vector4 == this->type);
 		return ((this->f[0] != rhs.x()) ||
