@@ -508,7 +508,7 @@ namespace Util
             return *this;
     }
 
-    inline static Util::Array<String> String::Tokenize(Util::String str, Util::String delim)
+    inline Util::Array<String> String::Tokenize(Util::String str, Util::String delim)
     {
         Util::Array<String> tokens;
 

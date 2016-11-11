@@ -1,6 +1,5 @@
 #include "config.h"
 #include "line.h"
-#include "plane.h"
 
 namespace Math
 {
@@ -27,16 +26,18 @@ Line::~Line()
 
 }
 
-bool Line::Intersect(vec4& out, const plane& plane)
+bool Line::Intersect(vec4& out, const Math::plane& plane)
 {
-    vec4 ab = (this->p + this->m) - this->p;
+    vec4 endPoint = (this->p + this->m);
 
-    float denom1 = vec4::dot(plane.n(), this->p);
-    float denom2 = vec4::dot(plane.n(), ab);
-    float d = plane.d();
-    float t = (d - denom1 / denom2);
+    vec4 ab = endPoint - this->p;
 
-    if (t >= 0.0f && t <= 1.0f)
+    float pd = vec4::dot3(plane.n(), this->p);
+    float denom = vec4::dot3(plane.n(), ab);
+
+    float t = (plane.d() - pd) / denom;
+
+    if(t >= 0.0f && t <= 1.0f)
     {
         out = this->p + (ab * t);
         return true;

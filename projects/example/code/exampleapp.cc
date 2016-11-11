@@ -170,12 +170,10 @@ ExampleApp::Run()
     gProperty->setModelMatrix(transf);
     gProperty1->setModelMatrix(transf2);
 
-	//quad.v1 = transf2 * quad.v1;
-	//quad.v2 = transf2 * quad.v2;
-	//quad.v3 = transf2 * quad.v3;
-	//quad.v4 = transf2 * quad.v4;
-
-    Math::plane plane = Math::plane(quad.v2, quad.v3, quad.v1);
+	quad.v1 = Math::mat4::transform(quad.v1, transf2);
+	quad.v2 = Math::mat4::transform(quad.v2, transf2);
+	quad.v3 = Math::mat4::transform(quad.v3, transf2);
+	quad.v4 = Math::mat4::transform(quad.v4, transf2);
 
 	double cursorPosX = 0.0f;
 	double cursorPosY = 0.0f;
@@ -226,59 +224,71 @@ ExampleApp::Run()
 		Math::mat4 invViewProj = Math::mat4::multiply(invView, invProj);
 		Math::mat4 viewProj = Math::mat4::multiply(view, projection);
 
-
 		if(keyhandler->leftMousePressed)
 		{
-            //Math::plane plane = Math::plane(projection * view * quad.v1, projection * view * quad.v2, projection * view * quad.v3);
+
+            Math::plane plane = Math::plane(quad.v1, quad.v2, quad.v3);
 
             printf("\n\n\n\n\n\n\n\n");
 			glfwGetCursorPos(this->window->GetGLFWWindow(), &cursorPosX, &cursorPosY);
 
-			// Transform to world coordinates
-			cursorPosX = ((2.0f * cursorPosX) / this->window->GetWidth()) -1.0f;
-			cursorPosY = 1.0f-((2.0f*cursorPosY) / this->window->GetHeight());
+            printf("CameraPos: %f %f %f %f\n", cameraPos.x(), cameraPos.y(), cameraPos.z(), cameraPos.w());
 
-            Math::vec4 cursorTransform = Math::vec4(cursorPosX, cursorPosY, 1.0, 1.0f);
+            // Transform to world coordinates
+			cursorPosX = (((cursorPosX / this->window->GetWidth()) -0.5f) * 2.0f);
+			cursorPosY = (((cursorPosY / this->window->GetHeight()) - 0.5f) * 2.0f);
+
+            Math::vec4 cursorTransform = Math::vec4(cursorPosX, -cursorPosY, 1.0, 1.0f);
 
             printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
 
 			cursorTransform = Math::mat4::transform(cursorTransform, invProj);
 
 			//Pl = Pv * NearPlane * (1,-1,1,1)
-            Math::vec4 ray = (cursorTransform * 0.01f);
-            ray.x() = ray.x() * -1.0f;
+            Math::point ray = (cursorTransform * 0.01f);
+            //ray.x() = ray.x() * -1.0f;
 
 			Math::vec4 rayWorldPos = Math::mat4::transform(ray, invView);
+
+            printf("rayWorldPos: %f %f %f %f\n", rayWorldPos.x(), rayWorldPos.y(), rayWorldPos.z(), rayWorldPos.w());
 
             Math::vec4 rayDirection = rayWorldPos - invView.get_position();
 
             rayDirection = Math::vec4::normalize(rayDirection);
 
             //Create ray to render
-            std::pair<Math::vec4, Math::vec4> r = std::make_pair(rayWorldPos, rayWorldPos + (rayDirection*100.0f));
+            std::pair<Math::vec4, Math::vec4> r = std::make_pair(rayWorldPos, rayWorldPos + (rayDirection*10.0f));
             rays.Append(r);
 
             Math::vec4 hit;
 
-			if(Physics::PhysicsServer::Raycast(hit, rayWorldPos, rayDirection, 100.0f, plane))
+			if(Physics::PhysicsServer::Raycast(hit, rayWorldPos, rayDirection, 10.0f, plane))
             {
                 printf("Hit plane at %f, %f, %f, %f\n", hit.x(), hit.y(), hit.z(), hit.w());
 
-                Math::vec4 modelMid = gProperty1->getModelMatrix().get_position();
+                Math::vec4 edgeN = Math::vec4::normalize(quad.v2 - quad.v1);
+                Math::vec4 edgeE = Math::vec4::normalize(quad.v4 - quad.v2);
+                Math::vec4 edgeS = Math::vec4::normalize(quad.v3 - quad.v4);
+                Math::vec4 edgeW = Math::vec4::normalize(quad.v1 - quad.v3);
 
-                Math::vec4 rightEdgeTop = modelMid;
-                rightEdgeTop.x() += 0.5f;
-                rightEdgeTop.y() += 0.5f;
+                Math::vec4 hitToN = Math::vec4::normalize(quad.v1 - hit);
+                Math::vec4 hitToE = Math::vec4::normalize(quad.v2 - hit);
+                Math::vec4 hitToS = Math::vec4::normalize(quad.v4 - hit);
+                Math::vec4 hitToW = Math::vec4::normalize(quad.v3 - hit);
 
-                //modelMid = projection * modelMid;
+                Math::vec4 edgeNormalN = Math::vec4::cross3(edgeN, plane.n());
+                Math::vec4 edgeNormalE = Math::vec4::cross3(edgeE, plane.n());
+                Math::vec4 edgeNormalS = Math::vec4::cross3(edgeS, plane.n());
+                Math::vec4 edgeNormalW = Math::vec4::cross3(edgeW, plane.n());
 
-                //modelMid = modelMid / modelMid.w();
-                //rightEdgeTop = projection * rightEdgeTop;
-
-                //rightEdgeTop = rightEdgeTop / rightEdgeTop.w();
-
-                printf("Model mid: %f, %f, %f, %f\n", modelMid.x(), modelMid.y(), modelMid.z(), modelMid.w());
-                printf("Model right top: %f, %f, %f, %f\n", rightEdgeTop.x(), rightEdgeTop.y(), rightEdgeTop.z(), rightEdgeTop.w());
+                if((Math::vec4::dot3(hitToN, edgeNormalN) > 0.0f) &&
+                    (Math::vec4::dot3(hitToE, edgeNormalE) > 0.0f) &&
+                    (Math::vec4::dot3(hitToS, edgeNormalS) > 0.0f) &&
+                    (Math::vec4::dot3(hitToW, edgeNormalW) > 0.0f)
+                    )
+                {
+                    printf("--- Hit object! ---\n");
+                }
             }
 
 
@@ -289,12 +299,19 @@ ExampleApp::Run()
         // Render LINES
         glUseProgram(0);
         glEnable(GL_DEPTH_TEST);
-		
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadMatrixf((GLfloat*)&Math::mat4::identity().mat.m[0][0]);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadMatrixf((GLfloat*)&Math::mat4::identity().mat.m[0][0]);
+
         // DRAW QUAD
         glBegin(GL_LINES);
         glColor3f(0.0f, 0.0f, 1.0f);
 
-		Math::mat4 t = Math::mat4::multiply(transf2, viewProj);
+		Math::mat4 t = view;
+        t = Math::mat4::multiply(t, projection);
 
         Math::vec4 v1 = Math::mat4::transform(quad.v1, t);
 		Math::vec4 v2 = Math::mat4::transform(quad.v2, t);
@@ -308,18 +325,19 @@ ExampleApp::Run()
 
 		glVertex4f(v3[0], v3[1], v3[2], v3[3]);
 		glVertex4f(v1[0], v1[1], v1[2], v1[3]);
-        glEnd();
-		
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf((GLfloat*)&view.mat.m[0][0]);
 
-		glMatrixMode(GL_PROJECTION);
-		glLoadMatrixf((GLfloat*)&projection.mat.m[0][0]);
+        glEnd();
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadMatrixf((GLfloat*)&view.mat.m[0][0]);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadMatrixf((GLfloat*)&projection.mat.m[0][0]);
 
         for (int i = 0; i < rays.Size(); ++i)
         {
             glBegin(GL_LINES);
-			
+
             Math::vec4 v1 = rays[i].first;
 			Math::vec4 v2 = rays[i].second;
 

@@ -1,4 +1,3 @@
-#pragma once
 #include "config.h"
 #include "messagehandler.h"
 //#include "..\handlers\GameHandler.h"
