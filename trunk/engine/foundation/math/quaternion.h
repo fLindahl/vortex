@@ -142,7 +142,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline
+	inline
 		quaternion::quaternion()
 	{
 		// empty
@@ -151,7 +151,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline
+	inline
 		quaternion::quaternion(float x, float y, float z, float w)
 	{
 		this->vec = vec4(x, y, z, w);
@@ -160,7 +160,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline
+	inline
 		quaternion::quaternion(vec4 const &rhs) :
 		vec(rhs.vec.vec)
 	{
@@ -170,7 +170,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline
+	inline
 		quaternion::quaternion(const __m128 & rhs) :
 		vec(rhs)
 	{
@@ -180,7 +180,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline
+	inline
 		quaternion::quaternion(const quaternion& rhs) :
 		vec(rhs.vec)
 	{
@@ -190,7 +190,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::operator=(const quaternion& rhs)
 	{
 		this->vec = rhs.vec;
@@ -199,7 +199,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::operator=(const __m128 & rhs)
 	{
 		this->vec = vec4(rhs);
@@ -208,7 +208,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline bool
+	inline bool
 		quaternion::operator==(const quaternion& rhs) const
 	{
 		return rhs.vec == this->vec;
@@ -217,7 +217,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline bool
+	inline bool
 		quaternion::operator!=(const quaternion& rhs) const
 	{
 		return !(this->operator==(rhs));
@@ -226,7 +226,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::load(const float* ptr)
 	{
 		vec4 temp;
@@ -237,7 +237,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::loadu(const float* ptr)
 	{
 		vec4 temp;
@@ -248,7 +248,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::store(float* ptr) const
 	{
 		vec4 temp(vec);
@@ -258,7 +258,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::storeu(float* ptr) const
 	{
 		vec4 temp(vec);
@@ -268,7 +268,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::stream(float* ptr) const
 	{
 		this->store(ptr);
@@ -277,7 +277,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::set(float x, float y, float z, float w)
 	{
 		this->vec = vec4(x, y, z, w);
@@ -322,7 +322,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::set(vec4 const &f4)
 	{
 		this->vec = f4;
@@ -331,7 +331,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float&
+	inline float&
 		quaternion::x()
 	{
 		return vec.x();
@@ -340,7 +340,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float
+	inline float
 		quaternion::x() const
 	{
 		return this->vec.x();
@@ -349,7 +349,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float&
+	inline float&
 		quaternion::y()
 	{
 		return vec.y();
@@ -358,7 +358,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float
+	inline float
 		quaternion::y() const
 	{
 		return this->vec.y();
@@ -367,7 +367,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float&
+	inline float&
 		quaternion::z()
 	{
 		return vec.z();
@@ -376,7 +376,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float
+	inline float
 		quaternion::z() const
 	{
 		return this->vec.z();
@@ -385,7 +385,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float&
+	inline float&
 		quaternion::w()
 	{
 		return vec.w();
@@ -394,7 +394,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float
+	inline float
 		quaternion::w() const
 	{
 		return this->vec.w();
@@ -403,7 +403,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline bool
+	inline bool
 		quaternion::isidentity() const
 	{
 		const quaternion id(0, 0, 0, 1);
@@ -413,7 +413,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float
+	inline float
 		quaternion::length() const
 	{
 		return (this->vec.length());
@@ -422,7 +422,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float
+	inline float
 		quaternion::lengthsq() const
 	{
 		return this->vec.lengthsq();
@@ -431,7 +431,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::undenormalize()
 	{
 		printf("UNDENOMALIZE NOT IMPLEMENTED\n");
@@ -441,7 +441,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::barycentric(const quaternion& q0, const quaternion& q1, const quaternion& q2, float f, float g)
 	{
 		float s = f + g;
@@ -461,7 +461,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::conjugate(const quaternion& q)
 	{
 		const VORTEX_ALIGN16 mm128_vec con = { -1.0f, -1.0f, -1.0f, 1.0f };
@@ -472,7 +472,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline float
+	inline float
 		quaternion::dot(const quaternion& q0, const quaternion& q1)
 	{
 		return vec4::dot(q0.vec, q1.vec);
@@ -481,7 +481,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::exp(const quaternion& q)
 	{
 		vec4 f(q.vec.vec);
@@ -498,7 +498,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::identity()
 	{
 		return quaternion(0,0,0,1);
@@ -507,7 +507,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::inverse(const quaternion& q)
 	{
 		float len = q.lengthsq();
@@ -523,7 +523,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::ln(const quaternion& q)
 	{
 
@@ -546,7 +546,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::multiply(const quaternion& q0, const quaternion& q1)
 	{
 		float x = q0.x() * q1.w() + q0.y() * q1.z() - q0.z() * q1.y() + q0.w() * q1.x();
@@ -560,7 +560,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::normalize(const quaternion& q)
 	{
 		return vec4::normalize(q.vec);
@@ -569,7 +569,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::rotationaxis(const vec4& axis, float angle)
 	{
 		printf("quaternion::rotationaxis: Not implemented!/n");
@@ -580,7 +580,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::rotationyawpitchroll(float yaw, float pitch, float roll)
 	{
 
@@ -605,7 +605,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::slerp(const quaternion& q0, const quaternion& q1, float t)
 	{
 		quaternion q = quaternion();
@@ -667,7 +667,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::squadsetup(const quaternion& q0, const quaternion& q1, const quaternion& q2, const quaternion& q3, quaternion& aOut, quaternion& bOut, quaternion& cOut)
 	{
 		printf("quaternion::squadsetup: Not implemented!/n");
@@ -679,7 +679,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline quaternion
+	inline quaternion
 		quaternion::squad(const quaternion& q1, const quaternion& a, const quaternion& b, const quaternion& c, float t)
 	{
 		printf("quaternion::squad: Not implemented!/n");
@@ -691,7 +691,7 @@ namespace Math
 	//------------------------------------------------------------------------------
 	/**
 	*/
-	__forceinline void
+	inline void
 		quaternion::to_axisangle(const quaternion& q, vec4& outAxis, float& outAngle)
 	{
 		outAxis = q.vec;

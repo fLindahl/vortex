@@ -6,15 +6,17 @@
 #include "plane.h"
 #include "vector4.h"
 
+#ifdef __GNUC__
+#include <cmath>
+#endif
+
 //Macros
 #define _mm_ror_ps(vec,i) (((i)%4) ? (_mm_shuffle_ps(vec,vec, _MM_SHUFFLE((unsigned char)(i+3)%4,(unsigned char)(i+2)%4,(unsigned char)(i+1)%4,(unsigned char)(i+0)%4))) : (vec))
 #define _mm_rol_ps(vec,i) (((i)%4) ? (_mm_shuffle_ps(vec,vec, _MM_SHUFFLE((unsigned char)(7-i)%4,(unsigned char)(6-i)%4,(unsigned char)(5-i)%4,(unsigned char)(4-i)%4))) : (vec))
 
 namespace Math
 {
-	class mat4;
-
-	typedef VORTEX_ALIGN16 struct mm128_mat
+    typedef VORTEX_ALIGN16 struct mm128_mat
 	{
 		union
 		{
@@ -850,7 +852,7 @@ namespace Math
 
 #ifdef N_USE_AVX
 	// dual linear combination using AVX instructions on YMM regs
-	static inline __m256 twolincomb_AVX_8(__m256 A01, const mat4 &B)
+	static __forceinline __m256 twolincomb_AVX_8(__m256 A01, const mat4 &B)
 	{
 		__m256 result;
 		result = _mm256_mul_ps(_mm256_shuffle_ps(A01, A01, 0x00), _mm256_broadcast_ps(&B.mat.r[0].vec));

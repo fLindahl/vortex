@@ -2,6 +2,7 @@
 #include <cfloat>
 #include "vector4.h"
 #include "plane.h"
+
 namespace Math
 {
 
@@ -13,7 +14,7 @@ public:
     Line(const vec4& startPos, const vec4& direction, const float& magnitude);
     ~Line();
 
-    bool Intersect(vec4& out, const plane& plane);
+    bool Intersect(vec4& out, const Math::plane& plane);
 
 //private:
     vec4 p;

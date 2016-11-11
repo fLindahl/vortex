@@ -43,7 +43,7 @@ public:
 //------------------------------------------------------------------------------
 /**
 */
-__forceinline
+inline
 point::point() :
     vec4(0.0f, 0.0f, 0.0f, 1.0f)
 {
@@ -53,7 +53,7 @@ point::point() :
 //------------------------------------------------------------------------------
 /**
 */
-__forceinline
+inline
 point::point(float x, float y, float z) :
     vec4(x, y, z, 1.0f)
 {
@@ -63,7 +63,7 @@ point::point(float x, float y, float z) :
 //------------------------------------------------------------------------------
 /**
 */
-__forceinline
+inline
 point::point(const vec4& rhs) :
     vec4(rhs)
 {
@@ -73,7 +73,7 @@ point::point(const vec4& rhs) :
 //------------------------------------------------------------------------------
 /**
 */
-__forceinline
+inline
 point::point(const __m128 & rhs) :
     vec4(rhs)
 {
@@ -83,7 +83,7 @@ point::point(const __m128 & rhs) :
 //------------------------------------------------------------------------------
 /**
 */
-__forceinline point
+inline point
 point::origin()
 {
     return point(0.0f, 0.0f, 0.0f);
@@ -92,7 +92,7 @@ point::origin()
 //------------------------------------------------------------------------------
 /**
 */
-__forceinline void
+inline void
 point::operator=(const point& rhs)
 {
     this->vec = rhs.vec;
@@ -101,7 +101,7 @@ point::operator=(const point& rhs)
 //------------------------------------------------------------------------------
 /**
 */
-__forceinline void
+inline void
 point::set(float x, float y, float z)
 {
     vec4::set(x, y, z, 1.0f);
