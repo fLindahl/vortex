@@ -1,6 +1,11 @@
 #pragma once
 #include "config.h"
 
+
+#ifdef __GNUC__
+#include <cmath>
+#endif
+
 //------------------------------------------------------------------------------
 namespace Math
 {
@@ -22,7 +27,7 @@ namespace Math
 			unsigned int u[4];
 			__m128 vec;
 		};
-		inline operator __m128() const { return vec; }
+		__forceinline operator __m128() const { return vec; }
 	} mm128_vec;
 
 	typedef VORTEX_ALIGN16 struct mm128_ivec {
@@ -30,7 +35,7 @@ namespace Math
 			int u[4];
 			mm128_vec vec;
 		};
-		inline operator __m128() const { return vec.vec; }
+		__forceinline operator __m128() const { return vec.vec; }
 	} mm128_ivec;
 
 	typedef VORTEX_ALIGN16 struct mm128_uivec {
@@ -38,7 +43,7 @@ namespace Math
 			unsigned int u[4];
 			mm128_vec vec;
 		};
-		inline operator __m128() const { return vec.vec; }
+		__forceinline operator __m128() const { return vec.vec; }
 	} mm128_uivec;
 	const mm128_vec _id_x = { 1.0f, 0.0f, 0.0f, 0.0f };
 	const mm128_vec _id_y = { 0.0f, 1.0f, 0.0f, 0.0f };
