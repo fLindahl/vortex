@@ -46,10 +46,12 @@ typedef double		float64;
 
 #if __VC__
 #define VORTEX_ALIGN16 __declspec(align(16))
+
 #elif __GNUC__
 #define __forceinline inline
 #include <immintrin.h>
 #define VORTEX_ALIGN16 __attribute__((aligned(16)))
+
 #else
 #define VORTEX_ALIGN16
 #endif

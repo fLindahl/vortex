@@ -1,7 +1,6 @@
 #pragma once
 #include "config.h"
 
-
 #ifdef __GNUC__
 #include <cmath>
 #endif

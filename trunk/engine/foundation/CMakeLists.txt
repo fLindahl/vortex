@@ -15,7 +15,10 @@ SET(files_foundation_math
 	math/plane.h
 	math/line.cpp
 	math/line.h
-	math/shapes/quad.h math/bbox.h)
+	math/shapes/quad.h
+	math/bbox.h
+	math/bbox.cpp
+	)
 
 SET(files_foundation_util
 	util/array.h

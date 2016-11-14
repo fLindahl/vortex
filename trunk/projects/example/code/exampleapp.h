@@ -45,8 +45,6 @@ private:
 	std::shared_ptr<Render::ShaderObject> shader;
 	std::shared_ptr<Render::ShaderObject> shader1;
 
-	Math::Quad quad;
-
 	BaseGameFeature::KeyHandler* keyhandler;
 
 	Render::GraphicsProperty* gProperty;

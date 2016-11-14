@@ -45,10 +45,9 @@ public:
     void debugRender();
 
     void get_quad(const index_t& index, Math::point& a, Math::point& b, Math::point& c, Math::point& d);
-private:
+
     point minPoint;
     point maxPoint;
-
 };
 
 inline bbox::bbox() :
@@ -65,13 +64,13 @@ inline bbox::~bbox()
 
 inline void bbox::begin_extend()
 {
-    this->minPoint = point(FLT_MAX, FLT_MAX, FLT_MAX);
-    this->maxPoint = point(FLT_MIN, FLT_MIN, FLT_MIN);
+	this->minPoint = point(100000.0f, 100000.0f, 100000.0f);
+	this->maxPoint = point(-100000.0f, -100000.0f, -100000.0f);
 }
 
 inline void bbox::end_extend()
 {
-    if(this->minPoint == point(FLT_MAX,FLT_MAX,FLT_MAX) || this->maxPoint == point(FLT_MIN,FLT_MIN,FLT_MIN))
+	if (this->minPoint == point(100000.0f, 100000.0f, 100000.0f) || this->maxPoint == point(-100000.0f, -100000.0f, -100000.0f))
     {
         this->minPoint = point(0.0f,0.0f,0.0f);
         this->maxPoint = point(0.0f,0.0f,0.0f);
@@ -87,35 +86,20 @@ inline void bbox::extend(const point &p)
 inline void bbox::transform(const mat4& t)
 {
     point temp;
-    point min = point(FLT_MAX, FLT_MAX, FLT_MAX);
-    point max = point(FLT_MIN, FLT_MIN, FLT_MIN);
+	point min = point(100000.0f, 100000.0f, 100000.0f);
+	point max = point(-100000.0f, -100000.0f, -100000.0f);
     index_t i;
 
     for (i = 0; i < 8; ++i)
     {
-        temp = mat4::transform(corner_point(i), t);
+		point cp = corner_point(i);
+        temp = mat4::transform(cp, t);
         max = point::maximize(temp, max);
         min = point::minimize(temp, min);
     }
 
     this->minPoint = min;
     this->maxPoint = max;
-}
-
-inline point bbox::corner_point(const int& index) const
-{
-    assert((index >= 0) && (index < 8));
-    switch (index)
-    {
-        case 0:     return this->minPoint;
-        case 1:     return point(this->minPoint.x(), this->maxPoint.y(), this->minPoint.z());
-        case 2:     return point(this->maxPoint.x(), this->maxPoint.y(), this->minPoint.z());
-        case 3:     return point(this->maxPoint.x(), this->minPoint.y(), this->minPoint.z());
-        case 4:     return this->maxPoint;
-        case 5:     return point(this->minPoint.x(), this->maxPoint.y(), this->maxPoint.z());
-        case 6:     return point(this->minPoint.x(), this->minPoint.y(), this->maxPoint.z());
-        default:    return point(this->maxPoint.x(), this->minPoint.y(), this->maxPoint.z());
-    }
 }
 
 inline void bbox::get_quad(const index_t& index, Math::point& a, Math::point& b, Math::point& c, Math::point& d)
