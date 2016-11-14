@@ -8,9 +8,9 @@ public:
     BaseCollider();
     virtual ~BaseCollider();
 
-
+	
 private:
-
+	
 };
 
 }

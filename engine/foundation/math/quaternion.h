@@ -623,8 +623,8 @@ namespace Math
 			cosHalfTheta = -cosHalfTheta;
 		}
 		// Calculate temporary values.
-		const double halfTheta = acos(cosHalfTheta);
-		const double sinHalfTheta = std::sqrt(1.0 - (cosHalfTheta * cosHalfTheta));
+		const float halfTheta = (float)(acos(cosHalfTheta));
+		const float sinHalfTheta = (float)(std::sqrt(1.0 - (cosHalfTheta * cosHalfTheta)));
 		// if theta = 180 degrees then result is not fully defined
 		// we could rotate around any axis normal to qa or qb
 		if (std::abs(sinHalfTheta) < 0.001)
@@ -645,8 +645,8 @@ namespace Math
 			}
 			return q;
 		}
-		const double A = sin((1 - t) * halfTheta) / sinHalfTheta;
-		const double B = sin(t*halfTheta) / sinHalfTheta;
+		const float A = (float)(sin((1 - t) * halfTheta) / sinHalfTheta);
+		const float B = (float)(sin(t*halfTheta) / sinHalfTheta);
 		if (!reverse_q1)
 		{
 			q.vec.x() = A*q0.vec.x() + B*q1.vec.x();
