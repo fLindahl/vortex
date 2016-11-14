@@ -253,6 +253,10 @@ namespace Render
 			return false;
 		}
 		int32 index = 0;
+
+		//Start constructing boundingbox.
+		this->bbox.begin_extend();
+
 		while (true)
 		{
 			char lineHeader[128];
@@ -272,6 +276,8 @@ namespace Render
 				a.Append(vertex[1]);
 				a.Append(vertex[2]);
 				temp_vertices.Append(a);
+
+				this->bbox.extend(Math::point(vertex[0], vertex[1], vertex[2]));
 			}
 			else if (strcmp(lineHeader, "vt") == 0)
 			{
@@ -352,6 +358,8 @@ namespace Render
 				}
 			}
 		}
+
+		this->bbox.end_extend();
 
 		this->numIndices = indexBuffer.Size();
 
