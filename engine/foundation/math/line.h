@@ -6,13 +6,13 @@
 namespace Math
 {
 
-class Line
+class line
 {
 public:
-    Line();
-    Line(const vec4& startPos, const vec4& dirAndMagnitude);
-    Line(const vec4& startPos, const vec4& direction, const float& magnitude);
-    ~Line();
+    line();
+    line(const vec4& startPos, const vec4& dirAndMagnitude);
+    line(const vec4& startPos, const vec4& direction, const float& magnitude);
+    ~line();
 
     bool Intersect(vec4& out, const Math::plane& plane);
 

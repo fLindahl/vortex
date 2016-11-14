@@ -4,29 +4,29 @@
 namespace Math
 {
 
-Line::Line()
+line::line()
 {
 
 }
 
-Line::Line(const vec4& startPos, const vec4& dirAndMagnitude)
+line::line(const vec4& startPos, const vec4& dirAndMagnitude)
 {
     this->p = startPos;
     this->m = dirAndMagnitude;
 }
 
-Line::Line(const vec4& startPos, const vec4& direction, const float& magnitude)
+line::line(const vec4& startPos, const vec4& direction, const float& magnitude)
 {
     this->p = startPos;
     this->m = direction * magnitude;
 }
 
-Line::~Line()
+line::~line()
 {
 
 }
 
-bool Line::Intersect(vec4& out, const Math::plane& plane)
+bool line::Intersect(vec4& out, const Math::plane& plane)
 {
     vec4 endPoint = (this->p + this->m);
 
@@ -34,6 +34,11 @@ bool Line::Intersect(vec4& out, const Math::plane& plane)
 
     float pd = vec4::dot3(plane.n(), this->p);
     float denom = vec4::dot3(plane.n(), ab);
+
+    if(denom > 0.0f)
+    {
+        return false;
+    }
 
     float t = (plane.d() - pd) / denom;
 
