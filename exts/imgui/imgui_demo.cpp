@@ -833,7 +833,7 @@ void ImGui::ShowTestWindow(bool* p_open)
             bool goto_line = ImGui::Button("Goto");
             ImGui::SameLine();
             ImGui::PushItemWidth(100);
-            goto_line |= ImGui::InputInt("##Line", &line, 0, 0, ImGuiInputTextFlags_EnterReturnsTrue);
+            goto_line |= ImGui::InputInt("##line", &line, 0, 0, ImGuiInputTextFlags_EnterReturnsTrue);
             ImGui::PopItemWidth();
             ImGui::BeginChild("Sub1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f,300), false, ImGuiWindowFlags_HorizontalScrollbar);
             for (int i = 0; i < 100; i++)
@@ -1077,7 +1077,7 @@ void ImGui::ShowTestWindow(bool* p_open)
             static int track_line = 50, scroll_to_px = 200;
             ImGui::Checkbox("Track", &track);
             ImGui::PushItemWidth(100);
-            ImGui::SameLine(130); track |= ImGui::DragInt("##line", &track_line, 0.25f, 0, 99, "Line %.0f");
+            ImGui::SameLine(130); track |= ImGui::DragInt("##line", &track_line, 0.25f, 0, 99, "line %.0f");
             bool scroll_to = ImGui::Button("Scroll To");
             ImGui::SameLine(130); scroll_to |= ImGui::DragInt("##pos_y", &scroll_to_px, 1.00f, 0, 9999, "y = %.0f px");
             ImGui::PopItemWidth();
@@ -1095,12 +1095,12 @@ void ImGui::ShowTestWindow(bool* p_open)
                 {
                     if (track && line == track_line)
                     {
-                        ImGui::TextColored(ImColor(255,255,0), "Line %d", line);
+                        ImGui::TextColored(ImColor(255,255,0), "line %d", line);
                         ImGui::SetScrollHere(i * 0.25f); // 0.0f:top, 0.5f:center, 1.0f:bottom
                     }
                     else
                     {
-                        ImGui::Text("Line %d", line);
+                        ImGui::Text("line %d", line);
                     }
                 }
                 ImGui::EndChild();
@@ -1163,7 +1163,7 @@ void ImGui::ShowTestWindow(bool* p_open)
             ImGui::InvisibleButton("##dummy", size);
             if (ImGui::IsItemActive() && ImGui::IsMouseDragging()) { offset.x += ImGui::GetIO().MouseDelta.x; offset.y += ImGui::GetIO().MouseDelta.y; }
             ImGui::GetWindowDrawList()->AddRectFilled(pos, ImVec2(pos.x+size.x,pos.y+size.y), ImColor(90,90,120,255));
-            ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize()*2.0f, ImVec2(pos.x+offset.x,pos.y+offset.y), ImColor(255,255,255,255), "Line 1 hello\nLine 2 clip me!", NULL, 0.0f, &clip_rect);
+            ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize()*2.0f, ImVec2(pos.x+offset.x,pos.y+offset.y), ImColor(255,255,255,255), "line 1 hello\nline 2 clip me!", NULL, 0.0f, &clip_rect);
             ImGui::TreePop();
         }
     }

@@ -7,30 +7,51 @@
 #include "foundation/util/array.h"
 #include "application/game/entity.h"
 #include "foundation/math/plane.h"
+#include "foundation/math/line.h"
 
 namespace Physics
 {
+
+struct PhysicsHit
+{
+    Render::GraphicsProperty* object;
+    Math::point point;
+    Math::point surfaceNormal;
+};
+
 class PhysicsServer
 {
-public:
+private:
     PhysicsServer();
-    ~PhysicsServer();
 
-    //Shoot a ray and return first object that it intersects.
-    bool Raycast(std::shared_ptr<Game::Entity> out, const Math::vec4& position, const Math::vec4& direction, const float& length /*, const ExcludeSet& exclude*/);
+public:
+    static PhysicsServer* Instance()
+    {
+        static PhysicsServer instance;
+        return &instance;
+    }
 
-    // TEMPORARY: Raycast and check against a list of specific objects.
-    static bool Raycast(Math::vec4& out, const Math::vec4& position, const Math::vec4& direction, const float& length, const Math::plane& plane);
+    // C++ 11
+    // Delete the methods we don't want.
+    PhysicsServer(PhysicsServer const&) = delete;
+    void operator=(PhysicsServer const&) = delete;
 
+    ///Shoot a ray and return first object that it intersects.
+    bool Raycast(PhysicsHit& out, const Math::vec4& position, const Math::vec4& direction, const float& length /*, const ExcludeSet& exclude*/);
 
-    //Shoot a ray and return all objects that it intersects.
-    //bool Raycast(Util::Array<shared_ptr<Game::Entity>> out, const Math::vec4& position, const Math::vec4& direction /*, const ExcludeSet& exclude*/);
+    void addGraphicsProperty(Render::GraphicsProperty* p) { this->properties.Append(p);}
+
+    ///Shoot a ray and return all objects that it intersects.
+    //bool Raycast(Util::Array<PhysicsHit>& out, const Math::vec4& position, const Math::vec4& direction /*, const ExcludeSet& exclude*/);
 
 
 private:
     friend class PhysicsDevice;
 
-    Util::Array<Game::Entity> entities;
+    ///Check if point is within 4 given positions. Make sure a,b,c,d is in clockwise order.
+    bool isPointWithinBounds(const Math::point& p, const Math::point& a, const Math::point& b, const Math::point& c, const Math::point& d, const Math::vec4& surfaceNormal);
+
+    Util::Array<Render::GraphicsProperty*> properties;
 
 };
 

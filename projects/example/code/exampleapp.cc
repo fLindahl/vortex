@@ -71,7 +71,7 @@ ExampleApp::Open()
 		gProperty->setModelInstance(modelInstance);
 		
 		modelInstance1->SetMaterial("OBJStatic");
-		modelInstance1->SetMesh("resources/models/quad_tris.obj");
+		modelInstance1->SetMesh("resources/models/cat.obj");
 		gProperty1->setModelInstance(modelInstance1);
 
 		quad = Math::Quad();
@@ -170,17 +170,17 @@ ExampleApp::Run()
     gProperty->setModelMatrix(transf);
     gProperty1->setModelMatrix(transf2);
 
-	quad.v1 = Math::mat4::transform(quad.v1, transf2);
-	quad.v2 = Math::mat4::transform(quad.v2, transf2);
-	quad.v3 = Math::mat4::transform(quad.v3, transf2);
-	quad.v4 = Math::mat4::transform(quad.v4, transf2);
+    Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty1);
 
 	double cursorPosX = 0.0f;
 	double cursorPosY = 0.0f;
 
     Math::point cameraPos = Math::vec4::zerovector();
 
-    Util::Array<std::pair<Math::vec4, Math::vec4>> rays;
+    float tempRotation = 0.0f;
+
+    Math::vec4 rayStart = Math::vec4::zerovector();
+    Math::vec4 rayEnd= Math::vec4::zerovector();
 
 	while (this->window->IsOpen())
 	{
@@ -217,6 +217,10 @@ ExampleApp::Run()
 		translation = Math::mat4::transform(translation, rotation);
 		cameraPos += translation;
 
+        this->gProperty1->setModelMatrix(Math::mat4::rotationyawpitchroll(tempRotation, tempRotation, 0.0f));
+
+        tempRotation += 0.005f;
+
         Graphics::MainCamera::Instance()->setViewMatrix(Math::mat4::lookatrh(cameraPos, cameraPos + forward, up));
 
         Math::mat4 view = Graphics::MainCamera::Instance()->getViewMatrix();
@@ -226,9 +230,6 @@ ExampleApp::Run()
 
 		if(keyhandler->leftMousePressed)
 		{
-
-            Math::plane plane = Math::plane(quad.v1, quad.v2, quad.v3);
-
             printf("\n\n\n\n\n\n\n\n");
 			glfwGetCursorPos(this->window->GetGLFWWindow(), &cursorPosX, &cursorPosY);
 
@@ -257,38 +258,19 @@ ExampleApp::Run()
             rayDirection = Math::vec4::normalize(rayDirection);
 
             //Create ray to render
-            std::pair<Math::vec4, Math::vec4> r = std::make_pair(rayWorldPos, rayWorldPos + (rayDirection*10.0f));
-            rays.Append(r);
+            rayStart = rayWorldPos;
 
-            Math::vec4 hit;
 
-			if(Physics::PhysicsServer::Raycast(hit, rayWorldPos, rayDirection, 10.0f, plane))
+            Physics::PhysicsHit hit;
+
+			if(Physics::PhysicsServer::Instance()->Raycast(hit, rayWorldPos, rayDirection, 10.0f))
             {
-                printf("Hit plane at %f, %f, %f, %f\n", hit.x(), hit.y(), hit.z(), hit.w());
-
-                Math::vec4 edgeN = Math::vec4::normalize(quad.v2 - quad.v1);
-                Math::vec4 edgeE = Math::vec4::normalize(quad.v4 - quad.v2);
-                Math::vec4 edgeS = Math::vec4::normalize(quad.v3 - quad.v4);
-                Math::vec4 edgeW = Math::vec4::normalize(quad.v1 - quad.v3);
-
-                Math::vec4 hitToN = Math::vec4::normalize(quad.v1 - hit);
-                Math::vec4 hitToE = Math::vec4::normalize(quad.v2 - hit);
-                Math::vec4 hitToS = Math::vec4::normalize(quad.v4 - hit);
-                Math::vec4 hitToW = Math::vec4::normalize(quad.v3 - hit);
-
-                Math::vec4 edgeNormalN = Math::vec4::cross3(edgeN, plane.n());
-                Math::vec4 edgeNormalE = Math::vec4::cross3(edgeE, plane.n());
-                Math::vec4 edgeNormalS = Math::vec4::cross3(edgeS, plane.n());
-                Math::vec4 edgeNormalW = Math::vec4::cross3(edgeW, plane.n());
-
-                if((Math::vec4::dot3(hitToN, edgeNormalN) > 0.0f) &&
-                    (Math::vec4::dot3(hitToE, edgeNormalE) > 0.0f) &&
-                    (Math::vec4::dot3(hitToS, edgeNormalS) > 0.0f) &&
-                    (Math::vec4::dot3(hitToW, edgeNormalW) > 0.0f)
-                    )
-                {
-                    printf("--- Hit object! ---\n");
-                }
+                printf("--- Hit object! ---\n");
+                rayEnd = hit.point;
+            }
+            else
+            {
+                rayEnd = rayWorldPos + (rayDirection*10.0f);
             }
 
 
@@ -296,37 +278,11 @@ ExampleApp::Run()
 		
 		RenderDevice::Instance()->Render();
 
+        this->gProperty1->getbbox().debugRender();
+
         // Render LINES
         glUseProgram(0);
         glEnable(GL_DEPTH_TEST);
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf((GLfloat*)&Math::mat4::identity().mat.m[0][0]);
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf((GLfloat*)&Math::mat4::identity().mat.m[0][0]);
-
-        // DRAW QUAD
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 0.0f, 1.0f);
-
-		Math::mat4 t = view;
-        t = Math::mat4::multiply(t, projection);
-
-        Math::vec4 v1 = Math::mat4::transform(quad.v1, t);
-		Math::vec4 v2 = Math::mat4::transform(quad.v2, t);
-		Math::vec4 v3 = Math::mat4::transform(quad.v3, t);
-
-        glVertex4f(v1[0], v1[1], v1[2], v1[3]);
-		glVertex4f(v2[0], v2[1], v2[2], v2[3]);
-
-		glVertex4f(v2[0], v2[1], v2[2], v2[3]);
-		glVertex4f(v3[0], v3[1], v3[2], v3[3]);
-
-		glVertex4f(v3[0], v3[1], v3[2], v3[3]);
-		glVertex4f(v1[0], v1[1], v1[2], v1[3]);
-
-        glEnd();
 
         glMatrixMode(GL_MODELVIEW);
         glLoadMatrixf((GLfloat*)&view.mat.m[0][0]);
@@ -334,20 +290,17 @@ ExampleApp::Run()
         glMatrixMode(GL_PROJECTION);
         glLoadMatrixf((GLfloat*)&projection.mat.m[0][0]);
 
-        for (int i = 0; i < rays.Size(); ++i)
-        {
-            glBegin(GL_LINES);
+        glBegin(GL_LINES);
 
-            Math::vec4 v1 = rays[i].first;
-			Math::vec4 v2 = rays[i].second;
+        Math::vec4 v1 = rayStart;
+        Math::vec4 v2 = rayEnd;
 
-			glColor3f(0.0f, 1.0f, 0.0f);
-			glVertex4f(v1[0], v1[1], v1[2], v1[3]);
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glVertex4f(v2[0], v2[1], v2[2], v2[3]);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex4f(v1[0], v1[1], v1[2], v1[3]);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex4f(v2[0], v2[1], v2[2], v2[3]);
 
-            glEnd();
-        }
+        glEnd();
 		
 
 		this->window->SwapBuffers();

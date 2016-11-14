@@ -6,6 +6,7 @@
 #include "foundation/math/vector4.h"
 #include <map>
 #include <utility>
+#include <foundation/math/bbox.h>
 #include "foundation/util/array.h"
 #include "vertexcomponent.h"
 
@@ -46,6 +47,8 @@ public:
 	void* getMesh();
 	void* getIndices();
 
+	Math::bbox getBaseBBox() { return this->bbox; }
+
 private:
 	GLuint vao[1];
 	GLuint ib[1];
@@ -54,8 +57,7 @@ private:
 	void* mesh;
 	void* indices;
 
-	//Util::Array < MeshResource::Vertex > mesh;
-	//Util::Array < GLuint > indices;
+	Math::bbox bbox;
 
 	bool rawMode;
 

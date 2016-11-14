@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <foundation/math/bbox.h>
 #include "foundation/util/array.h"
 
 namespace Util
@@ -22,7 +23,7 @@ public:
 
 	std::shared_ptr<MeshResource> GetMesh();
 	void SetMesh(const char* file);
-	
+
 	void AddGraphicsProperty(GraphicsProperty* gp);
 
 	void SetMaterial(const Util::String& name);

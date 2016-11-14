@@ -34,6 +34,8 @@ namespace Render
 		this->modelInstance = inModelInstance;
 		this->modelInstance->AddGraphicsProperty(this);
 
+		this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
+
 	}
 
 	Math::mat4 GraphicsProperty::getModelMatrix() const
@@ -44,5 +46,7 @@ namespace Render
 	void GraphicsProperty::setModelMatrix(const Math::mat4 &mat)
 	{
 		this->modelMat = mat;
+        this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
+        this->bbox.transform(mat);
 	}
 }
