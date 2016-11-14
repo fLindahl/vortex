@@ -6,10 +6,6 @@
 	
 	(C) 2015 See the LICENSE file.
 */
-#ifdef __WIN32__
-#include "win32/pch.h"
-#endif
-
 #ifdef _MSC_VER
 // disable _s warnings
 #define _CRT_SECURE_NO_WARNINGS
@@ -36,15 +32,13 @@ typedef unsigned int	uint;
 typedef unsigned short	ushort;
 
 // eh, windows already defines byte, so don't redefine byte if we are running windows
-#ifndef __WIN32__
 typedef uint8_t      byte;
-#endif
 
 typedef uint8_t		ubyte;
 typedef float		float32;
 typedef double		float64;
 
-#if __VC__
+#if _MSC_VER
 #define VORTEX_ALIGN16 __declspec(align(16))
 
 #elif __GNUC__

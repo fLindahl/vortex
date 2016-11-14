@@ -1,7 +1,17 @@
 #pragma once
+#include "foundation/util/array.h"
 
 namespace Physics
 {
+
+enum ColliderShape
+{
+	SPHERE,
+	CAPSULE,
+	BOX,
+	SURFACE
+};
+
 class BaseCollider
 {
 public:
@@ -9,8 +19,9 @@ public:
     virtual ~BaseCollider();
 
 	
-private:
 	
+private:
+	ColliderShape shape;
 };
 
 }
