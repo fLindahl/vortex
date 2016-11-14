@@ -44,10 +44,12 @@ ExampleApp::Open()
 {
 	App::Open();
 	this->window = new Display::Window;
+	this->window->SetSize(2000, 2000);
+	this->window->SetTitle("Vortex Engine Test Environment");
 
-	
 	keyhandler = BaseGameFeature::KeyHandler::Instance();
 	keyhandler->Init(this->window);
+	
 
 	// Initiate everything we need
 	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
@@ -66,19 +68,15 @@ ExampleApp::Open()
 		//Load all materials
 		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
 		
-		modelInstance->SetMaterial("Static");
-		modelInstance->SetMesh("resources/models/player.nvx2");
+		//modelInstance->SetMaterial("Static");
+		//modelInstance->SetMesh("resources/models/player.nvx2");
+		modelInstance->SetMaterial("OBJStatic");
+		modelInstance->SetMesh("resources/models/cat.obj");
 		gProperty->setModelInstance(modelInstance);
 		
 		modelInstance1->SetMaterial("OBJStatic");
 		modelInstance1->SetMesh("resources/models/cat.obj");
 		gProperty1->setModelInstance(modelInstance1);
-
-		quad = Math::Quad();
-		quad.v1 = Math::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
-		quad.v2 = Math::vec4(0.5f, 0.5f, 0.0f, 1.0f);
-		quad.v3 = Math::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-		quad.v4 = Math::vec4(0.5f, -0.5f, 0.0f, 1.0f);
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -170,6 +168,7 @@ ExampleApp::Run()
     gProperty->setModelMatrix(transf);
     gProperty1->setModelMatrix(transf2);
 
+	Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty);
     Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty1);
 
 	double cursorPosX = 0.0f;

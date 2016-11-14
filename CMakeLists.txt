@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------
-# gscept laboration environment
+# VORTEX ENGINE
 #--------------------------------------------------------------------------
 PROJECT(vortex_engine)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
