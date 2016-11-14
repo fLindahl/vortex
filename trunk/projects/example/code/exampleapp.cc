@@ -276,7 +276,7 @@ ExampleApp::Run()
 		}
 		
 		RenderDevice::Instance()->Render();
-
+		/*
         this->gProperty1->getbbox().debugRender();
 
         // Render LINES
@@ -301,6 +301,7 @@ ExampleApp::Run()
 
         glEnd();
 		
+		*/
 
 		this->window->SwapBuffers();
 	}

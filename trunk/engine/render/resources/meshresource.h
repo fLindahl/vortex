@@ -49,16 +49,20 @@ public:
 
 	Math::bbox getBaseBBox() { return this->bbox; }
 
+	//TEMPORARY: for obj loading
+	Util::Array<OBJVertex> OBJvertexBuffer;
+	Util::Array<index_t> OBJindexBuffer;
+
 private:
+	Math::bbox bbox;
+
 	GLuint vao[1];
 	GLuint ib[1];
 	GLuint vbo[1];
 
 	void* mesh;
 	void* indices;
-
-	Math::bbox bbox;
-
+	
 	bool rawMode;
 
 	void ReadHeaderData();
