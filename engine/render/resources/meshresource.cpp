@@ -236,10 +236,6 @@ namespace Render
 
 	bool MeshResource::loadMeshFromOBJ(const char* filename)
 	{
-		Util::Array<OBJVertex> vertexBuffer;
-		Util::Array<unsigned int> indexBuffer;
-
-		Util::Array< unsigned int > vertexIndices, uvIndices, normalIndices;
 		Util::Array< Util::Array<GLfloat> > temp_vertices;
 		Util::Array< Util::Array<GLfloat> > temp_uvs;
 		Util::Array< Util::Array<GLfloat> > temp_normals;
@@ -252,7 +248,7 @@ namespace Render
 			printf("Impossible to open the file !\n");
 			return false;
 		}
-		int32 index = 0;
+		index_t index = 0;
 
 		//Start constructing boundingbox.
 		this->bbox.begin_extend();
@@ -302,7 +298,8 @@ namespace Render
 			else if (strcmp(lineHeader, "f") == 0)
 			{
 				unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-				int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+
+				int matches = fscanf(file, "%i/%i/%i %i/%i/%i %i/%i/%i\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
 
 				if (matches != 9){
 					printf("File can't be read by our simple parser : ( Try exporting with other options\n");
@@ -348,39 +345,39 @@ namespace Render
 
 						indexBitToVertexMap[indexBit] = tempVertex;
 
-						vertexBuffer.Append(*tempVertex);
+						OBJvertexBuffer.Append(*tempVertex);
 
 						//Use the memory adress as a number to quickly be able to lookup the vertex index
-						vertexMemoryAdressToIndex[(uintptr_t)tempVertex] = vertexBuffer.Size() - 1;
+						vertexMemoryAdressToIndex[(uintptr_t)tempVertex] = OBJvertexBuffer.Size() - 1;
 					}
 
-					indexBuffer.Append(vertexMemoryAdressToIndex[(uintptr_t)tempVertex]);
+					OBJindexBuffer.Append(vertexMemoryAdressToIndex[(uintptr_t)tempVertex]);
 				}
 			}
 		}
 
 		this->bbox.end_extend();
 
-		this->numIndices = indexBuffer.Size();
+		this->numIndices = OBJindexBuffer.Size();
 
 		glGenVertexArrays(1, &vao[0]); // Create our Vertex Array Object  
 		glBindVertexArray(vao[0]); // Bind our Vertex Array Object so we can use it  
 
 		glGenBuffers(1, this->vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, this->vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer.Size() * sizeof(OBJVertex), &vertexBuffer[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, OBJvertexBuffer.Size() * sizeof(OBJVertex), &OBJvertexBuffer[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, NULL);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)(sizeof(float32) * 3));
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)(sizeof(float32) * 5));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)(sizeof(GLfloat) * 3));
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)(sizeof(GLfloat) * 5));
 
 		glGenBuffers(1, this->ib);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ib[0]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(GLuint), &indexBuffer[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(GLuint), &OBJindexBuffer[0], GL_STATIC_DRAW);
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

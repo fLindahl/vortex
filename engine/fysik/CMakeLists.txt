@@ -4,7 +4,12 @@
 
 SET(files_fysik_fysik
 	physicsserver.h
-		physicsdevice.h physicsserver.cpp basecollider.h surfacecollider.h)
+	physicsdevice.h
+	physicsserver.cpp
+	basecollider.h
+	surfacecollider.h
+	surfacecollider.cpp
+	)
 
 SOURCE_GROUP("fysik" FILES ${files_fysik})
 
