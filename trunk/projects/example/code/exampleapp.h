@@ -5,7 +5,6 @@
 	(C) 2015 Individual contributors, see AUTHORS file
 */
 //------------------------------------------------------------------------------
-#include <foundation/math/shapes/quad.h>
 #include "core/app.h"
 #include "render/window.h"
 #include "render/properties/graphicsproperty.h"
@@ -16,6 +15,8 @@
 #include "render/server/shaderserver.h"
 #include "render/graphics/camera.h"
 #include "application/basegamefeature/keyhandler.h"
+#include "fysik/basecollider.h"
+#include <fysik/surfacecollider.h>
 namespace Example
 {
 class ExampleApp : public Core::App
@@ -38,12 +39,10 @@ private:
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
 
-	std::shared_ptr<Render::MeshResource> mesh;
-	std::shared_ptr<Render::TextureResource> texture;
 	std::shared_ptr<Render::ModelInstance> modelInstance;
 	std::shared_ptr<Render::ModelInstance> modelInstance1;
-	std::shared_ptr<Render::ShaderObject> shader;
-	std::shared_ptr<Render::ShaderObject> shader1;
+	std::shared_ptr<Physics::SurfaceCollider> physicsCollider;
+	std::shared_ptr<Physics::SurfaceCollider> physicsCollider1;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 
@@ -52,6 +51,6 @@ private:
 
 	Display::Window* window;
 
-	char* consoleBuffer;
+	std::string consoleBuffer;
 };
 } // namespace Example

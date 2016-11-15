@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <foundation/math/bbox.h>
+#include <fysik/surfacecollider.h>
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 
@@ -21,10 +22,15 @@ public:
 	Math::mat4 getModelMatrix() const;
 	void setModelMatrix(const Math::mat4 &mat);
 
+	void setCollider(std::shared_ptr<Physics::SurfaceCollider> coll) {this->collider = coll;}
+	std::shared_ptr<Physics::SurfaceCollider> getCollider() {return this->collider;}
+
 	Math::bbox& getbbox() {return this->bbox; }
 
 private:
 	Math::bbox bbox;
+
+	std::shared_ptr<Physics::SurfaceCollider> collider;
 
 	std::shared_ptr<ModelInstance> modelInstance;
 	Math::mat4 modelMat;

@@ -14,6 +14,8 @@ public:
     line(const vec4& startPos, const vec4& direction, const float& magnitude);
     ~line();
 
+    void transform(const Math::mat4& t);
+
     bool Intersect(vec4& out, const Math::plane& plane);
 
 //private:

@@ -32,9 +32,11 @@ public:
 	void CookMeshData(void* meshdata, void* indexdata, index_t numindices, size_t vertexstride, size_t indexstride, size_t positionoffset);
 	
 	//TEMPORARY: for cooking an OBJ-Loaded Mesh
-	void CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<index_t>& indices);
+	void CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<unsigned int>& indices);
 
 	Util::Array<ColliderFace>& GetFaceList() { return this->faces; }
+
+	void debugDraw();
 
 private:
 	Util::Array<ColliderFace> faces;

@@ -4,6 +4,16 @@
 namespace Physics
 {
 
+SurfaceCollider::SurfaceCollider()
+{
+
+}
+
+SurfaceCollider::~SurfaceCollider()
+{
+
+}
+
 void SurfaceCollider::CookMeshData(void* meshdata, void* indexdata, index_t numindices, size_t vertexstride, size_t indexstride, size_t positionoffset)
 {
 	printf("NOT IMPLEMENTED");
@@ -24,9 +34,10 @@ void SurfaceCollider::CookMeshData(void* meshdata, void* indexdata, index_t numi
 
 }
 
-void SurfaceCollider::CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<index_t>& indices)
+void SurfaceCollider::CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<unsigned int>& indices)
 {
-	for (size_t i = 0; i < indices.Size(); i += 3)
+	size_t iSize = indices.Size();
+	for (size_t i = 0; i < iSize; i += 3)
 	{
 		ColliderFace face;
 
@@ -39,5 +50,29 @@ void SurfaceCollider::CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& 
 	}
 }
 
+
+void SurfaceCollider::debugDraw()
+{
+	glUseProgram(0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getViewMatrix().mat.m[0][0]);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getProjectionMatrix().mat.m[0][0]);
+
+	glBegin(GL_POINTS);
+
+	glColor3f(0.5f, 0.5f, 0.5f);
+
+	for(auto face : faces)
+	{
+		glVertex4f(face.p0[0], face.p0[1], face.p0[2], face.p0[3]);
+		glVertex4f(face.p1[0], face.p1[1], face.p1[2], face.p1[3]);
+		glVertex4f(face.p2[0], face.p2[1], face.p2[2], face.p2[3]);
+	}
+
+	glEnd();
+}
 
 }

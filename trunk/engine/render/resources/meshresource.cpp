@@ -3,13 +3,13 @@
 #include <sstream>
 #include "meshresource.h"
 #include <cstring>
-#include <GLFW/glfw3.h>
 #include "nvx2fileformatstructs.h"
 
 namespace Render
 {
 	MeshResource::MeshResource()
 	{
+		this->name = "N/A";
 		rawMode = false;
 	}
 
@@ -30,6 +30,8 @@ namespace Render
 		file = fopen(filename, "rb");
 
 		assert(file != NULL);
+
+		this->name = filename;
 
 		// obtain file size:
 		fseek(file, 0, SEEK_END);
@@ -118,7 +120,7 @@ namespace Render
 		{
 			VertexComponent::SemanticName sem;
 			VertexComponent::Format fmt;
-			size_t index = 0;
+			uint index = 0;
 			if (vertexComponentMask & (1 << i))
 			{
 				switch (1 << i)
@@ -185,7 +187,7 @@ namespace Render
 		for (uint i = 0; i < this->vertexComponents.Size(); i++)
 		{
 
-			attributeIndex = (int)this->vertexComponents[i].GetSemanticName();
+			attributeIndex = (uint)this->vertexComponents[i].GetSemanticName();
 
 			byteSize = this->vertexComponents[i].GetByteSize();
 			format = this->vertexComponents[i].GetFormat();
@@ -240,14 +242,17 @@ namespace Render
 		Util::Array< Util::Array<GLfloat> > temp_uvs;
 		Util::Array< Util::Array<GLfloat> > temp_normals;
 
-		std::map <unsigned long, OBJVertex*> indexBitToVertexMap;
-		std::map <unsigned int, unsigned int> vertexMemoryAdressToIndex;
+		std::map<unsigned long, OBJVertex*> indexBitToVertexMap;
+		std::map<unsigned int, unsigned int> vertexMemoryAdressToIndex;
 
 		FILE * file = fopen(filename, "r");
 		if (file == NULL){
 			printf("Impossible to open the file !\n");
 			return false;
 		}
+
+		this->name = filename;
+
 		index_t index = 0;
 
 		//Start constructing boundingbox.
@@ -315,7 +320,7 @@ namespace Render
 				}
 
 				// for each vertex in face
-				unsigned long long indexBit;
+				index_t indexBit;
 				OBJVertex* tempVertex;
 
 				for (GLuint u = 0; u < 3; u++)
