@@ -50,6 +50,8 @@ private:
 
     ///Check if point is within 4 given positions. Make sure a,b,c,d is in clockwise order.
     bool isPointWithinBounds(const Math::point& p, const Math::point& a, const Math::point& b, const Math::point& c, const Math::point& d, const Math::vec4& surfaceNormal);
+    ///Check if point is within 3 given positions. Make sure a,b,c is in clockwise order.
+    bool isPointWithinBounds(const Math::point& p, const Math::point& a, const Math::point& b, const Math::point& c, const Math::vec4& surfaceNormal);
 
     Util::Array<Render::GraphicsProperty*> properties;
 

@@ -31,7 +31,6 @@ typedef size_t      index_t;
 typedef unsigned int	uint;
 typedef unsigned short	ushort;
 
-// eh, windows already defines byte, so don't redefine byte if we are running windows
 typedef uint8_t      byte;
 
 typedef uint8_t		ubyte;

@@ -64,13 +64,14 @@ inline bbox::~bbox()
 
 inline void bbox::begin_extend()
 {
-	this->minPoint = point(100000.0f, 100000.0f, 100000.0f);
-	this->maxPoint = point(-100000.0f, -100000.0f, -100000.0f);
+    // FLT_MIN & FLT_MAX doesn't work here unforunately. it yields some wierd results.
+	this->minPoint = point(1000000.0f, 1000000.0f, 1000000.0f);
+	this->maxPoint = point(-1000000.0f, -1000000.0f, -1000000.0f);
 }
 
 inline void bbox::end_extend()
 {
-	if (this->minPoint == point(100000.0f, 100000.0f, 100000.0f) || this->maxPoint == point(-100000.0f, -100000.0f, -100000.0f))
+	if (this->minPoint == point(1000000.0f, 1000000.0f, 1000000.0f) && this->maxPoint == point(-1000000.0f, -1000000.0f, -1000000.0f))
     {
         this->minPoint = point(0.0f,0.0f,0.0f);
         this->maxPoint = point(0.0f,0.0f,0.0f);
@@ -86,14 +87,13 @@ inline void bbox::extend(const point &p)
 inline void bbox::transform(const mat4& t)
 {
     point temp;
-	point min = point(100000.0f, 100000.0f, 100000.0f);
-	point max = point(-100000.0f, -100000.0f, -100000.0f);
+	point min = point(1000000.0f, 1000000.0f, 1000000.0f);
+	point max = point(-1000000.0f, -1000000.0f, -1000000.0f);
     index_t i;
 
     for (i = 0; i < 8; ++i)
     {
-		point cp = corner_point(i);
-        temp = mat4::transform(cp, t);
+        temp = mat4::transform(corner_point(i), t);
         max = point::maximize(temp, max);
         min = point::minimize(temp, min);
     }

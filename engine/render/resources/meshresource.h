@@ -51,9 +51,12 @@ public:
 
 	//TEMPORARY: for obj loading
 	Util::Array<OBJVertex> OBJvertexBuffer;
-	Util::Array<index_t> OBJindexBuffer;
+	Util::Array<unsigned int> OBJindexBuffer;
 
+	std::string GetFileName() { return this->name; }
 private:
+	std::string name;
+
 	Math::bbox bbox;
 
 	GLuint vao[1];
@@ -80,7 +83,7 @@ private:
 	uint numGroups;
 	uint numVertices;
 	uint vertexWidth;
-	uint numIndices;
+	size_t numIndices;
 	uint numEdges;
 	uint vertexComponentMask;
 

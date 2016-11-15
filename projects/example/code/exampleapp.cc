@@ -44,7 +44,7 @@ ExampleApp::Open()
 {
 	App::Open();
 	this->window = new Display::Window;
-	this->window->SetSize(2000, 2000);
+	this->window->SetSize(1024, 1024);
 	this->window->SetTitle("Vortex Engine Test Environment");
 
 	keyhandler = BaseGameFeature::KeyHandler::Instance();
@@ -63,19 +63,22 @@ ExampleApp::Open()
 		gProperty = new Render::GraphicsProperty();
 		gProperty1 = new Render::GraphicsProperty();
 
+        physicsCollider = std::make_shared<Physics::SurfaceCollider>();
+		physicsCollider1 = std::make_shared<Physics::SurfaceCollider>();
+
 		//Always setup shaders before materials!
 		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
 		//Load all materials
 		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
-		
+
 		//modelInstance->SetMaterial("Static");
 		//modelInstance->SetMesh("resources/models/player.nvx2");
 		modelInstance->SetMaterial("OBJStatic");
-		modelInstance->SetMesh("resources/models/cat.obj");
+		modelInstance->SetMesh("resources/models/cube.obj");
 		gProperty->setModelInstance(modelInstance);
-		
+
 		modelInstance1->SetMaterial("OBJStatic");
-		modelInstance1->SetMesh("resources/models/cat.obj");
+		modelInstance1->SetMesh("resources/models/kung.obj");
 		gProperty1->setModelInstance(modelInstance1);
 
 		// set ui rendering function
@@ -102,19 +105,20 @@ void ExampleApp::RenderUI()
 		// create a new window
 		ImGui::Begin("Console", &show, ImGuiWindowFlags_NoSavedSettings);
 
+		ImGui::SetWindowSize(ImVec2(450.0f,100.0f), ImGuiSetCond_::ImGuiSetCond_Always);
 		// create text editors for shader code
-		ImGui::InputTextMultiline("Vertex Shader", consoleBuffer, CONSOLE_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
-								  ImGuiInputTextFlags_AllowTabInput);
+		ImGui::Text("Selected Mesh: %s\n", consoleBuffer.c_str());
+		//ImGui::InputTextMultiline("Vertex Shader", consoleBuffer, CONSOLE_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput);
 
 		//ImGui::InputTextMultiline("Pixel Shader", fsBuffer, STRING_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
 		//						  ImGuiInputTextFlags_AllowTabInput);
 
 		// apply button
-		if (ImGui::Button("Apply"))
-		{
+		//if (ImGui::Button("Apply"))
+		//{
 			// if pressed we compile the shaders
 			//	this->CompileShaders();
-		}
+		//}
 		//if (this->compilerLog.length())
 		//{
 			// if compilation produced any output we display it here
@@ -163,10 +167,16 @@ ExampleApp::Run()
     Math::mat4 invProj = Math::mat4::inverse(projection);
 
     Math::mat4 transf = Math::mat4::translation(0.0f, 0.0f, -2.0f);
-    Math::mat4 transf2 = Math::mat4::translation(2.0f, 0.0f, -1.0f);
+    Math::mat4 transf2 = Math::mat4::translation(2.0f, 0.0f, 0.0f);
 
     gProperty->setModelMatrix(transf);
     gProperty1->setModelMatrix(transf2);
+
+    physicsCollider->CookOBJData(modelInstance->GetMesh()->OBJvertexBuffer, modelInstance->GetMesh()->OBJindexBuffer);
+	physicsCollider1->CookOBJData(modelInstance1->GetMesh()->OBJvertexBuffer, modelInstance1->GetMesh()->OBJindexBuffer);
+
+    gProperty->setCollider(physicsCollider);
+    gProperty1->setCollider(physicsCollider1);
 
 	Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty);
     Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty1);
@@ -180,6 +190,10 @@ ExampleApp::Run()
 
     Math::vec4 rayStart = Math::vec4::zerovector();
     Math::vec4 rayEnd= Math::vec4::zerovector();
+
+    Physics::PhysicsHit hit;
+
+	hit.object = nullptr;
 
 	while (this->window->IsOpen())
 	{
@@ -216,7 +230,7 @@ ExampleApp::Run()
 		translation = Math::mat4::transform(translation, rotation);
 		cameraPos += translation;
 
-        this->gProperty1->setModelMatrix(Math::mat4::rotationyawpitchroll(tempRotation, tempRotation, 0.0f));
+        this->gProperty1->setModelMatrix(Math::mat4::multiply(Math::mat4::rotationyawpitchroll(tempRotation, tempRotation, 0.0f), transf2));
 
         tempRotation += 0.005f;
 
@@ -259,9 +273,6 @@ ExampleApp::Run()
             //Create ray to render
             rayStart = rayWorldPos;
 
-
-            Physics::PhysicsHit hit;
-
 			if(Physics::PhysicsServer::Instance()->Raycast(hit, rayWorldPos, rayDirection, 10.0f))
             {
                 printf("--- Hit object! ---\n");
@@ -276,8 +287,14 @@ ExampleApp::Run()
 		}
 		
 		RenderDevice::Instance()->Render();
-		/*
+
+		if(hit.object != nullptr)
+			consoleBuffer = hit.object->getModelInstance()->GetMesh()->GetFileName();
+
+		this->gProperty->getbbox().debugRender();
         this->gProperty1->getbbox().debugRender();
+
+		this->gProperty->getCollider()->debugDraw();
 
         // Render LINES
         glUseProgram(0);
@@ -291,17 +308,25 @@ ExampleApp::Run()
 
         glBegin(GL_LINES);
 
-        Math::vec4 v1 = rayStart;
-        Math::vec4 v2 = rayEnd;
+        Math::point v1 = rayStart;
+        Math::point v2 = rayEnd;
 
         glColor3f(0.0f, 1.0f, 0.0f);
         glVertex4f(v1[0], v1[1], v1[2], v1[3]);
         glColor3f(1.0f, 0.0f, 0.0f);
         glVertex4f(v2[0], v2[1], v2[2], v2[3]);
 
+        Math::point hitp = hit.point;
+        Math::point hitn = hit.point + (hit.surfaceNormal * 0.1f);
+
+        glColor3f(1.0f, 0.0f, 1.0f);
+        glVertex4f(hitp[0], hitp[1], hitp[2], hitp[3]);
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glVertex4f(hitn[0], hitn[1], hitn[2], hitn[3]);
+
         glEnd();
 		
-		*/
+
 
 		this->window->SwapBuffers();
 	}

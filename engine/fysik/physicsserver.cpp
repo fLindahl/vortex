@@ -23,6 +23,8 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const M
     Math::point c;
     Math::point d;
 
+
+
     //for each object, check bbox for collision
     for (auto property : this->properties)
     {
@@ -39,10 +41,36 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const M
                 //check if hit is within the area.
                 if(isPointWithinBounds(planeHit, a,b,c,d, plane.n()))
                 {
-                    out.point = planeHit;
-                    out.surfaceNormal = plane.n();
-                    out.object = property;
-                    return true;
+                    bool contact = false;
+                    //Length is the furthest we can hit something
+                    float closestDistance = length;
+                    float distance;
+                    Util::Array<Physics::SurfaceCollider::ColliderFace>& faces = property->getCollider()->GetFaceList();
+
+                    Math::line modelSpaceRay = ray;
+                    Math::mat4 invModel = Math::mat4::inverse(property->getModelMatrix());
+                    modelSpaceRay.transform(invModel);
+
+                    for (auto face : faces)
+                    {
+                        plane.constructFromPoints(face.p0, face.p1, face.p2);
+                        if(modelSpaceRay.Intersect(planeHit, plane))
+                        {
+                            if(isPointWithinBounds(planeHit, face.p0,face.p1,face.p2, plane.n()))
+                            {
+                                distance = (modelSpaceRay.p - planeHit).length3();
+                                if(distance < closestDistance)
+                                {
+                                    closestDistance = distance;
+                                    out.point = Math::mat4::transform(planeHit, property->getModelMatrix());
+                                    out.surfaceNormal = Math::mat4::transform(plane.n(), Math::mat4::transpose(invModel));
+                                    out.object = property;
+                                    contact = true;
+                                }
+                            }
+                        }
+                    }
+                    return contact;
                 }
             }
         }
@@ -77,6 +105,35 @@ bool PhysicsServer::isPointWithinBounds(const Math::point& p,
     if((Math::vec4::dot3(hitToN, edgeNormalN) > 0.0f) &&
         (Math::vec4::dot3(hitToE, edgeNormalE) > 0.0f) &&
         (Math::vec4::dot3(hitToS, edgeNormalS) > 0.0f) &&
+        (Math::vec4::dot3(hitToW, edgeNormalW) > 0.0f)
+        )
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool PhysicsServer::isPointWithinBounds(const Math::point& p,
+                                        const Math::point& a,
+                                        const Math::point& b,
+                                        const Math::point& c,
+                                        const Math::vec4& surfaceNormal)
+{
+    const Math::vec4 edgeN = Math::vec4::normalize(b - a);
+    const Math::vec4 edgeE = Math::vec4::normalize(c - b);
+    const Math::vec4 edgeW = Math::vec4::normalize(a - c);
+
+    const Math::vec4 hitToN = Math::vec4::normalize(a - p);
+    const Math::vec4 hitToE = Math::vec4::normalize(b - p);
+    const Math::vec4 hitToW = Math::vec4::normalize(c - p);
+
+    const Math::vec4 edgeNormalN = Math::vec4::cross3(edgeN, surfaceNormal);
+    const Math::vec4 edgeNormalE = Math::vec4::cross3(edgeE, surfaceNormal);
+    const Math::vec4 edgeNormalW = Math::vec4::cross3(edgeW, surfaceNormal);
+
+    if((Math::vec4::dot3(hitToN, edgeNormalN) > 0.0f) &&
+        (Math::vec4::dot3(hitToE, edgeNormalE) > 0.0f) &&
         (Math::vec4::dot3(hitToW, edgeNormalW) > 0.0f)
         )
     {
