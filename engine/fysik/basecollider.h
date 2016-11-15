@@ -24,4 +24,14 @@ private:
 	ColliderShape shape;
 };
 
+inline BaseCollider::BaseCollider()
+{
+
+}
+
+inline BaseCollider::~BaseCollider()
+{
+
+}
+
 }

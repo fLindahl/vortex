@@ -9,7 +9,7 @@ SET(files_fysik_fysik
 	basecollider.h
 	surfacecollider.h
 	surfacecollider.cpp
-	)
+        rigidbody.h)
 
 SOURCE_GROUP("fysik" FILES ${files_fysik})
 

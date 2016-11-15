@@ -1,5 +1,6 @@
 #include "config.h"
 #include "line.h"
+#include "matrix4.h"
 
 namespace Math
 {
@@ -49,6 +50,12 @@ bool line::Intersect(vec4& out, const Math::plane& plane)
     }
 
     return false;
+}
+
+void line::transform(const Math::mat4 &t)
+{
+    this->p = Math::mat4::transform(this->p, t);
+    this->m = Math::mat4::transform(this->m, t);
 }
 
 }

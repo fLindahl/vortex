@@ -32,7 +32,7 @@ namespace Math
 
 	vec4 plane::n() const
     {
-        return vec4(this->vec.x(), this->vec.y(), this->vec.z(), 1);
+        return vec4(this->vec.x(), this->vec.y(), this->vec.z(), 0.0f);
     }
 
 	vec4 plane::p() const
