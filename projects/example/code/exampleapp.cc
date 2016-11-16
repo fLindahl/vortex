@@ -172,8 +172,8 @@ ExampleApp::Run()
     gProperty->setModelMatrix(transf);
     gProperty1->setModelMatrix(transf2);
 
-    physicsCollider->CookOBJData(modelInstance->GetMesh()->OBJvertexBuffer, modelInstance->GetMesh()->OBJindexBuffer);
-	physicsCollider1->CookOBJData(modelInstance1->GetMesh()->OBJvertexBuffer, modelInstance1->GetMesh()->OBJindexBuffer);
+    physicsCollider->CookOBJData(modelInstance->GetMesh()->OBJvertexBuffer, modelInstance->GetMesh()->OBJindexBuffer, modelInstance->GetMesh()->getBaseBBox());
+	physicsCollider1->CookOBJData(modelInstance1->GetMesh()->OBJvertexBuffer, modelInstance1->GetMesh()->OBJindexBuffer, modelInstance1->GetMesh()->getBaseBBox());
 
     gProperty->setCollider(physicsCollider);
     gProperty1->setCollider(physicsCollider1);
