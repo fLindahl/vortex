@@ -34,7 +34,7 @@ void SurfaceCollider::CookMeshData(void* meshdata, void* indexdata, index_t numi
 
 }
 
-void SurfaceCollider::CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<unsigned int>& indices)
+void SurfaceCollider::CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<unsigned int>& indices, const Math::bbox& bbox)
 {
 	size_t iSize = indices.Size();
 	for (size_t i = 0; i < iSize; i += 3)
@@ -48,6 +48,8 @@ void SurfaceCollider::CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& 
 
 		this->faces.Append(face);
 	}
+
+	this->colliderbbox = bbox;
 }
 
 
