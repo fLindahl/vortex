@@ -19,16 +19,33 @@ namespace Physics
 
         for(auto rigidbody : this->rigidBodies)
         {
-            rigidbody->calculate(this->frameTime);
+            rigidbody->update(this->frameTime);
         }
 
         //EvaluateCollisions();
-
-
 
         //-----TIME-----
         this->time = currentTime;
         //--------------
     }
+void PhysicsDevice::AddRigidBody(std::shared_ptr<RigidBody> rBody)
+{
+    this->rigidBodies.Append(rBody);
+
+    float mass = 5.0f;
+    float d = 0.083333333 * mass;
+    Math::vec4 boxExtents = rBody->collider->getbbox().maxPoint;
+    float sqX = (boxExtents.x() * boxExtents.x());
+    float sqY = (boxExtents.y() * boxExtents.y());
+    float sqZ = (boxExtents.z() * boxExtents.z());
+
+    Math::mat4 inertiaTensor = Math::mat4(
+        d * (sqY + sqZ), 0, 0, 0,
+        0,
+
+    );
+
+    rBody->initialize(5.0f, )
+}
 
 }

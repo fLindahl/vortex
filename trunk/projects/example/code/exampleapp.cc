@@ -7,6 +7,7 @@
 #include <cstring>
 #include <render/server/renderdevice.h>
 #include <fysik/physicsserver.h>
+#include <fysik/physicsdevice.h>
 #include "foundation/math/plane.h"
 #include "imgui.h"
 
@@ -65,6 +66,9 @@ ExampleApp::Open()
 
         physicsCollider = std::make_shared<Physics::SurfaceCollider>();
 		physicsCollider1 = std::make_shared<Physics::SurfaceCollider>();
+
+		rBody = std::make_shared<Physics::RigidBody>();
+		rBody1 = std::make_shared<Physics::RigidBody>();
 
 		//Always setup shaders before materials!
 		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
@@ -177,6 +181,18 @@ ExampleApp::Run()
 
     gProperty->setCollider(physicsCollider);
     gProperty1->setCollider(physicsCollider1);
+
+	this->rBody->setCollider(physicsCollider);
+	this->rBody1->setCollider(physicsCollider1);
+
+	gProperty->rigidBody = this->rBody;
+	gProperty1->rigidBody = this->rBody1;
+
+	this->rBody->setGraphicsProperty(gProperty);
+	this->rBody1->setGraphicsProperty(gProperty1);
+
+	Physics::PhysicsDevice::Instance()->AddRigidBody(this->rBody);
+	Physics::PhysicsDevice::Instance()->AddRigidBody(this->rBody1);
 
 	Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty);
     Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty1);
