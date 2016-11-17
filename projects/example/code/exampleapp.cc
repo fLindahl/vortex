@@ -6,7 +6,6 @@
 #include "exampleapp.h"
 #include <cstring>
 #include <render/server/renderdevice.h>
-#include <fysik/physicsserver.h>
 #include <fysik/physicsdevice.h>
 #include "foundation/math/plane.h"
 #include "imgui.h"
@@ -109,9 +108,20 @@ void ExampleApp::RenderUI()
 		// create a new window
 		ImGui::Begin("Console", &show, ImGuiWindowFlags_NoSavedSettings);
 
-		ImGui::SetWindowSize(ImVec2(450.0f,100.0f), ImGuiSetCond_::ImGuiSetCond_Always);
+		ImGui::SetWindowSize(ImVec2(450.0f,210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
 		// create text editors for shader code
 		ImGui::Text("Selected Mesh: %s\n", consoleBuffer.c_str());
+
+		if (hit.object != nullptr)
+		{
+			ImGui::Text("Orientation: %f, %f, %f, %f\n", hit.object->rigidBody->getOrientation().x(), hit.object->rigidBody->getOrientation().y(), hit.object->rigidBody->getOrientation().z(), hit.object->rigidBody->getOrientation().w());
+			ImGui::Text("Position: %f, %f, %f, %f\n", hit.object->rigidBody->getPosition().x(), hit.object->rigidBody->getPosition().y(), hit.object->rigidBody->getPosition().z(), hit.object->rigidBody->getPosition().w());
+			ImGui::Text("LinearVelocity: %f, %f, %f, %f\n", hit.object->rigidBody->getLinearVelocity().x(), hit.object->rigidBody->getLinearVelocity().y(), hit.object->rigidBody->getLinearVelocity().z(), hit.object->rigidBody->getLinearVelocity().w());
+			ImGui::Text("AngularVelocity: %f, %f, %f, %f\n", hit.object->rigidBody->getAngularVelocity().x(), hit.object->rigidBody->getAngularVelocity().y(), hit.object->rigidBody->getAngularVelocity().z(), hit.object->rigidBody->getAngularVelocity().w());
+			ImGui::Text("Acceleration: %f, %f, %f, %f\n", hit.object->rigidBody->getAcceleration().x(), hit.object->rigidBody->getAcceleration().y(), hit.object->rigidBody->getAcceleration().z(), hit.object->rigidBody->getAcceleration().w());
+
+		}
+		
 		//ImGui::InputTextMultiline("Vertex Shader", consoleBuffer, CONSOLE_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput);
 
 		//ImGui::InputTextMultiline("Pixel Shader", fsBuffer, STRING_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
@@ -202,19 +212,15 @@ ExampleApp::Run()
 
     Math::point cameraPos = Math::vec4::zerovector();
 
-    float tempRotation = 0.0f;
-
     Math::vec4 rayStart = Math::vec4::zerovector();
     Math::vec4 rayEnd= Math::vec4::zerovector();
-
-    Physics::PhysicsHit hit;
 
 	hit.object = nullptr;
 
 	while (this->window->IsOpen())
 	{
 		this->window->Update();
-
+		
 		Math::vec4 translation = Math::vec4::zerovector();
         if(keyhandler->W)
         {
@@ -245,10 +251,6 @@ ExampleApp::Run()
 
 		translation = Math::mat4::transform(translation, rotation);
 		cameraPos += translation;
-
-        this->gProperty1->setModelMatrix(Math::mat4::multiply(Math::mat4::rotationyawpitchroll(tempRotation, tempRotation, 0.0f), transf2));
-
-        tempRotation += 0.005f;
 
         Graphics::MainCamera::Instance()->setViewMatrix(Math::mat4::lookatrh(cameraPos, cameraPos + forward, up));
 
@@ -292,6 +294,7 @@ ExampleApp::Run()
 			if(Physics::PhysicsServer::Instance()->Raycast(hit, rayWorldPos, rayDirection, 10.0f))
             {
                 printf("--- Hit object! ---\n");
+				hit.object->rigidBody->applyForceAtPoint(rayDirection, 0.0001f, hit.point);
                 rayEnd = hit.point;
             }
             else
@@ -302,6 +305,11 @@ ExampleApp::Run()
 
 		}
 		
+		Physics::PhysicsDevice::Instance()->Solve();
+
+		this->gProperty->setModelMatrix(this->rBody->getTransform());
+		this->gProperty1->setModelMatrix(this->rBody1->getTransform());
+
 		RenderDevice::Instance()->Render();
 
 		if(hit.object != nullptr)

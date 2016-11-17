@@ -41,11 +41,12 @@ void PhysicsDevice::AddRigidBody(std::shared_ptr<RigidBody> rBody)
 
     Math::mat4 inertiaTensor = Math::mat4(
         d * (sqY + sqZ), 0, 0, 0,
-        0,
-
+		0, d * (sqX + sqZ), 0, 0,
+		0, 0, d * (sqX + sqY), 0,
+		0, 0, 0, 1
     );
 
-    rBody->initialize(5.0f, )
+	rBody->initialize(5.0f, inertiaTensor);
 }
 
 }
