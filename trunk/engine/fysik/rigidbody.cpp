@@ -1,15 +1,19 @@
 #include "config.h"
 #include "rigidbody.h"
 #include "render/resources/modelinstance.h"
-
+#include "render/properties/graphicsproperty.h"
 
 namespace Physics
 {
 
 RigidBody::RigidBody() :
- acceleration(0.0f)
+ acceleration(0.0f),
+ linearVelocity(0.0f),
+ angularVelocity(0.0f),
+ force(0.0f),
+ torque(0.0f)
 {
-
+	this->orientation = Math::quaternion::identity();
 }
 
 RigidBody::~RigidBody()
@@ -62,23 +66,23 @@ void RigidBody::applyForceAtPoint(const Math::vec4 &dir, const float &magnitude,
 void RigidBody::update(const double& frameTime)
 {
     assert(frameTime > 0.0);
-
-    //this->position += (this->linearVelocity * frameTime) + ((this->acceleration + (force * massInv)) * frameTime);
-
+	
     Math::vector lastFrameAcceleration = this->acceleration;
     lastFrameAcceleration += force * massInv;
+
+	this->linearVelocity += lastFrameAcceleration * frameTime;
+
+	this->position += (this->linearVelocity * frameTime);
 
     Math::vector angularAcceleration = Math::mat4::transform(torque, invInertiaTensorWorld);
 
     this->angularVelocity += angularAcceleration * frameTime;
 
-    this->position += (this->linearVelocity * frameTime);
+	Math::quaternion q = Math::quaternion::multiply(Math::quaternion(this->angularVelocity.x(), this->angularVelocity.y(), this->angularVelocity.z(), 0.0f), this->orientation);
+	Math::quaternion::scale(q, 0.5f);
 
-    Math::vector scaledAngVel = this->angularVelocity * frameTime;
-
-    this->orientation = Math::quaternion::multiply(this->orientation, Math::quaternion(0, scaledAngVel.x(), scaledAngVel.y(), scaledAngVel.z()));
-    this->orientation = Math::quaternion::scale(this->orientation, 0.5f);
-
+	this->orientation.set(this->orientation.x() + q.x(), this->orientation.y() + q.y(), this->orientation.z() + q.z(), this->orientation.w() + q.w());
+		    
     this->calculateDerivedQuantities();
 
     this->force = Math::vector::zerovector();
@@ -87,7 +91,7 @@ void RigidBody::update(const double& frameTime)
 
 bool RigidBody::collide()
 {
-
+	return false;
 }
 
 void RigidBody::calculateDerivedQuantities()

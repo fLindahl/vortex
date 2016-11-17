@@ -1,7 +1,11 @@
 #pragma once
-
-#include <render/properties/graphicsproperty.h>
 #include "surfacecollider.h"
+
+namespace Render
+{
+	class GraphicsProperty;
+}
+
 namespace Physics
 {
 class RigidBody
@@ -13,9 +17,17 @@ public:
     void applyForce(const Math::vec4& dir, const float& magnitude);
     void applyForceAtPoint(const Math::vec4& dir, const float& magnitude, const Math::point& worldPos);
 
-
-    void setGraphicsProperty(std::shared_ptr<Render::GraphicsProperty> gp) {this->gProperty = gp;}
+    void setGraphicsProperty(Render::GraphicsProperty* gp) {this->gProperty = gp;}
     void setCollider(std::shared_ptr<SurfaceCollider> coll);
+
+	Math::mat4 getTransform() { return this->transform; }
+	Math::quaternion getOrientation() { return this->orientation; }
+	Math::point getPosition() { return this->position; }
+	Math::vector getLinearVelocity() { return this->linearVelocity; }
+	Math::vector getAngularVelocity() { return this->angularVelocity; }
+	Math::vector getForce() { return this->force; }
+	Math::vector getTorque() { return this->torque; }
+	Math::vector getAcceleration() { return this->acceleration; }
 
 
 private:
@@ -54,10 +66,8 @@ private:
     //accumilative quantities
     Math::vector force;
     Math::vector torque;
-
-
-
-    std::shared_ptr<Render::GraphicsProperty> gProperty;
+	
+    Render::GraphicsProperty* gProperty;
     std::shared_ptr<SurfaceCollider> collider;
 };
 

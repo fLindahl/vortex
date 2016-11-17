@@ -18,6 +18,7 @@
 #include "fysik/basecollider.h"
 #include <fysik/surfacecollider.h>
 #include <fysik/rigidbody.h>
+#include <fysik/physicsserver.h>
 namespace Example
 {
 class ExampleApp : public Core::App
@@ -53,6 +54,8 @@ private:
 
 	Render::GraphicsProperty* gProperty;
 	Render::GraphicsProperty* gProperty1;
+
+	Physics::PhysicsHit hit;
 
 	Display::Window* window;
 
