@@ -2,6 +2,7 @@
 #include <memory>
 #include <foundation/math/bbox.h>
 #include <fysik/surfacecollider.h>
+#include <fysik/rigidbody.h>
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 
@@ -26,6 +27,8 @@ public:
 	std::shared_ptr<Physics::SurfaceCollider> getCollider() {return this->collider;}
 
 	Math::bbox& getbbox() {return this->bbox; }
+
+	std::shared_ptr<Physics::RigidBody> rigidBody;
 
 private:
 	Math::bbox bbox;
