@@ -99,6 +99,8 @@ namespace Math
 		/// un-denormalize quaternion (this is sort of a hack since Maya likes to return denormal quaternions)
 		void undenormalize();
 
+		/// return scaled quaternion
+		static quaternion scale(const quaternion& q, const float& s);
 		/// return quaternion in barycentric coordinates
 		static quaternion barycentric(const quaternion& q0, const quaternion& q1, const quaternion& q2, float f, float g);
 		/// return conjugate of a normalized quaternion
@@ -436,6 +438,15 @@ namespace Math
 	{
 		printf("UNDENOMALIZE NOT IMPLEMENTED\n");
 		assert(false);
+	}
+
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	inline quaternion
+	quaternion::scale(const quaternion& q, const float& s)
+	{
+		return q.vec * s;
 	}
 
 	//------------------------------------------------------------------------------

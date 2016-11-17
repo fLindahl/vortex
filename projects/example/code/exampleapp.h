@@ -17,6 +17,7 @@
 #include "application/basegamefeature/keyhandler.h"
 #include "fysik/basecollider.h"
 #include <fysik/surfacecollider.h>
+#include <fysik/rigidbody.h>
 namespace Example
 {
 class ExampleApp : public Core::App
@@ -43,6 +44,10 @@ private:
 	std::shared_ptr<Render::ModelInstance> modelInstance1;
 	std::shared_ptr<Physics::SurfaceCollider> physicsCollider;
 	std::shared_ptr<Physics::SurfaceCollider> physicsCollider1;
+
+    std::shared_ptr<Physics::RigidBody> rBody;
+    std::shared_ptr<Physics::RigidBody> rBody1;
+
 
 	BaseGameFeature::KeyHandler* keyhandler;
 
