@@ -33,7 +33,7 @@ void PhysicsDevice::AddRigidBody(std::shared_ptr<RigidBody> rBody)
     this->rigidBodies.Append(rBody);
 
     float mass = 5.0f;
-    float d = 0.083333333 * mass;
+    float d = 0.083333333f * mass;
     Math::vec4 boxExtents = rBody->collider->getbbox().maxPoint;
     float sqX = (boxExtents.x() * boxExtents.x());
     float sqY = (boxExtents.y() * boxExtents.y());
@@ -41,9 +41,9 @@ void PhysicsDevice::AddRigidBody(std::shared_ptr<RigidBody> rBody)
 
     Math::mat4 inertiaTensor = Math::mat4(
         d * (sqY + sqZ), 0, 0, 0,
-		0, d * (sqX + sqZ), 0, 0,
-		0, 0, d * (sqX + sqY), 0,
-		0, 0, 0, 1
+        0, d * (sqX + sqZ), 0, 0,
+        0, 0, d * (sqX + sqY), 0,
+        0, 0, 0, 1
     );
 
 	rBody->initialize(5.0f, inertiaTensor);
