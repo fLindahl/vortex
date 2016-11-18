@@ -2,6 +2,7 @@
 #include <cfloat>
 #include "vector4.h"
 #include "plane.h"
+#include "bbox.h"
 
 namespace Math
 {
@@ -17,6 +18,8 @@ public:
     void transform(const Math::mat4& t);
 
     bool Intersect(vec4& out, const Math::plane& plane);
+
+    bool IntersectAABB(const Math::bbox& box);
 
 //private:
     vec4 p;

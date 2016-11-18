@@ -1,6 +1,7 @@
 #include "config.h"
 #include "foundation/math/line.h"
 #include "physicsserver.h"
+#include "foundation/math/math.h"
 
 namespace Physics
 {
@@ -15,7 +16,6 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const M
     Math::line ray = Math::line(position, direction, length);
 
     Math::plane plane;
-    Math::bbox* box;
     Math::vec4 planeHit;
 
     Math::point a;
@@ -23,57 +23,43 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const M
     Math::point c;
     Math::point d;
 
-
-
     //for each object, check bbox for collision
     for (auto property : this->properties)
     {
-        box = &property->getbbox();
-
-        for (index_t i = 0; i < 6; ++i)
+        if(ray.IntersectAABB(property->getbbox()))
         {
-            //get all points on a face
-            box->get_quad(i,a,b,c,d);
-            plane.constructFromPoints(a, b, c);
+            bool contact = false;
+            //Length is the furthest we can hit something
+            float closestDistance = length;
+            float distance;
+            Util::Array<Physics::SurfaceCollider::ColliderFace>& faces = property->getCollider()->GetFaceList();
 
-            if(ray.Intersect(planeHit, plane))
+            Math::line modelSpaceRay = ray;
+            Math::mat4 invModel = Math::mat4::inverse(property->getModelMatrix());
+            modelSpaceRay.transform(invModel);
+
+            for (auto face : faces)
             {
-                //check if hit is within the area.
-                if(isPointWithinBounds(planeHit, a,b,c,d, plane.n()))
+                plane.constructFromPoints(face.p0, face.p1, face.p2);
+                if(modelSpaceRay.Intersect(planeHit, plane))
                 {
-                    bool contact = false;
-                    //Length is the furthest we can hit something
-                    float closestDistance = length;
-                    float distance;
-                    Util::Array<Physics::SurfaceCollider::ColliderFace>& faces = property->getCollider()->GetFaceList();
-
-                    Math::line modelSpaceRay = ray;
-                    Math::mat4 invModel = Math::mat4::inverse(property->getModelMatrix());
-                    modelSpaceRay.transform(invModel);
-
-                    for (auto face : faces)
+                    if(isPointWithinBounds(planeHit, face.p0,face.p1,face.p2, plane.n()))
                     {
-                        plane.constructFromPoints(face.p0, face.p1, face.p2);
-                        if(modelSpaceRay.Intersect(planeHit, plane))
+                        distance = (modelSpaceRay.p - planeHit).length3();
+                        if(distance < closestDistance)
                         {
-                            if(isPointWithinBounds(planeHit, face.p0,face.p1,face.p2, plane.n()))
-                            {
-                                distance = (modelSpaceRay.p - planeHit).length3();
-                                if(distance < closestDistance)
-                                {
-                                    closestDistance = distance;
-                                    out.point = Math::mat4::transform(planeHit, property->getModelMatrix());
-                                    out.surfaceNormal = Math::mat4::transform(plane.n(), Math::mat4::transpose(invModel));
-                                    out.object = property;
-                                    contact = true;
-                                }
-                            }
+                            closestDistance = distance;
+                            out.point = Math::mat4::transform(planeHit, property->getModelMatrix());
+                            out.surfaceNormal = Math::mat4::transform(plane.n(), Math::mat4::transpose(invModel));
+                            out.object = property;
+                            contact = true;
                         }
                     }
-                    return contact;
                 }
             }
+            return contact;
         }
+
     }
 
     return false;

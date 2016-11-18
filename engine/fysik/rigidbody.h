@@ -21,6 +21,7 @@ public:
     void setCollider(std::shared_ptr<SurfaceCollider> coll);
 
 	Math::mat4 getTransform() { return this->transform; }
+	Math::point getCenterOfMass() { return this->massCenter; }
 	Math::quaternion getOrientation() { return this->orientation; }
 	Math::point getPosition() { return this->position; }
 	Math::vector getLinearVelocity() { return this->linearVelocity; }
@@ -53,8 +54,6 @@ private:
     Math::point position; //Cm on worldspace
     Math::vector acceleration;
     Math::quaternion orientation; //q
-    Math::vector linearMomentum; //p
-    Math::vector angularMomentum; //L
 
     //derived quantities
     Math::mat4 R; //orientation matrix

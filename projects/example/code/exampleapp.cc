@@ -262,6 +262,7 @@ ExampleApp::Run()
 		if(keyhandler->leftMousePressed)
 		{
             printf("\n\n\n\n\n\n\n\n");
+			double time = glfwGetTime();
 			glfwGetCursorPos(this->window->GetGLFWWindow(), &cursorPosX, &cursorPosY);
 
             printf("CameraPos: %f %f %f %f\n", cameraPos.x(), cameraPos.y(), cameraPos.z(), cameraPos.w());
@@ -276,9 +277,7 @@ ExampleApp::Run()
 
 			cursorTransform = Math::mat4::transform(cursorTransform, invProj);
 
-			//Pl = Pv * NearPlane * (1,-1,1,1)
             Math::point ray = (cursorTransform * 0.01f);
-            //ray.x() = ray.x() * -1.0f;
 
 			Math::vec4 rayWorldPos = Math::mat4::transform(ray, invView);
 
@@ -294,7 +293,7 @@ ExampleApp::Run()
 			if(Physics::PhysicsServer::Instance()->Raycast(hit, rayWorldPos, rayDirection, 10.0f))
             {
                 printf("--- Hit object! ---\n");
-				hit.object->rigidBody->applyForceAtPoint(rayDirection, 0.0001f, hit.point);
+				hit.object->rigidBody->applyForceAtPoint(rayDirection, .1f, hit.point);
                 rayEnd = hit.point;
             }
             else
@@ -302,7 +301,8 @@ ExampleApp::Run()
                 rayEnd = rayWorldPos + (rayDirection*10.0f);
             }
 
-
+			double endtime = glfwGetTime();
+			printf("Raycast time elapsed: %f\n", endtime - time);
 		}
 		
 		Physics::PhysicsDevice::Instance()->Solve();
@@ -318,7 +318,7 @@ ExampleApp::Run()
 		this->gProperty->getbbox().debugRender();
         this->gProperty1->getbbox().debugRender();
 
-		this->gProperty->getCollider()->debugDraw();
+		//this->gProperty->getCollider()->debugDraw();
 
         // Render LINES
         glUseProgram(0);
