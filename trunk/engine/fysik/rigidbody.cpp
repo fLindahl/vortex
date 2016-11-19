@@ -21,15 +21,13 @@ RigidBody::~RigidBody()
 
 }
 
-void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTensor)
+void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTensor, std::shared_ptr<Game::RigidBodyEntity> entity)
 {
-    this->collider = this->gProperty->getCollider();
-
-    // Set position to be masscenter (center of bbox)
+    this->collider = entity->GetCollider();
 
     this->massCenter = (this->collider->getbbox().maxPoint - this->collider->getbbox().minPoint) * 0.5f;
-    this->position = this->gProperty->getModelMatrix().get_position();//+ this->massCenter;
-    this->orientation = Math::quaternion::identity();
+    this->position = entity->GetTransform().get_position();//+ this->massCenter;
+    this->orientation = Math::mat4::rotationmatrix(entity->GetTransform());
 
     this->mass = mass;
     this->massInv = 1.0f/this->mass;
@@ -41,7 +39,7 @@ void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTenso
     this->calculateDerivedQuantities();
 }
 
-void RigidBody::setCollider(std::shared_ptr<SurfaceCollider> coll)
+void RigidBody::setCollider(std::shared_ptr<Physics::SurfaceCollider> coll)
 {
     this->collider = coll;
 }

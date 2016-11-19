@@ -3,50 +3,58 @@
 #include "render/resources/meshresource.h"
 #include "render/resources/modelinstance.h"
 
-namespace Render
+namespace Property
 {
-	GraphicsProperty::GraphicsProperty()
-	{
-	}
+GraphicsProperty::GraphicsProperty()
+{
+}
 
-	GraphicsProperty::~GraphicsProperty()
-	{
-		if (this->modelInstance != nullptr)
-		{
-			//HACK: Implement this
-			//this->modelInstance->removeGraphicsProperty(this);
-		}
-	}
-
-	std::shared_ptr<ModelInstance> GraphicsProperty::getModelInstance() const
-	{
-		return this->modelInstance;
-	}
-
-	void GraphicsProperty::setModelInstance(std::shared_ptr<ModelInstance> inModelInstance)
+GraphicsProperty::~GraphicsProperty()
+{
+	if (this->modelInstance != nullptr)
 	{
 		//HACK: Implement this
-		//if (this->modelInstance.get() != nullptr)
-		//{
-		//	this->modelInstance->removeGraphicsProperty(this);
-		//}
-
-		this->modelInstance = inModelInstance;
-		this->modelInstance->AddGraphicsProperty(this);
-
-		this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
-
+		//this->modelInstance->removeGraphicsProperty(this);
 	}
+}
 
-	Math::mat4 GraphicsProperty::getModelMatrix() const
-	{
-		return this->modelMat;
-	}
+std::shared_ptr<Render::ModelInstance> GraphicsProperty::getModelInstance() const
+{
+	return this->modelInstance;
+}
 
-	void GraphicsProperty::setModelMatrix(const Math::mat4 &mat)
-	{
-		this->modelMat = mat;
-        this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
-        this->bbox.transform(mat);
-	}
+void GraphicsProperty::setModelInstance(std::shared_ptr<Render::ModelInstance> inModelInstance)
+{
+	//HACK: Implement this
+	//if (this->modelInstance.get() != nullptr)
+	//{
+	//	this->modelInstance->removeGraphicsProperty(this);
+	//}
+
+	this->modelInstance = inModelInstance;
+	this->modelInstance->AddGraphicsProperty(this);
+
+	this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
+
+}
+
+Math::mat4 GraphicsProperty::getModelMatrix() const
+{
+	return this->modelMat;
+}
+
+void GraphicsProperty::setModelMatrix(const Math::mat4 &mat)
+{
+	this->modelMat = mat;
+	this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
+	this->bbox.transform(mat);
+}
+
+void GraphicsProperty::Update()
+{
+	this->Game::BaseProperty::Update();
+
+	this->setModelMatrix(this->owner->GetTransform())
+	this->owner
+}
 }

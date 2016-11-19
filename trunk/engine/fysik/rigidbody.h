@@ -1,4 +1,6 @@
 #pragma once
+#include <application/game/rigidbodyentity.h>
+#include "application/game/baseproperty.h"
 #include "surfacecollider.h"
 
 namespace Render
@@ -17,8 +19,8 @@ public:
     void applyForce(const Math::vec4& dir, const float& magnitude);
     void applyForceAtPoint(const Math::vec4& dir, const float& magnitude, const Math::point& worldPos);
 
-    void setGraphicsProperty(Render::GraphicsProperty* gp) {this->gProperty = gp;}
-    void setCollider(std::shared_ptr<SurfaceCollider> coll);
+    //void setGraphicsProperty(Render::GraphicsProperty* gp) {this->gProperty = gp;}
+    void setCollider(std::shared_ptr<Physics::SurfaceCollider> coll);
 
 	Math::mat4 getTransform() { return this->transform; }
 	Math::point getCenterOfMass() { return this->massCenter; }
@@ -34,14 +36,12 @@ public:
 private:
     friend class PhysicsDevice;
 
-    void initialize(const float& mass, const Math::mat4& bodyInertiaTensor);
+    void initialize(const float& mass, const Math::mat4& bodyInertiaTensor, std::shared_ptr<Game::RigidBodyEntity> entity);
 
     void update(const double& frameTime);
     bool collide();
 
-
     void calculateDerivedQuantities();
-
 
     //Constant quantities
     float mass;
@@ -65,9 +65,8 @@ private:
     //accumilative quantities
     Math::vector force;
     Math::vector torque;
-	
-    Render::GraphicsProperty* gProperty;
-    std::shared_ptr<SurfaceCollider> collider;
+
+    std::shared_ptr<Physics::SurfaceCollider> collider;
 };
 
 }

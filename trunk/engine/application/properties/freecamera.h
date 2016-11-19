@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Application
+namespace Property
 {
 
 class FreeCamera
