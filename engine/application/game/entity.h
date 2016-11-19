@@ -1,10 +1,11 @@
 #pragma once
 #include "config.h"
+#include "foundation/math/matrix4.h"
+#include "foundation/util/array.h"
+#include "application/basegamefeature/managers/entitymanager.h"
 #include "foundation/messaging/messagehandler.h"
 #include "foundation/math/vector4.h"
-#include "render/properties/graphicsproperty.h"
-
-struct Msg;
+#include "baseproperty.h"
 
 namespace Game
 {
@@ -16,25 +17,31 @@ public:
 	~Entity();
 
 	int getID() { return ID; };
-	void setID(const int id) { ID = id; };
+	//void setID(const int id) { ID = id; };
+
+	virtual void Activate();
+	virtual void Deactivate();
 
 	virtual void FixedUpdate();
 	virtual void Update();
 
-	virtual void HandleMsg(Msg msg);
-	virtual void SendMsg(Msg msg);
-	virtual void SendMsg(int recipientID, MsgType message, float delay);
+	virtual void HandleMsg(std::shared_ptr<BaseGameFeature::Msg> msg);
+	virtual void SendMsg(std::shared_ptr<BaseGameFeature::Msg> msg);
+	virtual void SendMsg(const int& recipientID, const BaseGameFeature::MsgType& message, const float& delay);
 
-	virtual Math::point getPos();
-	virtual void setPos(const Math::point& nPos);
+    void AddProperty(std::shared_ptr<Game::BaseProperty> p);
 
-	std::shared_ptr<Render::GraphicsProperty> getGraphicsProperty() { return graphics; }
+	virtual Math::mat4 GetTransform();
+	virtual void SetTransform(const Math::mat4& nTransform);
 
 protected:
-	Math::point* pos;
+    friend class BaseGameFeature::EntityManager;
+
+    Math::mat4 transform;
+
 	int ID;
 
-	std::shared_ptr<Render::GraphicsProperty> graphics;
+	Util::Array<std::shared_ptr<Game::BaseProperty>> properties;
 };
 
 }

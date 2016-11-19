@@ -8,34 +8,32 @@
 
 namespace Render
 {
-	class ModelInstance;
-	class ShaderObject;
+class ModelInstance;
+class ShaderObject;
+}
 
-class GraphicsProperty
+namespace Property
+{
+class GraphicsProperty : public Game::BaseProperty
 {
 public:
 	GraphicsProperty();
 	~GraphicsProperty();
 
-	std::shared_ptr<ModelInstance> getModelInstance() const;
-	void setModelInstance(std::shared_ptr<ModelInstance> inModelInstance);
+    void Update();
+
+	std::shared_ptr<Render::ModelInstance> getModelInstance() const;
+	void setModelInstance(std::shared_ptr<Render::ModelInstance> inModelInstance);
 	
 	Math::mat4 getModelMatrix() const;
 	void setModelMatrix(const Math::mat4 &mat);
 
-	void setCollider(std::shared_ptr<Physics::SurfaceCollider> coll) {this->collider = coll;}
-	std::shared_ptr<Physics::SurfaceCollider> getCollider() {return this->collider;}
-
-	Math::bbox& getbbox() {return this->bbox; }
-
-	std::shared_ptr<Physics::RigidBody> rigidBody;
+	Math::bbox& getbbox() { return this->bbox; }
 
 private:
 	Math::bbox bbox;
 
-	std::shared_ptr<Physics::SurfaceCollider> collider;
-
-	std::shared_ptr<ModelInstance> modelInstance;
+	std::shared_ptr<Render::ModelInstance> modelInstance;
 	Math::mat4 modelMat;
 };
 

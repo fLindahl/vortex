@@ -4,14 +4,6 @@
 namespace Physics
 {
 
-enum ColliderShape
-{
-	SPHERE,
-	CAPSULE,
-	BOX,
-	SURFACE
-};
-
 class BaseCollider
 {
 public:

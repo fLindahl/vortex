@@ -2,7 +2,7 @@
 #include "freecamera.h"
 
 
-namespace Application
+namespace Property
 {
 
 FreeCamera::FreeCamera()
