@@ -24,9 +24,9 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const M
     Math::point d;
 
     //for each object, check bbox for collision
-    for (auto property : this->properties)
+    for (auto entity : this->physicsEntities)
     {
-        if(ray.IntersectAABB(property->getbbox()))
+        if(ray.IntersectAABB(entity->getbbox()))
         {
             bool contact = false;
             //Length is the furthest we can hit something

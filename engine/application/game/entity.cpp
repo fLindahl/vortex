@@ -1,14 +1,11 @@
 #include "config.h"
 #include "entity.h"
-#include "foundation/messaging/messagehandler.h"
 
 namespace Game
 {
 
 Entity::Entity()
 {
-	this->pos = new Math::point;
-
 	//Create graphics object and add it to graphicsserver.
 	//this->graphics = std::make_shared<Render::GraphicsProperty>(this);
 	
@@ -17,7 +14,6 @@ Entity::Entity()
 
 Entity::~Entity()
 {
-	delete this->pos;
 	//GraphicsServer::getInstance()->removeGraphicsProperty(this->graphics);
 }
 	
@@ -31,35 +27,50 @@ void Entity::Update()
 
 }
 
-void Entity::HandleMsg(Msg msg)
+void Entity::HandleMsg(std::shared_ptr<BaseGameFeature::Msg> msg)
 {
 
 }
 
-void Entity::SendMsg(Msg msg)
+void Entity::SendMsg(std::shared_ptr<BaseGameFeature::Msg> msg)
 {
-	MsgHandler::getInstance()->RecvMsg(msg);
+	//MsgHandler::getInstance()->RecvMsg(msg);
 }
 
-void Entity::SendMsg(int recipientID, MsgType message, float delay)
+void Entity::SendMsg(const int& recipientID, const BaseGameFeature::MsgType& message, const float& delay)
 {
-	Msg newMsg;
+	BaseGameFeature::Msg newMsg;
 	newMsg.recipientID = recipientID;
 	newMsg.senderID = this->getID();
 	newMsg.message = message;
 	newMsg.delay = delay;
 
-	MsgHandler::getInstance()->RecvMsg(newMsg);
+	//MsgHandler::getInstance()->RecvMsg(newMsg);
+}
+void Entity::SetTransform(const Math::mat4 &nTransform)
+{
+    this->transform = nTransform;
 }
 
-Math::point Entity::getPos()
+Math::mat4 Entity::GetTransform()
 {
-	return *pos;
+    return this->transform;
 }
 
-void Entity::setPos(const Math::point& nPos)
+void Entity::AddProperty(std::shared_ptr<Game::BaseProperty> p)
 {
-	this->pos->set(nPos.x(), nPos.y(), nPos.z());
+    this->properties.Append(p);
+    p->owner = this;
+}
+
+void Entity::Activate()
+{
+
+}
+
+void Entity::Deactivate()
+{
+
 }
 
 }

@@ -14,7 +14,7 @@ private:
 	EntityManager();
 
 public:
-	static EntityManager* getInstance()
+	static EntityManager* Instance()
 	{
 		static EntityManager instance;
 		return &instance;
