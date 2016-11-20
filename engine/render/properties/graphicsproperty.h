@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
-#include <foundation/math/bbox.h>
-#include <fysik/surfacecollider.h>
-#include <fysik/rigidbody.h>
+#include "foundation/math/bbox.h"
+#include "fysik/surfacecollider.h"
+#include "fysik/rigidbody.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 
@@ -10,10 +10,7 @@ namespace Render
 {
 class ModelInstance;
 class ShaderObject;
-}
 
-namespace Property
-{
 class GraphicsProperty : public Game::BaseProperty
 {
 public:

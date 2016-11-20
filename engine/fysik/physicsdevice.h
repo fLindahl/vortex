@@ -1,7 +1,6 @@
 #pragma once
-
-#include <foundation/util/array.h>
 #include "rigidbody.h"
+#include "foundation/util/array.h"
 namespace Physics
 {
 
@@ -33,5 +32,4 @@ private:
     Util::Array<std::shared_ptr<RigidBody>> rigidBodies;
 
 };
-
 }

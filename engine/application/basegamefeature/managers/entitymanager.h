@@ -5,6 +5,11 @@
 
 #define UPDATE_FREQUENCY 0.1f //Update frequency per second for Fixed Update
 
+namespace Game
+{
+class Entity;
+}
+
 namespace BaseGameFeature
 {
 

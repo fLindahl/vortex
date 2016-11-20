@@ -3,10 +3,11 @@
 #include "render/resources/meshresource.h"
 #include "render/resources/modelinstance.h"
 
-namespace Property
+namespace Render
 {
 GraphicsProperty::GraphicsProperty()
 {
+
 }
 
 GraphicsProperty::~GraphicsProperty()
@@ -53,8 +54,5 @@ void GraphicsProperty::setModelMatrix(const Math::mat4 &mat)
 void GraphicsProperty::Update()
 {
 	this->Game::BaseProperty::Update();
-
-	this->setModelMatrix(this->owner->GetTransform())
-	this->owner
 }
 }

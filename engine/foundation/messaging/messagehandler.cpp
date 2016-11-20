@@ -2,6 +2,9 @@
 #include "messagehandler.h"
 //#include "..\handlers\GameHandler.h"
 
+namespace BaseGameFeature
+{
+
 void MsgHandler::RecvMsg(Msg msg)
 {
 	msgQueue.push(msg);
@@ -70,4 +73,6 @@ bool Msg::operator==(const Msg& RHS)
 bool Msg::operator<(const Msg& RHS) const
 {
 	return ((float)this->timeStamp / CLOCKS_PER_SEC + this->delay > (float)RHS.timeStamp / CLOCKS_PER_SEC + RHS.delay);
+}
+
 }
