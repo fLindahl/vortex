@@ -17,8 +17,10 @@ public:
 
     void transform(const Math::mat4& t);
 
+    /// Returns true if the line intersects a plane. NOTE: out.w will be 1.0f/magnitude multiplied with the distance to the plane (range 0.0f to 1.0f)
     bool Intersect(vec4& out, const Math::plane& plane);
 
+    // Returns true if the line intersects a bounding box. Make sure the bbox is aligned with worldspace axes.
     bool IntersectAABB(const Math::bbox& box);
 
 //private:

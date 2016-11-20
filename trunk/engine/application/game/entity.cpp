@@ -60,7 +60,8 @@ Math::mat4 Entity::GetTransform()
 void Entity::AddProperty(std::shared_ptr<Game::BaseProperty> p)
 {
     this->properties.Append(p);
-    p->owner = this;
+	//TODO: This should work
+    //p->owner = std::shared_from_this();
 }
 
 void Entity::Activate()

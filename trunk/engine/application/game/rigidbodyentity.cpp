@@ -1,8 +1,17 @@
-#include "rigidbodyentity.h"
+#include "fysik/physicsdevice.h"
+#include "render/properties/graphicsproperty.h"
 
 namespace Game
 {
+RigidBodyEntity::RigidBodyEntity()
+{
 
+}
+
+RigidBodyEntity::~RigidBodyEntity()
+{
+
+}
 
 void RigidBodyEntity::Update()
 {
@@ -21,10 +30,24 @@ void RigidBodyEntity::Activate()
 {
     Entity::Activate();
 
+    this->rigidBody->initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider, 1.0f), this);
+    Physics::PhysicsServer::Instance()->addPhysicsEntity(this);
+
+    Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
+
 }
 void RigidBodyEntity::Deactivate()
 {
     Entity::Deactivate();
+}
+
+void RigidBodyEntity::SetRigidBody(std::shared_ptr<Physics::RigidBody> r)
+{
+    this->rigidBody = r;
+}
+void RigidBodyEntity::FixedUpdate()
+{
+    Entity::FixedUpdate();
 }
 
 }

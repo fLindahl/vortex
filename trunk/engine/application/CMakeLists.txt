@@ -12,7 +12,12 @@ SET(files_application_basegamefeature
 SET(files_application_game
 	game/entity.h
 	game/entity.cpp
-        game/baseproperty.h game/rigidbodyentity.h game/staticentity.h game/rigidbodyentity.cpp)
+	game/baseproperty.h
+	game/rigidbodyentity.h
+	game/staticentity.h
+	game/rigidbodyentity.cpp
+	game/physicsentity.h
+	game/staticentity.cpp game/physicsentity.cpp)
 	
 SET(files_application_properties
 	properties/freecamera.h

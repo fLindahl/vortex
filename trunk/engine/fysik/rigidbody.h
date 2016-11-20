@@ -1,5 +1,5 @@
 #pragma once
-#include <application/game/rigidbodyentity.h>
+#include "application/game/rigidbodyentity.h"
 #include "application/game/baseproperty.h"
 #include "surfacecollider.h"
 
@@ -35,8 +35,9 @@ public:
 
 private:
     friend class PhysicsDevice;
+    friend class Game::RigidBodyEntity;
 
-    void initialize(const float& mass, const Math::mat4& bodyInertiaTensor, std::shared_ptr<Game::RigidBodyEntity> entity);
+    void initialize(const float& mass, const Math::mat4& bodyInertiaTensor, Game::RigidBodyEntity* entity);
 
     void update(const double& frameTime);
     bool collide();
@@ -66,7 +67,8 @@ private:
     Math::vector force;
     Math::vector torque;
 
-    std::shared_ptr<Physics::SurfaceCollider> collider;
+    Game::RigidBodyEntity* owner;
+    std::shared_ptr<Physics::BaseCollider> collider;
 };
 
 }
