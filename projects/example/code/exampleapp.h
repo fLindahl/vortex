@@ -19,6 +19,7 @@
 #include <fysik/surfacecollider.h>
 #include <fysik/rigidbody.h>
 #include <fysik/physicsserver.h>
+#include <application/game/staticentity.h>
 namespace Example
 {
 class ExampleApp : public Core::App
@@ -49,6 +50,8 @@ private:
     std::shared_ptr<Physics::RigidBody> rBody;
     std::shared_ptr<Physics::RigidBody> rBody1;
 
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity;
+	std::shared_ptr<Game::StaticEntity> staticEntity;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 

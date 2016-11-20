@@ -5,17 +5,18 @@
 
 namespace Game
 {
-class StaticEntity : public Entity
+class StaticEntity : public PhysicsEntity
 {
 public:
     StaticEntity();
     ~StaticEntity();
 
-    void setCollider(std::shared_ptr<Physics::SurfaceCollider> coll) { this->collider = coll;}
-    std::shared_ptr<Physics::SurfaceCollider> getCollider() { return this->collider;}
+    void Activate();
+    void Deactivate();
+
+    void SetTransform(const Math::mat4& t);
 
 private:
-    std::shared_ptr<Physics::SurfaceCollider> collider;
 
 };
 

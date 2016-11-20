@@ -66,8 +66,19 @@ ExampleApp::Open()
         physicsCollider = std::make_shared<Physics::SurfaceCollider>();
 		physicsCollider1 = std::make_shared<Physics::SurfaceCollider>();
 
+		physicsCollider->SetShape(Physics::ColliderShape::BOX);
+		physicsCollider1->SetShape(Physics::ColliderShape::CAPSULE);
+
 		rBody = std::make_shared<Physics::RigidBody>();
 		rBody1 = std::make_shared<Physics::RigidBody>();
+
+		rigidBodyEntity = std::make_shared<Game::RigidBodyEntity>();
+		staticEntity = std::make_shared<Game::StaticEntity>();
+
+		rigidBodyEntity->SetRigidBody(rBody);
+
+		rigidBodyEntity->SetCollider(physicsCollider);
+		staticEntity->SetCollider(physicsCollider1);
 
 		//Always setup shaders before materials!
 		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
@@ -84,7 +95,23 @@ ExampleApp::Open()
 		modelInstance1->SetMesh("resources/models/kung.obj");
 		gProperty1->setModelInstance(modelInstance1);
 
-		// set ui rendering function
+        rigidBodyEntity->SetGraphicsProperty(gProperty);
+        staticEntity->SetGraphicsProperty(gProperty1);
+
+        physicsCollider->CookOBJData(modelInstance->GetMesh()->OBJvertexBuffer, modelInstance->GetMesh()->OBJindexBuffer, modelInstance->GetMesh()->getBaseBBox());
+        physicsCollider1->CookOBJData(modelInstance1->GetMesh()->OBJvertexBuffer, modelInstance1->GetMesh()->OBJindexBuffer, modelInstance1->GetMesh()->getBaseBBox());
+
+        Math::mat4 transf = Math::mat4::translation(0.0f, 0.0f, -2.0f);
+        Math::mat4 transf2 = Math::mat4::translation(2.0f, 0.0f, 0.0f);
+
+        this->rigidBodyEntity->SetTransform(transf);
+        this->staticEntity->SetTransform(transf2);
+
+        rigidBodyEntity->Activate();
+        staticEntity->Activate();
+
+
+        // set ui rendering function
 		this->window->SetUiRender([this]()
 		  {
 			  this->RenderUI();
@@ -114,12 +141,11 @@ void ExampleApp::RenderUI()
 
 		if (hit.object != nullptr)
 		{
-			ImGui::Text("Orientation: %f, %f, %f, %f\n", hit.object->rigidBody->getOrientation().x(), hit.object->rigidBody->getOrientation().y(), hit.object->rigidBody->getOrientation().z(), hit.object->rigidBody->getOrientation().w());
-			ImGui::Text("Position: %f, %f, %f, %f\n", hit.object->rigidBody->getPosition().x(), hit.object->rigidBody->getPosition().y(), hit.object->rigidBody->getPosition().z(), hit.object->rigidBody->getPosition().w());
-			ImGui::Text("LinearVelocity: %f, %f, %f, %f\n", hit.object->rigidBody->getLinearVelocity().x(), hit.object->rigidBody->getLinearVelocity().y(), hit.object->rigidBody->getLinearVelocity().z(), hit.object->rigidBody->getLinearVelocity().w());
-			ImGui::Text("AngularVelocity: %f, %f, %f, %f\n", hit.object->rigidBody->getAngularVelocity().x(), hit.object->rigidBody->getAngularVelocity().y(), hit.object->rigidBody->getAngularVelocity().z(), hit.object->rigidBody->getAngularVelocity().w());
-			ImGui::Text("Acceleration: %f, %f, %f, %f\n", hit.object->rigidBody->getAcceleration().x(), hit.object->rigidBody->getAcceleration().y(), hit.object->rigidBody->getAcceleration().z(), hit.object->rigidBody->getAcceleration().w());
-
+			//ImGui::Text("Orientation: %f, %f, %f, %f\n", std::static_pointer_cast<Game::PhysicsEntity>(hit.object)->GetRigidBody->getOrientation().x(), hit.object->rigidBody->getOrientation().y(), hit.object->rigidBody->getOrientation().z(), hit.object->rigidBody->getOrientation().w());
+			//ImGui::Text("Position: %f, %f, %f, %f\n", hit.object->rigidBody->getPosition().x(), hit.object->rigidBody->getPosition().y(), hit.object->rigidBody->getPosition().z(), hit.object->rigidBody->getPosition().w());
+			//ImGui::Text("LinearVelocity: %f, %f, %f, %f\n", hit.object->rigidBody->getLinearVelocity().x(), hit.object->rigidBody->getLinearVelocity().y(), hit.object->rigidBody->getLinearVelocity().z(), hit.object->rigidBody->getLinearVelocity().w());
+			//ImGui::Text("AngularVelocity: %f, %f, %f, %f\n", hit.object->rigidBody->getAngularVelocity().x(), hit.object->rigidBody->getAngularVelocity().y(), hit.object->rigidBody->getAngularVelocity().z(), hit.object->rigidBody->getAngularVelocity().w());
+			//ImGui::Text("Acceleration: %f, %f, %f, %f\n", hit.object->rigidBody->getAcceleration().x(), hit.object->rigidBody->getAcceleration().y(), hit.object->rigidBody->getAcceleration().z(), hit.object->rigidBody->getAcceleration().w());
 		}
 		
 		//ImGui::InputTextMultiline("Vertex Shader", consoleBuffer, CONSOLE_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput);
@@ -179,33 +205,6 @@ ExampleApp::Run()
 
 	Math::mat4 projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
     Math::mat4 invProj = Math::mat4::inverse(projection);
-
-    Math::mat4 transf = Math::mat4::translation(0.0f, 0.0f, -2.0f);
-    Math::mat4 transf2 = Math::mat4::translation(2.0f, 0.0f, 0.0f);
-
-    gProperty->setModelMatrix(transf);
-    gProperty1->setModelMatrix(transf2);
-
-    physicsCollider->CookOBJData(modelInstance->GetMesh()->OBJvertexBuffer, modelInstance->GetMesh()->OBJindexBuffer, modelInstance->GetMesh()->getBaseBBox());
-	physicsCollider1->CookOBJData(modelInstance1->GetMesh()->OBJvertexBuffer, modelInstance1->GetMesh()->OBJindexBuffer, modelInstance1->GetMesh()->getBaseBBox());
-
-    gProperty->setCollider(physicsCollider);
-    gProperty1->setCollider(physicsCollider1);
-
-	this->rBody->setCollider(physicsCollider);
-	this->rBody1->setCollider(physicsCollider1);
-
-	gProperty->rigidBody = this->rBody;
-	gProperty1->rigidBody = this->rBody1;
-
-	this->rBody->setGraphicsProperty(gProperty);
-	this->rBody1->setGraphicsProperty(gProperty1);
-
-	Physics::PhysicsDevice::Instance()->AddRigidBody(this->rBody);
-	Physics::PhysicsDevice::Instance()->AddRigidBody(this->rBody1);
-
-	Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty);
-    Physics::PhysicsServer::Instance()->addGraphicsProperty(gProperty1);
 
 	double cursorPosX = 0.0f;
 	double cursorPosY = 0.0f;
@@ -293,7 +292,11 @@ ExampleApp::Run()
 			if(Physics::PhysicsServer::Instance()->Raycast(hit, rayWorldPos, rayDirection, 10.0f))
             {
                 printf("--- Hit object! ---\n");
-				hit.object->rigidBody->applyForceAtPoint(rayDirection, .1f, hit.point);
+                Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
+
+                if(rbe != nullptr)
+                    rbe->GetRigidBody()->applyForceAtPoint(rayDirection, .1f, hit.point);
+
                 rayEnd = hit.point;
             }
             else
@@ -307,14 +310,19 @@ ExampleApp::Run()
 		
 		Physics::PhysicsDevice::Instance()->Solve();
 
-		this->gProperty->setModelMatrix(this->rBody->getTransform());
-		this->gProperty1->setModelMatrix(this->rBody1->getTransform());
+        this->rigidBodyEntity->Update();
+        this->staticEntity->Update();
 
 		RenderDevice::Instance()->Render();
 
 		if(hit.object != nullptr)
-			consoleBuffer = hit.object->getModelInstance()->GetMesh()->GetFileName();
+        {
+            Game::PhysicsEntity* pe = dynamic_cast<Game::PhysicsEntity*>(hit.object);
 
+            if(pe != nullptr)
+                consoleBuffer = pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetFileName();
+
+        }
 		this->gProperty->getbbox().debugRender();
         this->gProperty1->getbbox().debugRender();
 

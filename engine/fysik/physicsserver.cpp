@@ -2,6 +2,8 @@
 #include "foundation/math/line.h"
 #include "physicsserver.h"
 #include "foundation/math/math.h"
+#include "surfacecollider.h"
+#include "render/properties/graphicsproperty.h"
 
 namespace Physics
 {
@@ -18,24 +20,27 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const M
     Math::plane plane;
     Math::vec4 planeHit;
 
+
     Math::point a;
     Math::point b;
     Math::point c;
     Math::point d;
 
+    bool contact = false;
+    //t = 1.0f is the furthest we can hit something
+    float closestDistance = 1.0f;
+    // distance is between 0.0f -> 1.0f
+    float distance;
+
     //for each object, check bbox for collision
     for (auto entity : this->physicsEntities)
     {
-        if(ray.IntersectAABB(entity->getbbox()))
+        if(ray.IntersectAABB(entity->GetGraphicsProperty()->getbbox()))
         {
-            bool contact = false;
-            //Length is the furthest we can hit something
-            float closestDistance = length;
-            float distance;
-            Util::Array<Physics::SurfaceCollider::ColliderFace>& faces = property->getCollider()->GetFaceList();
+            Util::Array<Physics::SurfaceCollider::ColliderFace>& faces = entity->GetCollider()->GetFaceList();
 
             Math::line modelSpaceRay = ray;
-            Math::mat4 invModel = Math::mat4::inverse(property->getModelMatrix());
+            Math::mat4 invModel = Math::mat4::inverse(entity->GetTransform());
             modelSpaceRay.transform(invModel);
 
             for (auto face : faces)
@@ -45,24 +50,24 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const M
                 {
                     if(isPointWithinBounds(planeHit, face.p0,face.p1,face.p2, plane.n()))
                     {
-                        distance = (modelSpaceRay.p - planeHit).length3();
-                        if(distance < closestDistance)
+                        distance = planeHit.w();
+                        if(distance <= closestDistance)
                         {
                             closestDistance = distance;
-                            out.point = Math::mat4::transform(planeHit, property->getModelMatrix());
+                            planeHit.w() = 1.0f;
+                            out.point = Math::mat4::transform(planeHit, entity->GetTransform());
                             out.surfaceNormal = Math::mat4::transform(plane.n(), Math::mat4::transpose(invModel));
-                            out.object = property;
+                            out.object = entity;
                             contact = true;
                         }
                     }
                 }
             }
-            return contact;
-        }
 
+        }
     }
 
-    return false;
+    return contact;
 }
 
 
@@ -127,6 +132,54 @@ bool PhysicsServer::isPointWithinBounds(const Math::point& p,
     }
 
     return false;
+}
+
+Math::mat4 PhysicsServer::CalculateInertiaTensor(std::shared_ptr<BaseCollider> collider, const float& mass)
+{
+    switch (collider->GetShape())
+    {
+        case CAPSULE:
+        {
+            printf("Inertia tensor CAPSULE not implemented!\n");
+            assert(false);
+            return Math::mat4();
+        }
+        case BOX:
+        {
+            float d = 0.083333333f * mass;
+            Math::vec4 boxExtents = collider->getbbox().maxPoint - collider->getbbox().minPoint;
+            float sqX = (boxExtents.x() * boxExtents.x());
+            float sqY = (boxExtents.y() * boxExtents.y());
+            float sqZ = (boxExtents.z() * boxExtents.z());
+
+            Math::mat4 inertiaTensor = Math::mat4(
+                d * (sqY + sqZ), 0, 0, 0,
+                0, d * (sqX + sqZ), 0, 0,
+                0, 0, d * (sqX + sqY), 0,
+                0, 0, 0, 1
+            );
+            return inertiaTensor;
+        }
+        case SPHERE:
+        {
+            printf("Inertia tensor SPHERE not implemented!\n");
+            assert(false);
+            return Math::mat4();
+        }
+        case SURFACE:
+        {
+            printf("Inertia tensor SURFACE not implemented!\n");
+            assert(false);
+            return Math::mat4();
+        }
+        default:
+        {
+            printf("Invalid Shape! No Inertia Tensor found!");
+            assert(false);
+            return Math::mat4();
+        }
+    }
+
 }
 
 }

@@ -38,11 +38,7 @@ public:
 
 	void debugDraw();
 
-	const Math::bbox& getbbox() { return this->colliderbbox; }
-
 private:
-
-	Math::bbox colliderbbox;
 
 	Util::Array<ColliderFace> faces;
 };

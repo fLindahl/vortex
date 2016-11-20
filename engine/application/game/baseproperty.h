@@ -4,21 +4,25 @@
 
 namespace Game
 {
+class Entity;
+
 class BaseProperty
 {
 public:
-    BaseProperty();
-    ~BaseProperty();
+    BaseProperty() {}
+    virtual ~BaseProperty() {}
 
-    virtual void FixedUpdate();
-    virtual void Update();
+    virtual void FixedUpdate() {}
+    virtual void Update() {}
 
     //void HandleMsg(const BaseGameFeature::Msg& msg);
+
+    void SetOwner(Entity* o) {this->owner = o;}
 
 protected:
     friend class Entity;
 
-    std::shared_ptr<Entity> owner;
+    Entity* owner;
 };
 
 }

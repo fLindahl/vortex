@@ -21,9 +21,10 @@ RigidBody::~RigidBody()
 
 }
 
-void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTensor, std::shared_ptr<Game::RigidBodyEntity> entity)
+void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTensor, Game::RigidBodyEntity* entity)
 {
-    this->collider = entity->GetCollider();
+    this->owner = entity;
+    this->collider = this->owner->GetCollider();
 
     this->massCenter = (this->collider->getbbox().maxPoint - this->collider->getbbox().minPoint) * 0.5f;
     this->position = entity->GetTransform().get_position();//+ this->massCenter;

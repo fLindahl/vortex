@@ -35,7 +35,7 @@ public:
 	virtual void SetTransform(const Math::mat4& nTransform);
 
 protected:
-    friend class BaseGameFeature::EntityManager;
+    //friend class BaseGameFeature::EntityManager;
 
     Math::mat4 transform;
 

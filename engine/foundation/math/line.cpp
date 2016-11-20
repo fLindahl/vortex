@@ -47,6 +47,7 @@ bool line::Intersect(vec4& out, const Math::plane& plane)
     if(t >= 0.0f && t <= 1.0f)
     {
         out = this->p + (ab * t);
+        out.w() = t;
         return true;
     }
 
