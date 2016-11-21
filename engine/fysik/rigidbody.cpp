@@ -26,8 +26,8 @@ void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTenso
     this->owner = entity;
     this->collider = this->owner->GetCollider();
 
-    this->massCenter = (this->collider->getbbox().maxPoint - this->collider->getbbox().minPoint) * 0.5f;
-    this->position = entity->GetTransform().get_position();//+ this->massCenter;
+    this->massCenter = (this->collider->getbbox().maxPoint + this->collider->getbbox().minPoint) * 0.5f;
+    this->position = entity->GetTransform().get_position() + this->massCenter;
     this->orientation = Math::mat4::rotationmatrix(entity->GetTransform());
 
     this->mass = mass;
@@ -69,7 +69,7 @@ void RigidBody::update(const double& frameTime)
 
 	this->linearVelocity += lastFrameAcceleration;
 
-	this->position += (this->linearVelocity * frameTime);
+	//this->position += (this->linearVelocity * frameTime);
 
     Math::vector angularAcceleration = Math::mat4::transform(torque, invInertiaTensorWorld);
 

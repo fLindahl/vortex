@@ -1,3 +1,4 @@
+#include "config.h"
 #include "fysik/physicsdevice.h"
 #include "render/properties/graphicsproperty.h"
 
@@ -18,7 +19,8 @@ void RigidBodyEntity::Update()
     Entity::Update();
 
     //TODO: This should be a message, sent by the rigidbody
-    this->SetTransform(this->rigidBody->getTransform());
+	//TODO: this is ugly.
+    this->SetTransform(Math::mat4::multiply(Math::mat4::translation(this->rigidBody->getCenterOfMass() * -1.0f), this->rigidBody->getTransform()));
 }
 void RigidBodyEntity::SetTransform(const Math::mat4 &t)
 {
