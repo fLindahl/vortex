@@ -4,6 +4,7 @@
 
 namespace Game
 {
+
 RigidBodyEntity::RigidBodyEntity()
 {
 
@@ -22,12 +23,14 @@ void RigidBodyEntity::Update()
 	//TODO: this is ugly.
     this->SetTransform(Math::mat4::multiply(Math::mat4::translation(this->rigidBody->getCenterOfMass() * -1.0f), this->rigidBody->getTransform()));
 }
+
 void RigidBodyEntity::SetTransform(const Math::mat4 &t)
 {
     Entity::SetTransform(t);
     this->gProperty->setModelMatrix(t);
 
 }
+
 void RigidBodyEntity::Activate()
 {
     Entity::Activate();
@@ -38,6 +41,7 @@ void RigidBodyEntity::Activate()
     Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
 
 }
+
 void RigidBodyEntity::Deactivate()
 {
     Entity::Deactivate();

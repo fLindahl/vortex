@@ -10,6 +10,8 @@ Entity::Entity()
 	//this->graphics = std::make_shared<Render::GraphicsProperty>(this);
 	
 	//GraphicsServer::getInstance()->addGraphicsProperty(this->graphics);
+
+	//this->ID = __GETNEWUID;
 }
 
 Entity::~Entity()

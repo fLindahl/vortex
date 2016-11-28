@@ -765,7 +765,7 @@ Array<TYPE>::Difference(const Array<TYPE>& rhs)
 template<class TYPE> void
 Array<TYPE>::Sort()
 {
-    std::sort(this->Begin(), this->End());
+    std::sort(this->begin(), this->end());
 }
 
 //------------------------------------------------------------------------------
@@ -774,7 +774,7 @@ Array<TYPE>::Sort()
 template<class TYPE> void
 Util::Array<TYPE>::SortWithFunc(bool (*func)(const TYPE& lhs, const TYPE& rhs))
 {
-	std::sort(this->Begin(), this->End(), func);
+	std::sort(this->begin(), this->end(), func);
 }
 
 //------------------------------------------------------------------------------

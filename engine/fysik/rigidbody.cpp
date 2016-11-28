@@ -69,7 +69,7 @@ void RigidBody::update(const double& frameTime)
 
 	this->linearVelocity += lastFrameAcceleration;
 
-	//this->position += (this->linearVelocity * frameTime);
+	this->position += (this->linearVelocity * frameTime);
 
     Math::vector angularAcceleration = Math::mat4::transform(torque, invInertiaTensorWorld);
 

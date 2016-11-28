@@ -88,11 +88,11 @@ ExampleApp::Open()
 		//modelInstance->SetMaterial("Static");
 		//modelInstance->SetMesh("resources/models/player.nvx2");
 		modelInstance->SetMaterial("OBJStatic");
-		modelInstance->SetMesh("resources/models/cube.obj");
+		modelInstance->SetMesh("resources/models/kung.obj");
 		gProperty->setModelInstance(modelInstance);
 
 		modelInstance1->SetMaterial("OBJStatic");
-		modelInstance1->SetMesh("resources/models/kung.obj");
+		modelInstance1->SetMesh("resources/models/cube.obj");
 		gProperty1->setModelInstance(modelInstance1);
 
         rigidBodyEntity->SetGraphicsProperty(gProperty);
@@ -101,8 +101,8 @@ ExampleApp::Open()
         physicsCollider->CookOBJData(modelInstance->GetMesh()->OBJvertexBuffer, modelInstance->GetMesh()->OBJindexBuffer, modelInstance->GetMesh()->getBaseBBox());
         physicsCollider1->CookOBJData(modelInstance1->GetMesh()->OBJvertexBuffer, modelInstance1->GetMesh()->OBJindexBuffer, modelInstance1->GetMesh()->getBaseBBox());
 
-        Math::mat4 transf = Math::mat4::translation(0.0f, 0.0f, -2.0f);
-        Math::mat4 transf2 = Math::mat4::translation(2.0f, 0.0f, 0.0f);
+        Math::mat4 transf = Math::mat4::translation(0.0f, 0.0f, 0.0f);
+        Math::mat4 transf2 = Math::mat4::translation(-2.0f, 0.0f, 0.0f);
 
         this->rigidBodyEntity->SetTransform(transf);
         this->staticEntity->SetTransform(transf2);
@@ -138,6 +138,8 @@ void ExampleApp::RenderUI()
 		ImGui::SetWindowSize(ImVec2(450.0f,210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
 		// create text editors for shader code
 		ImGui::Text("Selected Mesh: %s\n", consoleBuffer.c_str());
+
+        ImGui::Text("Collision: %d\n", Physics::PhysicsDevice::Instance()->hasCollision);
 
 		if (hit.object != nullptr)
 		{
