@@ -181,5 +181,9 @@ Math::mat4 PhysicsServer::CalculateInertiaTensor(std::shared_ptr<BaseCollider> c
     }
 
 }
+void PhysicsServer::addPhysicsEntity(Game::PhysicsEntity *p)
+{
+    this->physicsEntities.Append(p);
+}
 
 }

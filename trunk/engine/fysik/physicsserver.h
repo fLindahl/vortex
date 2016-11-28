@@ -55,7 +55,7 @@ public:
     ///Shoot a ray and return first object that it intersects.
     bool Raycast(PhysicsHit& out, const Math::vec4& position, const Math::vec4& direction, const float& length /*, const ExcludeSet& exclude*/);
 
-    void addPhysicsEntity(Game::PhysicsEntity* p) { this->physicsEntities.Append(p);}
+    void addPhysicsEntity(Game::PhysicsEntity* p);
 
     ///Shoot a ray and return all objects that it intersects.
     //bool Raycast(Util::Array<PhysicsHit>& out, const Math::vec4& position, const Math::vec4& direction /*, const ExcludeSet& exclude*/);
@@ -71,7 +71,6 @@ private:
     bool isPointWithinBounds(const Math::point& p, const Math::point& a, const Math::point& b, const Math::point& c, const Math::vec4& surfaceNormal);
 
     Util::Array<Game::PhysicsEntity*> physicsEntities;
-
 };
 
 }
