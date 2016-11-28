@@ -13,6 +13,13 @@
 
 namespace Render
 {
+
+RenderDevice::RenderDevice()
+{
+	glGenBuffers(1, this->ubo);
+	currentProgram = 0;
+}
+
 void RenderDevice::Render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -40,7 +47,7 @@ void RenderDevice::Render()
 			glUseProgram(material->GetShader()->GetProgram());
 			currentProgram = material->GetShader()->GetProgram();
 		}
-        
+
 		for (index_t i = 0; i < material->TextureList().Size(); i++)
 		{
 			material->TextureList()[i]->BindTexture(i); //TODO: slot?
@@ -75,7 +82,7 @@ void RenderDevice::Render()
             //Bind mesh
             //TODO: We should probably check and make sure we don't bind these more than once
             modelInstance->GetMesh()->Bind();
-            
+
 
             for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
             {
@@ -87,8 +94,5 @@ void RenderDevice::Render()
         }
     }
 }
-
-
-
 
 }

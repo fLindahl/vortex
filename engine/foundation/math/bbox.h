@@ -8,9 +8,9 @@
 namespace Math
 {
 
-class bbox
+struct bbox
 {
-public:
+//public:
     bbox();
     ~bbox();
 
@@ -48,6 +48,7 @@ public:
 
     point minPoint;
     point maxPoint;
+    bool intersects(const bbox &box) const;
 };
 
 inline bbox::bbox() :
@@ -211,6 +212,13 @@ inline void bbox::debugRender()
     glVertex4f(v5[0], v5[1], v5[2], v5[3]);
 
     glEnd();
+}
+
+inline bool bbox::intersects(const bbox& box) const
+{
+    bool lt = vec4::less3_any(this->maxPoint, box.minPoint);
+    bool gt = vec4::greater3_any(this->minPoint, box.maxPoint);
+    return !(lt || gt);
 }
 
 }

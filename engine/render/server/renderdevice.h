@@ -21,11 +21,8 @@ namespace Render
     class RenderDevice
     {
     private:
-        RenderDevice()
-        {
-            glGenBuffers(1, this->ubo);
-			currentProgram = 0;
-        }
+        RenderDevice();
+
 
         struct UniformBufferBlock
         {
