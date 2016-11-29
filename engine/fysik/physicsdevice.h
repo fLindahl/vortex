@@ -45,7 +45,7 @@ private:
     double time;
     double frameTime;
 
-    Math::point Support(const Math::point& dir, Game::PhysicsEntity* entity, const Math::mat4& invMat);
+    Math::point Support(const Math::point& dir, Game::PhysicsEntity* entity);
     bool GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2);
 
     void BroadPhase();
@@ -57,7 +57,7 @@ private:
     Util::Array<std::pair<Game::PhysicsEntity*, Game::PhysicsEntity*>> PCEntities;
 
 
-    bool DoSimplex(Util::Array<Math::point> &points, Math::point &D);
+    int DoSimplex(Util::Array<Math::point> &points, Math::point &D);
 
     //Used for broad phase sorting
     int sortAxis;
