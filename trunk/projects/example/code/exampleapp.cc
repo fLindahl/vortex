@@ -92,7 +92,7 @@ ExampleApp::Open()
 		gProperty->setModelInstance(modelInstance);
 
 		modelInstance1->SetMaterial("OBJStatic");
-		modelInstance1->SetMesh("resources/models/cube.obj");
+		modelInstance1->SetMesh("resources/models/kung.obj");
 		gProperty1->setModelInstance(modelInstance1);
 
         rigidBodyEntity->SetGraphicsProperty(gProperty);
@@ -139,7 +139,12 @@ void ExampleApp::RenderUI()
 		// create text editors for shader code
 		ImGui::Text("Selected Mesh: %s\n", consoleBuffer.c_str());
 
-        ImGui::Text("Collision: %d\n", Physics::PhysicsDevice::Instance()->hasCollision);
+        if(Physics::PhysicsDevice::Instance()->hasCollision)
+            a = "#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n";
+        else
+            a = "0";
+
+        ImGui::Text("Collision: %s\n", a.c_str());
 
 		if (hit.object != nullptr)
 		{

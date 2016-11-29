@@ -63,5 +63,6 @@ private:
 	Display::Window* window;
 
 	std::string consoleBuffer;
+	std::string a;
 };
 } // namespace Example
