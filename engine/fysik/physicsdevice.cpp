@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <foundation/util/fixedarray.h>
+#include <foundation/math/math.h>
 #include "physicsdevice.h"
 #include "render/properties/graphicsproperty.h"
 #include "render/resources/modelinstance.h"
@@ -9,12 +10,13 @@
 
 namespace Physics
 {
-bool LineCase(Util::Array<Math::point>& simplex, Math::point& D)
+
+int LineCase(Util::Array<Math::point>& simplex, Math::point& D)
 {
     //LINE CASE
 
-    const Math::point& A = simplex.Back();
-    const Math::point& B = simplex.Front();
+    const Math::point& A = simplex[1];
+    const Math::point& B = simplex[0];
 
     Math::point AO = -A;
     Math::point AB = B - A;
@@ -32,8 +34,8 @@ bool LineCase(Util::Array<Math::point>& simplex, Math::point& D)
 
         //simplex = [A, B]
         simplex.Clear();
-        simplex.Append(nA);
         simplex.Append(nB);
+        simplex.Append(nA);
     }
     else
     {
@@ -45,14 +47,21 @@ bool LineCase(Util::Array<Math::point>& simplex, Math::point& D)
         simplex.Append(nA);
 
     }
-    return false;
+    return 0;
 }
-bool TriangleCase(Util::Array<Math::point>& simplex, Math::point& D)
+
+int TriangleCase(Util::Array<Math::point>& simplex, Math::point& D)
 {
     // TRIANGLE CASE
-    const Math::point& A = simplex.Back();
+    const Math::point& A = simplex[2];
     const Math::point& B = simplex[1];
     const Math::point& C = simplex[0];
+
+    if (Math::point::equal3_all(A, B) || Math::point::equal3_all(A, C))
+    {
+        //Area of triangle is 0, this means we cant have an intersection.
+        return -1;
+    }
 
     Math::point AO = -A;
     Math::point AB = B - A;
@@ -80,8 +89,8 @@ bool TriangleCase(Util::Array<Math::point>& simplex, Math::point& D)
 
             //simplex = [A, C]
             simplex.Clear();
-            simplex.Append(nA);
             simplex.Append(nC);
+            simplex.Append(nA);
         }
         else
         {
@@ -97,8 +106,8 @@ bool TriangleCase(Util::Array<Math::point>& simplex, Math::point& D)
 
                 //simplex = [A, B]
                 simplex.Clear();
-                simplex.Append(nA);
                 simplex.Append(nB);
+                simplex.Append(nA);
             }
             else
             {
@@ -126,8 +135,8 @@ bool TriangleCase(Util::Array<Math::point>& simplex, Math::point& D)
                 Math::point nB = B;
 
                 simplex.Clear();
-                simplex.Append(nA);
                 simplex.Append(nB);
+                simplex.Append(nA);
             }
             else
             {
@@ -153,9 +162,9 @@ bool TriangleCase(Util::Array<Math::point>& simplex, Math::point& D)
 
                 //simplex = [A, B, C]
                 simplex.Clear();
-                simplex.Append(nA);
-                simplex.Append(nB);
                 simplex.Append(nC);
+                simplex.Append(nB);
+                simplex.Append(nA);
             }
             else
             {
@@ -168,24 +177,37 @@ bool TriangleCase(Util::Array<Math::point>& simplex, Math::point& D)
 
                 //simplex = [A, C, B]
                 simplex.Clear();
-                simplex.Append(nA);
-                simplex.Append(nC);
                 simplex.Append(nB);
+                simplex.Append(nC);
+                simplex.Append(nA);
 
             }
         }
     }
-    return false;
+    return 0;
 }
-bool TetrahedronCase(Util::Array<Math::point>& simplex, Math::point& D)
+
+int TetrahedronCase(Util::Array<Math::point>& simplex, Math::point& D)
 {
     //1. Check which of three faces that's closest to origin
     //2. do the triangle case.
 
-    const Math::point& a = simplex.Back();
+    const Math::point& a = simplex[3];
     const Math::point& b = simplex[2];
     const Math::point& c = simplex[1];
     const Math::point& d = simplex[0];
+
+    if (Math::point::equal3_all(a, b) ||
+        Math::point::equal3_all(a, c) ||
+        Math::point::equal3_all(a, d) ||
+        Math::point::equal3_all(b, c) ||
+        Math::point::equal3_all(b, d) ||
+        Math::point::equal3_all(c, d)
+        )
+    {
+        //volume is 0, this means we cant have an intersection.
+        return -1;
+    }
 
     Math::point AO = -a;
     Math::point AB = b - a;
@@ -193,17 +215,70 @@ bool TetrahedronCase(Util::Array<Math::point>& simplex, Math::point& D)
     Math::point AD = d - a;
 
     Math::point ABC = Math::vector::cross3(AB, AC);
-    Math::point ADB = Math::vector::cross3(AD, AB);
     Math::point ACD = Math::vector::cross3(AC, AD);
+    Math::point ADB = Math::vector::cross3(AD, AB);
 
-    if (Math::point::dot3(ABC, AO) > 0)
+
+    // SIGN (A == 0 ? 0 : (A < 0 ? -1 : 1));
+
+    float B_on_ACD = Math::vec4::dot3(ACD, AB);
+    float C_on_ADB = Math::vec4::dot3(ADB, AC);
+    float D_on_ABC = Math::vec4::dot3(ABC, AD);
+
+    /*
+    // whether origin is on same side of ACD, ADB, ABC as B, C, D
+    // respectively
+    bool AB_O = Math::vec4::dot3(ACD, AO) > B_on_ACD;
+    bool AC_O = Math::vec4::dot3(ADB, AO) > C_on_ADB;
+    bool AD_O = Math::vec4::dot3(ABC, AO) > D_on_ABC;
+
+    if(AB_O && AC_O && AD_O)
     {
-        if(Math::point::dot3(ADB, AO) > 0)
+        return true;
+    }
+    else if(!AB_O)
+    {
+        Math::point nA = a;
+        Math::point nC = c;
+        Math::point nD = d;
+
+        simplex.Clear();
+        simplex.Append(nD);
+        simplex.Append(nC);
+        simplex.Append(nA);
+    }
+    else if(!AC_O)
+    {
+        Math::point nA = a;
+        Math::point nB = b;
+        Math::point nD = d;
+
+        simplex.Clear();
+        simplex.Append(nB);
+        simplex.Append(nD);
+        simplex.Append(nA);
+    }
+    else
+    {
+        Math::point nA = a;
+        Math::point nB = b;
+        Math::point nC = c;
+
+        simplex.Clear();
+        simplex.Append(nC);
+        simplex.Append(nB);
+        simplex.Append(nA);
+    }
+*/
+
+    if (Math::point::dot3(ABC, AO) < 0)
+    {
+        if(Math::point::dot3(ADB, AO) < 0)
         {
-            if(Math::point::dot3(ACD, AO) > 0)
+            if(Math::point::dot3(ACD, AO) < 0)
             {
-                //WE HAVE AN INTERSECTION! :D
-                return true;
+                //intersection
+                return 1;
             }
             else
             {
@@ -211,18 +286,16 @@ bool TetrahedronCase(Util::Array<Math::point>& simplex, Math::point& D)
                 // do the triangle case on ACD
                 //simplex = [A, C, D];
 
-                D = ACD;
+                //D = ACD;
 
                 Math::point nA = a;
                 Math::point nC = c;
                 Math::point nD = d;
 
                 simplex.Clear();
-                simplex.Append(nA);
-                simplex.Append(nC);
                 simplex.Append(nD);
-
-                return TriangleCase(simplex, D);
+                simplex.Append(nC);
+                simplex.Append(nA);
             }
         }
         else
@@ -230,38 +303,38 @@ bool TetrahedronCase(Util::Array<Math::point>& simplex, Math::point& D)
             // origin is behind ADB.
             // do the triangle case on ADB
             //points = [A, D, B];
-            D = ADB;
+            //D = ADB;
 
             Math::point nA = a;
             Math::point nB = b;
             Math::point nD = d;
 
             simplex.Clear();
-            simplex.Append(nA);
-            simplex.Append(nD);
             simplex.Append(nB);
-
-            return TriangleCase(simplex, D);
+            simplex.Append(nD);
+            simplex.Append(nA);
         }
     }
     else
     {
-        // origin is behind ABC.
+        // origin is in direction of ABC.
         // do the triangle case on ABC
         //points = [A, B, C];
-        D = ABC;
+        //D = ABC;
 
         Math::point nA = a;
         Math::point nB = b;
         Math::point nC = c;
 
         simplex.Clear();
-        simplex.Append(nA);
-        simplex.Append(nB);
         simplex.Append(nC);
-
-        return TriangleCase(simplex, D);
+        simplex.Append(nB);
+        simplex.Append(nA);
     }
+
+
+    return TriangleCase(simplex, D);
+    // We might've missed AB, AC, and AD Voronoi regions
 }
 
 PhysicsDevice::PhysicsDevice()
@@ -299,7 +372,7 @@ bool PhysicsDevice::GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2)
     //Start point
     Math::mat4 mat = Math::mat4::inverse(E1->GetGraphicsProperty()->getModelMatrix());
 
-    Math::point S = Support(Math::vector::upvec(), E1, mat) - Support(-Math::vector::upvec(), E2, mat);
+    Math::point S = Support(Math::vec4(0.0f,1.0f,0.0f,1.0f), E2) - Support(Math::vec4(0.0f,-1.0f,0.0f,1.0f), E1);
 
     //Point list
     Util::Array<Math::point> simplex = Util::Array<Math::point>();
@@ -313,28 +386,42 @@ bool PhysicsDevice::GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2)
     //Our variable point.
     Math::point A;
 
-    while(true)
+    //Max iterations will be the largest list of vertices considering that we should probably converge faster than we run out of vertices.
+    size_t maxIterations = Math::max(E1->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer.Size(), E2->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer.Size());
+
+    for (size_t i = 0; i < maxIterations; ++i)
     {
-        //D = Math::vector::transform(D, E1->GetGraphicsProperty()->getModelMatrix());
+        //D = Math::point::transform(D, Math::mat4::inverse(E1->GetGraphicsProperty()->getModelMatrix()));
         // new point is the point furthest away in direction towards origin.
-        A = Support(D, E1, mat) - Support(-D, E2, mat);
+        A = Support(D, E2) - Support(-D, E1);
 
         // if the dotproduct of A with our search direction is less than zero, we can immediately say our shape does not contain origin, thus our objects are not intersecting
-        if (Math::vec4::dot(A, D) < 0)
+        if (Math::vec4::dot3(A, D) < 0)
         {
             return false;
         }
 
         simplex.Append(A);
 
-        if(DoSimplex(simplex, D))
+        int res = DoSimplex(simplex, D);
+        if(res == 1)
         {
             return true;
         }
+        else if(res == -1)
+        {
+            return false;
+        }
+        else
+        {
+            continue;
+        }
     }
+
+    return false;
 }
 
-bool PhysicsDevice::DoSimplex(Util::Array<Math::point>& simplex, Math::point& D)
+int PhysicsDevice::DoSimplex(Util::Array<Math::point>& simplex, Math::point& D)
 {
 
     switch (simplex.Size())
@@ -354,7 +441,7 @@ bool PhysicsDevice::DoSimplex(Util::Array<Math::point>& simplex, Math::point& D)
         default:
         {
             //We only have a point. This shouldn't happen!
-            return false;
+            return 0;
         }
 
     }
@@ -432,18 +519,23 @@ void PhysicsDevice::NarrowPhase()
     }
 }
 
-Math::point PhysicsDevice::Support(const Math::point &dir, Game::PhysicsEntity *entity, const Math::mat4& mat)
+Math::point PhysicsDevice::Support(const Math::point &dir, Game::PhysicsEntity *entity)
 {
+    Math::mat4 rot = entity->GetGraphicsProperty()->getModelMatrix();
+    rot.set_position(Math::vec4(0.0f,0.0f,0.0f,1.0f));
+
+    Math::point D = Math::mat4::transform(dir, Math::mat4::inverse(rot));
+
     Util::Array<Render::MeshResource::OBJVertex>& vertbuffer = entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer;
     Math::point p = Math::point(vertbuffer[0].pos[0], vertbuffer[0].pos[1], vertbuffer[0].pos[2]);
-    float max = Math::vector::dot3(Math::point(vertbuffer[0].pos[0], vertbuffer[0].pos[1], vertbuffer[0].pos[2]), dir);
+    float max = Math::vector::dot3(p, D);
 
     Math::point temp;
 
     for(int i = 1; i < vertbuffer.Size(); ++i)
     {
         temp = Math::point(vertbuffer[i].pos[0], vertbuffer[i].pos[1], vertbuffer[i].pos[2]);
-        float t = Math::vector::dot3(temp, dir);
+        float t = Math::vector::dot3(temp, D);
         if(t >= max)
         {
             p = temp;
@@ -451,7 +543,7 @@ Math::point PhysicsDevice::Support(const Math::point &dir, Game::PhysicsEntity *
         }
     }
 
-    return p;//Math::mat4::transform(p, entity->GetGraphicsProperty()->getModelMatrix());
+    return Math::mat4::transform(p, entity->GetGraphicsProperty()->getModelMatrix());
 }
 
 }
