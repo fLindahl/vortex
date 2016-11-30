@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <atomic>
 #include <xmmintrin.h>
+#include <immintrin.h>
 #include <memory>
 #include <assert.h>
 
@@ -42,7 +43,6 @@ typedef double		float64;
 
 #elif __GNUC__
 #define __forceinline inline
-#include <immintrin.h>
 #define VORTEX_ALIGN16 __attribute__((aligned(16)))
 
 #else
