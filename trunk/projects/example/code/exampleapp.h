@@ -51,12 +51,18 @@ private:
     std::shared_ptr<Physics::RigidBody> rBody1;
 
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity;
-	std::shared_ptr<Game::StaticEntity> staticEntity;
+	std::shared_ptr<Game::StaticEntity> staticEntity1;
+	std::shared_ptr<Game::StaticEntity> staticEntity2;
+	std::shared_ptr<Game::StaticEntity> staticEntity3;
+	std::shared_ptr<Game::StaticEntity> staticEntity4;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 
 	Render::GraphicsProperty* gProperty;
 	Render::GraphicsProperty* gProperty1;
+	Render::GraphicsProperty* gProperty2;
+	Render::GraphicsProperty* gProperty3;
+	Render::GraphicsProperty* gProperty4;
 
 	Physics::PhysicsHit hit;
 

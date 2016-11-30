@@ -14,7 +14,7 @@ namespace Render
 
 	ShaderObject::~ShaderObject()
 	{
-
+		glDeleteProgram(this->program);
 	}
 
 	void ShaderObject::loadVertexShader(const std::string &vertFile)

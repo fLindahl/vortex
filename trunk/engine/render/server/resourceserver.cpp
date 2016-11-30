@@ -137,10 +137,23 @@ bool ResourceServer::SetupMaterials(const char *fileName)
 
 			// Get which frame pass we render in
 			const tinyxml2::XMLElement* pass = material->FirstChildElement("Pass");
-			mat->SetFramePass(pass->FindAttribute("name")->Value());
+			while (true)
+			{
+				mat->SetFramePass(pass->FindAttribute("name")->Value(), pass->FindAttribute("shader")->Value());
+
+				if (pass->NextSiblingElement("Pass") != nullptr)
+				{
+					pass = pass->NextSiblingElement("Pass");
+				}
+				else
+				{
+					// out of passes
+					break;
+				}
+			}
 
 			// Load shader
-			mat->SetShader(pass->FindAttribute("shader")->Value());
+			//mat->SetShader(pass->FindAttribute("shader")->Value());
 
 			// Get all parameters that this material contains
 			const tinyxml2::XMLElement* param = material->FirstChildElement("Param");
@@ -275,6 +288,8 @@ bool ResourceServer::HasSurfaceNamed(const std::string &nName)
     else
         return false;
 }
+
+
 
 
 }

@@ -40,6 +40,8 @@ SET(files_render_properties
 	)
 
 SET(files_render_resources
+	resources/framepass.h
+	resources/framepass.cpp
 	resources/lightnode.h
 	resources/lightnode.cpp
 	resources/meshresource.h
@@ -59,6 +61,10 @@ SET(files_render_resources
 	)
 
 SET(files_render_server
+	server/lightserver.h
+	server/lightserver.cpp
+	server/frameserver.h
+	server/frameserver.cpp
 	server/shaderserver.h
 	server/shaderserver.cpp
 	server/resourceserver.h

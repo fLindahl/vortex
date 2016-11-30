@@ -47,6 +47,7 @@ public:
 	//Loads individual shader programs
 	GLuint LoadVertexShader(const std::string& file);
 	GLuint LoadFragmentShader(const std::string& file);
+	GLuint LoadComputeShader(const std::string& file);
 
 	//Loads renderstate from a renderstate file or from existing list of states
 	Render::RenderState LoadRenderState(const std::string& file);
@@ -70,7 +71,6 @@ private:
 	//This contains all RenderStates.
 	//Key must be unique to each state, and in this case, the key is the state's filename
 	std::unordered_map<std::string, RenderState> renderStates;
-
 
 	//Contains all shaderobjects currently compiled.
 	//Key is a name of shader, and value is a pointer to the shaderobject	

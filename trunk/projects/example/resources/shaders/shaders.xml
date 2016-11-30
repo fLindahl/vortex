@@ -1,23 +1,29 @@
 <Vortex>
     <Shaders>
-	
-        <Shader name="defaultLit" desc="Default shader for rendering opaque lit geometry">            
+		
+		<Shader name="depthStatic" desc="Default shader for writing to the depth buffer">
+			<VertexShader name="resources/shaders/vertex/depthstatic.vert"/>
+			<FragmentShader name="resources/shaders/fragment/depth.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
+		<Shader name="defaultLit" desc="Default shader for rendering opaque lit geometry">            
 			<VertexShader name="resources/shaders/vertex/static.vert"/>
 			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
-        </Shader>
-		
-	<Shader name="defaultLitObj" desc="OBJ FILES ONLY: Default shader for rendering opaque lit geometry">            
+		</Shader>
+			
+		<Shader name="defaultLitObj" desc="OBJ FILES ONLY: Default shader for rendering opaque lit geometry">            
 			<VertexShader name="resources/shaders/vertex/static_obj.vert"/>
 			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
-        </Shader>
+		</Shader>
 
-        <Shader name="toonShader" desc="Shader for rendering cartoon-like lit geometry">    
+		<Shader name="toonShader" desc="Shader for rendering cartoon-like lit geometry">    
 			<VertexShader name="resources/shaders/vertex/static.vert"/>
 			<FragmentShader name="resources/shaders/fragment/toonshader.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
-        </Shader>
-		
+		</Shader>
+			
     </Shaders>
 </Vortex>

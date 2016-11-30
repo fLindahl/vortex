@@ -10,6 +10,7 @@ Contains all compiled resources and is used to load, store and retrieve them.
 #include <unordered_map>
 #include "render/resources/meshresource.h"
 #include "render/resources/textureresource.h"
+#include "render/resources/framepass.h"
 #include "GLFW/glfw3.h"
 #include "render/resources/material.h"
 
@@ -33,7 +34,7 @@ public:
 	// Delete the methods we don't want.
 	ResourceServer(ResourceServer const&) = delete;
 	void operator=(ResourceServer const&) = delete;
-
+	
 	//Returns a mesh if it exists, otherwise loads it and then returns the new mesh
 	std::shared_ptr<MeshResource> LoadMesh(const std::string& modelpath);
 	bool HasMeshNamed(const std::string& nName);
@@ -48,10 +49,9 @@ public:
 	bool HasMaterialNamed(const std::string& nName);
 
 	//Loads a surface .surface file and adds all files to the list if they're not already defined
-
 	std::shared_ptr<Surface> LoadSurface(const char* filepath);
 	bool HasSurfaceNamed(const std::string& nName);
-
+	
 private:
 	//This contains all ModelInstances currently in-game.
 	Util::Array<ModelInstance> modelInstances;
