@@ -7,31 +7,42 @@
  */
 
 #include <unordered_map>
-#include "GLFW/glfw3.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/util/array.h"
 #include "render/resources/material.h"
 
+//#define _LIGHT_DEBUG
 
 namespace Render
 {
+	struct Resolution
+	{
+		GLint x;
+		GLint y;
+	};
 
     class ShaderObject;
 
     class RenderDevice
     {
     private:
-        RenderDevice();
-
-
+		RenderDevice();
+        
         struct UniformBufferBlock
         {
             Math::mat4 View;
             Math::mat4 Projection;
             Math::mat4 ViewProjection;
-
+			Math::mat4 InvView;
+			Math::mat4 InvProjection;
+			Math::mat4 InvViewProjection;
+			Math::vec4 CameraPos;
+			Resolution ScreenSize;
+			GLfloat TimeAndRandom[2];
+			GLuint LightTileWorkGroups[2];
+			
         } uniformBufferBlock;
-
+		
         //Uniform Buffer Object
         GLuint ubo[1];
 
@@ -47,16 +58,42 @@ namespace Render
         RenderDevice(RenderDevice const&) = delete;
         void operator=(RenderDevice const&) = delete;
 
+		Resolution GetResolution() { return this->resolution; }
+		void SetResolution(const Resolution& res);
+		void SetResolution(const int& x, const int& y);
 
-		void AddMaterial(Material* obj) { this->materials.InsertSorted(obj); }
+		void AddMaterial(Material* obj) { this->materials.Append(obj); }
         //This renders all graphicsproperties.
         void Render();
 
-    private:
+		void Initialize();
+
+   private:
+		friend class LightServer;
+		void DoPass();
+
+		void UpdateWorkGroups();
+		void UpdateLightBuffer();
+
+		Resolution resolution;
+
 		GLuint currentProgram;
+		
+		// Used for storage buffer objects to hold light data and visible light indicies data
+		GLuint lightBuffer = 0;
+		GLuint visibleLightIndicesBuffer = 0;
+
+		// X and Y work group dimension variables for compute shader
+		GLuint workGroupsX = 0;
+		GLuint workGroupsY = 0;
 
         //contains all the shader objects that we've loaded
         Util::Array<Material*> materials;
+
+#ifdef _LIGHT_DEBUG
+		std::shared_ptr<ShaderObject> lightDebugShader;
+#endif // _DEBUG
+
     };
 
 

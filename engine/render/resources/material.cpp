@@ -1,6 +1,7 @@
 #include "config.h"
 #include "material.h"
 #include "render/server/resourceserver.h"
+#include "render/server/frameserver.h"
 
 namespace Render
 {
@@ -14,31 +15,27 @@ namespace Render
 
 	}
 
+	/*
 	bool Material::operator<(const Material& rhs) const
 	{
 		//HACK: This is currently used to sort material by shader, should be changed later
 		return (this->shader->GetProgram() < rhs.GetShader()->GetProgram());
 	}
+	*/
 
 	void Material::SetName(const Util::String& n)
 	{
 		this->name = n;
 	}
 
+	std::shared_ptr<ShaderObject> Material::GetShader(const std::string& pass)
+	{
+		return this->framepasses[Util::String(pass.c_str())];
+	}
+
 	Util::String Material::GetName()
 	{
 		return this->name;
-	}
-
-	void Material::SetShader(const Util::String& name)
-	{
-		//HACK: shouldn't need to cast to std::string...
-		this->shader = ShaderServer::Instance()->LoadShader(std::string(name));
-	}
-
-	std::shared_ptr<ShaderObject> Material::GetShader()	const
-	{
-		return this->shader;
 	}
 
 	Util::Array<std::shared_ptr<TextureResource>>& Material::TextureList()
@@ -87,14 +84,24 @@ namespace Render
 		return this->surfaces;
 	}
 
-	void Material::SetFramePass(const Util::String& pass)
+	void Material::SetFramePass(const Util::String& pass, const Util::String& shader)
 	{
-		//TODO: Implement!
+		if (FrameServer::Instance()->HasPassNamed(pass.c_str()))
+		{
+			FrameServer::Instance()->GetFramePass(pass.c_str())->AddMaterial(this);
+			this->framepasses.insert(std::make_pair(pass, ShaderServer::Instance()->LoadShader(std::string(shader.c_str()))));
+		}
+		else
+		{
+			printf("ERROR Material::SetFramePass : Cannot find pass named %s!\n", pass.c_str());
+			assert(false);
+		}		
 	}
 
+	/*
 	index_t Material::GetFramePass()
 	{
 		return this->framePass;
 	}
-
+	*/
 }

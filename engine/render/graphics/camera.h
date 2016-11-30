@@ -33,17 +33,19 @@ public:
 
 	void setViewMatrix(const Math::mat4& mat) { this->viewMatrix = mat; }
 
+	void LookAt(const Math::vec4& target, const Math::vec4& up);
+
 	Math::mat4 getProjectionMatrix() const { return projectionMatrix; }
 	void setProjectionMatrix(const Math::mat4& mat) { this->projectionMatrix = mat; }
 
-private:
+	Math::vec4 GetPosition() { return this->cameraPos; }
+	void SetPosition(const Math::vec4& pos) { this->cameraPos = pos; }
 
-	float windowWidth;
-	float windowHeight;
+private:
 
 	Math::mat4 viewMatrix;
 	Math::mat4 projectionMatrix;
-
+	Math::vec4 cameraPos;
 };
 
 }
