@@ -12,8 +12,14 @@ MainCamera::MainCamera()
 
 	//TODO: These should obviously not be hardcoded
 	viewMatrix = Math::mat4::identity();
-	projectionMatrix = Math::mat4::perspfovrh(80, 1.0f, 0.01f, 100000.0f);
+	projectionMatrix = Math::mat4::perspfovrh(80, 1.777777777777778f, 0.05f, 1000.0f);
 
 }
+
+void MainCamera::LookAt(const Math::vec4& target, const Math::vec4& up)
+{
+	this->viewMatrix = Math::mat4::lookatrh(cameraPos, target, up);
+}
+
 
 }

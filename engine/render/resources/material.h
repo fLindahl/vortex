@@ -24,13 +24,13 @@ public:
 	~Material();
 
 	// Used for sorting by shaderobject.
-	bool operator<(const Material& rhs) const;
+	//bool operator<(const Material& rhs) const;
 
     void SetName(const Util::String& name);
 	Util::String GetName();
 
-    void SetShader(const Util::String& name);
-    std::shared_ptr<ShaderObject> GetShader() const;
+	///returns shader from specified pass
+	std::shared_ptr<ShaderObject> GetShader(const std::string& pass);
 
     Util::Array<std::shared_ptr<TextureResource>>& TextureList();
 
@@ -39,8 +39,8 @@ public:
 	
     Util::Array<std::shared_ptr<Surface>>& SurfaceList();
 
-	void SetFramePass(const Util::String& pass);
-	index_t GetFramePass();
+	void SetFramePass(const Util::String& pass, const Util::String& shader);
+	//std::string GetFramePasses();
 	
 	Util::Array<MaterialParameter*>& ParameterList() { return this->parameters; }
 
@@ -50,26 +50,22 @@ public:
 private:
 	friend class ResourceServer;
 
-	//TEMPORARY
+	///TEMPORARY
 	Util::Array<ModelInstance*> modelInstances;
 
-	// name of the material
+	/// name of the material
 	Util::String name;
 
-	// loaded shader object
-	std::shared_ptr<ShaderObject> shader;
+	/// What framepasses are we rendering this material in and with what shader?
+	std::map<Util::String, std::shared_ptr<ShaderObject>> framepasses;
 
-	// What framepass are we rendering this material in?
-	// TODO: this should probably be it's own class that we just point to... maybe...
-	index_t framePass;
-
-	// loaded textures
+	/// loaded textures
 	Util::Array<std::shared_ptr<TextureResource>> textures;
 	
 	std::map<Util::String, MaterialParameter*> parametersByName;
 	Util::Array<MaterialParameter*> parameters;
 
-	// all surfaces that currently use this material
+	/// all surfaces that currently use this material
 	Util::Array<std::shared_ptr<Surface>> surfaces;
 };
 

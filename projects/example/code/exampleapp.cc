@@ -9,6 +9,8 @@
 #include <fysik/physicsdevice.h>
 #include "foundation/math/plane.h"
 #include "imgui.h"
+#include "render/server/frameserver.h"
+#include "render/server/lightserver.h"
 
 #include "application/basegamefeature/keyhandler.h"
 
@@ -44,17 +46,27 @@ ExampleApp::Open()
 {
 	App::Open();
 	this->window = new Display::Window;
-	this->window->SetSize(1024, 1024);
-	this->window->SetTitle("Vortex Engine Test Environment");
-
+	
 	keyhandler = BaseGameFeature::KeyHandler::Instance();
 	keyhandler->Init(this->window);
 	
-
 	// Initiate everything we need
 	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
 	if (this->window->Open())
 	{
+		this->window->SetSize(1600, 900);
+		this->window->SetTitle("Vortex Engine Test Environment");
+
+		//Init RenderDevice
+		RenderDevice::Instance()->Initialize();
+		// Setup framepasses
+		FrameServer::Instance()->SetupFramePasses();
+		//Always setup shaders before materials!
+		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
+		//Load all materials
+		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
+		
+
 		this->consoleBuffer = new char[CONSOLE_BUFFER_SIZE];
 
 		modelInstance = std::make_shared<Render::ModelInstance>();
@@ -62,29 +74,33 @@ ExampleApp::Open()
 
 		gProperty = new Render::GraphicsProperty();
 		gProperty1 = new Render::GraphicsProperty();
+		gProperty2 = new Render::GraphicsProperty();
+		gProperty3 = new Render::GraphicsProperty();
+		gProperty4 = new Render::GraphicsProperty();
 
         physicsCollider = std::make_shared<Physics::SurfaceCollider>();
 		physicsCollider1 = std::make_shared<Physics::SurfaceCollider>();
 
 		physicsCollider->SetShape(Physics::ColliderShape::BOX);
-		physicsCollider1->SetShape(Physics::ColliderShape::CAPSULE);
+		physicsCollider1->SetShape(Physics::ColliderShape::BOX);
 
 		rBody = std::make_shared<Physics::RigidBody>();
 		rBody1 = std::make_shared<Physics::RigidBody>();
 
 		rigidBodyEntity = std::make_shared<Game::RigidBodyEntity>();
-		staticEntity = std::make_shared<Game::StaticEntity>();
+		staticEntity1 = std::make_shared<Game::StaticEntity>();
+		staticEntity2 = std::make_shared<Game::StaticEntity>();
+		staticEntity3 = std::make_shared<Game::StaticEntity>();
+		staticEntity4 = std::make_shared<Game::StaticEntity>();
 
 		rigidBodyEntity->SetRigidBody(rBody);
 
 		rigidBodyEntity->SetCollider(physicsCollider);
-		staticEntity->SetCollider(physicsCollider1);
-
-		//Always setup shaders before materials!
-		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
-		//Load all materials
-		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
-
+		staticEntity1->SetCollider(physicsCollider1);
+		staticEntity2->SetCollider(physicsCollider1);
+		staticEntity3->SetCollider(physicsCollider1);
+		staticEntity4->SetCollider(physicsCollider1);
+		
 		//modelInstance->SetMaterial("Static");
 		//modelInstance->SetMesh("resources/models/player.nvx2");
 		modelInstance->SetMaterial("OBJStatic");
@@ -92,23 +108,45 @@ ExampleApp::Open()
 		gProperty->setModelInstance(modelInstance);
 
 		modelInstance1->SetMaterial("OBJStatic");
-		modelInstance1->SetMesh("resources/models/kung.obj");
+		modelInstance1->SetMesh("resources/models/cube.obj");
 		gProperty1->setModelInstance(modelInstance1);
+		gProperty2->setModelInstance(modelInstance1);
+		gProperty3->setModelInstance(modelInstance1);
+		gProperty4->setModelInstance(modelInstance1);
+
+		PointLight pLight;
+		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
+		pLight.color = Math::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+		pLight.radiusAndPadding.set_x(10.0f);
+
+		LightServer::Instance()->AddPointLight(pLight);
 
         rigidBodyEntity->SetGraphicsProperty(gProperty);
-        staticEntity->SetGraphicsProperty(gProperty1);
+        staticEntity1->SetGraphicsProperty(gProperty1);
+		staticEntity2->SetGraphicsProperty(gProperty2);
+		staticEntity3->SetGraphicsProperty(gProperty3);
+		staticEntity4->SetGraphicsProperty(gProperty4);
 
         physicsCollider->CookOBJData(modelInstance->GetMesh()->OBJvertexBuffer, modelInstance->GetMesh()->OBJindexBuffer, modelInstance->GetMesh()->getBaseBBox());
         physicsCollider1->CookOBJData(modelInstance1->GetMesh()->OBJvertexBuffer, modelInstance1->GetMesh()->OBJindexBuffer, modelInstance1->GetMesh()->getBaseBBox());
 
-        Math::mat4 transf = Math::mat4::translation(0.0f, 0.0f, 0.0f);
-        Math::mat4 transf2 = Math::mat4::translation(-2.0f, 0.0f, 0.0f);
+        Math::mat4 transf = Math::mat4::translation(0.0f, -0.5f, -2.0f);
+		Math::mat4 transf1 = Math::mat4::translation(1.0f, -0.5f, 0.5f);
+        Math::mat4 transf2 = Math::mat4::translation(0.0f, -0.5f, 0.5f);
+		Math::mat4 transf3 = Math::mat4::translation(1.0f, -0.5f, -0.5f);
+		Math::mat4 transf4 = Math::mat4::translation(0.0f, -0.5f, -0.5f);
 
         this->rigidBodyEntity->SetTransform(transf);
-        this->staticEntity->SetTransform(transf2);
+        this->staticEntity1->SetTransform(transf1);
+		this->staticEntity2->SetTransform(transf2);
+		this->staticEntity3->SetTransform(transf3);
+		this->staticEntity4->SetTransform(transf4);
 
         rigidBodyEntity->Activate();
-        staticEntity->Activate();
+        staticEntity1->Activate();
+		staticEntity2->Activate();
+		staticEntity3->Activate();
+		staticEntity4->Activate();
 
 
         // set ui rendering function
@@ -258,7 +296,8 @@ ExampleApp::Run()
 		translation = Math::mat4::transform(translation, rotation);
 		cameraPos += translation;
 
-        Graphics::MainCamera::Instance()->setViewMatrix(Math::mat4::lookatrh(cameraPos, cameraPos + forward, up));
+		Graphics::MainCamera::Instance()->SetPosition(cameraPos);
+        Graphics::MainCamera::Instance()->LookAt(cameraPos + forward, up);
 
         Math::mat4 view = Graphics::MainCamera::Instance()->getViewMatrix();
         Math::mat4 invView = Math::mat4::inverse(view);
@@ -305,6 +344,13 @@ ExampleApp::Run()
                     rbe->GetRigidBody()->applyForceAtPoint(rayDirection, .1f, hit.point);
 
                 rayEnd = hit.point;
+
+				PointLight pLight;
+				pLight.position = hit.point + (hit.surfaceNormal * 0.5f);
+				pLight.color = hit.surfaceNormal;
+				pLight.radiusAndPadding.set_x(1.0f);
+
+				LightServer::Instance()->AddPointLight(pLight);
             }
             else
             {
@@ -318,7 +364,10 @@ ExampleApp::Run()
 		Physics::PhysicsDevice::Instance()->Solve();
 
         this->rigidBodyEntity->Update();
-        this->staticEntity->Update();
+        this->staticEntity1->Update();
+		this->staticEntity2->Update();
+		this->staticEntity3->Update();
+		this->staticEntity4->Update();
 
 		RenderDevice::Instance()->Render();
 
@@ -330,11 +379,14 @@ ExampleApp::Run()
                 consoleBuffer = pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetFileName();
 
         }
+
+		/*
 		this->gProperty->getbbox().debugRender();
         this->gProperty1->getbbox().debugRender();
 
 		//this->gProperty->getCollider()->debugDraw();
 
+		
         // Render LINES
         glUseProgram(0);
         glEnable(GL_DEPTH_TEST);
@@ -364,7 +416,7 @@ ExampleApp::Run()
         glVertex4f(hitn[0], hitn[1], hitn[2], hitn[3]);
 
         glEnd();
-		
+		*/
 
 
 		this->window->SwapBuffers();

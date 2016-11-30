@@ -170,6 +170,7 @@ GLuint ShaderServer::LoadVertexShader(const std::string& file)
 
 		//Attach Header
 		content = VertexShaderHeader + content;
+		content = ShaderHeader + content;
 
 		const char* vs = content.c_str();
 
@@ -227,6 +228,7 @@ GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 
 		//Attach Header
 		content = FragmentShaderHeader + content;
+		content = ShaderHeader + content;
 
 		const char* fs = content.c_str();
 	
@@ -256,6 +258,62 @@ GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 		this->shaderPrograms.insert(par);
 
 		return fragmentShader;
+	}
+	else
+	{
+		//Shader is already loaded so we can just return it.
+		return this->shaderPrograms.find(file)->second;
+	}
+}
+
+GLuint ShaderServer::LoadComputeShader(const std::string& file)
+{
+	//Make sure we've not already loaded this shader
+	if (!this->HasShaderProgramLoaded(file))
+	{
+		if (file.substr(file.find_last_of(".")) != ".comp")
+		{
+			printf("[COMPUTE SHADER LOAD ERROR]: File is not a .comp file!");
+			return false;
+		}
+
+		std::string content = ReadFromFile(file);
+		if (content.empty())
+		{
+			return false;
+		}
+
+		// Attach header
+		content = ShaderHeader + content;
+
+		const char* fs = content.c_str();
+
+		// setup fragment shader
+		GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
+		GLint length = (GLint)content.length();
+		glShaderSource(computeShader, 1, &fs, &length);
+		glCompileShader(computeShader);
+
+		// get error log
+		GLint shaderLogSize;
+		glGetShaderiv(computeShader, GL_INFO_LOG_LENGTH, &shaderLogSize);
+		if (shaderLogSize > 0)
+		{
+			char* buf = new char[shaderLogSize];
+			glGetShaderInfoLog(computeShader, shaderLogSize, NULL, buf);
+			printf("[COMPUTE SHADER COMPILE ERROR]: %s", buf);
+			delete[] buf;
+
+#ifdef _DEBUG
+			assert(false);
+#endif
+		}
+
+		//Insert to our shader list
+		std::pair<std::string, GLuint> par(file, computeShader);
+		this->shaderPrograms.insert(par);
+
+		return computeShader;
 	}
 	else
 	{
