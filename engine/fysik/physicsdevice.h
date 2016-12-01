@@ -5,21 +5,56 @@
 namespace Physics
 {
 
-struct Interval
+struct SupportPoint
 {
-    Game::PhysicsEntity* entity;
+    // Minkowski difference
+    Math::point pointDiff;
+
+    //Individual point
+    Math::point pointA;
+
+    bool operator==(const SupportPoint& r) const
+    {
+        return pointDiff == r.pointDiff;
+    }
 };
 
-struct AxisPoint
+struct Triangle
 {
-    float val;
-    int entityID;
+    SupportPoint points[3];
+    Math::vec4 faceNormal;
+
+    Triangle(const SupportPoint &a,const SupportPoint &b,const SupportPoint &c) {
+        points[0] = a;
+        points[1] = b;
+        points[2] = c;
+        //Remember to possibly having to normalize this before using it!
+        faceNormal = Math::point::normalize(Math::point::cross3((b.pointDiff-a.pointDiff), (c.pointDiff-a.pointDiff)));
+    }
 };
+
+struct Edge {
+    SupportPoint points[2];
+
+    Edge(const SupportPoint &a,const SupportPoint &b) {
+        points[0] = a;
+        points[1] = b;
+    }
+};
+
 
 class PhysicsDevice
 {
 private:
     PhysicsDevice();
+
+    struct PhysicsCollision
+    {
+        Math::point point;
+        Math::vec4 normal;
+        float penetrationDepth;
+    };
+
 
 public:
     static PhysicsDevice* Instance()
@@ -46,7 +81,7 @@ private:
     double frameTime;
 
     Math::point Support(const Math::point& dir, Game::PhysicsEntity* entity);
-    bool GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2);
+    bool GJKEPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, PhysicsCollision& collisionData);
 
     void BroadPhase();
     void NarrowPhase();
@@ -57,7 +92,7 @@ private:
     Util::Array<std::pair<Game::PhysicsEntity*, Game::PhysicsEntity*>> PCEntities;
 
 
-    int DoSimplex(Util::Array<Math::point> &points, Math::point &D);
+    int DoSimplex(Util::Array<SupportPoint> &points, Math::point &D);
 
     //Used for broad phase sorting
     int sortAxis;
