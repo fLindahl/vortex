@@ -11,6 +11,7 @@
 
 #pragma once
 #include <stdlib.h>
+#include "vector4.h"
 
 namespace Math
 {
@@ -47,5 +48,25 @@ namespace Math
 	static const T& clamp(const T& in, const T& min, const T& max)
 	{
 		return (in < min) ? min : ((in > max) ? max : in);
+	}
+
+	static void barycentric(const vec4& p, const vec4& a, const vec4& b, const vec4& c, float& u, float& v, float& w)
+	{
+		vec4 v0 = b - a;
+		vec4 v1 = c - a;
+		vec4 v2 = p - a;
+
+		float d00 = Math::vec4::dot(v0,v0);
+		float d01 = Math::vec4::dot(v0,v1);
+		float d11 = Math::vec4::dot(v1,v1);
+		float d20 = Math::vec4::dot(v2,v0);
+		float d21 = Math::vec4::dot(v2,v1);
+
+		float denom = 1 / (d00 * d11 - d01 * d01);
+
+		v = (d11 * d20 - d01 * d21) * denom;
+		w = (d00 * d21 - d01 * d20) * denom;
+
+		u = 1.0f - v - w;
 	}
 }
