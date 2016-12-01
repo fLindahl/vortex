@@ -1,5 +1,5 @@
 #pragma once
-#include "foundation/math/vector4.h"
+#include "foundation/math/point.h"
 #include "foundation/util/array.h"
 
 
@@ -7,8 +7,8 @@ namespace Render
 {
 	struct PointLight
 	{
-		Math::vec4 color;
-		Math::vec4 position;
+		Math::point color;
+		Math::point position;
 		Math::vec4 radiusAndPadding;
 	};
 

@@ -69,6 +69,22 @@ ExampleApp::Open()
 
 		this->consoleBuffer = new char[CONSOLE_BUFFER_SIZE];
 
+
+		// Load Scene
+		modelInstanceScene = std::make_shared<Render::ModelInstance>();
+		gPropertyScene = new Render::GraphicsProperty();
+		SceneCollider = std::make_shared<Physics::SurfaceCollider>();
+		SceneCollider->SetShape(Physics::ColliderShape::BOX);
+		SceneEntity = std::make_shared<Game::StaticEntity>();
+		SceneEntity->SetCollider(SceneCollider);
+		modelInstanceScene->SetMaterial("OBJStatic");
+		modelInstanceScene->SetMesh("resources/models/groundfloor.obj");
+		gPropertyScene->setModelInstance(modelInstanceScene);
+		SceneEntity->SetGraphicsProperty(gPropertyScene);
+		SceneCollider->CookOBJData(modelInstanceScene->GetMesh()->OBJvertexBuffer, modelInstanceScene->GetMesh()->OBJindexBuffer, modelInstanceScene->GetMesh()->getBaseBBox());
+		SceneEntity->SetTransform(Math::mat4::translation(0.0f, -2.0f, -0.0f));
+		SceneEntity->Activate();
+
 		modelInstance = std::make_shared<Render::ModelInstance>();
 		modelInstance1 = std::make_shared<Render::ModelInstance>();
 
@@ -108,8 +124,6 @@ ExampleApp::Open()
 		rigidBodyEntity4->SetCollider(physicsCollider1);
 		rigidBodyEntity5->SetCollider(physicsCollider);
 
-		//modelInstance->SetMaterial("Static");
-		//modelInstance->SetMesh("resources/models/player.nvx2");
 		modelInstance->SetMaterial("OBJStatic");
 		modelInstance->SetMesh("resources/models/kung.obj");
 		gProperty->setModelInstance(modelInstance);
@@ -125,7 +139,18 @@ ExampleApp::Open()
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
 		pLight.color = Math::vec4(0.5f, 0.5f, 0.5f, 1.0f);
 		pLight.radiusAndPadding.set_x(10.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+		
+		pLight.position = Math::vec4(3.0f, 2.0f, 5.0f, 1.0f);
+		pLight.color = Math::vec4(0.7f, 0.5f, 0.3f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
 
+		pLight.position = Math::vec4(8.0f, -1.5f, 5.0f, 1.0f);
+		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+
+		pLight.position = Math::vec4(10.0f, -1.5f, 10.0f, 1.0f);
+		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 
         rigidBodyEntity1->SetGraphicsProperty(gProperty1);
@@ -156,6 +181,8 @@ ExampleApp::Open()
         rigidBodyEntity5->Activate();
 
 
+
+
         // set ui rendering function
 		this->window->SetUiRender([this]()
 		  {
@@ -181,6 +208,9 @@ void ExampleApp::RenderUI()
 		ImGui::Begin("Console", &show, ImGuiWindowFlags_NoSavedSettings);
 
 		ImGui::SetWindowSize(ImVec2(450.0f,210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
+
+		ImGui::Text("Frame time: %f\n", this->frameTime);
+
 		// create text editors for shader code
 		ImGui::Text("Selected Mesh: %s\n", consoleBuffer.c_str());
 
@@ -190,6 +220,8 @@ void ExampleApp::RenderUI()
             a = "0";
 
         ImGui::Text("Collision: %s\n", a.c_str());
+
+
 
 		if (hit.object != nullptr)
 		{
@@ -270,6 +302,7 @@ ExampleApp::Run()
 
 	while (this->window->IsOpen())
 	{
+		double time = glfwGetTime();
 		this->window->Update();
 		
 		Math::vec4 translation = Math::vec4::zerovector();
@@ -353,12 +386,12 @@ ExampleApp::Run()
                 rayEnd = hit.point;
 
 				PointLight pLight;
-				pLight.position = hit.point + (hit.surfaceNormal * 0.5f);
-				pLight.color = Math::vec4(1.0f,1.0f,1.0f,1.0f);
-				pLight.radiusAndPadding.set_x(1.0f);
+				pLight.position = hit.point + (hit.surfaceNormal);
+				pLight.color = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+				pLight.radiusAndPadding.set_x(10.0f);
 
 				LightServer::Instance()->AddPointLight(pLight);
-            }
+			}
             else
             {
                 rayEnd = rayWorldPos + (rayDirection*10.0f);
@@ -387,7 +420,7 @@ ExampleApp::Run()
 
         }
 
-
+		/*
 		this->gProperty->getbbox().debugRender();
         this->gProperty1->getbbox().debugRender();
 
@@ -423,10 +456,14 @@ ExampleApp::Run()
         glVertex4f(hitn[0], hitn[1], hitn[2], hitn[3]);
 
         glEnd();
+		*/
 
 
 
 		this->window->SwapBuffers();
+
+		frameTime = glfwGetTime() - time;
+
 	}
 }
 
