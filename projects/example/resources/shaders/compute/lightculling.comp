@@ -36,8 +36,8 @@ shared vec4 frustumPlanes[6];
 shared int visibleLightIndices[1024];
 
 layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;
-
-void main() {
+void main() 
+{
 	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 itemID = ivec2(gl_LocalInvocationID.xy);
 	ivec2 tileID = ivec2(gl_WorkGroupID.xy);
@@ -106,9 +106,8 @@ void main() {
 	// Step 3: Cull lights.
 	// Parallelize the threads against the lights now.
 	// Can handle 256 simultaniously. Anymore lights than that and additional passes are performed
-	const uint threadCount = TILE_SIZE * TILE_SIZE;
+	uint threadCount = TILE_SIZE * TILE_SIZE;
 	uint passCount = (lightCount + threadCount - 1) / threadCount;
-	
 	for (uint i = 0; i < passCount; i++) 
 	{
 		// Get the lightIndex to test for this thread / pass. If the index is >= light count, then this thread can stop testing lights
@@ -128,8 +127,7 @@ void main() {
 			distance = dot(position, frustumPlanes[j]) + radius;
 
 			// If one of the tests fails, then there is no intersection
-			if (distance <= 0.0) 
-			{
+			if (distance <= 0.0) {
 				break;
 			}
 		}
@@ -146,7 +144,8 @@ void main() {
 	barrier();
 
 	// One thread should fill the global light buffer
-	if (gl_LocalInvocationIndex == 0) {
+	if (gl_LocalInvocationIndex == 0) 
+	{
 		uint offset = index * 1024; // Determine position in global buffer
 		for (uint i = 0; i < visibleLightCount; i++) 
 		{

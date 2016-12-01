@@ -42,10 +42,16 @@ private:
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
 
+
+	double frameTime;
+
 	std::shared_ptr<Render::ModelInstance> modelInstance;
 	std::shared_ptr<Render::ModelInstance> modelInstance1;
+	std::shared_ptr<Render::ModelInstance> modelInstanceScene;
+
 	std::shared_ptr<Physics::SurfaceCollider> physicsCollider;
 	std::shared_ptr<Physics::SurfaceCollider> physicsCollider1;
+	std::shared_ptr<Physics::SurfaceCollider> SceneCollider;
 
     std::shared_ptr<Physics::RigidBody> rBody1;
     std::shared_ptr<Physics::RigidBody> rBody2;
@@ -59,6 +65,8 @@ private:
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity4;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity5;
 
+	std::shared_ptr<Game::StaticEntity> SceneEntity;
+
 	BaseGameFeature::KeyHandler* keyhandler;
 
 	Render::GraphicsProperty* gProperty;
@@ -66,6 +74,8 @@ private:
 	Render::GraphicsProperty* gProperty2;
 	Render::GraphicsProperty* gProperty3;
 	Render::GraphicsProperty* gProperty4;
+
+	Render::GraphicsProperty* gPropertyScene;
 
 
 	Physics::PhysicsHit hit;
