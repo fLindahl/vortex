@@ -47,14 +47,17 @@ private:
 	std::shared_ptr<Physics::SurfaceCollider> physicsCollider;
 	std::shared_ptr<Physics::SurfaceCollider> physicsCollider1;
 
-    std::shared_ptr<Physics::RigidBody> rBody;
     std::shared_ptr<Physics::RigidBody> rBody1;
+    std::shared_ptr<Physics::RigidBody> rBody2;
+    std::shared_ptr<Physics::RigidBody> rBody3;
+    std::shared_ptr<Physics::RigidBody> rBody4;
+    std::shared_ptr<Physics::RigidBody> rBody5;
 
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity;
-	std::shared_ptr<Game::StaticEntity> staticEntity1;
-	std::shared_ptr<Game::StaticEntity> staticEntity2;
-	std::shared_ptr<Game::StaticEntity> staticEntity3;
-	std::shared_ptr<Game::StaticEntity> staticEntity4;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity1;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity2;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity3;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity4;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity5;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 
@@ -63,6 +66,7 @@ private:
 	Render::GraphicsProperty* gProperty2;
 	Render::GraphicsProperty* gProperty3;
 	Render::GraphicsProperty* gProperty4;
+
 
 	Physics::PhysicsHit hit;
 

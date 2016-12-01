@@ -84,23 +84,30 @@ ExampleApp::Open()
 		physicsCollider->SetShape(Physics::ColliderShape::BOX);
 		physicsCollider1->SetShape(Physics::ColliderShape::BOX);
 
-		rBody = std::make_shared<Physics::RigidBody>();
 		rBody1 = std::make_shared<Physics::RigidBody>();
+        rBody2 = std::make_shared<Physics::RigidBody>();
+        rBody3 = std::make_shared<Physics::RigidBody>();
+        rBody4 = std::make_shared<Physics::RigidBody>();
+		rBody5 = std::make_shared<Physics::RigidBody>();
 
-		rigidBodyEntity = std::make_shared<Game::RigidBodyEntity>();
-		staticEntity1 = std::make_shared<Game::StaticEntity>();
-		staticEntity2 = std::make_shared<Game::StaticEntity>();
-		staticEntity3 = std::make_shared<Game::StaticEntity>();
-		staticEntity4 = std::make_shared<Game::StaticEntity>();
+		rigidBodyEntity1 = std::make_shared<Game::RigidBodyEntity>();
+		rigidBodyEntity2 = std::make_shared<Game::RigidBodyEntity>();
+		rigidBodyEntity3 = std::make_shared<Game::RigidBodyEntity>();
+		rigidBodyEntity4 = std::make_shared<Game::RigidBodyEntity>();
+		rigidBodyEntity5 = std::make_shared<Game::RigidBodyEntity>();
 
-		rigidBodyEntity->SetRigidBody(rBody);
+        rigidBodyEntity1->SetRigidBody(rBody1);
+        rigidBodyEntity2->SetRigidBody(rBody2);
+        rigidBodyEntity3->SetRigidBody(rBody3);
+        rigidBodyEntity4->SetRigidBody(rBody4);
+		rigidBodyEntity5->SetRigidBody(rBody5);
 
-		rigidBodyEntity->SetCollider(physicsCollider);
-		staticEntity1->SetCollider(physicsCollider1);
-		staticEntity2->SetCollider(physicsCollider1);
-		staticEntity3->SetCollider(physicsCollider1);
-		staticEntity4->SetCollider(physicsCollider1);
-		
+        rigidBodyEntity1->SetCollider(physicsCollider1);
+        rigidBodyEntity2->SetCollider(physicsCollider1);
+		rigidBodyEntity3->SetCollider(physicsCollider1);
+		rigidBodyEntity4->SetCollider(physicsCollider1);
+		rigidBodyEntity5->SetCollider(physicsCollider);
+
 		//modelInstance->SetMaterial("Static");
 		//modelInstance->SetMesh("resources/models/player.nvx2");
 		modelInstance->SetMaterial("OBJStatic");
@@ -121,32 +128,32 @@ ExampleApp::Open()
 
 		LightServer::Instance()->AddPointLight(pLight);
 
-        rigidBodyEntity->SetGraphicsProperty(gProperty);
-        staticEntity1->SetGraphicsProperty(gProperty1);
-		staticEntity2->SetGraphicsProperty(gProperty2);
-		staticEntity3->SetGraphicsProperty(gProperty3);
-		staticEntity4->SetGraphicsProperty(gProperty4);
+        rigidBodyEntity1->SetGraphicsProperty(gProperty1);
+        rigidBodyEntity2->SetGraphicsProperty(gProperty2);
+        rigidBodyEntity3->SetGraphicsProperty(gProperty3);
+        rigidBodyEntity4->SetGraphicsProperty(gProperty4);
+        rigidBodyEntity5->SetGraphicsProperty(gProperty);
 
         physicsCollider->CookOBJData(modelInstance->GetMesh()->OBJvertexBuffer, modelInstance->GetMesh()->OBJindexBuffer, modelInstance->GetMesh()->getBaseBBox());
         physicsCollider1->CookOBJData(modelInstance1->GetMesh()->OBJvertexBuffer, modelInstance1->GetMesh()->OBJindexBuffer, modelInstance1->GetMesh()->getBaseBBox());
 
-        Math::mat4 transf = Math::mat4::translation(0.0f, -0.5f, -2.0f);
-		Math::mat4 transf1 = Math::mat4::translation(1.0f, -0.5f, 0.5f);
-        Math::mat4 transf2 = Math::mat4::translation(0.0f, -0.5f, 0.5f);
-		Math::mat4 transf3 = Math::mat4::translation(1.0f, -0.5f, -0.5f);
-		Math::mat4 transf4 = Math::mat4::translation(0.0f, -0.5f, -0.5f);
+		Math::mat4 transf1 = Math::mat4::translation(2.0f, -0.5f, 1.5f);
+        Math::mat4 transf2 = Math::mat4::translation(0.0f, -0.5f, 1.5f);
+		Math::mat4 transf3 = Math::mat4::translation(2.0f, -0.5f, -1.5f);
+		Math::mat4 transf4 = Math::mat4::translation(0.0f, -0.5f, -1.5f);
+        Math::mat4 transf5 = Math::mat4::translation(0.0f, -0.5f, -3.0f);
 
-        this->rigidBodyEntity->SetTransform(transf);
-        this->staticEntity1->SetTransform(transf1);
-		this->staticEntity2->SetTransform(transf2);
-		this->staticEntity3->SetTransform(transf3);
-		this->staticEntity4->SetTransform(transf4);
+        this->rigidBodyEntity1->SetTransform(transf1);
+		this->rigidBodyEntity2->SetTransform(transf2);
+		this->rigidBodyEntity3->SetTransform(transf3);
+		this->rigidBodyEntity4->SetTransform(transf4);
+        this->rigidBodyEntity5->SetTransform(transf5);
 
-        rigidBodyEntity->Activate();
-        staticEntity1->Activate();
-		staticEntity2->Activate();
-		staticEntity3->Activate();
-		staticEntity4->Activate();
+        rigidBodyEntity1->Activate();
+        rigidBodyEntity2->Activate();
+        rigidBodyEntity3->Activate();
+        rigidBodyEntity4->Activate();
+        rigidBodyEntity5->Activate();
 
 
         // set ui rendering function
@@ -347,7 +354,7 @@ ExampleApp::Run()
 
 				PointLight pLight;
 				pLight.position = hit.point + (hit.surfaceNormal * 0.5f);
-				pLight.color = hit.surfaceNormal;
+				pLight.color = Math::vec4(1.0f,1.0f,1.0f,1.0f);
 				pLight.radiusAndPadding.set_x(1.0f);
 
 				LightServer::Instance()->AddPointLight(pLight);
@@ -363,11 +370,11 @@ ExampleApp::Run()
 		
 		Physics::PhysicsDevice::Instance()->Solve();
 
-        this->rigidBodyEntity->Update();
-        this->staticEntity1->Update();
-		this->staticEntity2->Update();
-		this->staticEntity3->Update();
-		this->staticEntity4->Update();
+        this->rigidBodyEntity1->Update();
+        this->rigidBodyEntity2->Update();
+		this->rigidBodyEntity3->Update();
+		this->rigidBodyEntity4->Update();
+		this->rigidBodyEntity5->Update();
 
 		RenderDevice::Instance()->Render();
 
@@ -380,7 +387,7 @@ ExampleApp::Run()
 
         }
 
-		/*
+
 		this->gProperty->getbbox().debugRender();
         this->gProperty1->getbbox().debugRender();
 
@@ -416,7 +423,7 @@ ExampleApp::Run()
         glVertex4f(hitn[0], hitn[1], hitn[2], hitn[3]);
 
         glEnd();
-		*/
+
 
 
 		this->window->SwapBuffers();
