@@ -28,6 +28,15 @@ enum ColliderShape
     SURFACE
 };
 
+struct DynamicsData
+{
+	float massInv = 0;
+	Math::vec4 linearVelocity = Math::vec4::zerovector();
+	Math::vec4 angularVelocity = Math::vec4::zerovector();
+	Math::mat4 invInertiaTensorWorld = Math::mat4::zeromatrix();
+	Math::point position = Math::point::zerovector();
+};
+
 struct PhysicsHit
 {
     Game::Entity* object;

@@ -304,7 +304,7 @@ void PhysicsDevice::Solve()
 
     for(auto rigidbody : this->rigidBodies)
     {
-		rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.01f);
+		//rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
         rigidbody->update(this->frameTime);
     }
 
@@ -442,24 +442,29 @@ bool PhysicsDevice::GJKEPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Phy
         S.pointDiff = diff;
         S.pointA = pointA;
 
+		// If we're within a small threshold, we stop searching and decide on a contact point
         if((Math::vec4::dot3(entry_cur_triangle_it->faceNormal, S.pointDiff) - entry_cur_dst < 0.001f))
         {
             // Find Contact point
             // calculate the barycentric coordinates of the closest triangle with respect to
             // the projection of the origin onto the triangle
-            float bary_u,bary_v,bary_w;
+			float u;
+			float v;
+			float w;
+
             Math::barycentric(entry_cur_triangle_it->faceNormal * entry_cur_dst,
-                        entry_cur_triangle_it->points[0].pointDiff,
-                        entry_cur_triangle_it->points[1].pointDiff,
-                        entry_cur_triangle_it->points[2].pointDiff,
-                        bary_u,
-                        bary_v,
-                        bary_w);
+                              entry_cur_triangle_it->points[0].pointDiff,
+                              entry_cur_triangle_it->points[1].pointDiff,
+							  entry_cur_triangle_it->points[2].pointDiff,
+							  u,
+                              v,
+                              w
+							 );
 
             // collision point on object a in world space
-            Math::point wcolpoint((entry_cur_triangle_it->points[0].pointA * bary_u)+
-                                  (entry_cur_triangle_it->points[1].pointA * bary_v)+
-                                  (entry_cur_triangle_it->points[2].pointA * bary_w)
+            Math::point wcolpoint((entry_cur_triangle_it->points[0].pointA * u) +
+                                  (entry_cur_triangle_it->points[1].pointA * v) +
+                                  (entry_cur_triangle_it->points[2].pointA * w)
                                  );
 
             // collision normal
@@ -525,6 +530,33 @@ int PhysicsDevice::DoSimplex(Util::Array<SupportPoint>& simplex, Math::point& D)
     }
 }
 
+Math::point PhysicsDevice::Support(const Math::point &dir, Game::PhysicsEntity *entity)
+{
+	Math::mat4 rot = entity->GetGraphicsProperty()->getModelMatrix();
+	rot.set_position(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	Math::point D = Math::mat4::transform(dir, Math::mat4::inverse(rot));
+
+	Util::Array<Render::MeshResource::OBJVertex>& vertbuffer = entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer;
+	Math::point p = Math::point(vertbuffer[0].pos[0], vertbuffer[0].pos[1], vertbuffer[0].pos[2]);
+	float max = Math::vector::dot3(p, D);
+
+	Math::point temp;
+
+	for (int i = 1; i < vertbuffer.Size(); ++i)
+	{
+		temp = Math::point(vertbuffer[i].pos[0], vertbuffer[i].pos[1], vertbuffer[i].pos[2]);
+		float t = Math::vector::dot3(temp, D);
+		if (t >= max)
+		{
+			p = temp;
+			max = t;
+		}
+	}
+
+	return Math::mat4::transform(p, entity->GetGraphicsProperty()->getModelMatrix());
+}
+
 int cmpAABBs(const void* a, const void* b)
 {
     const int axis = PhysicsDevice::Instance()->GetCurrentAABBSortAxis();
@@ -557,17 +589,39 @@ void PhysicsDevice::BroadPhase()
             sqsum[c] += p[c] * p[c];
         }
 
-        for (int j = i+1; j < physicsEntities.Size(); j++)
-        {
-            if((physicsEntities[j]->GetGraphicsProperty()->getbbox().minPoint[sortAxis] > physicsEntities[i]->GetGraphicsProperty()->getbbox().maxPoint[sortAxis]))
-            {
-                break;
-            }
-            if(physicsEntities[i]->GetGraphicsProperty()->getbbox().intersects(physicsEntities[j]->GetGraphicsProperty()->getbbox()))
-            {
-                this->PCEntities.Append(std::make_pair(physicsEntities[i], physicsEntities[j]));
-            }
-        }
+
+		if (physicsEntities[i]->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+		{
+			for (int j = i + 1; j < physicsEntities.Size(); j++)
+			{
+				if ((physicsEntities[j]->GetGraphicsProperty()->getbbox().minPoint[sortAxis] > physicsEntities[i]->GetGraphicsProperty()->getbbox().maxPoint[sortAxis]))
+				{
+					break;
+				}
+				if (physicsEntities[i]->GetGraphicsProperty()->getbbox().intersects(physicsEntities[j]->GetGraphicsProperty()->getbbox()))
+				{
+					this->PCEntities.Append(std::make_pair(physicsEntities[i], physicsEntities[j]));
+				}
+			}
+		}
+		else // object at i is static
+		{
+			for (int j = i + 1; j < physicsEntities.Size(); j++)
+			{
+				//Make sure we don't test collisions between static objects.
+				if (physicsEntities[j]->GetPhysicsType() == Physics::PhysicsType::Static)
+					continue;
+
+				if ((physicsEntities[j]->GetGraphicsProperty()->getbbox().minPoint[sortAxis] > physicsEntities[i]->GetGraphicsProperty()->getbbox().maxPoint[sortAxis]))
+				{
+					break;
+				}
+				if (physicsEntities[i]->GetGraphicsProperty()->getbbox().intersects(physicsEntities[j]->GetGraphicsProperty()->getbbox()))
+				{
+					this->PCEntities.Append(std::make_pair(physicsEntities[i], physicsEntities[j]));
+				}
+			}
+		}
     }
 
     // Compute Variance
@@ -591,51 +645,86 @@ void PhysicsDevice::NarrowPhase()
     PhysicsCollision collData;
     for(auto pair : this->PCEntities)
     {
-        if(GJKEPA(pair.first, pair.second, collData))
+		Game::PhysicsEntity* E1 = pair.first;
+		Game::PhysicsEntity* E2 = pair.second;
+
+        if(GJKEPA(E1, E2, collData))
         {
-            Game::PhysicsEntity* E1 = pair.first;
-            Game::PhysicsEntity* E2 = pair.second;
-
-            Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
-
-            if(rbe != nullptr)
-                rbe->GetRigidBody()->applyForceAtPoint(collData.normal, 0.1f, collData.point);
-
-            rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
-
-            if(rbe != nullptr)
-                rbe->GetRigidBody()->applyForceAtPoint(-collData.normal, 0.1f, collData.point);
-
+			CollideEntities(E1, E2, collData);
+			
             this->hasCollision = true;
         }
     }
 }
 
-Math::point PhysicsDevice::Support(const Math::point &dir, Game::PhysicsEntity *entity)
+void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity* b, const PhysicsCollision& collData)
 {
-    Math::mat4 rot = entity->GetGraphicsProperty()->getModelMatrix();
-    rot.set_position(Math::vec4(0.0f,0.0f,0.0f,1.0f));
+	DynamicsData aDynamicsData;
+	DynamicsData bDynamicsData;
 
-    Math::point D = Math::mat4::transform(dir, Math::mat4::inverse(rot));
+	if (a->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+	{
+		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(a);
 
-    Util::Array<Render::MeshResource::OBJVertex>& vertbuffer = entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer;
-    Math::point p = Math::point(vertbuffer[0].pos[0], vertbuffer[0].pos[1], vertbuffer[0].pos[2]);
-    float max = Math::vector::dot3(p, D);
+		aDynamicsData.massInv = rbe->GetRigidBody()->massInv;
+		aDynamicsData.angularVelocity = rbe->GetRigidBody()->angularVelocity;
+		aDynamicsData.linearVelocity = rbe->GetRigidBody()->linearVelocity;
+		aDynamicsData.invInertiaTensorWorld = rbe->GetRigidBody()->invInertiaTensorWorld;
+		aDynamicsData.position = rbe->GetRigidBody()->position;
+	}
 
-    Math::point temp;
+	if (b->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+	{
+		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(b);
 
-    for(int i = 1; i < vertbuffer.Size(); ++i)
-    {
-        temp = Math::point(vertbuffer[i].pos[0], vertbuffer[i].pos[1], vertbuffer[i].pos[2]);
-        float t = Math::vector::dot3(temp, D);
-        if(t >= max)
-        {
-            p = temp;
-            max = t;
-        }
-    }
+		bDynamicsData.massInv = rbe->GetRigidBody()->massInv;
+		bDynamicsData.angularVelocity = rbe->GetRigidBody()->angularVelocity;
+		bDynamicsData.linearVelocity = rbe->GetRigidBody()->linearVelocity;
+		bDynamicsData.invInertiaTensorWorld = rbe->GetRigidBody()->invInertiaTensorWorld;
+		bDynamicsData.position = rbe->GetRigidBody()->position;
+	}
 
-    return Math::mat4::transform(p, entity->GetGraphicsProperty()->getModelMatrix());
+	Math::vec4 dPa = aDynamicsData.linearVelocity + Math::vec4::cross3(aDynamicsData.angularVelocity, (collData.point - aDynamicsData.position));
+	Math::vec4 dPb = bDynamicsData.linearVelocity + Math::vec4::cross3(bDynamicsData.angularVelocity, (collData.point - bDynamicsData.position));
+
+	float relVelocity = Math::vec4::dot3(collData.normal, (dPa - dPb));
+
+	float restitution = 0.5f;
+
+	float num = -(1 + restitution) * relVelocity;
+
+	float Msum = aDynamicsData.massInv + bDynamicsData.massInv;
+
+	Math::vec4 relPointA = collData.point - aDynamicsData.position;
+	Math::vec4 tangentA = Math::vec4::cross3(relPointA, collData.normal);
+	tangentA = Math::vec4::cross3(tangentA, relPointA);
+
+	Math::vec4 relPointB = collData.point - bDynamicsData.position;
+	Math::vec4 tangentB = Math::vec4::cross3(relPointB, collData.normal);
+	tangentB = Math::vec4::cross3(tangentB, relPointB);
+
+	float forceA = Math::vec4::dot3(collData.normal, (Math::mat4::transform(tangentA, aDynamicsData.invInertiaTensorWorld)));
+	float forceB = Math::vec4::dot3(collData.normal, (Math::mat4::transform(tangentB, bDynamicsData.invInertiaTensorWorld)));
+
+	float denom = Msum + forceA + forceB;
+
+	float j = num / denom;
+
+	if (a->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+	{
+		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(a);
+		rbe->GetRigidBody()->position += collData.normal * collData.penetrationDepth;
+		rbe->GetRigidBody()->transform.translate(Math::vector(collData.normal * (collData.penetrationDepth * 0.5f)));
+		rbe->GetRigidBody()->applyForceAtPoint(collData.normal, j, collData.point);
+	}
+
+	if (b->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+	{
+		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(b);
+		rbe->GetRigidBody()->position += -collData.normal * collData.penetrationDepth;
+		rbe->GetRigidBody()->transform.translate(Math::vector(-collData.normal * (collData.penetrationDepth * 0.5f)));
+		rbe->GetRigidBody()->applyForceAtPoint(-collData.normal, j, collData.point);
+	}
 }
 
 }

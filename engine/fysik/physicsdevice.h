@@ -86,6 +86,8 @@ private:
     void BroadPhase();
     void NarrowPhase();
 
+	void CollideEntities(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, const PhysicsCollision& collData);
+
     Util::Array<std::shared_ptr<RigidBody>> rigidBodies;
 
     // Potentially Colliding Entities

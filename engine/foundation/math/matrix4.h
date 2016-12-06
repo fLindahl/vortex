@@ -144,6 +144,8 @@ namespace Math
 
 		/// build identity matrix
 		static mat4 identity();
+		/// build zero matrix (all elements are zero)
+		static mat4 zeromatrix();
 		/// build matrix from affine transformation
 		static mat4 affinetransformation(float scaling, vec4 const &rotationCenter, const quaternion& rotation, vec4 const &translation);
 		/// compute the inverse of a matrix
@@ -699,6 +701,20 @@ namespace Math
 		mat4::identity()
 	{
 		return mat4();
+	}
+
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	__forceinline mat4
+		mat4::zeromatrix()
+	{
+		mat4 mat;
+		mat.mat.r[0] = _zero;
+		mat.mat.r[1] = _zero;
+		mat.mat.r[2] = _zero;
+		mat.mat.r[3] = _zero;
+		return mat;
 	}
 
 	//------------------------------------------------------------------------------
