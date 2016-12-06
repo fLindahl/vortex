@@ -7,7 +7,7 @@ namespace Game
 
 RigidBodyEntity::RigidBodyEntity()
 {
-
+	this->physicsType = Physics::PhysicsType::Rigidbody;
 }
 
 RigidBodyEntity::~RigidBodyEntity()

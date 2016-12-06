@@ -160,7 +160,6 @@ void RenderDevice::Render()
 	
 	//Unbind Depth FrameBufferObject
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
 
 	// Light culling compute shader
 	GLuint lightCullingProgram = FrameServer::Instance()->lightCullingProgram;

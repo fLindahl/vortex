@@ -10,10 +10,18 @@ class GraphicsProperty;
 namespace Physics
 {
 class SurfaceCollider;
+
+enum PhysicsType
+{
+	Static,
+	Rigidbody
+};
+
 }
 
 namespace Game
 {
+
 class PhysicsEntity : public Entity
 {
 public:
@@ -27,7 +35,11 @@ public:
 
     Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty; }
 
+	Physics::PhysicsType GetPhysicsType() const { return this->physicsType; }
+	//void SetPhysicsType(const Physics::PhysicsType& t) { this->physicsType = t; }
+
 protected:
+	Physics::PhysicsType physicsType;
     Render::GraphicsProperty* gProperty;
     std::shared_ptr<Physics::SurfaceCollider> collider;
 

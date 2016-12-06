@@ -44,6 +44,7 @@ namespace Math
 		};
 		__forceinline operator __m128() const { return vec.vec; }
 	} mm128_uivec;
+	const mm128_vec _zero = { 0.0f, 0.0f, 0.0f, 0.0f };
 	const mm128_vec _id_x = { 1.0f, 0.0f, 0.0f, 0.0f };
 	const mm128_vec _id_y = { 0.0f, 1.0f, 0.0f, 0.0f };
 	const mm128_vec _id_z = { 0.0f, 0.0f, 1.0f, 0.0f };

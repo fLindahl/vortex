@@ -58,6 +58,7 @@ void RigidBody::applyForceAtPoint(const Math::vec4 &dir, const float &magnitude,
     Math::point relativeContactPosition = worldPos - this->position;
     Math::vector impulsiveTorque = Math::vector::cross3(impulse, relativeContactPosition);
     this->torque += Math::mat4::transform(impulsiveTorque, this->invInertiaTensor);
+
 }
 
 void RigidBody::update(const double& frameTime)
@@ -85,6 +86,7 @@ void RigidBody::update(const double& frameTime)
 
     this->force = Math::vector::zerovector();
     this->torque = Math::vector::zerovector();
+
 }
 
 void RigidBody::calculateDerivedQuantities()
