@@ -6,8 +6,9 @@ namespace Game
 {
 StaticEntity::StaticEntity()
 {
-
+	this->physicsType = Physics::PhysicsType::Static;
 }
+
 StaticEntity::~StaticEntity()
 {
 
