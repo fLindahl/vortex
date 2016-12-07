@@ -72,18 +72,53 @@ ExampleApp::Open()
 
 		// Load Scene
 		modelInstanceScene = std::make_shared<Render::ModelInstance>();
-		gPropertyScene = new Render::GraphicsProperty();
+		gPropertyScene1 = new Render::GraphicsProperty();
+        gPropertyScene2 = new Render::GraphicsProperty();
+        gPropertyScene3 = new Render::GraphicsProperty();
+        gPropertyScene4 = new Render::GraphicsProperty();
+        gPropertyScene5 = new Render::GraphicsProperty();
+        gPropertyScene6 = new Render::GraphicsProperty();
 		SceneCollider = std::make_shared<Physics::SurfaceCollider>();
 		SceneCollider->SetShape(Physics::ColliderShape::BOX);
-		SceneEntity = std::make_shared<Game::StaticEntity>();
-		SceneEntity->SetCollider(SceneCollider);
+		SceneEntity1 = std::make_shared<Game::StaticEntity>();
+        SceneEntity2 = std::make_shared<Game::StaticEntity>();
+        SceneEntity3 = std::make_shared<Game::StaticEntity>();
+        SceneEntity4 = std::make_shared<Game::StaticEntity>();
+        SceneEntity5 = std::make_shared<Game::StaticEntity>();
+        SceneEntity6 = std::make_shared<Game::StaticEntity>();
+		SceneEntity1->SetCollider(SceneCollider);
+        SceneEntity2->SetCollider(SceneCollider);
+        SceneEntity3->SetCollider(SceneCollider);
+        SceneEntity4->SetCollider(SceneCollider);
+        SceneEntity5->SetCollider(SceneCollider);
+        SceneEntity6->SetCollider(SceneCollider);
 		modelInstanceScene->SetMaterial("OBJStatic");
 		modelInstanceScene->SetMesh("resources/models/groundfloor.obj");
-		gPropertyScene->setModelInstance(modelInstanceScene);
-		SceneEntity->SetGraphicsProperty(gPropertyScene);
+		gPropertyScene1->setModelInstance(modelInstanceScene);
+        gPropertyScene2->setModelInstance(modelInstanceScene);
+        gPropertyScene3->setModelInstance(modelInstanceScene);
+        gPropertyScene4->setModelInstance(modelInstanceScene);
+        gPropertyScene5->setModelInstance(modelInstanceScene);
+        gPropertyScene6->setModelInstance(modelInstanceScene);
+		SceneEntity1->SetGraphicsProperty(gPropertyScene1);
+        SceneEntity2->SetGraphicsProperty(gPropertyScene2);
+        SceneEntity3->SetGraphicsProperty(gPropertyScene3);
+        SceneEntity4->SetGraphicsProperty(gPropertyScene4);
+        SceneEntity5->SetGraphicsProperty(gPropertyScene5);
+        SceneEntity6->SetGraphicsProperty(gPropertyScene6);
 		SceneCollider->CookOBJData(modelInstanceScene->GetMesh()->OBJvertexBuffer, modelInstanceScene->GetMesh()->OBJindexBuffer, modelInstanceScene->GetMesh()->getBaseBBox());
-		SceneEntity->SetTransform(Math::mat4::translation(0.0f, -2.0f, -0.0f));
-		SceneEntity->Activate();
+		SceneEntity1->SetTransform(Math::mat4::translation(0.0f, -2.0f, 0.0f));
+        SceneEntity2->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(10.0f, 8.0f, 0.0f)));
+        SceneEntity3->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(-10.0f, 8.0f, 0.0f)));
+        SceneEntity4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
+        SceneEntity5->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
+        SceneEntity6->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
+		SceneEntity1->Activate();
+        SceneEntity2->Activate();
+        SceneEntity3->Activate();
+        SceneEntity4->Activate();
+        SceneEntity5->Activate();
+        SceneEntity6->Activate();
 
 		modelInstance = std::make_shared<Render::ModelInstance>();
 		modelInstance1 = std::make_shared<Render::ModelInstance>();
@@ -179,9 +214,6 @@ ExampleApp::Open()
         rigidBodyEntity3->Activate();
         rigidBodyEntity4->Activate();
         rigidBodyEntity5->Activate();
-
-
-
 
         // set ui rendering function
 		this->window->SetUiRender([this]()
@@ -306,21 +338,29 @@ ExampleApp::Run()
 		this->window->Update();
 		
 		Math::vec4 translation = Math::vec4::zerovector();
+
+        const float speedIncrease = 0.02f;
+        float speedMultiplier = 1.0f;
+
+        if(keyhandler->leftShift)
+        {
+            speedMultiplier = 3.0f;
+        }
         if(keyhandler->W)
         {
-            translation.z() += 0.02f;
+                translation.z() += speedIncrease * speedMultiplier;
         }
         if(keyhandler->S)
         {
-            translation.z() -= 0.015f;
+            translation.z() -= speedIncrease * speedMultiplier;
         }
         if(keyhandler->A)
         {
-            translation.x() -= 0.02f;
+            translation.x() -= speedIncrease * speedMultiplier;
         }
         if(keyhandler->D)
         {
-            translation.x() += 0.02f;
+            translation.x() += speedIncrease * speedMultiplier;
         }
 
 		Math::mat4 xMat = Math::mat4::rotationx(-keyhandler->mouseX * 0.01f);
@@ -375,7 +415,7 @@ ExampleApp::Run()
             //Create ray to render
             rayStart = rayWorldPos;
 
-			if(Physics::PhysicsServer::Instance()->Raycast(hit, rayWorldPos, rayDirection, 10.0f))
+			if(Physics::PhysicsServer::Instance()->Raycast(hit, rayWorldPos, rayDirection, 40.0f))
             {
                 printf("--- Hit object! ---\n");
                 Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
@@ -385,12 +425,15 @@ ExampleApp::Run()
 
                 rayEnd = hit.point;
 
-				PointLight pLight;
-				pLight.position = hit.point + (hit.surfaceNormal);
-				pLight.color = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-				pLight.radiusAndPadding.set_x(5.0f);
+                if(keyhandler->rightMousePressed)
+                {
+                    PointLight pLight;
+                    pLight.position = hit.point + (hit.surfaceNormal);
+                    pLight.color = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+                    pLight.radiusAndPadding.set_x(5.0f);
 
-				LightServer::Instance()->AddPointLight(pLight);
+                    LightServer::Instance()->AddPointLight(pLight);
+                }
 			}
             else
             {
