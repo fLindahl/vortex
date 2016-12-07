@@ -51,6 +51,8 @@ namespace BaseGameFeature
 		bool A = false;
 		bool D = false;
 
+		bool leftShift = false;
+
 		bool quit = false;
 
 	};
@@ -124,6 +126,10 @@ namespace BaseGameFeature
 		{
 			D = true;
 		}
+		if (key == GLFW_KEY_LEFT_SHIFT)
+		{
+			leftShift = true;
+		}
 	}
 
 	inline void KeyHandler::setKeyStateReleased(int32 key)
@@ -171,6 +177,10 @@ namespace BaseGameFeature
 		if (key == GLFW_KEY_ESCAPE)
 		{
 			quit = true;
+		}
+		if (key == GLFW_KEY_LEFT_SHIFT)
+		{
+			leftShift = false;
 		}
 	}
 }

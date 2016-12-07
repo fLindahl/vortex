@@ -65,7 +65,12 @@ private:
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity4;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity5;
 
-	std::shared_ptr<Game::StaticEntity> SceneEntity;
+	std::shared_ptr<Game::StaticEntity> SceneEntity1;
+    std::shared_ptr<Game::StaticEntity> SceneEntity2;
+    std::shared_ptr<Game::StaticEntity> SceneEntity3;
+    std::shared_ptr<Game::StaticEntity> SceneEntity4;
+    std::shared_ptr<Game::StaticEntity> SceneEntity5;
+    std::shared_ptr<Game::StaticEntity> SceneEntity6;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 
@@ -75,7 +80,12 @@ private:
 	Render::GraphicsProperty* gProperty3;
 	Render::GraphicsProperty* gProperty4;
 
-	Render::GraphicsProperty* gPropertyScene;
+	Render::GraphicsProperty* gPropertyScene1;
+    Render::GraphicsProperty* gPropertyScene2;
+    Render::GraphicsProperty* gPropertyScene3;
+    Render::GraphicsProperty* gPropertyScene4;
+    Render::GraphicsProperty* gPropertyScene5;
+    Render::GraphicsProperty* gPropertyScene6;
 
 
 	Physics::PhysicsHit hit;
