@@ -10,6 +10,20 @@ namespace Render
 
 namespace Physics
 {
+struct BodyState
+{
+	Math::point position; //Cm on worldspace
+	Math::vector acceleration;
+	Math::quaternion orientation; //q
+	Math::vector linearVelocity; //v
+	Math::vector angularVelocity; //w
+	Math::vector force; //Force applied this frame
+	Math::vector torque; //Torque applied this frame
+	Math::mat4 R; //orientation matrix
+	Math::mat4 transform;
+	Math::mat4 invInertiaTensorWorld;
+};
+
 class RigidBody
 {
 public:
@@ -22,16 +36,19 @@ public:
     //void setGraphicsProperty(Render::GraphicsProperty* gp) {this->gProperty = gp;}
     void setCollider(std::shared_ptr<Physics::SurfaceCollider> coll);
 
-	Math::mat4 getTransform() { return this->transform; }
+	Math::mat4 getTransform() { return this->currentState.transform; }
 	Math::point getCenterOfMass() { return this->massCenter; }
-	Math::quaternion getOrientation() { return this->orientation; }
-	Math::point getPosition() { return this->position; }
-	Math::vector getLinearVelocity() { return this->linearVelocity; }
-	Math::vector getAngularVelocity() { return this->angularVelocity; }
-	Math::vector getForce() { return this->force; }
-	Math::vector getTorque() { return this->torque; }
-	Math::vector getAcceleration() { return this->acceleration; }
+	Math::quaternion getOrientation() { return this->currentState.orientation; }
+	Math::point getPosition() { return this->currentState.position; }
+	Math::vector getLinearVelocity() { return this->currentState.linearVelocity; }
+	Math::vector getAngularVelocity() { return this->currentState.angularVelocity; }
+	Math::vector getForce() { return this->currentState.force; }
+	Math::vector getTorque() { return this->currentState.torque; }
+	Math::vector getAcceleration() { return this->currentState.acceleration; }
+	BodyState& GetCurrentState() { return this->currentState; }
+	BodyState& GetPreviousState() { return this->previousState; }
 
+	BodyState Integrate(const BodyState& state, const double& frameTime);
 
 private:
     friend class PhysicsDevice;
@@ -42,7 +59,7 @@ private:
     void update(const double& frameTime);
     bool collide();
 
-    void calculateDerivedQuantities();
+    void calculateDerivedQuantities(BodyState& state);
 
     //Constant quantities
     float mass;
@@ -52,20 +69,23 @@ private:
     Math::mat4 invInertiaTensor; // model coordiantes
 
     //State Variables
-    Math::point position; //Cm on worldspace
-    Math::vector acceleration;
-    Math::quaternion orientation; //q
+	BodyState previousState;
+	BodyState currentState;
+
+    //Math::point position; //Cm on worldspace
+    //Math::vector acceleration;
+    //Math::quaternion orientation; //q
+    //Math::vec4 linearVelocity; //v
+    //Math::vec4 angularVelocity; //w
 
     //derived quantities
-    Math::mat4 R; //orientation matrix
-    Math::vec4 linearVelocity; //v
-    Math::vec4 angularVelocity; //w
-    Math::mat4 transform;
-    Math::mat4 invInertiaTensorWorld;
+    //Math::mat4 R; //orientation matrix
+    //Math::mat4 transform;
+    //Math::mat4 invInertiaTensorWorld;
 
     //accumilative quantities
-    Math::vector force;
-    Math::vector torque;
+    //Math::vector force;
+    //Math::vector torque;
 
     Game::RigidBodyEntity* owner;
     std::shared_ptr<Physics::BaseCollider> collider;

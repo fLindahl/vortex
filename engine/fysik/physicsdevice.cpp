@@ -311,6 +311,12 @@ void PhysicsDevice::Solve()
     BroadPhase();
     NarrowPhase();
 
+	//Update Derivative Quantities (transforms and such)
+	for (auto rigidbody : this->rigidBodies)
+	{
+		rigidbody->calculateDerivedQuantities(rigidbody->currentState);
+	}
+
     //-----TIME-----
     this->time = currentTime;
     //--------------
@@ -320,188 +326,380 @@ void PhysicsDevice::AddRigidBody(std::shared_ptr<RigidBody> rBody)
     this->rigidBodies.Append(rBody);
 }
 
-bool PhysicsDevice::GJKEPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, PhysicsCollision& collisionData)
+bool PhysicsDevice::GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex)
 {
-    //initialize vars
-    //Start point
-    Math::mat4 mat = Math::mat4::inverse(E1->GetGraphicsProperty()->getModelMatrix());
+	Math::mat4 invRotE1;
+	Math::mat4 invRotE2;
+	Math::mat4 transformE1;
+	Math::mat4 transformE2;
 
-    //Point list
-    Util::Array<SupportPoint> simplex = Util::Array<SupportPoint>();
-    simplex.Reserve(5);// Reserve 5 because we want 4 but don't want to grow our list...
+	if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+	{
+		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
+		invRotE1 = Math::mat4::inverse(rbe->GetRigidBody()->GetCurrentState().R);
+		transformE1 = Math::mat4::multiply(Math::mat4::translation(rbe->GetRigidBody()->getCenterOfMass() * -1.0f), rbe->GetRigidBody()->GetCurrentState().transform);
+	}
+	else
+	{
+		invRotE1 = E1->GetGraphicsProperty()->getModelMatrix();
+		invRotE1.set_position(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		invRotE1 = Math::mat4::inverse(invRotE1);
 
-    Math::point pointA = Support(Math::vec4(0.0f,1.0f,0.0f,1.0f), E1);
-    Math::point pointB = Support(Math::vec4(0.0f,-1.0f,0.0f,1.0f), E2);
+		transformE1 = E1->GetGraphicsProperty()->getModelMatrix();
+	}
 
-    Math::point diff = pointA - pointB;
+	if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+	{
+		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
+		invRotE2 = Math::mat4::inverse(rbe->GetRigidBody()->GetCurrentState().R);
+		transformE2 = Math::mat4::multiply(Math::mat4::translation(rbe->GetRigidBody()->getCenterOfMass() * -1.0f), rbe->GetRigidBody()->GetCurrentState().transform);
+	}
+	else
+	{
+		invRotE2 = E2->GetGraphicsProperty()->getModelMatrix();
+		invRotE2.set_position(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		invRotE2 = Math::mat4::inverse(invRotE2);
 
-    SupportPoint S;
+		transformE2 = E2->GetGraphicsProperty()->getModelMatrix();
+	}
 
-    S.pointDiff = diff;
-    S.pointA = pointA;
+	Math::point D = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 
-    simplex.Append(S);
+	Math::point pointA = Math::mat4::transform(Support(Math::mat4::transform(D, invRotE1), E1), transformE1);
+	Math::point pointB = Math::mat4::transform(Support(Math::mat4::transform(-D, invRotE2), E2), transformE2);
 
-    //Initial direction
-    Math::point D = -diff;
+	Math::point diff = pointA - pointB;
 
-    //Max iterations will be the largest list of vertices considering that we should probably converge faster than we run out of vertices.
-    size_t maxIterations = Math::max(E1->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer.Size(), E2->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer.Size());
+	//Start point
+	SupportPoint S;
 
-    bool collision = false;
+	S.pointDiff = diff;
+	S.pointA = pointA;
 
-    size_t i;
-    for (i = 0; i < maxIterations; ++i)
-    {
-        // new point is the point furthest away in direction towards origin.
-        pointA = Support(D, E1);
-        pointB = Support(-D, E2);
-        diff = pointA - pointB;
+	simplex.Append(S);
 
-        // if the dotproduct of A with our search direction is less than zero, we can immediately say our shape does not contain origin, thus our objects are not intersecting
-        if (Math::vec4::dot3(diff, D) < 0)
-        {
-            return false;
-        }
+	//Initial direction
+	D = -diff;
 
-        S.pointDiff = diff;
-        S.pointA = pointA;
+	//Max iterations will be the largest list of vertices considering that we should probably converge faster than we run out of vertices.
+	size_t maxIterations = Math::max(E1->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer.Size(), E2->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer.Size());
 
-        simplex.Append(S);
+	bool collision = false;
 
-        int res = DoSimplex(simplex, D);
-        if(res == 1)
-        {
-            collision = true;
-            break;
-        }
-        else if(res == -1)
-        {
-            return false;
-        }
-        else
-        {
-            continue;
-        }
-    }
+	size_t i;
+	for (i = 0; i < maxIterations; ++i)
+	{
+		// new point is the point furthest away in direction towards origin.
+		pointA = Math::mat4::transform(Support(Math::mat4::transform(D, invRotE1), E1), transformE1);
+		pointB = Math::mat4::transform(Support(Math::mat4::transform(-D, invRotE2), E2), transformE2);
+		diff = pointA - pointB;
 
-    if(i >= maxIterations)
-    {
-        return false;
-    }
+		// if the dotproduct of A with our search direction is less than zero, we can immediately say our shape does not contain origin, thus our objects are not intersecting
+		if (Math::vec4::dot3(diff, D) < 0)
+		{
+			return false;
+		}
 
-    //We have a collision.
-    //Use EPA to extrapolate collision depth, collision normal and contact point
+		S.pointDiff = diff;
+		S.pointA = pointA;
 
-    // list because we will be removing and adding a lot
-    std::list<Triangle> triangles;
-    std::list<Edge> edges;
+		simplex.Append(S);
 
-    // Add edge lambda function. Consider moving this to a static function as we won't ever change this.
-    auto addEdge = [&](const SupportPoint &a,const SupportPoint &b)->void
-    {
-        for(auto it = edges.begin(); it != edges.end(); it++)
-        {
-            if(it->points[0] == b && it->points[1] == a)
-            {
-                //opposite edge found, remove it and do not add new one
-                edges.erase(it);
-                return;
-            }
-        }
-        edges.emplace_back(a,b);
-    };
+		int res = DoSimplex(simplex, D);
+		if (res == 1)
+		{
+			collision = true;
+			return true;
+		}
+		else if (res == -1)
+		{
+			return false;
+		}
+		else
+		{
+			continue;
+		}
+	}
 
-    // add the GJK simplex triangles to the list
-    triangles.emplace_back(simplex[0], simplex[1], simplex[2]);
-    triangles.emplace_back(simplex[0], simplex[2], simplex[3]);
-    triangles.emplace_back(simplex[0], simplex[3], simplex[1]);
-    triangles.emplace_back(simplex[1], simplex[3], simplex[2]);
+	if (i >= maxIterations)
+	{
+		return false;
+	}
+}
 
-    while(true)
-    {
-        // find closest triangle to origin
-        std::list<Triangle>::iterator entry_cur_triangle_it = triangles.begin();
-        float entry_cur_dst = FLT_MAX;
-        for(auto it = triangles.begin(); it != triangles.end(); it++)
-        {
-            float dst = (float)fabs(Math::point::dot3(it->faceNormal, it->points[0].pointDiff));
-            if(dst < entry_cur_dst)
-            {
-                entry_cur_dst = dst;
-                entry_cur_triangle_it = it;
-            }
-        }
+PhysicsDevice::PhysicsCollision PhysicsDevice::EPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex)
+{
+	Math::mat4 invRotE1;
+	Math::mat4 invRotE2;
+	Math::mat4 transformE1;
+	Math::mat4 transformE2;
 
-        // get the next support point in front of the current triangle, away from the origin
-        pointA = Support(entry_cur_triangle_it->faceNormal, E1);
-        pointB = Support(-entry_cur_triangle_it->faceNormal, E2);
-        diff = pointA - pointB;
+	if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+	{
+		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
+		invRotE1 = Math::mat4::inverse(rbe->GetRigidBody()->GetCurrentState().R);
+		transformE1 = Math::mat4::multiply(Math::mat4::translation(rbe->GetRigidBody()->getCenterOfMass() * -1.0f), rbe->GetRigidBody()->GetCurrentState().transform);
+	}
+	else
+	{
+		invRotE1 = E1->GetGraphicsProperty()->getModelMatrix();
+		invRotE1.set_position(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		invRotE1 = Math::mat4::inverse(invRotE1);
 
-        //S is our new support point
-        S.pointDiff = diff;
-        S.pointA = pointA;
+		transformE1 = E1->GetGraphicsProperty()->getModelMatrix();
+	}
+
+	if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+	{
+		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
+		invRotE2 = Math::mat4::inverse(rbe->GetRigidBody()->GetCurrentState().R);
+		transformE2 = Math::mat4::multiply(Math::mat4::translation(rbe->GetRigidBody()->getCenterOfMass() * -1.0f), rbe->GetRigidBody()->GetCurrentState().transform);
+	}
+	else
+	{
+		invRotE2 = E2->GetGraphicsProperty()->getModelMatrix();
+		invRotE2.set_position(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		invRotE2 = Math::mat4::inverse(invRotE2);
+
+		transformE2 = E2->GetGraphicsProperty()->getModelMatrix();
+	}
+
+
+	// list because we will be removing and adding a lot
+	std::list<Triangle> triangles;
+	std::list<Edge> edges;
+
+	// Add edge lambda function. Consider moving this to a static function as we won't ever change this.
+	auto addEdge = [&](const SupportPoint &a, const SupportPoint &b)->void
+	{
+		for (auto it = edges.begin(); it != edges.end(); it++)
+		{
+			if (it->points[0] == b && it->points[1] == a)
+			{
+				//opposite edge found, remove it and do not add new one
+				edges.erase(it);
+				return;
+			}
+		}
+		edges.emplace_back(a, b);
+	};
+
+	// add the GJK simplex triangles to the list
+	triangles.emplace_back(simplex[0], simplex[1], simplex[2]);
+	triangles.emplace_back(simplex[0], simplex[2], simplex[3]);
+	triangles.emplace_back(simplex[0], simplex[3], simplex[1]);
+	triangles.emplace_back(simplex[1], simplex[3], simplex[2]);
+
+	SupportPoint S;
+
+	Math::point pointA;
+	Math::point pointB;
+	Math::point diff;
+
+	while (true)
+	{
+		// find closest triangle to origin
+		std::list<Triangle>::iterator entry_cur_triangle_it = triangles.begin();
+		float entry_cur_dst = FLT_MAX;
+		for (auto it = triangles.begin(); it != triangles.end(); it++)
+		{
+			float dst = (float)fabs(Math::point::dot3(it->faceNormal, it->points[0].pointDiff));
+			if (dst < entry_cur_dst)
+			{
+				entry_cur_dst = dst;
+				entry_cur_triangle_it = it;
+			}
+		}
+
+
+		// get the next support point in front of the current triangle, away from the origin
+		pointA = Math::mat4::transform(Support(Math::mat4::transform(entry_cur_triangle_it->faceNormal, invRotE1), E1), transformE1);
+		pointB = Math::mat4::transform(Support(Math::mat4::transform(-entry_cur_triangle_it->faceNormal, invRotE2), E2), transformE2);
+		diff = pointA - pointB;
+
+		//S is our new support point
+		S.pointDiff = diff;
+		S.pointA = pointA;
 
 		// If we're within a small threshold, we stop searching and decide on a contact point
-        if((Math::vec4::dot3(entry_cur_triangle_it->faceNormal, S.pointDiff) - entry_cur_dst < 0.001f))
-        {
-            // Find Contact point
-            // calculate the barycentric coordinates of the closest triangle with respect to
-            // the projection of the origin onto the triangle
+		if ((Math::vec4::dot3(entry_cur_triangle_it->faceNormal, S.pointDiff) - entry_cur_dst < 0.001f))
+		{
+			// Find Contact point
+			// calculate the barycentric coordinates of the closest triangle with respect to
+			// the projection of the origin onto the triangle
 			float u;
 			float v;
 			float w;
 
-            Math::barycentric(entry_cur_triangle_it->faceNormal * entry_cur_dst,
-                              entry_cur_triangle_it->points[0].pointDiff,
-                              entry_cur_triangle_it->points[1].pointDiff,
-							  entry_cur_triangle_it->points[2].pointDiff,
-							  u,
-                              v,
-                              w
-							 );
+			Math::barycentric(entry_cur_triangle_it->faceNormal * entry_cur_dst,
+				entry_cur_triangle_it->points[0].pointDiff,
+				entry_cur_triangle_it->points[1].pointDiff,
+				entry_cur_triangle_it->points[2].pointDiff,
+				u,
+				v,
+				w
+				);
 
-            // collision point on object a in world space
-            Math::point wcolpoint((entry_cur_triangle_it->points[0].pointA * u) +
-                                  (entry_cur_triangle_it->points[1].pointA * v) +
-                                  (entry_cur_triangle_it->points[2].pointA * w)
-                                 );
+			// collision point on object a in world space
+			Math::point wcolpoint((entry_cur_triangle_it->points[0].pointA * u) +
+				(entry_cur_triangle_it->points[1].pointA * v) +
+				(entry_cur_triangle_it->points[2].pointA * w)
+				);
 
-            // collision normal
-            Math::point wcolnormal = -entry_cur_triangle_it->faceNormal;
+			// collision normal
+			Math::point wcolnormal = -entry_cur_triangle_it->faceNormal;
 
-            // penetration depth
-            float wpendepth = entry_cur_dst;
+			// penetration depth
+			float wpendepth = entry_cur_dst;
 
-            collisionData.point = wcolpoint;
-            collisionData.normal = wcolnormal;
-            collisionData.penetrationDepth = wpendepth;
+			PhysicsCollision collisionData;
 
-            return true;
+			collisionData.point = wcolpoint;
+			collisionData.normal = wcolnormal;
+			collisionData.penetrationDepth = wpendepth;
 
-        }
+			return collisionData;
 
-        for(auto it = triangles.begin(); it != triangles.end();)
-        {
-            // can this face be "seen" by S?
-            if(Math::vec4::dot3(it->faceNormal, (S.pointDiff - it->points[0].pointDiff)) > 0)
-            {
-                addEdge(it->points[0],it->points[1]);
-                addEdge(it->points[1],it->points[2]);
-                addEdge(it->points[2],it->points[0]);
-                it = triangles.erase(it);
-                continue;
-            }
-            it++;
-        }
+		}
 
-        // create new triangles from the edges in the edge list
-        for(auto it = edges.begin(); it != edges.end(); it++) {
-            triangles.emplace_back(S, it->points[0], it->points[1]);
-        }
+		for (auto it = triangles.begin(); it != triangles.end();)
+		{
+			// can this face be "seen" by S?
+			if (Math::vec4::dot3(it->faceNormal, (S.pointDiff - it->points[0].pointDiff)) > 0)
+			{
+				addEdge(it->points[0], it->points[1]);
+				addEdge(it->points[1], it->points[2]);
+				addEdge(it->points[2], it->points[0]);
+				it = triangles.erase(it);
+				continue;
+			}
+			it++;
+		}
 
-        edges.clear();
-    }
+		// create new triangles from the edges in the edge list
+		for (auto it = edges.begin(); it != edges.end(); it++) {
+			triangles.emplace_back(S, it->points[0], it->points[1]);
+		}
+
+		edges.clear();
+	}
+}
+
+bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, PhysicsCollision& collisionData)
+{
+    //initialize vars
+    //Point list
+    Util::Array<SupportPoint> simplex = Util::Array<SupportPoint>();
+    simplex.Reserve(5);// Reserve 5 because we want 4 but don't want to grow our list...
+
+	Util::Array<SupportPoint> prevSimplex = Util::Array<SupportPoint>();
+	prevSimplex.Reserve(5);// Reserve 5 because we want 4 but don't want to grow our list...
+
+	if (GJK(E1, E2, simplex))
+	{
+
+		//We have a collision.
+		//Use integrator to find the time of collision and set bodies to that state.
+		auto Euler = [&](const double& frameTime)->void
+		{
+			// DO NOTHING :D
+		};
+
+		auto MidPoint = [&](const double& frameTime)->void
+		{
+			//previousState is at t = 0
+			//currentState is at t = frameTime
+
+			double t = frameTime;
+			double prevT = t;
+
+			BodyState originalStateE1;
+			BodyState originalStateE2;
+
+			BodyState lastCollisionStateE1;
+			BodyState newE1State;
+			BodyState lastCollisionStateE2;
+			BodyState newE2State;
+
+			/*
+			if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+			{
+				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
+				prevE1State = rbe->GetRigidBody()->GetCurrentState();
+				originalStateE1 = prevE1State;
+			}
+			if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+			{
+				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
+				prevE2State = rbe->GetRigidBody()->GetCurrentState();
+				originalStateE2 = prevE2State;
+			}
+			*/
+
+			const int maxIterations = 4;
+			int i = 0;
+			do
+			{
+				prevSimplex = simplex;
+				simplex.Clear();
+				prevT = t;
+				//Divide frametime
+				t = t / 2;
+
+				//Integrate, then check if we're still colliding. If we're still colliding we keep going. If we're not, we use the previous t and simplex and we perform EPA and apply collisions! 
+				if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+				{
+					Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
+					lastCollisionStateE1 = rbe->GetRigidBody()->GetCurrentState();
+
+					newE1State = rbe->GetRigidBody()->Integrate(rbe->GetRigidBody()->GetPreviousState(), t);
+					rbe->GetRigidBody()->calculateDerivedQuantities(newE1State);
+					rbe->GetRigidBody()->GetCurrentState() = newE1State;
+				}
+				if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+				{
+					Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
+					lastCollisionStateE2 = newE2State;
+
+					newE2State = rbe->GetRigidBody()->Integrate(rbe->GetRigidBody()->GetPreviousState(), t);
+					rbe->GetRigidBody()->calculateDerivedQuantities(newE2State);
+					rbe->GetRigidBody()->GetCurrentState() = newE2State;
+				}
+
+				++i;
+			} while (i < maxIterations && GJK(E1, E2, simplex));
+
+			//Set everything to previous state
+			if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+			{
+				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
+				rbe->GetRigidBody()->GetCurrentState() = lastCollisionStateE1;
+				printf("a");
+			}
+			if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+			{
+				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
+				rbe->GetRigidBody()->GetCurrentState() = lastCollisionStateE2;
+			}
+
+			simplex = prevSimplex;
+		};
+
+		auto RK4 = [&](const double& frameTime)->void
+		{
+
+		};
+
+		MidPoint(this->frameTime);
+
+		//Use EPA to extrapolate collision depth, collision normal and contact point
+		collisionData = EPA(E1, E2, simplex);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 int PhysicsDevice::DoSimplex(Util::Array<SupportPoint>& simplex, Math::point& D)
@@ -532,21 +730,16 @@ int PhysicsDevice::DoSimplex(Util::Array<SupportPoint>& simplex, Math::point& D)
 
 Math::point PhysicsDevice::Support(const Math::point &dir, Game::PhysicsEntity *entity)
 {
-	Math::mat4 rot = entity->GetGraphicsProperty()->getModelMatrix();
-	rot.set_position(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-
-	Math::point D = Math::mat4::transform(dir, Math::mat4::inverse(rot));
-
 	Util::Array<Render::MeshResource::OBJVertex>& vertbuffer = entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer;
 	Math::point p = Math::point(vertbuffer[0].pos[0], vertbuffer[0].pos[1], vertbuffer[0].pos[2]);
-	float max = Math::vector::dot3(p, D);
+	float max = Math::vector::dot3(p, dir);
 
 	Math::point temp;
 
 	for (int i = 1; i < vertbuffer.Size(); ++i)
 	{
 		temp = Math::point(vertbuffer[i].pos[0], vertbuffer[i].pos[1], vertbuffer[i].pos[2]);
-		float t = Math::vector::dot3(temp, D);
+		float t = Math::vector::dot3(temp, dir);
 		if (t >= max)
 		{
 			p = temp;
@@ -554,7 +747,7 @@ Math::point PhysicsDevice::Support(const Math::point &dir, Game::PhysicsEntity *
 		}
 	}
 
-	return Math::mat4::transform(p, entity->GetGraphicsProperty()->getModelMatrix());
+	return p;
 }
 
 int cmpAABBs(const void* a, const void* b)
@@ -648,9 +841,9 @@ void PhysicsDevice::NarrowPhase()
 		Game::PhysicsEntity* E1 = pair.first;
 		Game::PhysicsEntity* E2 = pair.second;
 
-        if(GJKEPA(E1, E2, collData))
+		if(CheckForCollision(E1, E2, collData))
         {
-			CollideEntities(E1, E2, collData);
+			CollideEntities(E1, E2, collData); 
 			
             this->hasCollision = true;
         }
@@ -667,10 +860,10 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(a);
 
 		aDynamicsData.massInv = rbe->GetRigidBody()->massInv;
-		aDynamicsData.angularVelocity = rbe->GetRigidBody()->angularVelocity;
-		aDynamicsData.linearVelocity = rbe->GetRigidBody()->linearVelocity;
-		aDynamicsData.invInertiaTensorWorld = rbe->GetRigidBody()->invInertiaTensorWorld;
-		aDynamicsData.position = rbe->GetRigidBody()->position;
+		aDynamicsData.angularVelocity = rbe->GetRigidBody()->currentState.angularVelocity;
+		aDynamicsData.linearVelocity = rbe->GetRigidBody()->currentState.linearVelocity;
+		aDynamicsData.invInertiaTensorWorld = rbe->GetRigidBody()->currentState.invInertiaTensorWorld;
+		aDynamicsData.position = rbe->GetRigidBody()->currentState.position;
 	}
 
 	if (b->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
@@ -678,18 +871,18 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(b);
 
 		bDynamicsData.massInv = rbe->GetRigidBody()->massInv;
-		bDynamicsData.angularVelocity = rbe->GetRigidBody()->angularVelocity;
-		bDynamicsData.linearVelocity = rbe->GetRigidBody()->linearVelocity;
-		bDynamicsData.invInertiaTensorWorld = rbe->GetRigidBody()->invInertiaTensorWorld;
-		bDynamicsData.position = rbe->GetRigidBody()->position;
+		bDynamicsData.angularVelocity = rbe->GetRigidBody()->currentState.angularVelocity;
+		bDynamicsData.linearVelocity = rbe->GetRigidBody()->currentState.linearVelocity;
+		bDynamicsData.invInertiaTensorWorld = rbe->GetRigidBody()->currentState.invInertiaTensorWorld;
+		bDynamicsData.position = rbe->GetRigidBody()->currentState.position;
 	}
 
-	Math::vec4 dPa = aDynamicsData.linearVelocity + Math::vec4::cross3(aDynamicsData.angularVelocity, (collData.point - aDynamicsData.position));
-	Math::vec4 dPb = bDynamicsData.linearVelocity + Math::vec4::cross3(bDynamicsData.angularVelocity, (collData.point - bDynamicsData.position));
+	Math::point dPa = aDynamicsData.linearVelocity + Math::point::cross3(aDynamicsData.angularVelocity, (aDynamicsData.position - collData.point));
+	Math::point dPb = bDynamicsData.linearVelocity + Math::point::cross3(bDynamicsData.angularVelocity, (bDynamicsData.position - collData.point));
 
 	float relVelocity = Math::vec4::dot3(collData.normal, (dPa - dPb));
 
-	float restitution = 0.5f;
+	float restitution = 1.0f;
 
 	float num = -(1 + restitution) * relVelocity;
 
@@ -697,14 +890,16 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 
 	Math::vec4 relPointA = collData.point - aDynamicsData.position;
 	Math::vec4 tangentA = Math::vec4::cross3(relPointA, collData.normal);
+	tangentA = Math::mat4::transform(tangentA, aDynamicsData.invInertiaTensorWorld);
 	tangentA = Math::vec4::cross3(tangentA, relPointA);
 
 	Math::vec4 relPointB = collData.point - bDynamicsData.position;
 	Math::vec4 tangentB = Math::vec4::cross3(relPointB, collData.normal);
+	tangentB = Math::mat4::transform(tangentB, bDynamicsData.invInertiaTensorWorld);
 	tangentB = Math::vec4::cross3(tangentB, relPointB);
 
-	float forceA = Math::vec4::dot3(collData.normal, (Math::mat4::transform(tangentA, aDynamicsData.invInertiaTensorWorld)));
-	float forceB = Math::vec4::dot3(collData.normal, (Math::mat4::transform(tangentB, bDynamicsData.invInertiaTensorWorld)));
+	float forceA = Math::vec4::dot3(collData.normal, tangentA);
+	float forceB = Math::vec4::dot3(collData.normal, tangentB);
 
 	float denom = Msum + forceA + forceB;
 
@@ -713,17 +908,15 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 	if (a->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
 	{
 		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(a);
-		rbe->GetRigidBody()->position += collData.normal * collData.penetrationDepth;
-		rbe->GetRigidBody()->transform.translate(Math::vector(collData.normal * (collData.penetrationDepth * 0.5f)));
 		rbe->GetRigidBody()->applyForceAtPoint(collData.normal, j, collData.point);
+		rbe->GetRigidBody()->currentState.position += collData.normal * collData.penetrationDepth;
 	}
 
 	if (b->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
 	{
 		Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(b);
-		rbe->GetRigidBody()->position += -collData.normal * collData.penetrationDepth;
-		rbe->GetRigidBody()->transform.translate(Math::vector(-collData.normal * (collData.penetrationDepth * 0.5f)));
 		rbe->GetRigidBody()->applyForceAtPoint(-collData.normal, j, collData.point);
+		rbe->GetRigidBody()->currentState.position += -collData.normal * collData.penetrationDepth;
 	}
 }
 

@@ -51,7 +51,7 @@ private:
     struct PhysicsCollision
     {
         Math::point point;
-        Math::vec4 normal;
+        Math::point normal;
         float penetrationDepth;
     };
 
@@ -81,7 +81,10 @@ private:
     double frameTime;
 
     Math::point Support(const Math::point& dir, Game::PhysicsEntity* entity);
-    bool GJKEPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, PhysicsCollision& collisionData);
+	bool CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, PhysicsCollision& collisionData);
+
+	bool GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex);
+	PhysicsCollision EPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex);
 
     void BroadPhase();
     void NarrowPhase();
