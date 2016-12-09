@@ -70,7 +70,10 @@ SET(files_render_server
 	server/resourceserver.h
 	server/resourceserver.cpp
 	server/shaderconstants.h
-    server/renderdevice.h server/renderdevice.cpp
+    server/renderdevice.h
+	server/renderdevice.cpp
+	server/visibilityserver.h
+	server/visibilityserver.cpp
 )
 	
 SET(files_render_softwarerender

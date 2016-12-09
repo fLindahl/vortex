@@ -6,14 +6,14 @@
 namespace Physics
 {
 
-RigidBody::RigidBody() :
- acceleration(0.0f),
- linearVelocity(0.0f),
- angularVelocity(0.0f),
- force(0.0f),
- torque(0.0f)
+RigidBody::RigidBody() 
 {
-	this->orientation = Math::quaternion::identity();
+	this->currentState.orientation = Math::quaternion::identity();
+	this->currentState.acceleration = 0.0f;
+	this->currentState.linearVelocity = 0.0f;
+	this->currentState.angularVelocity = 0.0f;
+	this->currentState.force = 0.0f;
+	this->currentState.torque = 0.0f;
 }
 
 RigidBody::~RigidBody()
@@ -27,8 +27,8 @@ void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTenso
     this->collider = this->owner->GetCollider();
 
     this->massCenter = (this->collider->getbbox().maxPoint + this->collider->getbbox().minPoint) * 0.5f;
-    this->position = entity->GetTransform().get_position() + this->massCenter;
-    this->orientation = Math::mat4::rotationmatrix(entity->GetTransform());
+	this->currentState.position = entity->GetTransform().get_position() + this->massCenter;
+	this->currentState.orientation = Math::mat4::rotationmatrix(entity->GetTransform());
 
     this->mass = mass;
     this->massInv = 1.0f/this->mass;
@@ -37,7 +37,7 @@ void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTenso
     this->inertiaTensor = bodyInertiaTensor;
     this->invInertiaTensor = Math::mat4::inverse(this->inertiaTensor);
 
-    this->calculateDerivedQuantities();
+    this->calculateDerivedQuantities(this->currentState);
 }
 
 void RigidBody::setCollider(std::shared_ptr<Physics::SurfaceCollider> coll)
@@ -47,57 +47,63 @@ void RigidBody::setCollider(std::shared_ptr<Physics::SurfaceCollider> coll)
 
 void RigidBody::applyForce(const Math::vec4 &dir, const float &magnitude)
 {
-    this->force += dir*magnitude;
+	this->currentState.force += dir*magnitude;
 }
 
 void RigidBody::applyForceAtPoint(const Math::vec4 &dir, const float &magnitude, const Math::point &worldPos)
 {
     Math::vector impulse = dir*magnitude;
-    this->force += impulse;
+	this->currentState.force += impulse;
 
-    Math::point relativeContactPosition = worldPos - this->position;
+    Math::point relativeContactPosition = worldPos - this->currentState.position;
     Math::vector impulsiveTorque = Math::vector::cross3(impulse, relativeContactPosition);
-    this->torque += Math::mat4::transform(impulsiveTorque, this->invInertiaTensor);
+	this->currentState.torque += Math::mat4::transform(impulsiveTorque, this->invInertiaTensor);
 
+}
+
+BodyState RigidBody::Integrate(const BodyState& oldState, const double& frameTime)
+{
+	BodyState newState;
+
+	Math::vector lastFrameAcceleration = oldState.acceleration;
+	lastFrameAcceleration += oldState.force * this->massInv;
+
+	newState.linearVelocity = oldState.linearVelocity + lastFrameAcceleration;
+
+	newState.position = oldState.position + (newState.linearVelocity * frameTime);
+
+	Math::vector angularAcceleration = Math::mat4::transform(oldState.torque, oldState.invInertiaTensorWorld);
+
+	newState.angularVelocity = oldState.angularVelocity + angularAcceleration * frameTime;
+
+	Math::quaternion q = Math::quaternion::multiply(oldState.orientation, Math::quaternion(newState.angularVelocity.x() * frameTime, newState.angularVelocity.y() * frameTime, newState.angularVelocity.z() * frameTime, 0.0f));
+	Math::quaternion::scale(q, 0.5f);
+
+	newState.orientation.set(oldState.orientation.x() + q.x(), oldState.orientation.y() + q.y(), oldState.orientation.z() + q.z(), oldState.orientation.w() + q.w());
+	newState.orientation = Math::quaternion::normalize(newState.orientation);
+	
+	newState.force = Math::vector::zerovector();
+	newState.torque = Math::vector::zerovector();
+
+	return newState;
 }
 
 void RigidBody::update(const double& frameTime)
 {
     assert(frameTime > 0.0);
 	
-    Math::vector lastFrameAcceleration = this->acceleration;
-    lastFrameAcceleration += force * massInv;
-
-	this->linearVelocity += lastFrameAcceleration;
-
-	this->position += (this->linearVelocity * frameTime);
-
-    Math::vector angularAcceleration = Math::mat4::transform(torque, invInertiaTensorWorld);
-
-    this->angularVelocity += angularAcceleration * frameTime;
-
-	Math::quaternion q = Math::quaternion::multiply(this->orientation, Math::quaternion(this->angularVelocity.x() * frameTime, this->angularVelocity.y() * frameTime, this->angularVelocity.z() * frameTime, 0.0f));
-	Math::quaternion::scale(q, 0.5f);
-
-	this->orientation.set(this->orientation.x() + q.x(), this->orientation.y() + q.y(), this->orientation.z() + q.z(), this->orientation.w() + q.w());
-    this->orientation = Math::quaternion::normalize(this->orientation);
-
-    this->calculateDerivedQuantities();
-
-    this->force = Math::vector::zerovector();
-    this->torque = Math::vector::zerovector();
-
+	this->previousState = this->currentState;
+	this->currentState = Integrate(this->previousState, frameTime);
+	this->calculateDerivedQuantities(currentState);
 }
 
-void RigidBody::calculateDerivedQuantities()
+void RigidBody::calculateDerivedQuantities(BodyState& state)
 {
-    this->R = Math::mat4::rotationquaternion(this->orientation);
-    //this->R = Math::mat4::multiply(this->R, Math::mat4::translation(this->massCenter));
-    Math::mat4 invBodyTensorRotated = Math::mat4::multiply(this->invInertiaTensor, Math::mat4::transpose(this->R));
-    this->invInertiaTensorWorld = Math::mat4::multiply(this->R, invBodyTensorRotated);
-    this->transform = R;
-    this->transform = Math::mat4::multiply(this->transform, Math::mat4::translation(this->position));
-    //this->transform.set_position(this->position);
+    state.R = Math::mat4::rotationquaternion(state.orientation);
+    Math::mat4 invBodyTensorRotated = Math::mat4::multiply(this->invInertiaTensor, Math::mat4::transpose(state.R));
+    state.invInertiaTensorWorld = Math::mat4::multiply(state.R, invBodyTensorRotated);
+    state.transform = state.R;
+    state.transform = Math::mat4::multiply(state.transform, Math::mat4::translation(state.position));
 }
 
 bool RigidBody::collide()
