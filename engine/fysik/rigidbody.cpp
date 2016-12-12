@@ -65,6 +65,8 @@ BodyState RigidBody::Integrate(const BodyState& oldState, const double& frameTim
 {
 	BodyState newState;
 
+    newState.dt = frameTime;
+
 	Math::point lastFrameAcceleration = oldState.acceleration;
 	lastFrameAcceleration += oldState.force * this->massInv;
 
