@@ -609,7 +609,6 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 		{
 			//previousState is at t = 0
 			//currentState is at t = frameTime
-
 			double t = frameTime;
 			double prevT = t;
 
@@ -621,21 +620,6 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 			BodyState lastCollisionStateE2;
 			BodyState newE2State;
 
-			/*
-			if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
-			{
-				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
-				prevE1State = rbe->GetRigidBody()->GetCurrentState();
-				originalStateE1 = prevE1State;
-			}
-			if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
-			{
-				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
-				prevE2State = rbe->GetRigidBody()->GetCurrentState();
-				originalStateE2 = prevE2State;
-			}
-			*/
-
 			const int maxIterations = 4;
 			int i = 0;
 			do
@@ -645,6 +629,9 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 				prevT = t;
 				//Divide frametime
 				t = t / 2;
+
+				if (t <= 0)
+					break;
 
 				//Integrate, then check if we're still colliding. If we're still colliding we keep going. If we're not, we use the previous t and simplex and we perform EPA and apply collisions! 
 				if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
@@ -659,7 +646,7 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 				if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
 				{
 					Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
-					lastCollisionStateE2 = newE2State;
+					lastCollisionStateE2 = rbe->GetRigidBody()->GetCurrentState();
 
 					newE2State = rbe->GetRigidBody()->Integrate(rbe->GetRigidBody()->GetPreviousState(), t);
 					rbe->GetRigidBody()->calculateDerivedQuantities(newE2State);
@@ -674,12 +661,14 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 			{
 				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
 				rbe->GetRigidBody()->GetCurrentState() = lastCollisionStateE1;
-				printf("a");
+				rbe->GetRigidBody()->calculateDerivedQuantities(rbe->GetRigidBody()->GetCurrentState());
+				//printf("a");
 			}
 			if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
 			{
 				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
 				rbe->GetRigidBody()->GetCurrentState() = lastCollisionStateE2;
+				rbe->GetRigidBody()->calculateDerivedQuantities(rbe->GetRigidBody()->GetCurrentState());
 			}
 
 			simplex = prevSimplex;
@@ -865,6 +854,10 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 		aDynamicsData.invInertiaTensorWorld = rbe->GetRigidBody()->currentState.invInertiaTensorWorld;
 		aDynamicsData.position = rbe->GetRigidBody()->currentState.position;
 	}
+	else
+	{
+		aDynamicsData.position = a->GetTransform().get_position();
+	}
 
 	if (b->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
 	{
@@ -876,11 +869,15 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 		bDynamicsData.invInertiaTensorWorld = rbe->GetRigidBody()->currentState.invInertiaTensorWorld;
 		bDynamicsData.position = rbe->GetRigidBody()->currentState.position;
 	}
+	else
+	{
+		bDynamicsData.position = b->GetTransform().get_position();
+	}
 
 	Math::point dPa = aDynamicsData.linearVelocity + Math::point::cross3(aDynamicsData.angularVelocity, (aDynamicsData.position - collData.point));
 	Math::point dPb = bDynamicsData.linearVelocity + Math::point::cross3(bDynamicsData.angularVelocity, (bDynamicsData.position - collData.point));
 
-	float relVelocity = Math::vec4::dot3(collData.normal, (dPa - dPb));
+	float relVelocity = Math::point::dot3(collData.normal, (dPa - dPb));
 
 	float restitution = 1.0f;
 
@@ -888,18 +885,18 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 
 	float Msum = aDynamicsData.massInv + bDynamicsData.massInv;
 
-	Math::vec4 relPointA = collData.point - aDynamicsData.position;
-	Math::vec4 tangentA = Math::vec4::cross3(relPointA, collData.normal);
+	Math::point relPointA = collData.point - aDynamicsData.position;
+	Math::point tangentA = Math::point::cross3(relPointA, collData.normal);
 	tangentA = Math::mat4::transform(tangentA, aDynamicsData.invInertiaTensorWorld);
-	tangentA = Math::vec4::cross3(tangentA, relPointA);
+	tangentA = Math::point::cross3(tangentA, relPointA);
 
-	Math::vec4 relPointB = collData.point - bDynamicsData.position;
-	Math::vec4 tangentB = Math::vec4::cross3(relPointB, collData.normal);
+	Math::point relPointB = collData.point - bDynamicsData.position;
+	Math::point tangentB = Math::point::cross3(relPointB, collData.normal);
 	tangentB = Math::mat4::transform(tangentB, bDynamicsData.invInertiaTensorWorld);
-	tangentB = Math::vec4::cross3(tangentB, relPointB);
+	tangentB = Math::point::cross3(tangentB, relPointB);
 
-	float forceA = Math::vec4::dot3(collData.normal, tangentA);
-	float forceB = Math::vec4::dot3(collData.normal, tangentB);
+	float forceA = Math::point::dot3(collData.normal, tangentA);
+	float forceB = Math::point::dot3(collData.normal, tangentB);
 
 	float denom = Msum + forceA + forceB;
 

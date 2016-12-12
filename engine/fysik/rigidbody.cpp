@@ -9,11 +9,11 @@ namespace Physics
 RigidBody::RigidBody() 
 {
 	this->currentState.orientation = Math::quaternion::identity();
-	this->currentState.acceleration = 0.0f;
-	this->currentState.linearVelocity = 0.0f;
-	this->currentState.angularVelocity = 0.0f;
-	this->currentState.force = 0.0f;
-	this->currentState.torque = 0.0f;
+	this->currentState.acceleration = Math::point::zerovector();
+	this->currentState.linearVelocity = Math::point::zerovector();
+	this->currentState.angularVelocity = Math::point::zerovector();
+	this->currentState.force = Math::point::zerovector();
+	this->currentState.torque = Math::point::zerovector();
 }
 
 RigidBody::~RigidBody()
@@ -52,11 +52,11 @@ void RigidBody::applyForce(const Math::vec4 &dir, const float &magnitude)
 
 void RigidBody::applyForceAtPoint(const Math::vec4 &dir, const float &magnitude, const Math::point &worldPos)
 {
-    Math::vector impulse = dir*magnitude;
+	Math::point impulse = dir*magnitude;
 	this->currentState.force += impulse;
 
     Math::point relativeContactPosition = worldPos - this->currentState.position;
-    Math::vector impulsiveTorque = Math::vector::cross3(impulse, relativeContactPosition);
+	Math::point impulsiveTorque = Math::point::cross3(impulse, relativeContactPosition);
 	this->currentState.torque += Math::mat4::transform(impulsiveTorque, this->invInertiaTensor);
 
 }
@@ -65,14 +65,14 @@ BodyState RigidBody::Integrate(const BodyState& oldState, const double& frameTim
 {
 	BodyState newState;
 
-	Math::vector lastFrameAcceleration = oldState.acceleration;
+	Math::point lastFrameAcceleration = oldState.acceleration;
 	lastFrameAcceleration += oldState.force * this->massInv;
 
 	newState.linearVelocity = oldState.linearVelocity + lastFrameAcceleration;
 
 	newState.position = oldState.position + (newState.linearVelocity * frameTime);
 
-	Math::vector angularAcceleration = Math::mat4::transform(oldState.torque, oldState.invInertiaTensorWorld);
+	Math::point angularAcceleration = Math::mat4::transform(oldState.torque, oldState.invInertiaTensorWorld);
 
 	newState.angularVelocity = oldState.angularVelocity + angularAcceleration * frameTime;
 

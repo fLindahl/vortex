@@ -31,8 +31,8 @@ enum ColliderShape
 struct DynamicsData
 {
 	float massInv = 0;
-	Math::vec4 linearVelocity = Math::vec4::zerovector();
-	Math::vec4 angularVelocity = Math::vec4::zerovector();
+	Math::point linearVelocity = Math::point::zerovector();
+	Math::point angularVelocity = Math::point::zerovector();
 	Math::mat4 invInertiaTensorWorld = Math::mat4::zeromatrix();
 	Math::point position = Math::point::zerovector();
 };
