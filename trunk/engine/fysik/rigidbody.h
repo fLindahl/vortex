@@ -13,12 +13,12 @@ namespace Physics
 struct BodyState
 {
 	Math::point position; //Cm on worldspace
-	Math::vector acceleration;
+	Math::point acceleration;
 	Math::quaternion orientation; //q
-	Math::vector linearVelocity; //v
-	Math::vector angularVelocity; //w
-	Math::vector force; //Force applied this frame
-	Math::vector torque; //Torque applied this frame
+	Math::point linearVelocity; //v
+	Math::point angularVelocity; //w
+	Math::point force; //Force applied this frame
+	Math::point torque; //Torque applied this frame
 	Math::mat4 R; //orientation matrix
 	Math::mat4 transform;
 	Math::mat4 invInertiaTensorWorld;
@@ -40,11 +40,11 @@ public:
 	Math::point getCenterOfMass() { return this->massCenter; }
 	Math::quaternion getOrientation() { return this->currentState.orientation; }
 	Math::point getPosition() { return this->currentState.position; }
-	Math::vector getLinearVelocity() { return this->currentState.linearVelocity; }
-	Math::vector getAngularVelocity() { return this->currentState.angularVelocity; }
-	Math::vector getForce() { return this->currentState.force; }
-	Math::vector getTorque() { return this->currentState.torque; }
-	Math::vector getAcceleration() { return this->currentState.acceleration; }
+	Math::point getLinearVelocity() { return this->currentState.linearVelocity; }
+	Math::point getAngularVelocity() { return this->currentState.angularVelocity; }
+	Math::point getForce() { return this->currentState.force; }
+	Math::point getTorque() { return this->currentState.torque; }
+	Math::point getAcceleration() { return this->currentState.acceleration; }
 	BodyState& GetCurrentState() { return this->currentState; }
 	BodyState& GetPreviousState() { return this->previousState; }
 
