@@ -12,6 +12,7 @@ namespace Physics
 {
 struct BodyState
 {
+    double dt;
 	Math::point position; //Cm on worldspace
 	Math::point acceleration;
 	Math::quaternion orientation; //q
