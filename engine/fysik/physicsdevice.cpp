@@ -608,100 +608,93 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 
 		//We have a collision.
 		//Use integrator to find the time of collision and set bodies to that state.
-		auto Euler = [&](const double& frameTime)->void
+
+		
+		//------------------------------------------------
+		// Midpoint for finding true collision
+		//-------
+
+		//previousState is at t = 0
+		//currentState is at t = frameTime
+		double t = frameTime;
+		double prevT = t;
+
+		BodyState originalStateE1;
+		BodyState originalStateE2;
+
+		BodyState lastCollisionStateE1;
+		BodyState newE1State;
+		BodyState lastCollisionStateE2;
+		BodyState newE2State;
+
+        if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+        {
+            Game::RigidBodyEntity *rbe = dynamic_cast<Game::RigidBodyEntity *>(E1);
+            originalStateE1 = rbe->GetRigidBody()->GetCurrentState();
+        }
+        if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+        {
+            Game::RigidBodyEntity *rbe = dynamic_cast<Game::RigidBodyEntity *>(E2);
+            originalStateE2 = rbe->GetRigidBody()->GetCurrentState();
+        }
+
+		const int maxIterations = 4;
+		int i = 0;
+		do
 		{
-			// DO NOTHING :D
-		};
+			prevSimplex = simplex;
+			simplex.Clear();
+			prevT = t;
+			//Divide frametime
+			t = t / 2;
 
-		auto MidPoint = [&](const double& frameTime)->void
-		{
-			//previousState is at t = 0
-			//currentState is at t = frameTime
-			double t = frameTime;
-			double prevT = t;
+			if (t <= 0)
+				break;
 
-			BodyState originalStateE1;
-			BodyState originalStateE2;
-
-			BodyState lastCollisionStateE1;
-			BodyState newE1State;
-			BodyState lastCollisionStateE2;
-			BodyState newE2State;
-
-            if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
-            {
-                Game::RigidBodyEntity *rbe = dynamic_cast<Game::RigidBodyEntity *>(E1);
-                originalStateE1 = rbe->GetRigidBody()->GetCurrentState();
-            }
-            if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
-            {
-                Game::RigidBodyEntity *rbe = dynamic_cast<Game::RigidBodyEntity *>(E2);
-                originalStateE2 = rbe->GetRigidBody()->GetCurrentState();
-            }
-
-			const int maxIterations = 4;
-			int i = 0;
-			do
-			{
-				prevSimplex = simplex;
-				simplex.Clear();
-				prevT = t;
-				//Divide frametime
-				t = t / 2;
-
-				if (t <= 0)
-					break;
-
-				//Integrate, then check if we're still colliding. If we're still colliding we keep going. If we're not, we use the previous t and simplex and we perform EPA and apply collisions! 
-				if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
-				{
-					Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
-					lastCollisionStateE1 = rbe->GetRigidBody()->GetCurrentState();
-
-					newE1State = rbe->GetRigidBody()->Integrate(rbe->GetRigidBody()->GetPreviousState(), t);
-					rbe->GetRigidBody()->calculateDerivedQuantities(newE1State);
-					rbe->GetRigidBody()->GetCurrentState() = newE1State;
-				}
-				if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
-				{
-					Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
-					lastCollisionStateE2 = rbe->GetRigidBody()->GetCurrentState();
-
-					newE2State = rbe->GetRigidBody()->Integrate(rbe->GetRigidBody()->GetPreviousState(), t);
-					rbe->GetRigidBody()->calculateDerivedQuantities(newE2State);
-					rbe->GetRigidBody()->GetCurrentState() = newE2State;
-				}
-
-				++i;
-			} while (i < maxIterations && GJK(E1, E2, simplex));
-
-			//Set everything to previous state
+			//Integrate, then check if we're still colliding. If we're still colliding we keep going. If we're not, we use the previous t and simplex and we perform EPA and apply collisions! 
 			if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
 			{
 				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
-				rbe->GetRigidBody()->GetCurrentState() = lastCollisionStateE1;
-				rbe->GetRigidBody()->calculateDerivedQuantities(rbe->GetRigidBody()->GetCurrentState());
-                rbe->GetRigidBody()->GetCurrentState().force += originalStateE1.force;
-                rbe->GetRigidBody()->GetCurrentState().torque += originalStateE1.torque;
+				lastCollisionStateE1 = rbe->GetRigidBody()->GetCurrentState();
+
+				newE1State = rbe->GetRigidBody()->Integrate(rbe->GetRigidBody()->GetPreviousState(), t);
+				rbe->GetRigidBody()->calculateDerivedQuantities(newE1State);
+				rbe->GetRigidBody()->GetCurrentState() = newE1State;
 			}
 			if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
 			{
 				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
-				rbe->GetRigidBody()->GetCurrentState() = lastCollisionStateE2;
-				rbe->GetRigidBody()->calculateDerivedQuantities(rbe->GetRigidBody()->GetCurrentState());
-                rbe->GetRigidBody()->GetCurrentState().force += originalStateE2.force;
-                rbe->GetRigidBody()->GetCurrentState().torque += originalStateE2.torque;
+				lastCollisionStateE2 = rbe->GetRigidBody()->GetCurrentState();
+
+				newE2State = rbe->GetRigidBody()->Integrate(rbe->GetRigidBody()->GetPreviousState(), t);
+				rbe->GetRigidBody()->calculateDerivedQuantities(newE2State);
+				rbe->GetRigidBody()->GetCurrentState() = newE2State;
 			}
 
-			simplex = prevSimplex;
-		};
+			++i;
+		} while (i < maxIterations && GJK(E1, E2, simplex));
 
-		auto RK4 = [&](const double& frameTime)->void
+		//Set everything to previous state
+		if (E1->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
 		{
+			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E1);
+			rbe->GetRigidBody()->GetCurrentState() = lastCollisionStateE1;
+			rbe->GetRigidBody()->calculateDerivedQuantities(rbe->GetRigidBody()->GetCurrentState());
+            rbe->GetRigidBody()->GetCurrentState().force += originalStateE1.force;
+            rbe->GetRigidBody()->GetCurrentState().torque += originalStateE1.torque;
+		}
+		if (E2->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+		{
+			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(E2);
+			rbe->GetRigidBody()->GetCurrentState() = lastCollisionStateE2;
+			rbe->GetRigidBody()->calculateDerivedQuantities(rbe->GetRigidBody()->GetCurrentState());
+            rbe->GetRigidBody()->GetCurrentState().force += originalStateE2.force;
+            rbe->GetRigidBody()->GetCurrentState().torque += originalStateE2.torque;
+		}
 
-		};
-
-		MidPoint(this->frameTime);
+		simplex = prevSimplex;
+		
+		
 
 		//Use EPA to extrapolate collision depth, collision normal and contact point
 		collisionData = EPA(E1, E2, simplex);

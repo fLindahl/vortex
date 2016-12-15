@@ -65,25 +65,58 @@ BodyState RigidBody::Integrate(const BodyState& oldState, const double& frameTim
 {
 	BodyState newState;
 
-    newState.dt = frameTime;
+	auto Euler = [&](const double& frameTime)->void
+	{
+		newState = Evaluate(oldState, frameTime, oldState);
+	};
+
+	auto MidPoint = [&](const double& frameTime)->void
+	{
+		BodyState mid = Evaluate(oldState, frameTime * 0.5f, oldState);
+
+		newState = Evaluate(oldState, frameTime, mid);
+	};
+
+	auto RK4 = [&](const double& frameTime)->void
+	{
+		BodyState w1 = oldState;
+		BodyState w2 = Evaluate(oldState, frameTime * 0.5f, w1);
+		BodyState w3 = Evaluate(oldState, frameTime * 0.5f, w2);
+		BodyState w4 = Evaluate(oldState, frameTime, w3);
+
+		newState.linearVelocity = (w1.linearVelocity + (w2.linearVelocity + w3.linearVelocity) * 2.0f + w4.linearVelocity)* (1.0f / 6.0f);
+		newState.angularVelocity = (w1.angularVelocity + (w2.angularVelocity + w3.angularVelocity) * 2.0f + w4.angularVelocity) * (1.0f / 6.0f);
+
+		newState = Evaluate(oldState, frameTime, newState);
+	};
+
+	RK4(frameTime);
+
+	return newState;
+
+}
+
+BodyState RigidBody::Evaluate(const BodyState& oldState, const double& frameTime, const BodyState& derivative)
+{
+	BodyState newState;
+
+	newState.dt = frameTime;
 
 	Math::point lastFrameAcceleration = oldState.acceleration;
 	lastFrameAcceleration += oldState.force * this->massInv;
 
-	newState.linearVelocity = oldState.linearVelocity + lastFrameAcceleration;
-
-	newState.position = oldState.position + (newState.linearVelocity * frameTime);
-
 	Math::point angularAcceleration = Math::mat4::transform(oldState.torque, oldState.invInertiaTensorWorld);
 
+	newState.linearVelocity = oldState.linearVelocity + lastFrameAcceleration;
 	newState.angularVelocity = oldState.angularVelocity + angularAcceleration * frameTime;
+	newState.position = oldState.position + (derivative.linearVelocity * frameTime);
 
-	Math::quaternion q = Math::quaternion::multiply(oldState.orientation, Math::quaternion(newState.angularVelocity.x() * frameTime, newState.angularVelocity.y() * frameTime, newState.angularVelocity.z() * frameTime, 0.0f));
+	Math::quaternion q = Math::quaternion::multiply(oldState.orientation, Math::quaternion(derivative.angularVelocity.x() * frameTime, derivative.angularVelocity.y() * frameTime, derivative.angularVelocity.z() * frameTime, 0.0f));
 	Math::quaternion::scale(q, 0.5f);
 
 	newState.orientation.set(oldState.orientation.x() + q.x(), oldState.orientation.y() + q.y(), oldState.orientation.z() + q.z(), oldState.orientation.w() + q.w());
 	newState.orientation = Math::quaternion::normalize(newState.orientation);
-	
+
 	newState.force = Math::vector::zerovector();
 	newState.torque = Math::vector::zerovector();
 
