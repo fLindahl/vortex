@@ -50,6 +50,7 @@ public:
 	BodyState& GetPreviousState() { return this->previousState; }
 
 	BodyState Integrate(const BodyState& state, const double& frameTime);
+	BodyState Evaluate(const BodyState& state, const double& frameTime, const BodyState& derivative);
 
 private:
     friend class PhysicsDevice;
