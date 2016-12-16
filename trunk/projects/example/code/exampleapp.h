@@ -58,12 +58,14 @@ private:
     std::shared_ptr<Physics::RigidBody> rBody3;
     std::shared_ptr<Physics::RigidBody> rBody4;
     std::shared_ptr<Physics::RigidBody> rBody5;
+    Util::Array<std::shared_ptr<Physics::RigidBody>> RBs;
 
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity1;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity2;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity3;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity4;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity5;
+    Util::Array<std::shared_ptr<Game::RigidBodyEntity>> RBEs;
 
 	std::shared_ptr<Game::StaticEntity> SceneEntity1;
     std::shared_ptr<Game::StaticEntity> SceneEntity2;
@@ -79,6 +81,7 @@ private:
 	Render::GraphicsProperty* gProperty2;
 	Render::GraphicsProperty* gProperty3;
 	Render::GraphicsProperty* gProperty4;
+    Util::Array<Render::GraphicsProperty*> gPs;
 
 	Render::GraphicsProperty* gPropertyScene1;
     Render::GraphicsProperty* gPropertyScene2;

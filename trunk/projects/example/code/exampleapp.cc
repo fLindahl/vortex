@@ -129,6 +129,7 @@ ExampleApp::Open()
 		gProperty3 = new Render::GraphicsProperty();
 		gProperty4 = new Render::GraphicsProperty();
 
+
         physicsCollider = std::make_shared<Physics::SurfaceCollider>();
 		physicsCollider1 = std::make_shared<Physics::SurfaceCollider>();
 
@@ -146,6 +147,8 @@ ExampleApp::Open()
 		rigidBodyEntity3 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity4 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity5 = std::make_shared<Game::RigidBodyEntity>();
+
+
 
         rigidBodyEntity1->SetRigidBody(rBody1);
         rigidBodyEntity2->SetRigidBody(rBody2);
@@ -208,6 +211,29 @@ ExampleApp::Open()
 		this->rigidBodyEntity3->SetTransform(transf3);
 		this->rigidBodyEntity4->SetTransform(transf4);
         this->rigidBodyEntity5->SetTransform(transf5);
+
+        const int numEntsX = 2;
+        const int numEntsY = 2;
+
+        for (int i = 0; i < numEntsX; ++i) {
+            for (int j = 0; j < numEntsY; ++j) {
+                std::shared_ptr<Physics::RigidBody> rb = std::make_shared<Physics::RigidBody>();
+                std::shared_ptr<Game::RigidBodyEntity> ent = std::make_shared<Game::RigidBodyEntity>();
+                RBEs.Append(ent);
+                RBs.Append(rb);
+                ent->SetRigidBody(rb);
+                ent->SetCollider(physicsCollider1);
+
+                Render::GraphicsProperty* gp = new Render::GraphicsProperty;
+                gp->setModelInstance(modelInstance1);
+                ent->SetGraphicsProperty(gp);
+                gPs.Append(gp);
+
+                Math::mat4 transf1 = Math::mat4::translation(i*1.0f - (numEntsX/2), numEntsY/4 + j*1.0f, 5.0f);
+                ent->SetTransform(transf1);
+                ent->Activate();
+            }
+        }
 
         rigidBodyEntity1->Activate();
         rigidBodyEntity2->Activate();
@@ -451,6 +477,10 @@ ExampleApp::Run()
 		this->rigidBodyEntity3->Update();
 		this->rigidBodyEntity4->Update();
 		this->rigidBodyEntity5->Update();
+
+        for (int i = 0; i < RBEs.Size(); ++i) {
+            RBEs[i]->Update();
+        }
 
 		RenderDevice::Instance()->Render();
 
