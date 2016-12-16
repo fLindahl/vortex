@@ -306,7 +306,7 @@ void PhysicsDevice::Solve()
 
     for(auto rigidbody : this->rigidBodies)
     {
-		//rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
+		rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
         rigidbody->update(this->frameTime);
     }
 
@@ -614,6 +614,7 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 		// Midpoint for finding true collision
 		//-------
 
+
 		//previousState is at t = 0
 		//currentState is at t = frameTime
 		double t = frameTime;
@@ -693,7 +694,7 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 		}
 
 		simplex = prevSimplex;
-		
+
 		
 
 		//Use EPA to extrapolate collision depth, collision normal and contact point
