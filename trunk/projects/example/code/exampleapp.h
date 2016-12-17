@@ -44,6 +44,8 @@ private:
 
 
 	double frameTime;
+	double prevFPSTime;
+	double currentFPS;
 
 	std::shared_ptr<Render::ModelInstance> modelInstance;
 	std::shared_ptr<Render::ModelInstance> modelInstance1;

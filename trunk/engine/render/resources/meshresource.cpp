@@ -4,6 +4,9 @@
 #include "meshresource.h"
 #include <cstring>
 #include "nvx2fileformatstructs.h"
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 namespace Render
 {
@@ -20,6 +23,177 @@ namespace Render
 		glDeleteBuffers(1, &ib[0]);
 	}
 
+	bool MeshResource::loadMesh(const char* filename)
+	{
+		const aiScene* scene = aiImportFile(filename, aiProcessPreset_TargetRealtime_MaxQuality);
+
+		//TODO: Add primitive groups
+		aiMesh* mesh = scene->mMeshes[0];
+		
+		this->name = mesh->mName.C_Str();
+
+		this->numVertices = mesh->mNumVertices;
+		this->numIndices = 0;
+
+		this->vertexWidth = 0;
+		this->vertexDataSize = 0;
+		
+		if (mesh->HasPositions())
+		{
+			VertexComponent::SemanticName sem = VertexComponent::Position;
+			VertexComponent::Format fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+		}
+		if (mesh->HasNormals())
+		{
+			VertexComponent::SemanticName sem = VertexComponent::Normal;
+			VertexComponent::Format fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+		}
+		if (mesh->HasTextureCoords(0))
+		{
+			//TODO: Check how many components texcoords have so that we can load 3d textures too.
+			//if (mesh->mNumUVComponents == 2)
+			VertexComponent::SemanticName sem = VertexComponent::TexCoord1;
+			VertexComponent::Format fmt = VertexComponent::Float2;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 2;
+		}
+		if (mesh->HasTextureCoords(1))
+		{
+			VertexComponent::SemanticName sem = VertexComponent::TexCoord2;
+			VertexComponent::Format fmt = VertexComponent::Float2;
+			this->vertexComponents.Append(VertexComponent(sem, 1, fmt));
+			this->vertexWidth += 2;
+		}
+		if (mesh->HasTangentsAndBitangents())
+		{
+			VertexComponent::SemanticName sem = VertexComponent::Tangent;
+			VertexComponent::Format fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+
+			sem = VertexComponent::Binormal;
+			fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+		}
+		if (mesh->HasVertexColors(0))
+		{
+			VertexComponent::SemanticName sem = VertexComponent::Color;
+			VertexComponent::Format fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+		}
+
+		//Sort to make sure that our components are in the correct order when we construct our vertexbuffer
+		this->vertexComponents.Sort();
+
+		this->vertexDataSize = this->numVertices * this->vertexWidth * sizeof(GLfloat);
+
+		//count indices
+		for (size_t i = 0; i < mesh->mNumFaces; ++i)
+		{
+			this->numIndices += mesh->mFaces[i].mNumIndices;
+		}
+
+		this->indexDataSize = this->numIndices * sizeof(int);
+
+		this->mesh = new byte[this->vertexDataSize];
+		this->indices = new byte[this->indexDataSize];
+
+		//Point to the first element in our indexbuffer
+		this->indexDataPtr = this->indices;
+
+		//Construct our indexbuffer
+		const byte triangleByteSize = 3 * sizeof(int);
+
+		for (size_t i = 0; i < mesh->mNumFaces; ++i)
+		{
+			if (mesh->mFaces[i].mNumIndices == 3)
+			{
+				//Triangles. Just append everything to the indexbuffer
+				memcpy(this->indexDataPtr, mesh->mFaces[i].mIndices, triangleByteSize);
+				this->indexDataPtr = (byte*)indexDataPtr + triangleByteSize;
+			}
+			else if (mesh->mFaces[i].mNumIndices == 2)
+			{
+				printf("ERROR: Meshloader does not support lines within meshes!");
+				assert(false);
+			}
+			else if (mesh->mFaces[i].mNumIndices == 4)
+			{
+				printf("ERROR: Meshloader does not support quads within meshes!");
+				assert(false);
+			}
+		}
+
+		this->vertexDataPtr = this->mesh;
+
+		//Start constructing boundingbox.
+		this->bbox.begin_extend();
+
+		//Construct our vertexbuffer
+		for (size_t i = 0; i < mesh->mNumVertices; ++i)
+		{
+			for (uint j = 0; j < this->vertexComponents.Size(); j++)
+			{
+				size_t byteSize = this->vertexComponents[j].GetByteSize();
+				
+				switch (this->vertexComponents[j].GetSemanticName())
+				{
+				case VertexComponent::SemanticName::Position:
+				{
+					this->bbox.extend(Math::point(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+					memcpy(this->vertexDataPtr, &mesh->mVertices[i], byteSize);
+					break;
+				}
+				case VertexComponent::SemanticName::Normal:
+				{
+					memcpy(this->vertexDataPtr, &mesh->mNormals[i], byteSize);
+					break;
+				}
+				case VertexComponent::SemanticName::TexCoord1:
+				{
+					memcpy(this->vertexDataPtr, &mesh->mTextureCoords[0][i], byteSize);
+					break;
+				}
+				case VertexComponent::SemanticName::TexCoord2:
+				{
+					memcpy(this->vertexDataPtr, &mesh->mTextureCoords[1][i], byteSize);
+					break;
+				}
+				case VertexComponent::SemanticName::Tangent:
+				{
+					memcpy(this->vertexDataPtr, &mesh->mTangents[i], byteSize);
+					break;
+				}
+				case VertexComponent::SemanticName::Binormal:
+				{
+					memcpy(this->vertexDataPtr, &mesh->mBitangents[i], byteSize);
+					break;
+				}
+				case VertexComponent::SemanticName::Color:
+				{
+					memcpy(this->vertexDataPtr, &mesh->mColors[0][i], byteSize);
+					break;
+				}
+				}
+
+				this->vertexDataPtr = (byte*)vertexDataPtr + byteSize;
+			}
+		}
+
+		this->bbox.end_extend();
+
+		this->SetupVertexBuffer();
+		this->SetupIndexBuffer();
+
+		return true;
+	}
+
 	bool MeshResource::loadMeshFromFile(const char* filename)
 	{
 		FILE * file;
@@ -31,13 +205,15 @@ namespace Render
 
 		assert(file != NULL);
 
+		this->N2File = true;
+
 		this->name = filename;
 
 		// obtain file size:
 		fseek(file, 0, SEEK_END);
 		bufferSize = ftell(file);
 		rewind(file);
-
+		
 		// allocate memory to contain the whole file:
 		buffer = new uchar[bufferSize];
 
@@ -56,7 +232,6 @@ namespace Render
 		this->mapPtr = new uchar[10];
 
 		this->mapPtr = buffer;
-
 		// read data
 		this->ReadHeaderData();
 		this->ReadPrimitiveGroups();
@@ -156,15 +331,18 @@ namespace Render
 	void MeshResource::SetupVertexBuffer()
 	{
 		// setup new vertex buffer
-		//this->mesh.reserve(this->numVertices);
 
-		uchar* ptr = (uchar*)this->vertexDataPtr;
+		//If we've loaded a Nebula file we need to do some extra stuff
+		if (N2File)
+		{
+			uchar* ptr = (uchar*)this->vertexDataPtr;
 
-		//setup mesh to be the size of our vertex data block
-		this->mesh = new uchar[vertexDataSize];
+			//setup mesh to be the size of our vertex data block
+			this->mesh = new uchar[vertexDataSize];
 
-		//Copy vertexdata!
-		memcpy(this->mesh, ptr, vertexDataSize);
+			//Copy vertexdata!
+			memcpy(this->mesh, ptr, vertexDataSize);
+		}
 
 		glGenVertexArrays(1, &vao[0]); // Create our Vertex Array Object  
 		glBindVertexArray(vao[0]); // Bind our Vertex Array Object so we can use it  
@@ -180,8 +358,7 @@ namespace Render
 		GLenum type;
 		GLboolean normalized;
 		GLint components;
-
-
+		
 		GLbyte* offset = NULL;
 
 		for (uint i = 0; i < this->vertexComponents.Size(); i++)
@@ -219,13 +396,17 @@ namespace Render
 
 	void MeshResource::SetupIndexBuffer()
 	{
-		uchar* ptr = (uchar*)this->indexDataPtr;
+		//If we've loaded a Nebula file we need to do some extra stuff
+		if (N2File)
+		{
+			uchar* ptr = (uchar*)this->indexDataPtr;
 
-		//setup indices to be the size of our index data block
-		this->indices = new uchar[indexDataSize];
+			//setup indices to be the size of our index data block
+			this->indices = new uchar[indexDataSize];
 
-		//Copy indexdata!
-		memcpy(this->indices, ptr, indexDataSize);
+			//Copy indexdata!
+			memcpy(this->indices, ptr, indexDataSize);
+		}
 
 		glGenBuffers(1, this->ib);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ib[0]);

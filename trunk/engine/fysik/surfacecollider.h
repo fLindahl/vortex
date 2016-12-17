@@ -24,12 +24,7 @@ public:
 	~SurfaceCollider();
 
 	/// Cook a physics surface collider from mesh data.
-	/// meshdata: A pointer to the first element in the meshdata that you want to cook.
-	/// indexdata: A pointer to the first element in the indexdata array.
-	/// vertexstride: How large (in bytes) is our entire vertex-structure (how far between position elements)?
-	/// indexstride: How large (in bytes) are our indices?
-	/// positionoffset: Is there any offset before we hit our positional data in the vertex-structure?
-	void CookMeshData(void* meshdata, void* indexdata, index_t numindices, size_t vertexstride, size_t indexstride, size_t positionoffset);
+	void CookMeshData(const std::shared_ptr<Render::MeshResource> mesh);
 	
 	//TEMPORARY: for cooking an OBJ-Loaded Mesh
 	void CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<unsigned int>& indices, const Math::bbox& bbox);
