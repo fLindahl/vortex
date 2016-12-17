@@ -14,24 +14,29 @@ SurfaceCollider::~SurfaceCollider()
 
 }
 
-void SurfaceCollider::CookMeshData(void* meshdata, void* indexdata, index_t numindices, size_t vertexstride, size_t indexstride, size_t positionoffset)
+void SurfaceCollider::CookMeshData(const std::shared_ptr<Render::MeshResource> mesh)
 {
-	printf("NOT IMPLEMENTED");
-	assert(false);
+	float* vertDataBase = (float*)mesh->getMesh();
+	const uint vWidth = mesh->getVertexWidth();
 
-	Math::point* pointer = (Math::point*)meshdata + positionoffset;
-
-	uint* index = (uint*)indexdata;
+	uint* index = (uint*)mesh->getIndices();
 
 	ColliderFace face;
 
-	for (index_t i = 0; i < numindices; i++)
+	for (index_t i = 0; i < mesh->getNumIndices(); i += 3)
 	{
-		
+		float* data = vertDataBase + (*index) * vWidth;
+		face.p0 = Math::point(data[0], data[1], data[2]);
+		data = vertDataBase + (*(index + 1)) * vWidth;
+		face.p1 = Math::point(data[0], data[1], data[2]);
+		data = vertDataBase + (*(index + 2)) * vWidth;
+		face.p2 = Math::point(data[0], data[1], data[2]);
 
-		index = index + indexstride;
+		this->faces.Append(face);
+		index = index + 3;
 	}
 
+	this->colliderbbox = mesh->getBaseBBox();
 }
 
 void SurfaceCollider::CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<unsigned int>& indices, const Math::bbox& bbox)

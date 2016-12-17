@@ -16,18 +16,19 @@ std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const std::string& meshpa
 
         std::string fileExtension = meshpath.substr(meshpath.find_last_of("."));
 
-        if(fileExtension == ".obj")
-        {
-            nMesh->loadMeshFromOBJ(meshpath.c_str());
-        }
-        else if(fileExtension == ".nvx2")
+        //if(fileExtension == ".obj")
+        //{
+        //    nMesh->loadMeshFromOBJ(meshpath.c_str());
+        //}
+        if(fileExtension == ".nvx2")
         {
             nMesh->loadMeshFromFile(meshpath.c_str());
         }
         else
         {
-            printf("Could not load mesh! Invalid file extension!");
-            assert(false);
+			nMesh->loadMesh(meshpath.c_str());
+            //printf("Could not load mesh! Invalid file extension!");
+            //assert(false);
             //_assert(false, "Could not load mesh!");
         }
 		std::pair<const char*, std::shared_ptr<MeshResource>> par(meshpath.c_str(), nMesh);

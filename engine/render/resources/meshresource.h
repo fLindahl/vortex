@@ -31,8 +31,10 @@ public:
 		GLfloat normal[3];
 	};
 
-	bool loadMeshFromFile(const char* filename);
+	bool loadMesh(const char* filename);
 
+	bool loadMeshFromFile(const char* filename);
+	
 	/// DEPRECATED AND OBSOLETE. DO NOT USE AS IT WILL PROBABLY CAUSE MEMLEAKS
 	bool loadMeshFromOBJ(const char* filename);
 
@@ -47,15 +49,23 @@ public:
 	void* getMesh();
 	void* getIndices();
 
-	Math::bbox getBaseBBox() { return this->bbox; }
+	///Total amount of indices in mesh
+	size_t getNumIndices() { return this->numIndices; }
+	///Total amount of vertices in mesh
+	uint getNumVertices() { return this->numVertices; }
+	///Returns the amount of floats that a vertex contains
+	uint getVertexWidth() { return this->vertexWidth; }
 
-	//TEMPORARY: for obj loading
-	Util::Array<OBJVertex> OBJvertexBuffer;
-	Util::Array<unsigned int> OBJindexBuffer;
+	///Returns the base bbox for this entity.
+	Math::bbox getBaseBBox() { return this->bbox; }
 
 	std::string GetFileName() { return this->name; }
 private:
 	std::string name;
+
+	//TEMPORARY: for obj loading
+	Util::Array<OBJVertex> OBJvertexBuffer;
+	Util::Array<unsigned int> OBJindexBuffer;
 
 	Math::bbox bbox;
 
@@ -67,6 +77,7 @@ private:
 	void* indices;
 	
 	bool rawMode;
+	bool N2File = false;
 
 	void ReadHeaderData();
 	void ReadPrimitiveGroups();

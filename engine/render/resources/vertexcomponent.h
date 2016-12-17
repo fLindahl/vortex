@@ -81,6 +81,8 @@ public:
   VertexComponent();
   /// constructor
   VertexComponent(SemanticName semName, uint semIndex, Format format, uint streamIndex=0, StrideType strideType=PerVertex, size_t stride=0);
+  /// compares semantic names so that we can assure order of vertexcomponents
+  bool operator<(const VertexComponent& rhs) const;
   /// get semantic name
   SemanticName GetSemanticName() const;
   /// get semantic index
@@ -108,7 +110,7 @@ public:
   /// get the byte offset of this component (only valid when part of a VertexLayout)
   uint GetByteOffset() const;
 
-
+  
 
 private:
   
@@ -151,6 +153,16 @@ VertexComponent::VertexComponent(SemanticName semName_, uint semIndex_, Format f
 {
     // empty
 }
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+VertexComponent::operator<(const VertexComponent& rhs) const
+{
+	return this->semName < rhs.semName;
+}
+
 
 //------------------------------------------------------------------------------
 /**
