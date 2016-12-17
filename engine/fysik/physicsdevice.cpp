@@ -306,7 +306,7 @@ void PhysicsDevice::Solve()
 
     for(auto rigidbody : this->rigidBodies)
     {
-		rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
+		//rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
         rigidbody->update(this->frameTime);
     }
 
@@ -390,7 +390,7 @@ bool PhysicsDevice::GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::
 	D = -diff;
 
 	//Max iterations will be the largest list of vertices considering that we should probably converge faster than we run out of vertices.
-	size_t maxIterations = Math::max(E1->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer.Size(), E2->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer.Size());
+	size_t maxIterations = Math::max(E1->GetGraphicsProperty()->getModelInstance()->GetMesh()->getNumVertices(), E2->GetGraphicsProperty()->getModelInstance()->GetMesh()->getNumVertices());
 
 	bool collision = false;
 
@@ -735,15 +735,23 @@ int PhysicsDevice::DoSimplex(Util::Array<SupportPoint>& simplex, Math::point& D)
 
 Math::point PhysicsDevice::Support(const Math::point &dir, Game::PhysicsEntity *entity)
 {
-	Util::Array<Render::MeshResource::OBJVertex>& vertbuffer = entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer;
-	Math::point p = Math::point(vertbuffer[0].pos[0], vertbuffer[0].pos[1], vertbuffer[0].pos[2]);
+	float* mesh = (float*)entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->getMesh();
+	uint vertexWidth = entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->getVertexWidth();
+	size_t numVertices = entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->getNumVertices();
+	//Util::Array<Render::MeshResource::OBJVertex>& vertbuffer = entity->GetGraphicsProperty()->getModelInstance()->GetMesh()->OBJvertexBuffer;
+
+	//First attributes are always position.
+	Math::point p = Math::point(mesh[0], mesh[1], mesh[2]);
+
+	mesh += vertexWidth;
 	float max = Math::vector::dot3(p, dir);
 
 	Math::point temp;
 
-	for (int i = 1; i < vertbuffer.Size(); ++i)
+	for (int i = 1; i < numVertices; ++i)
 	{
-		temp = Math::point(vertbuffer[i].pos[0], vertbuffer[i].pos[1], vertbuffer[i].pos[2]);
+		temp = Math::point(mesh[0], mesh[1], mesh[2]);
+		mesh += vertexWidth;
 		float t = Math::vector::dot3(temp, dir);
 		if (t >= max)
 		{
