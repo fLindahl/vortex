@@ -2,7 +2,8 @@
 #include "GL/glew.h"
 #include <memory>
 #include "shaderobject.h"
-#include "render/softwarerender/rasterizer.h"
+//#include "render/softwarerender/rasterizer.h"
+#include "foundation/util/string.h"
 
 namespace Render
 {
@@ -19,7 +20,13 @@ public:
 	//void loadFromRasterizer();
 	void BindTexture(GLuint slot);
 
+	std::string GetName();
+
 private:
+	friend class ResourceServer;
+
+	Util::String name;
+
 	std::shared_ptr<ShaderObject> shader;
 	//std::shared_ptr<Rasterizer> raster;
 

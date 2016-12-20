@@ -23,6 +23,8 @@ namespace Render
 
 		MaterialParameter* GetParameterByName(const Util::String& name);
 
+		Util::Array<MaterialParameter*>& ParameterList() { return this->parameters; }
+
 		Util::Array<ModelInstance*>& getModelInstances() { return this->modelInstances; }
 
 	private:
@@ -35,7 +37,9 @@ namespace Render
 		// surface material
 		std::shared_ptr<Material> material;
 
+		
 		// loaded textures
+		std::map<Util::String, std::shared_ptr<TextureResource>> texturesByName;
 		Util::Array<std::shared_ptr<TextureResource>> textures;
 
 		std::map<Util::String, MaterialParameter*> parametersByName;

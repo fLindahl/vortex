@@ -39,25 +39,6 @@ void SurfaceCollider::CookMeshData(const std::shared_ptr<Render::MeshResource> m
 	this->colliderbbox = mesh->getBaseBBox();
 }
 
-void SurfaceCollider::CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<unsigned int>& indices, const Math::bbox& bbox)
-{
-	size_t iSize = indices.Size();
-	for (size_t i = 0; i < iSize; i += 3)
-	{
-		ColliderFace face;
-
-		face.p0 = Math::point(mesh[indices[i]].pos[0], mesh[indices[i]].pos[1], mesh[indices[i]].pos[2]);
-		face.p1 = Math::point(mesh[indices[i + 1]].pos[0], mesh[indices[i + 1]].pos[1], mesh[indices[i + 1]].pos[2]);
-		face.p2 = Math::point(mesh[indices[i + 2]].pos[0], mesh[indices[i + 2]].pos[1], mesh[indices[i + 2]].pos[2]);
-		//face.plane = Math::plane(face.p0, face.p1, face.p2);
-
-		this->faces.Append(face);
-	}
-
-	this->colliderbbox = bbox;
-}
-
-
 void SurfaceCollider::debugDraw()
 {
 	glUseProgram(0);
