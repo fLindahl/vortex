@@ -61,6 +61,7 @@ std::shared_ptr<TextureResource> ResourceServer::LoadTexture(const char* filepat
 		std::shared_ptr<TextureResource> texture = std::make_shared<TextureResource>();
 		texture->loadFromFile(filepath);
 		std::pair<const char*, std::shared_ptr<TextureResource>> par(filepath, texture);
+		texture->name = filepath;
 		this->textures.insert(par);
 
 		return texture;
@@ -244,16 +245,19 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
         // create our surface
         sur = std::make_shared<Surface>();
 
+		//Append this surface to materials surfacelist
+		mat->surfaces.Append(sur);
+
         sur->name = filepath;
         sur->material = mat;
 
         // Get all parameters that this surface overrides
         const tinyxml2::XMLElement* param = surface->FirstChildElement("Param");
-        while (true)
+		while (param != nullptr)
         {
             Util::String type = param->FindAttribute("type")->Value();
 
-            Util::Variable var = Util::Variable(Util::Variable::StringToType(type), Util::String(param->FindAttribute("defaultValue")->Value()));
+            Util::Variable var = Util::Variable(Util::Variable::StringToType(type), Util::String(param->FindAttribute("value")->Value()));
 
             sur->AddParameter(param->FindAttribute("name")->Value(), var);
 
@@ -268,15 +272,24 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
             }
         }
 
-        // Now we add the additional parameters that we've not overloaded.
+        // Now we add the additional parameters and textures that we've not overloaded.
         for (MaterialParameter* param : mat->parameters)
         {
-            if (!sur->parametersByName.count(param->name))
+            if (sur->parametersByName.count(param->name) == 0)
             {
                 sur->parameters.Append(param);
                 sur->parametersByName.insert(std::make_pair(param->name, param));
             }
         }
+
+		for (auto tex : mat->textures)
+		{
+			if (sur->texturesByName.count(tex->name) == 0)
+			{
+				sur->textures.Append(tex);
+				sur->texturesByName.insert(std::make_pair(tex->name, tex));
+			}
+		}
     }
 
     return sur;

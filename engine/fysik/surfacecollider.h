@@ -25,9 +25,6 @@ public:
 
 	/// Cook a physics surface collider from mesh data.
 	void CookMeshData(const std::shared_ptr<Render::MeshResource> mesh);
-	
-	//TEMPORARY: for cooking an OBJ-Loaded Mesh
-	void CookOBJData(Util::Array<Render::MeshResource::OBJVertex>& mesh, Util::Array<unsigned int>& indices, const Math::bbox& bbox);
 
 	Util::Array<ColliderFace>& GetFaceList() { return this->faces; }
 

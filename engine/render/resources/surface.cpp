@@ -24,7 +24,9 @@ void Surface::AddParameter(const Util::String& name, const Util::Variable& varia
     {
         //HACK: Since we're loading a string, we're probably loading a texture
         //This should probably be done in some other way
-        this->textures.Append(ResourceServer::Instance()->LoadTexture(*variable.GetString()));
+		std::shared_ptr<TextureResource> tex = ResourceServer::Instance()->LoadTexture(*variable.GetString());
+		this->textures.Append(tex);
+		this->texturesByName.insert(std::make_pair(name, tex));
     }
     else
     {

@@ -12,6 +12,7 @@
 #include "foundation/util/variable.h"
 #include "frameserver.h"
 #include "render/resources/material.h"
+#include "render/resources/surface.h"
 #include "lightserver.h"
 #include "render/resources/framepass.h"
 
@@ -130,7 +131,7 @@ void RenderDevice::Render()
 	depthPass->Bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
-	std::string& str = depthPass->name;
+	std::string str = depthPass->name;
 	
 	for (Material* material : FrameServer::Instance()->Depth->materials)
 	{
@@ -141,21 +142,23 @@ void RenderDevice::Render()
 		}
 
 		//TODO: Renderstates?
-
-		for (ModelInstance* modelInstance : material->getModelInstances())
+		for (auto surface : material->SurfaceList())
 		{
-			//Bind mesh
-			//TODO: We should probably check and make sure we don't bind these more than once
-			modelInstance->GetMesh()->Bind();
-			
-			for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
+			for (ModelInstance* modelInstance : surface->getModelInstances())
 			{
-				material->GetShader(str)->setModelMatrix(graphicsProperty->getModelMatrix());
-				modelInstance->GetMesh()->Draw();
-			}
+				//Bind mesh
+				//TODO: We should probably check and make sure we don't bind these more than once
+				modelInstance->GetMesh()->Bind();
 
-			modelInstance->GetMesh()->Unbind();
-		}		
+				for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
+				{
+					material->GetShader(str)->setModelMatrix(graphicsProperty->getModelMatrix());
+					modelInstance->GetMesh()->Draw();
+				}
+
+				modelInstance->GetMesh()->Unbind();
+			}
+		}
 	}
 	
 	//Unbind Depth FrameBufferObject
@@ -219,50 +222,55 @@ void RenderDevice::Render()
 			currentProgram = material->GetShader(str)->GetProgram();
 			glUseProgram(currentProgram);
 		}
-        
-		for (index_t i = 0; i < material->TextureList().Size(); i++)
-		{
-			material->TextureList()[i]->BindTexture(i); //TODO: slot?
-		}
 
-        //TODO: Renderstates?
+		FrameServer* fServer = FrameServer::Instance();
+        
+		//TODO: Renderstates?
 
 		//TODO: Per surface
-		for (index_t i = 0; i < material->ParameterList().Size(); i++)
+		for (auto surface : material->SurfaceList())
 		{
-			//TODO: Move this elsewhere
-			switch (material->ParameterList()[i]->var.GetType())
+			for (index_t i = 0; i < surface->TextureList().Size(); i++)
 			{
-			case Util::Variable::Type::Float:
-				material->GetShader(str)->setUni1f(*material->ParameterList()[i]->var.GetFloat(), material->ParameterList()[i]->name);
-				break;
+				surface->TextureList()[i]->BindTexture(i); //TODO: slot?
+			}
+			
+			for (index_t i = 0; i < surface->ParameterList().Size(); i++)
+			{
+				//TODO: Move this elsewhere
+				switch (surface->ParameterList()[i]->var.GetType())
+				{
+				case Util::Variable::Type::Float:
+					material->GetShader(str)->setUni1f(*surface->ParameterList()[i]->var.GetFloat(), surface->ParameterList()[i]->name);
+					break;
 
-			case Util::Variable::Type::Vector4:
-				material->GetShader(str)->setUniVector4fv(material->ParameterList()[i]->var.GetVector4(), material->ParameterList()[i]->name);
-				break;
+				case Util::Variable::Type::Vector4:
+					material->GetShader(str)->setUniVector4fv(surface->ParameterList()[i]->var.GetVector4(), surface->ParameterList()[i]->name);
+					break;
 
-			default:
-				printf("ERROR : Parameter might not be fully implemented! \n");
-				assert(false);
-				break;
+				default:
+					printf("ERROR : Parameter might not be fully implemented! \n");
+					assert(false);
+					break;
+				}
+			}
+
+			for (ModelInstance* modelInstance : surface->getModelInstances())
+			{
+				//Bind mesh
+				//TODO: We should probably check and make sure we don't bind these more than once
+				modelInstance->GetMesh()->Bind();
+
+
+				for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
+				{
+					material->GetShader(str)->setModelMatrix(graphicsProperty->getModelMatrix());
+					modelInstance->GetMesh()->Draw();
+				}
+
+				modelInstance->GetMesh()->Unbind();
 			}
 		}
-
-        for (ModelInstance* modelInstance : material->getModelInstances())
-        {
-            //Bind mesh
-            //TODO: We should probably check and make sure we don't bind these more than once
-            modelInstance->GetMesh()->Bind();
-            
-
-            for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
-            {
-                material->GetShader(str)->setModelMatrix(graphicsProperty->getModelMatrix());
-                modelInstance->GetMesh()->Draw();
-            }
-
-            modelInstance->GetMesh()->Unbind();
-        }
     }
 
 #endif

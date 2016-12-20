@@ -13,6 +13,7 @@ namespace Render
 
 class MeshResource;
 class Material;
+class Surface;
 class GraphicsProperty;
 
 class ModelInstance
@@ -26,14 +27,19 @@ public:
 
 	void AddGraphicsProperty(GraphicsProperty* gp);
 
-	void SetMaterial(const Util::String& name);
-	std::shared_ptr<Material> GetMaterial();
+	//void SetMaterial(const Util::String& name);
+	//std::shared_ptr<Material> GetMaterial();
+
+	void SetSurface(const Util::String& name);
+	std::shared_ptr<Surface> GetSurface();
 
 	Util::Array<GraphicsProperty*>& GetGraphicsProperties();
 
 private:
 	std::shared_ptr<MeshResource> mesh;
-	std::shared_ptr<Material> material;
+
+	std::shared_ptr<Surface> surface;
+	//std::shared_ptr<Material> material;
 
 	Util::Array<GraphicsProperty*> graphicsProperties;
 };

@@ -92,7 +92,7 @@ ExampleApp::Open()
         SceneEntity4->SetCollider(SceneCollider);
         SceneEntity5->SetCollider(SceneCollider);
         SceneEntity6->SetCollider(SceneCollider);
-		modelInstanceScene->SetMaterial("Static");
+		modelInstanceScene->SetSurface("resources/surfaces/rock.surface");
 		modelInstanceScene->SetMesh("resources/models/groundfloor.obj");
 		gPropertyScene1->setModelInstance(modelInstanceScene);
         gPropertyScene2->setModelInstance(modelInstanceScene);
@@ -119,9 +119,7 @@ ExampleApp::Open()
         SceneEntity4->Activate();
         SceneEntity5->Activate();
         SceneEntity6->Activate();
-
 		
-
 		modelInstance = std::make_shared<Render::ModelInstance>();
 		modelInstance1 = std::make_shared<Render::ModelInstance>();
 
@@ -164,11 +162,11 @@ ExampleApp::Open()
 		rigidBodyEntity4->SetCollider(physicsCollider1);
 		rigidBodyEntity5->SetCollider(physicsCollider);
 
-		modelInstance->SetMaterial("Static");
+		modelInstance->SetSurface("resources/surfaces/player.surface");
 		modelInstance->SetMesh("resources/models/kung.obj");
 		gProperty->setModelInstance(modelInstance);
 
-		modelInstance1->SetMaterial("Static");
+		modelInstance1->SetSurface("resources/surfaces/placeholder.surface");
 		modelInstance1->SetMesh("resources/models/cube.obj");
 		gProperty1->setModelInstance(modelInstance1);
 		gProperty2->setModelInstance(modelInstance1);
@@ -177,7 +175,7 @@ ExampleApp::Open()
 
 		PointLight pLight;
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
-		pLight.color = Math::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		pLight.radiusAndPadding.set_x(10.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 		
@@ -495,11 +493,12 @@ ExampleApp::Run()
             Game::PhysicsEntity* pe = dynamic_cast<Game::PhysicsEntity*>(hit.object);
 
             if(pe != nullptr)
-                consoleBuffer = pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetFileName();
+                consoleBuffer = pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName();
 
         }
 
 		
+		/*
 		this->gProperty->getbbox().debugRender();
 		this->gProperty1->getbbox().debugRender();
 		this->gProperty2->getbbox().debugRender();
@@ -508,7 +507,6 @@ ExampleApp::Run()
 
 		//this->gProperty->getCollider()->debugDraw();
 
-		
         // Render LINES
         glUseProgram(0);
         glEnable(GL_DEPTH_TEST);
@@ -538,7 +536,7 @@ ExampleApp::Run()
         glVertex4f(hitn[0], hitn[1], hitn[2], hitn[3]);
 
         glEnd();
-		
+		*/
 
 
 
