@@ -13,32 +13,35 @@
 namespace Render
 {
 
+	struct PrimitiveGroup
+	{
+		//name of this primitivegroup
+		std::string name;
+
+		//Pointer to this primitivegroups first element in the total buffer
+		size_t indexOffset;
+
+		//amount of floats that fit a vertex
+		//uint vertexWidth;
+		//Number of indices in this group
+		size_t numIndices;
+
+		//How many bytes are our index buffer?
+		size_t indexDataSize;
+
+		//Util::Array<VertexComponent> vertexComponents;
+	};
+
 class MeshResource
 {
 public:
 	MeshResource();
 	~MeshResource();
 
-	struct OBJVertex
-	{
-		bool operator==(const OBJVertex& rhs) const
-		{
-			return (pos == rhs.pos && uv == rhs.uv && normal == rhs.normal);
-		}
-
-		GLfloat pos[3];
-		GLfloat uv[2];
-		GLfloat normal[3];
-	};
-
 	bool loadMesh(const char* filename);
 
 	bool loadMeshFromFile(const char* filename);
-	
-	/// DEPRECATED AND OBSOLETE. DO NOT USE AS IT WILL PROBABLY CAUSE MEMLEAKS
-	bool loadMeshFromOBJ(const char* filename);
 
-	void createQuad();
 	///Bind VAO
 	void Bind();
 	/// Unbind VAO
@@ -48,6 +51,8 @@ public:
 
 	void* getMesh();
 	void* getIndices();
+
+	const PrimitiveGroup& getPrimitiveGroup(const int& i);
 
 	///Total amount of indices in mesh
 	size_t getNumIndices() { return this->numIndices; }
@@ -59,32 +64,26 @@ public:
 	///Returns the base bbox for this entity.
 	Math::bbox getBaseBBox() { return this->bbox; }
 
-	std::string GetFileName() { return this->name; }
+	std::string GetName() { return this->name; }
+	
 private:
+	// The filename for this mesh
 	std::string name;
 
-	//TEMPORARY: for obj loading
-	Util::Array<OBJVertex> OBJvertexBuffer;
-	Util::Array<unsigned int> OBJindexBuffer;
-
 	Math::bbox bbox;
+	///Contains all PrimitiveGroups vertices/indices
+	void* mesh;
+	void* indices;
 
+	///PrimitiveGroups for this mesh
+	Util::Array<PrimitiveGroup> primitiveGroups;
+	
 	GLuint vao[1];
 	GLuint ib[1];
 	GLuint vbo[1];
 
-	void* mesh;
-	void* indices;
-	
 	bool rawMode;
 	bool N2File = false;
-
-	void ReadHeaderData();
-	void ReadPrimitiveGroups();
-	void SetupVertices();
-
-	void SetupVertexBuffer();
-	void SetupIndexBuffer();
 
 	uchar* mapPtr;
 	void* groupDataPtr;
@@ -102,8 +101,18 @@ private:
 	size_t vertexDataSize;
 	size_t indexDataSize;
 
-	Util::Array<VertexComponent> vertexComponents;
+	//Functions
 
+	///Setup GL Buffers
+	void SetupVertexBuffer();
+	void SetupIndexBuffer();
+
+	///Read nvx2 data
+	void ReadHeaderData();
+	void ReadPrimitiveGroups();
+	void SetupVertices();
+
+	Util::Array<VertexComponent> vertexComponents;
 };
 
 }
