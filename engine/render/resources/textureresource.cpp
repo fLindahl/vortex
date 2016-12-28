@@ -17,13 +17,6 @@ TextureResource::~TextureResource()
 	glDeleteTextures(1, &texture);
 }
 
-/*
-void TextureResource::setRasterizer(shared_ptr<Rasterizer> inRaster)
-{
-	this->raster = inRaster;
-}
-*/
-
 void TextureResource::loadFromFile(const char * filename)
 {
 
@@ -51,24 +44,7 @@ void TextureResource::loadFromFile(const char * filename)
 	stbi_image_free(image);
 
 }
-/*
-void TextureResource::loadFromRasterizer()
-{
-	int w = raster->screenwidth;
-	int h = raster->screenheight;
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, &raster->draw()[0]);
-	
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-}
-*/
 void TextureResource::BindTexture(GLuint slot)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
