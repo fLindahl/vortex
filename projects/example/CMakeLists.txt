@@ -10,5 +10,7 @@ SET(files_example ${example_headers} ${example_sources})
 SOURCE_GROUP("example" FILES ${files_example})
 
 ADD_EXECUTABLE(example ${files_example})
-TARGET_LINK_LIBRARIES(example core render foundation application fysik)
-ADD_DEPENDENCIES(example core render foundation application fysik)
+TARGET_LINK_LIBRARIES(example core render fysik)
+ADD_DEPENDENCIES(example core render fysik)
+
+SET_TARGET_PROPERTIES(example PROPERTIES FOLDER "vortex/projects")
