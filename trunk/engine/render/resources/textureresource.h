@@ -14,10 +14,7 @@ public:
 	TextureResource();
 	~TextureResource();
 
-	//void setRasterizer(std::shared_ptr<Rasterizer> inRaster);
-
 	void loadFromFile(const char * filename);
-	//void loadFromRasterizer();
 	void BindTexture(GLuint slot);
 
 	std::string GetName();
@@ -28,7 +25,6 @@ private:
 	Util::String name;
 
 	std::shared_ptr<ShaderObject> shader;
-	//std::shared_ptr<Rasterizer> raster;
 
 	GLuint texture;
 };
