@@ -50,14 +50,25 @@ public:
     TYPE& Back() const;
     /// return true if array empty
     bool IsEmpty() const;
-    /// erase element at index, keep sorting intact
+
+    /// erase element at index, keep sorting intact. NOTE: Calls destructor. See Remove-functions for not calling destructors.
     void EraseIndex(uint index);
-    /// erase element pointed to by iterator, keep sorting intact
+    /// erase element pointed to by iterator, keep sorting intact. NOTE: Calls destructor. See Remove-functions for not calling destructors.
     Iterator Erase(Iterator iter);
-    /// erase element at index, fill gap by swapping in last element, destroys sorting!
+    /// erase element at index, fill gap by swapping in last element, destroys sorting!. NOTE: Calls destructor. See Remove-functions for not calling destructors.
     void EraseIndexSwap(uint index);
-    /// erase element at iterator, fill gap by swapping in last element, destroys sorting!
+    /// erase element at iterator, fill gap by swapping in last element, destroys sorting!. NOTE: Calls destructor. See Remove-functions for not calling destructors.
     Iterator EraseSwap(Iterator iter);
+
+	/// remove element at index, keep sorting intact. NOTE: Does not call destructor. See Erase-functions for calling destructors.
+	void RemoveIndex(uint index);
+	/// remove element pointed to by iterator, keep sorting intact. NOTE: Does not call destructor. See Erase-functions for calling destructors.
+	Iterator Remove(Iterator iter);
+	/// remove element at index, fill gap by swapping in last element, destroys sorting!. NOTE: Does not call destructor. See Erase-functions for calling destructors.
+	void RemoveIndexSwap(uint index);
+	/// remove element at iterator, fill gap by swapping in last element, destroys sorting!. NOTE: Does not call destructor. See Erase-functions for calling destructors.
+	Iterator RemoveSwap(Iterator iter);
+
     /// insert element before element at index
     void Insert(uint index, const TYPE& elm);
     /// insert element into sorted array, return index where element was included
@@ -605,8 +616,89 @@ Array<TYPE>::Erase(typename Array<TYPE>::Iterator iter)
 template<class TYPE> typename Array<TYPE>::Iterator
 Array<TYPE>::EraseSwap(typename Array<TYPE>::Iterator iter)
 {
-    this->EraseSwapIndex(uint(iter - this->elements));
+	//HACK: Couldn't resolve external symbol... The linker really doesn't want to find the definition for this function, so i just copied it for now!
+	//this->EraseSwapIndex(uint(iter - this->elements));
+
+	//---- COPY OF 'EraseSwapIndex' FUNCTION -------
+	uint index = uint(iter - this->elements);
+	// swap with last element, and destroy last element
+	uint lastElementIndex = this->size - 1;
+	if (index < lastElementIndex)
+	{
+		this->elements[index] = this->elements[lastElementIndex];
+	}
+	this->Destroy(&(this->elements[lastElementIndex]));
+	this->size--;
+	//-------------------
+
     return iter;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class TYPE> void
+Array<TYPE>::RemoveIndex(uint index)
+{
+	if (index == (this->size - 1))
+	{
+		// special case: last element
+		this->size--;
+	}
+	else
+	{
+		this->Move(index + 1, index);
+	}
+}
+
+//------------------------------------------------------------------------------
+/**
+NOTE: this method is fast but destroys the sorting order!
+*/
+template<class TYPE> void
+Array<TYPE>::RemoveIndexSwap(uint index)
+{
+	// swap with last element, and destroy last element
+	uint lastElementIndex = this->size - 1;
+	if (index < lastElementIndex)
+	{
+		this->elements[index] = this->elements[lastElementIndex];
+	}
+	this->size--;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class TYPE> typename Array<TYPE>::Iterator
+Array<TYPE>::Remove(typename Array<TYPE>::Iterator iter)
+{
+	this->RemoveIndex(uint(iter - this->elements));
+	return iter;
+}
+
+//------------------------------------------------------------------------------
+/**
+NOTE: this method is fast but destroys the sorting order!
+*/
+template<class TYPE> typename Array<TYPE>::Iterator
+Array<TYPE>::RemoveSwap(typename Array<TYPE>::Iterator iter)
+{
+	//HACK: Couldn't resolve external symbol... The linker really doesn't want to find the definition for this function, so i just copied it for now!
+	//this->RemoveSwapIndex(uint(iter - this->elements));
+
+	//---- COPY OF 'RemoveSwapIndex' FUNCTION -------
+	uint index = uint(iter - this->elements);
+	// swap with last element, and destroy last element
+	uint lastElementIndex = this->size - 1;
+	if (index < lastElementIndex)
+	{
+		this->elements[index] = this->elements[lastElementIndex];
+	}
+	this->size--;
+	//-------------------
+
+	return iter;
 }
 
 //------------------------------------------------------------------------------

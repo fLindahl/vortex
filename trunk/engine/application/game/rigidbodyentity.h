@@ -14,6 +14,7 @@ public:
     RigidBodyEntity();
     ~RigidBodyEntity();
 
+	///Registers this entity to the physics server
     void Activate();
     void Deactivate();
 

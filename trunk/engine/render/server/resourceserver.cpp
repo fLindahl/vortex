@@ -206,8 +206,6 @@ bool ResourceServer::HasMaterialNamed(const std::string &nName)
 
 std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
 {
-    //TODO: should loader this really be here?
-
     if(this->HasSurfaceNamed(filepath))
         return this->surfaces[filepath];
 

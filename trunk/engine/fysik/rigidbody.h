@@ -56,6 +56,7 @@ private:
     friend class PhysicsDevice;
     friend class Game::RigidBodyEntity;
 
+	bool initialized;
     void initialize(const float& mass, const Math::mat4& bodyInertiaTensor, Game::RigidBodyEntity* entity);
 
     void update(const double& frameTime);

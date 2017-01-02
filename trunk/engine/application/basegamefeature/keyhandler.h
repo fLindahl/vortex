@@ -50,8 +50,12 @@ namespace BaseGameFeature
 		bool S = false;
 		bool A = false;
 		bool D = false;
+		bool Z = false;
+		bool Y = false;
 
 		bool leftShift = false;
+		bool leftCtrl = false;
+		
 
 		bool quit = false;
 
@@ -130,6 +134,18 @@ namespace BaseGameFeature
 		{
 			leftShift = true;
 		}
+		if (key == GLFW_KEY_LEFT_CONTROL)
+		{
+			leftCtrl = true;
+		}
+		if (key == GLFW_KEY_Z)
+		{
+			Z = true;
+		}
+		if (key == GLFW_KEY_Y)
+		{
+			Y = true;
+		}
 	}
 
 	inline void KeyHandler::setKeyStateReleased(int32 key)
@@ -181,6 +197,18 @@ namespace BaseGameFeature
 		if (key == GLFW_KEY_LEFT_SHIFT)
 		{
 			leftShift = false;
+		}
+		if (key == GLFW_KEY_LEFT_CONTROL)
+		{
+			leftCtrl = false;
+		}
+		if (key == GLFW_KEY_Z)
+		{
+			Z = false;
+		}
+		if (key == GLFW_KEY_Y)
+		{
+			Y = false;
 		}
 	}
 }

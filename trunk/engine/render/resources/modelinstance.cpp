@@ -71,7 +71,26 @@ void ModelInstance::SetMesh(const char* file)
 
 void ModelInstance::AddGraphicsProperty(GraphicsProperty* gp)
 {
-	this->graphicsProperties.Append(gp);
+	auto it = this->graphicsProperties.Find(gp);
+	if (it == nullptr)
+	{
+		this->graphicsProperties.Append(gp);
+	}
+	else
+	{
+		printf("WARNING: GraphicsProperty already registered to this Model!\n");
+	}
+}
+
+void ModelInstance::RemoveGraphicsProperty(GraphicsProperty* gp)
+{
+	auto it = this->graphicsProperties.Find(gp);
+	if (it != nullptr)
+	{
+		//Erase and move last element to this position.
+		//Destroys sorting!
+		it = this->graphicsProperties.EraseSwap(it);
+	}
 }
 
 Util::Array<GraphicsProperty*>& ModelInstance::GetGraphicsProperties()

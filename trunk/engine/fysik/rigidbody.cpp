@@ -14,15 +14,17 @@ RigidBody::RigidBody()
 	this->currentState.angularVelocity = Math::point::zerovector();
 	this->currentState.force = Math::point::zerovector();
 	this->currentState.torque = Math::point::zerovector();
+	this->initialized = false;
 }
 
 RigidBody::~RigidBody()
 {
-
+	this->initialized = false;
 }
 
 void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTensor, Game::RigidBodyEntity* entity)
 {
+	this->initialized = true;
     this->owner = entity;
     this->collider = this->owner->GetCollider();
 

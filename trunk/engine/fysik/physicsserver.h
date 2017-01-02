@@ -9,6 +9,7 @@
 #include "application/game/entity.h"
 #include "foundation/math/plane.h"
 #include "foundation/math/line.h"
+#include <map>
 
 namespace Game
 {
@@ -66,11 +67,19 @@ public:
 
     void addPhysicsEntity(Game::PhysicsEntity* p);
 
+	void removePhysicsEntity(Game::PhysicsEntity *p);
+
     ///Shoot a ray and return all objects that it intersects.
     //bool Raycast(Util::Array<PhysicsHit>& out, const Math::vec4& position, const Math::vec4& direction /*, const ExcludeSet& exclude*/);
 
 
     static Math::mat4 CalculateInertiaTensor(std::shared_ptr<BaseCollider> collider, const float& mass);
+
+	///Loads a collider based on mesh name and collider type.
+	///Note: If a collider has already been cooked from this mesh, it will never cook it again, eventhough you ask for a different shaped collider.
+	///TODO: we should split it into multiple lists with different shapes so that we can load them separately.
+	std::shared_ptr<Physics::BaseCollider> LoadCollider(const std::string& meshName, const Physics::ColliderShape& shape);
+
 private:
     friend class PhysicsDevice;
 
@@ -79,7 +88,10 @@ private:
     ///Check if point is within 3 given positions. Make sure a,b,c is in clockwise order.
     bool isPointWithinBounds(const Math::point& p, const Math::point& a, const Math::point& b, const Math::point& c, const Math::vec4& surfaceNormal);
 
+	//TODO: these need to be smartpointers!
     Util::Array<Game::PhysicsEntity*> physicsEntities;
+
+	std::map<std::string, std::shared_ptr<Physics::BaseCollider>> collidersByMeshName;
 };
 
 }

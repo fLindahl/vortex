@@ -50,18 +50,7 @@ private:
 	std::shared_ptr<Render::ModelInstance> modelInstance;
 	std::shared_ptr<Render::ModelInstance> modelInstance1;
 	std::shared_ptr<Render::ModelInstance> modelInstanceScene;
-
-	std::shared_ptr<Physics::SurfaceCollider> physicsCollider;
-	std::shared_ptr<Physics::SurfaceCollider> physicsCollider1;
-	std::shared_ptr<Physics::SurfaceCollider> SceneCollider;
-
-    std::shared_ptr<Physics::RigidBody> rBody1;
-    std::shared_ptr<Physics::RigidBody> rBody2;
-    std::shared_ptr<Physics::RigidBody> rBody3;
-    std::shared_ptr<Physics::RigidBody> rBody4;
-    std::shared_ptr<Physics::RigidBody> rBody5;
-    Util::Array<std::shared_ptr<Physics::RigidBody>> RBs;
-
+	
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity1;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity2;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity3;
@@ -77,22 +66,7 @@ private:
     std::shared_ptr<Game::StaticEntity> SceneEntity6;
 
 	BaseGameFeature::KeyHandler* keyhandler;
-
-	Render::GraphicsProperty* gProperty;
-	Render::GraphicsProperty* gProperty1;
-	Render::GraphicsProperty* gProperty2;
-	Render::GraphicsProperty* gProperty3;
-	Render::GraphicsProperty* gProperty4;
-    Util::Array<Render::GraphicsProperty*> gPs;
-
-	Render::GraphicsProperty* gPropertyScene1;
-    Render::GraphicsProperty* gPropertyScene2;
-    Render::GraphicsProperty* gPropertyScene3;
-    Render::GraphicsProperty* gPropertyScene4;
-    Render::GraphicsProperty* gPropertyScene5;
-    Render::GraphicsProperty* gPropertyScene6;
-
-
+	
 	Physics::PhysicsHit hit;
 
 	Display::Window* window;

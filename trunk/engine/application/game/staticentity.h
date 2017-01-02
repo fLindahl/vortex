@@ -11,6 +11,7 @@ public:
     StaticEntity();
     ~StaticEntity();
 
+	///Registers this entity to the physics server
     void Activate();
     void Deactivate();
 

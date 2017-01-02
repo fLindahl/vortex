@@ -68,7 +68,7 @@ namespace Display
 			vg(nullptr),
 			width(1024),
 			height(1024),
-			title("gscept Lab Environment")
+			title("Vortex Engine")
 	{
 		// empty
 	}
@@ -147,6 +147,22 @@ namespace Display
 /**
 */
 	void
+	Window::StaticWindowResizeCallback(GLFWwindow* win, int32 x, int32 y)
+	{
+		Window* window = (Window*)glfwGetWindowUserPointer(win);
+		//window->SetSize(x, y);
+		//Render::RenderDevice::Instance()->SetRenderResolution(x, y);
+		Render::RenderDevice::Instance()->SetWindowResolution(x, y);
+		window->width = x;
+		window->height = y;
+		window->Resize();
+		if (nullptr != window->windowResizeCallback) window->windowResizeCallback(x, y);
+	}
+
+//------------------------------------------------------------------------------
+/**
+*/
+	void
 	Window::Resize()
 	{
 		if (nullptr != this->window)
@@ -186,7 +202,7 @@ namespace Display
 		glfwWindowHint(GLFW_GREEN_BITS, 8);
 		glfwWindowHint(GLFW_BLUE_BITS, 8);
 		glfwWindowHint(GLFW_SRGB_CAPABLE, GL_TRUE);
-		glfwWindowHint(GLFW_SAMPLES, 8);
+		//glfwWindowHint(GLFW_SAMPLES, 8);
 
 		// open window
 		this->window = glfwCreateWindow(this->width, this->height, this->title.c_str(), nullptr, nullptr);
@@ -213,11 +229,11 @@ namespace Display
 
 			// setup stuff
 			glEnable(GL_FRAMEBUFFER_SRGB);
-			glEnable(GL_LINE_SMOOTH);
-			glEnable(GL_POLYGON_SMOOTH);
-			glEnable(GL_MULTISAMPLE);
-			glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-			glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+			//glEnable(GL_LINE_SMOOTH);
+			//glEnable(GL_POLYGON_SMOOTH);
+			//glEnable(GL_MULTISAMPLE);
+			//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+			//glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 			// setup viewport
 			glViewport(0, 0, this->width, this->height);
@@ -230,6 +246,7 @@ namespace Display
 		glfwSetCursorPosCallback(this->window, Window::StaticMouseMoveCallback);
 		glfwSetCursorEnterCallback(this->window, Window::StaticMouseEnterLeaveCallback);
 		glfwSetScrollCallback(this->window, Window::StaticMouseScrollCallback);
+		glfwSetWindowSizeCallback(this->window, Window::StaticWindowResizeCallback);
 		// setup imgui implementation
 		ImGui_ImplGlfwGL3_Init(this->window, false);
 		glfwSetCharCallback(window, ImGui_ImplGlfwGL3_CharCallback);

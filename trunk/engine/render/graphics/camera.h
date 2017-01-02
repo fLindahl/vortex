@@ -36,12 +36,18 @@ public:
 	void LookAt(const Math::vec4& target, const Math::vec4& up);
 
 	Math::mat4 getProjectionMatrix() const { return projectionMatrix; }
-	void setProjectionMatrix(const Math::mat4& mat) { this->projectionMatrix = mat; }
+	//void setProjectionMatrix(const Math::mat4& mat) { this->projectionMatrix = mat; }
+
+	void UpdateProjectionMatrix();
 
 	Math::vec4 GetPosition() { return this->cameraPos; }
 	void SetPosition(const Math::vec4& pos) { this->cameraPos = pos; }
 
 private:
+
+	const float fov = 80.0f;
+	const float nearZ = 0.05f;
+	const float farZ = 1000.0f;
 
 	Math::mat4 viewMatrix;
 	Math::mat4 projectionMatrix;
