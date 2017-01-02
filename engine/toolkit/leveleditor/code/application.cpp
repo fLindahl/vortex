@@ -50,6 +50,8 @@ Application::Open()
 	keyhandler = BaseGameFeature::KeyHandler::Instance();
 	keyhandler->Init(this->window);
 	
+	hit.object = nullptr;
+
 	// Initiate everything we need
 	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
 	if (this->window->Open())
@@ -70,6 +72,8 @@ Application::Open()
 
 		this->consoleBuffer = new char[CONSOLE_BUFFER_SIZE];
 
+		this->rayStart = Math::vec4::zerovector();
+		this->rayEnd = Math::vec4::zerovector();
 		
 		// Load Scene
 		modelInstanceScene = std::make_shared<Render::ModelInstance>();
@@ -154,8 +158,8 @@ Application::Open()
 		this->rigidBodyEntity4->SetTransform(transf4);
         this->rigidBodyEntity5->SetTransform(transf5);
 
-        const int numEntsX = 1;
-        const int numEntsY = 1;
+        const int numEntsX = 10;
+        const int numEntsY = 10;
 
         for (int i = 0; i < numEntsX; ++i) {
             for (int j = 0; j < numEntsY; ++j) {
@@ -163,7 +167,7 @@ Application::Open()
                 RBEs.Append(ent);
 				ent->SetModel(modelInstance1);
 
-                Math::mat4 transf1 = Math::mat4::translation(i*1.0f - (numEntsX/2), numEntsY/4 + j*1.0f, 5.0f);
+                Math::mat4 transf1 = Math::mat4::translation(i*1.001f - (numEntsX/2), numEntsY/4 + j*1.001f, 5.0f);
                 ent->SetTransform(transf1);
                 ent->Activate();
             }
@@ -343,6 +347,10 @@ Application::Run()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	
+	cameraPos = Math::point::zerovector();
+	camRotX = 0;
+	camRotY = 0;
+
 	while (this->window->IsOpen() && !this->shutdown)
 	{
 		double time = glfwGetTime();
@@ -350,6 +358,11 @@ Application::Run()
        	
 		Physics::PhysicsDevice::Instance()->Solve();
 		BaseGameFeature::EntityManager::Instance()->Update();
+
+		if (ImGui::GetIO().KeyAlt)
+		{
+			CameraMovement();
+		}
 
 		RenderDevice::Instance()->Render(false);
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
