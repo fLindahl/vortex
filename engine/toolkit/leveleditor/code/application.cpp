@@ -158,8 +158,8 @@ Application::Open()
 		this->rigidBodyEntity4->SetTransform(transf4);
         this->rigidBodyEntity5->SetTransform(transf5);
 
-        const int numEntsX = 10;
-        const int numEntsY = 10;
+        const int numEntsX = 1;
+        const int numEntsY = 1;
 
         for (int i = 0; i < numEntsX; ++i) {
             for (int j = 0; j < numEntsY; ++j) {
@@ -219,21 +219,21 @@ void Application::ShowFileMenu()
 		ImGui::EndMenu();
 	}
 
-	if (ImGui::BeginMenu("Options"))
-	{
-		ImGui::EndMenu();
-	}
-	if (ImGui::BeginMenu("Colors"))
-	{
-		for (int i = 0; i < ImGuiCol_COUNT; i++)
-			ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
-		ImGui::EndMenu();
-	}
-	if (ImGui::BeginMenu("Disabled", false)) // Disabled
-	{
-		IM_ASSERT(0);
-	}
-	if (ImGui::MenuItem("Checked", NULL, true)) {}
+	//if (ImGui::BeginMenu("Options"))
+	//{
+	//	ImGui::EndMenu();
+	//}
+	//if (ImGui::BeginMenu("Colors"))
+	//{
+		//for (int i = 0; i < ImGuiCol_COUNT; i++)
+		//	ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
+		//ImGui::EndMenu();
+	//}
+	//if (ImGui::BeginMenu("Disabled", false)) // Disabled
+	//{
+	//	IM_ASSERT(0);
+	//}
+	//if (ImGui::MenuItem("Checked", NULL, true)) {}
 	if (ImGui::MenuItem("Quit", "Alt+F4")) { this->shutdown = true; }
 }
 
