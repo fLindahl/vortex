@@ -35,6 +35,34 @@ void Application::RenderDocks()
 
 	ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings);
 	{
+		if (hit.object != nullptr)
+		{
+			ImGui::Text("Transform:");
+			ImGui::Text("%f | %f | %f | %f", hit.object->GetTransform().getrow(0).x(), hit.object->GetTransform().getrow(0).y(), hit.object->GetTransform().getrow(0).z(), hit.object->GetTransform().getrow(0).w());
+			ImGui::Text("%f | %f | %f | %f", hit.object->GetTransform().getrow(1).x(), hit.object->GetTransform().getrow(1).y(), hit.object->GetTransform().getrow(1).z(), hit.object->GetTransform().getrow(1).w());
+			ImGui::Text("%f | %f | %f | %f", hit.object->GetTransform().getrow(2).x(), hit.object->GetTransform().getrow(2).y(), hit.object->GetTransform().getrow(2).z(), hit.object->GetTransform().getrow(2).w());
+			ImGui::Text("%f | %f | %f | %f", hit.object->GetTransform().getrow(3).x(), hit.object->GetTransform().getrow(3).y(), hit.object->GetTransform().getrow(3).z(), hit.object->GetTransform().getrow(3).w());
+
+			Game::PhysicsEntity* pe = dynamic_cast<Game::PhysicsEntity*>(hit.object);
+
+			if (pe != nullptr)
+			{
+				ImGui::Text("Mesh: %s", pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName().c_str());
+				ImGui::Text("Type: %i", pe->GetPhysicsType());
+
+				if (pe->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+				{
+					Game::RigidBodyEntity* rb = dynamic_cast<Game::RigidBodyEntity*>(pe);
+
+					ImGui::Text("Orientation: %f, %f, %f, %f\n", rb->GetRigidBody()->getOrientation().x(), rb->GetRigidBody()->getOrientation().y(), rb->GetRigidBody()->getOrientation().z(), rb->GetRigidBody()->getOrientation().w());
+					ImGui::Text("Position: %f, %f, %f, %f\n", rb->GetRigidBody()->getPosition().x(), rb->GetRigidBody()->getPosition().y(), rb->GetRigidBody()->getPosition().z(), rb->GetRigidBody()->getPosition().w());
+					ImGui::Text("LinearVelocity: %f, %f, %f, %f\n", rb->GetRigidBody()->getLinearVelocity().x(), rb->GetRigidBody()->getLinearVelocity().y(), rb->GetRigidBody()->getLinearVelocity().z(), rb->GetRigidBody()->getLinearVelocity().w());
+					ImGui::Text("AngularVelocity: %f, %f, %f, %f\n", rb->GetRigidBody()->getAngularVelocity().x(), rb->GetRigidBody()->getAngularVelocity().y(), rb->GetRigidBody()->getAngularVelocity().z(), rb->GetRigidBody()->getAngularVelocity().w());
+					ImGui::Text("Acceleration: %f, %f, %f, %f\n", rb->GetRigidBody()->getAcceleration().x(), rb->GetRigidBody()->getAcceleration().y(), rb->GetRigidBody()->getAcceleration().z(), rb->GetRigidBody()->getAcceleration().w());
+				}
+			}
+		}
+		/*
 		static bool enabled = true;
 		ImGui::BeginChild("child", ImVec2(0, 60), true);
 		for (int i = 0; i < 10; i++)
@@ -46,6 +74,7 @@ void Application::RenderDocks()
 		ImGui::InputFloat("Input", &f, 0.1f);
 		ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
 		ImGui::Checkbox("Checkbox", &enabled);
+		*/
 	}
 	ImGui::EndDock();
 
