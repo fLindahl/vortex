@@ -349,17 +349,8 @@ Application::Run()
 		this->window->Update();
        	
 		Physics::PhysicsDevice::Instance()->Solve();
+		BaseGameFeature::EntityManager::Instance()->Update();
 
-        this->rigidBodyEntity1->Update();
-        this->rigidBodyEntity2->Update();
-		this->rigidBodyEntity3->Update();
-		this->rigidBodyEntity4->Update();
-		this->rigidBodyEntity5->Update();
-
-        for (int i = 0; i < RBEs.Size(); ++i) {
-            RBEs[i]->Update();
-        }
-		
 		RenderDevice::Instance()->Render(false);
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

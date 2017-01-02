@@ -306,7 +306,7 @@ void PhysicsDevice::Solve()
 
     for(auto rigidbody : this->rigidBodies)
     {
-		rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
+		//rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
         rigidbody->update(this->frameTime);
     }
 

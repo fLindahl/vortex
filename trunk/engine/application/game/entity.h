@@ -10,7 +10,8 @@
 namespace Game
 {
 
-class Entity
+// Inherit from enable_shared_from_this so that we can safely create ned shared_ptr instances from within this class
+class Entity : public std::enable_shared_from_this<Entity>
 {
 public:
 	Entity();

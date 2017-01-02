@@ -11,7 +11,7 @@ Entity::Entity()
 	
 	//GraphicsServer::getInstance()->addGraphicsProperty(this->graphics);
 
-	//this->ID = __GETNEWUID;
+	this->ID = BaseGameFeature::EntityManager::Instance()->GetNewEntityID();
 }
 
 Entity::~Entity()
@@ -62,17 +62,18 @@ Math::mat4 Entity::GetTransform()
 void Entity::AddProperty(std::shared_ptr<Game::BaseProperty> p)
 {
     this->properties.Append(p);
-	//TODO: This should work
-    //p->owner = std::shared_from_this();
+    p->owner = this->shared_from_this();
 }
 
 void Entity::Activate()
 {
+	BaseGameFeature::EntityManager::Instance()->RegisterEntity(this->shared_from_this());
 	this->active = true;
 }
 
 void Entity::Deactivate()
 {
+	BaseGameFeature::EntityManager::Instance()->UnregisterEntity(this->ID);
 	this->active = false;
 }
 

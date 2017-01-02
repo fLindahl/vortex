@@ -162,6 +162,7 @@ inline void bbox::debugRender()
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getProjectionMatrix().mat.m[0][0]);
 
+	glLineWidth(5.0f);
     glBegin(GL_LINES);
 
     Math::vec4 v0 = this->corner_point(0);
@@ -174,6 +175,7 @@ inline void bbox::debugRender()
     Math::vec4 v7 = this->corner_point(7);
 
     glColor3f(0.5f, 0.5f, 0.5f);
+	
 
     glVertex4f(v0[0], v0[1], v0[2], v0[3]);
     glVertex4f(v1[0], v1[1], v1[2], v1[3]);
