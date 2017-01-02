@@ -27,10 +27,17 @@ public:
 	///Temporary. Sets up the most common framepasses such as depthbuffer, lightculling and more.
 	void SetupFramePasses();
 
+	void UpdateResolutions();
+
 	std::shared_ptr<FramePass> GetFramePass(const std::string& name);
 	bool HasPassNamed(const std::string& name);
 
+	GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
+
 private:
+	GLuint finalColorFrameBufferObject;
+	GLuint finalColorBuffer;
+
 	const unsigned int MAX_NUM_LIGHTS = 1024;
 
 	friend class RenderDevice;

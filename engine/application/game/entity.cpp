@@ -68,12 +68,12 @@ void Entity::AddProperty(std::shared_ptr<Game::BaseProperty> p)
 
 void Entity::Activate()
 {
-
+	this->active = true;
 }
 
 void Entity::Deactivate()
 {
-
+	this->active = false;
 }
 
 }

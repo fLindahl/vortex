@@ -37,6 +37,8 @@ public:
 protected:
     //friend class BaseGameFeature::EntityManager;
 
+	bool active = false;
+
     Math::mat4 transform;
 
 	int ID;

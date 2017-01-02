@@ -12,7 +12,7 @@
 // SDL,GL3W
 #include <SDL.h>
 #include <SDL_syswm.h>
-#include <GL/gl3w.h>
+#include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
 
 // Data
 static double       g_Time = 0.0f;
@@ -123,12 +123,12 @@ void ImGui_ImplSdlGL3_RenderDrawLists(ImDrawData* draw_data)
     glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }
 
-static const char* ImGui_ImplSdlGL3_GetClipboardText()
+static const char* ImGui_ImplSdlGL3_GetClipboardText(void*)
 {
     return SDL_GetClipboardText();
 }
 
-static void ImGui_ImplSdlGL3_SetClipboardText(const char* text)
+static void ImGui_ImplSdlGL3_SetClipboardText(void*, const char* text)
 {
     SDL_SetClipboardText(text);
 }
@@ -327,6 +327,7 @@ bool    ImGui_ImplSdlGL3_Init(SDL_Window* window)
     io.RenderDrawListsFn = ImGui_ImplSdlGL3_RenderDrawLists;   // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
     io.SetClipboardTextFn = ImGui_ImplSdlGL3_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplSdlGL3_GetClipboardText;
+    io.ClipboardUserData = NULL;
 
 #ifdef _WIN32
     SDL_SysWMinfo wmInfo;

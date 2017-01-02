@@ -26,6 +26,7 @@ public:
 	void SetMesh(const char* file);
 
 	void AddGraphicsProperty(GraphicsProperty* gp);
+	void RemoveGraphicsProperty(GraphicsProperty* gp);
 
 	//void SetMaterial(const Util::String& name);
 	//std::shared_ptr<Material> GetMaterial();

@@ -19,6 +19,9 @@ public:
 
     void Update();
 
+	void Activate();
+	void Deactivate();
+
 	std::shared_ptr<Render::ModelInstance> getModelInstance() const;
 	void setModelInstance(std::shared_ptr<Render::ModelInstance> inModelInstance);
 	

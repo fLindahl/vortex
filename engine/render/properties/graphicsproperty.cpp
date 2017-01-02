@@ -14,8 +14,7 @@ GraphicsProperty::~GraphicsProperty()
 {
 	if (this->modelInstance != nullptr)
 	{
-		//HACK: Implement this
-		//this->modelInstance->removeGraphicsProperty(this);
+		this->modelInstance->RemoveGraphicsProperty(this);
 	}
 }
 
@@ -26,17 +25,12 @@ std::shared_ptr<Render::ModelInstance> GraphicsProperty::getModelInstance() cons
 
 void GraphicsProperty::setModelInstance(std::shared_ptr<Render::ModelInstance> inModelInstance)
 {
-	//HACK: Implement this
-	//if (this->modelInstance.get() != nullptr)
-	//{
-	//	this->modelInstance->removeGraphicsProperty(this);
-	//}
+	if (this->modelInstance != nullptr)
+	{
+		this->modelInstance->RemoveGraphicsProperty(this);
+	}
 
 	this->modelInstance = inModelInstance;
-	this->modelInstance->AddGraphicsProperty(this);
-
-	this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
-
 }
 
 Math::mat4 GraphicsProperty::getModelMatrix() const
@@ -55,4 +49,33 @@ void GraphicsProperty::Update()
 {
 	this->Game::BaseProperty::Update();
 }
+
+void GraphicsProperty::Activate()
+{
+	if (!this->active)
+	{
+		if (this->modelInstance != nullptr)
+		{
+			this->modelInstance->AddGraphicsProperty(this);
+			this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
+		}
+		else
+		{
+			printf("ERROR: GraphicsProperty::Activate() >> No ModelInstance found!\n");
+			assert(false);
+		}
+
+		BaseProperty::Activate();
+	}
+}
+
+void GraphicsProperty::Deactivate()
+{
+	if (this->active)
+	{
+		this->modelInstance->RemoveGraphicsProperty(this);
+		BaseProperty::Deactivate();
+	}
+}
+
 }

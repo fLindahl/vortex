@@ -48,24 +48,31 @@ void RenderDevice::Initialize()
 
 }
 
-void RenderDevice::SetResolution(const Resolution& res)
+void RenderDevice::SetRenderResolution(const Resolution& res)
 {
-	this->resolution = res;
+	this->renderResolution = res;
+	Graphics::MainCamera::Instance()->UpdateProjectionMatrix();
+	FrameServer::Instance()->UpdateResolutions();
 	UpdateWorkGroups();
+	UpdateLightBuffer();
 }
 
-void RenderDevice::SetResolution(const int& x, const int& y)
+void RenderDevice::SetRenderResolution(const int& x, const int& y)
 {
-	this->resolution.x = x; 
-	this->resolution.y = y;
-	UpdateWorkGroups();
+	SetRenderResolution({ x, y });
+}
+
+void RenderDevice::SetWindowResolution(const int& x, const int& y)
+{
+	this->windowResolution.x = x;
+	this->windowResolution.y = y;
 }
 
 void RenderDevice::UpdateWorkGroups()
 {
 	// Define work group sizes in x and y direction based off screen size and tile size (in pixels)
-	workGroupsX = (resolution.x + (resolution.x % 16)) / 16;
-	workGroupsY = (resolution.y + (resolution.y % 16)) / 16;
+	workGroupsX = (renderResolution.x + (renderResolution.x % 16)) / 16;
+	workGroupsY = (renderResolution.y + (renderResolution.y % 16)) / 16;
 
 	size_t numberOfTiles = workGroupsX * workGroupsY;
 
@@ -87,8 +94,12 @@ void RenderDevice::UpdateLightBuffer()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void RenderDevice::Render()
+void RenderDevice::Render(bool drawToScreen)
 {
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glViewport(0, 0, renderResolution.x, renderResolution.y);
+
     //Set global matrix uniform buffer block for this frame
     uniformBufferBlock.View = Graphics::MainCamera::Instance()->getViewMatrix();
     uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
@@ -100,7 +111,7 @@ void RenderDevice::Render()
 
 	uniformBufferBlock.CameraPos = Graphics::MainCamera::Instance()->GetPosition();
 
-	uniformBufferBlock.ScreenSize = this->resolution;
+	uniformBufferBlock.ScreenSize = this->renderResolution;
 	uniformBufferBlock.TimeAndRandom[0] = (GLfloat)glfwGetTime();
 
 	//TODO: Add some interesting random function here!
@@ -174,8 +185,7 @@ void RenderDevice::Render()
 	glUniform1i(glGetUniformLocation(lightCullingProgram, "lightCount"), LightServer::Instance()->pointLights.Size());
 	glBindTexture(GL_TEXTURE_2D, depthPass->buffer);
 
-	// Bind shader storage buffer objects for the light and indice buffers
-
+	// Bind shader storage buffer objects for the light and index buffers
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, visibleLightIndicesBuffer);
 	
@@ -186,7 +196,10 @@ void RenderDevice::Render()
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	//Bind the final color buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 #ifdef _LIGHT_DEBUG
 
@@ -272,6 +285,21 @@ void RenderDevice::Render()
 			}
 		}
     }
+
+	glViewport(0, 0, windowResolution.x, windowResolution.y);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glDrawBuffer(GL_BACK); // Set the back buffer as the draw buffer
+
+	//Copy final colorbuffer to screen if specified
+	if (drawToScreen)
+	{
+		//glBindFramebuffer(GL_READ_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
+		glBlitFramebuffer(0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->windowResolution.x, this->windowResolution.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		
+		//This is only for OGL 4.5 and it might cause issues with older cards...
+		//glBlitNamedFramebuffer(FrameServer::Instance()->finalColorFrameBufferObject, 0, 0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->windowResolution.x, this->windowResolution.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	}
 
 #endif
 

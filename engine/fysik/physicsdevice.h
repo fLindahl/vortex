@@ -69,6 +69,7 @@ public:
     void operator=(PhysicsDevice const&) = delete;
 
     void AddRigidBody(std::shared_ptr<RigidBody> rBody);
+	void RemoveRigidBody(std::shared_ptr<RigidBody> rBody);
 
     void Solve();
 

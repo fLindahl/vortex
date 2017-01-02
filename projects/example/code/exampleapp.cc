@@ -54,9 +54,6 @@ ExampleApp::Open()
 	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
 	if (this->window->Open())
 	{
-		this->window->SetSize(1600, 900);
-		this->window->SetTitle("Vortex Engine Test Environment");
-
 		//Init RenderDevice
 		RenderDevice::Instance()->Initialize();
 		// Setup framepasses
@@ -65,48 +62,35 @@ ExampleApp::Open()
 		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
 		//Load all materials
 		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
-		
+	
+		//Never set resolution before initializing rendering and framepasses
+		this->window->SetSize(1600, 900);
+		this->window->SetTitle("Vortex Engine Test Environment");
+
+		//Set render resolution. This is set with window->setsize too so we override it here
+		RenderDevice::Instance()->SetRenderResolution(1920, 1080);
 
 		this->consoleBuffer = new char[CONSOLE_BUFFER_SIZE];
-
 		
 		// Load Scene
 		modelInstanceScene = std::make_shared<Render::ModelInstance>();
-		gPropertyScene1 = new Render::GraphicsProperty();
-        gPropertyScene2 = new Render::GraphicsProperty();
-        gPropertyScene3 = new Render::GraphicsProperty();
-        gPropertyScene4 = new Render::GraphicsProperty();
-        gPropertyScene5 = new Render::GraphicsProperty();
-        gPropertyScene6 = new Render::GraphicsProperty();
-		SceneCollider = std::make_shared<Physics::SurfaceCollider>();
-		SceneCollider->SetShape(Physics::ColliderShape::BOX);
+		modelInstanceScene->SetSurface("resources/surfaces/rock.surface");
+		modelInstanceScene->SetMesh("resources/models/groundfloor.obj");
+
 		SceneEntity1 = std::make_shared<Game::StaticEntity>();
         SceneEntity2 = std::make_shared<Game::StaticEntity>();
         SceneEntity3 = std::make_shared<Game::StaticEntity>();
         SceneEntity4 = std::make_shared<Game::StaticEntity>();
         SceneEntity5 = std::make_shared<Game::StaticEntity>();
         SceneEntity6 = std::make_shared<Game::StaticEntity>();
-		SceneEntity1->SetCollider(SceneCollider);
-        SceneEntity2->SetCollider(SceneCollider);
-        SceneEntity3->SetCollider(SceneCollider);
-        SceneEntity4->SetCollider(SceneCollider);
-        SceneEntity5->SetCollider(SceneCollider);
-        SceneEntity6->SetCollider(SceneCollider);
-		modelInstanceScene->SetSurface("resources/surfaces/rock.surface");
-		modelInstanceScene->SetMesh("resources/models/groundfloor.obj");
-		gPropertyScene1->setModelInstance(modelInstanceScene);
-        gPropertyScene2->setModelInstance(modelInstanceScene);
-        gPropertyScene3->setModelInstance(modelInstanceScene);
-        gPropertyScene4->setModelInstance(modelInstanceScene);
-        gPropertyScene5->setModelInstance(modelInstanceScene);
-        gPropertyScene6->setModelInstance(modelInstanceScene);
-		SceneEntity1->SetGraphicsProperty(gPropertyScene1);
-        SceneEntity2->SetGraphicsProperty(gPropertyScene2);
-        SceneEntity3->SetGraphicsProperty(gPropertyScene3);
-        SceneEntity4->SetGraphicsProperty(gPropertyScene4);
-        SceneEntity5->SetGraphicsProperty(gPropertyScene5);
-        SceneEntity6->SetGraphicsProperty(gPropertyScene6);
-		SceneCollider->CookMeshData(modelInstanceScene->GetMesh());
+
+		SceneEntity1->SetModel(modelInstanceScene);
+		SceneEntity2->SetModel(modelInstanceScene);
+		SceneEntity3->SetModel(modelInstanceScene);
+		SceneEntity4->SetModel(modelInstanceScene);
+		SceneEntity5->SetModel(modelInstanceScene);
+		SceneEntity6->SetModel(modelInstanceScene);
+
 		SceneEntity1->SetTransform(Math::mat4::translation(0.0f, -2.0f, 0.0f));
         SceneEntity2->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(10.0f, 8.0f, 0.0f)));
         SceneEntity3->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(-10.0f, 8.0f, 0.0f)));
@@ -123,55 +107,17 @@ ExampleApp::Open()
 		modelInstance = std::make_shared<Render::ModelInstance>();
 		modelInstance1 = std::make_shared<Render::ModelInstance>();
 
-		gProperty = new Render::GraphicsProperty();
-		gProperty1 = new Render::GraphicsProperty();
-		gProperty2 = new Render::GraphicsProperty();
-		gProperty3 = new Render::GraphicsProperty();
-		gProperty4 = new Render::GraphicsProperty();
-
-
-        physicsCollider = std::make_shared<Physics::SurfaceCollider>();
-		physicsCollider1 = std::make_shared<Physics::SurfaceCollider>();
-
-		physicsCollider->SetShape(Physics::ColliderShape::BOX);
-		physicsCollider1->SetShape(Physics::ColliderShape::BOX);
-
-		rBody1 = std::make_shared<Physics::RigidBody>();
-        rBody2 = std::make_shared<Physics::RigidBody>();
-        rBody3 = std::make_shared<Physics::RigidBody>();
-        rBody4 = std::make_shared<Physics::RigidBody>();
-		rBody5 = std::make_shared<Physics::RigidBody>();
-
 		rigidBodyEntity1 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity2 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity3 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity4 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity5 = std::make_shared<Game::RigidBodyEntity>();
 
-
-
-        rigidBodyEntity1->SetRigidBody(rBody1);
-        rigidBodyEntity2->SetRigidBody(rBody2);
-        rigidBodyEntity3->SetRigidBody(rBody3);
-        rigidBodyEntity4->SetRigidBody(rBody4);
-		rigidBodyEntity5->SetRigidBody(rBody5);
-
-        rigidBodyEntity1->SetCollider(physicsCollider1);
-        rigidBodyEntity2->SetCollider(physicsCollider1);
-		rigidBodyEntity3->SetCollider(physicsCollider1);
-		rigidBodyEntity4->SetCollider(physicsCollider1);
-		rigidBodyEntity5->SetCollider(physicsCollider);
-
 		modelInstance->SetSurface("resources/surfaces/player.surface");
 		modelInstance->SetMesh("resources/models/kung.obj");
-		gProperty->setModelInstance(modelInstance);
 
 		modelInstance1->SetSurface("resources/surfaces/placeholder.surface");
 		modelInstance1->SetMesh("resources/models/cube.obj");
-		gProperty1->setModelInstance(modelInstance1);
-		gProperty2->setModelInstance(modelInstance1);
-		gProperty3->setModelInstance(modelInstance1);
-		gProperty4->setModelInstance(modelInstance1);
 
 		PointLight pLight;
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
@@ -191,14 +137,11 @@ ExampleApp::Open()
 		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 
-        rigidBodyEntity1->SetGraphicsProperty(gProperty1);
-        rigidBodyEntity2->SetGraphicsProperty(gProperty2);
-        rigidBodyEntity3->SetGraphicsProperty(gProperty3);
-        rigidBodyEntity4->SetGraphicsProperty(gProperty4);
-        rigidBodyEntity5->SetGraphicsProperty(gProperty);
-
-        physicsCollider->CookMeshData(modelInstance->GetMesh());
-		physicsCollider1->CookMeshData(modelInstance1->GetMesh());
+		rigidBodyEntity1->SetModel(modelInstance1);
+		rigidBodyEntity2->SetModel(modelInstance1);
+		rigidBodyEntity3->SetModel(modelInstance1);
+		rigidBodyEntity4->SetModel(modelInstance1);
+		rigidBodyEntity5->SetModel(modelInstance);
 
 		Math::mat4 transf1 = Math::mat4::translation(2.0f, -0.5f, 1.5f);
         Math::mat4 transf2 = Math::mat4::translation(0.0f, -0.5f, 1.5f);
@@ -217,17 +160,9 @@ ExampleApp::Open()
 
         for (int i = 0; i < numEntsX; ++i) {
             for (int j = 0; j < numEntsY; ++j) {
-                std::shared_ptr<Physics::RigidBody> rb = std::make_shared<Physics::RigidBody>();
                 std::shared_ptr<Game::RigidBodyEntity> ent = std::make_shared<Game::RigidBodyEntity>();
                 RBEs.Append(ent);
-                RBs.Append(rb);
-                ent->SetRigidBody(rb);
-                ent->SetCollider(physicsCollider1);
-
-                Render::GraphicsProperty* gp = new Render::GraphicsProperty;
-                gp->setModelInstance(modelInstance1);
-                ent->SetGraphicsProperty(gp);
-                gPs.Append(gp);
+				ent->SetModel(modelInstance1);
 
                 Math::mat4 transf1 = Math::mat4::translation(i*1.0f - (numEntsX/2), numEntsY/4 + j*1.0f, 5.0f);
                 ent->SetTransform(transf1);
@@ -257,11 +192,88 @@ ExampleApp::Open()
 	return false;
 }
 
+void ShowExampleMenuFile()
+{
+	ImGui::MenuItem("(dummy menu)", NULL, false, false);
+	if (ImGui::MenuItem("New")) {}
+	if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+	if (ImGui::BeginMenu("Open Recent"))
+	{
+		ImGui::MenuItem("fish_hat.c");
+		ImGui::MenuItem("fish_hat.inl");
+		ImGui::MenuItem("fish_hat.h");
+		if (ImGui::BeginMenu("More.."))
+		{
+			ImGui::MenuItem("Hello");
+			ImGui::MenuItem("Sailor");
+			if (ImGui::BeginMenu("Recurse.."))
+			{
+				ShowExampleMenuFile();
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenu();
+	}
+	if (ImGui::MenuItem("Save", "Ctrl+S")) {}
+	if (ImGui::MenuItem("Save As..")) {}
+	ImGui::Separator();
+	if (ImGui::BeginMenu("Options"))
+	{
+		static bool enabled = true;
+		ImGui::MenuItem("Enabled", "", &enabled);
+		ImGui::BeginChild("child", ImVec2(0, 60), true);
+		for (int i = 0; i < 10; i++)
+			ImGui::Text("Scrolling Text %d", i);
+		ImGui::EndChild();
+		static float f = 0.5f;
+		static int n = 0;
+		ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
+		ImGui::InputFloat("Input", &f, 0.1f);
+		ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("Colors"))
+	{
+		for (int i = 0; i < ImGuiCol_COUNT; i++)
+			ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("Disabled", false)) // Disabled
+	{
+		IM_ASSERT(0);
+	}
+	if (ImGui::MenuItem("Checked", NULL, true)) {}
+	if (ImGui::MenuItem("Quit", "Alt+F4")) {}
+}
+
+
 void ExampleApp::RenderUI()
 {
 	if (this->window->IsOpen())
 	{
 		bool show = true;
+
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				ShowExampleMenuFile();
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
+
 		// create a new window
 		ImGui::Begin("Console", &show, ImGuiWindowFlags_NoSavedSettings);
 
