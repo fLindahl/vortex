@@ -26,6 +26,9 @@ SET(files_foundation_util
 	util/indexedpriorityqueue.h
 	util/variable.h
 	util/string.h
+	util/linkedlist.h
+	util/queue.h
+	util/stack.h
 	)
 
 SET(files_foundation_messaging
