@@ -58,13 +58,16 @@ namespace Render
         RenderDevice(RenderDevice const&) = delete;
         void operator=(RenderDevice const&) = delete;
 
-		Resolution GetResolution() { return this->resolution; }
-		void SetResolution(const Resolution& res);
-		void SetResolution(const int& x, const int& y);
+		const Resolution& GetRenderResolution() const { return this->renderResolution; }
+		const Resolution& GetWindowResolution() const { return this->windowResolution; }
+		void SetRenderResolution(const Resolution& res);
+		void SetRenderResolution(const int& x, const int& y);
+
+		void SetWindowResolution(const int& x, const int& y);
 
 		void AddMaterial(Material* obj) { this->materials.Append(obj); }
         //This renders all graphicsproperties.
-        void Render();
+        void Render(bool drawToScreen = true);
 
 		void Initialize();
 
@@ -75,7 +78,8 @@ namespace Render
 		void UpdateWorkGroups();
 		void UpdateLightBuffer();
 
-		Resolution resolution;
+		Resolution renderResolution;
+		Resolution windowResolution;
 
 		GLuint currentProgram;
 		

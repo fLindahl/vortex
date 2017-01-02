@@ -27,7 +27,7 @@ public:
 	/// kill application
 	virtual void Exit();
 
-private:
+protected:
 	bool isOpen;
 };
 } // namespace App

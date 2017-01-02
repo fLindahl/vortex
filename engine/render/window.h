@@ -52,6 +52,8 @@ namespace Display
 		void SetMouseEnterLeaveFunction(const std::function<void(bool)>& func);
 		/// set mouse scroll function callback
 		void SetMouseScrollFunction(const std::function<void(float64, float64)>& func);
+		/// set window resize function callback
+		void SetWindowResizeFunction(const std::function<void(int32, int32)>& func);
 
 		/// set optional UI render function
 		void SetUiRender(const std::function<void()>& func);
@@ -75,6 +77,8 @@ namespace Display
 		static void StaticMouseEnterLeaveCallback(GLFWwindow* win, int32 mode);
 		/// static mouse scroll callback
 		static void StaticMouseScrollCallback(GLFWwindow* win, float64 x, float64 y);
+		/// static resize window callback
+		static void StaticWindowResizeCallback(GLFWwindow* win, int32 x, int32 y);
 
 		/// resize update
 		void Resize();
@@ -93,6 +97,8 @@ namespace Display
 		std::function<void(bool)> mouseLeaveEnterCallback;
 		/// function for mouse scroll callbacks
 		std::function<void(float64, float64)> mouseScrollCallback;
+		/// function for window resize callbacks
+		std::function<void(int32, int32)> windowResizeCallback;
 		/// function for ui rendering callback
 		std::function<void()> uiFunc;
 		/// function for nanovg rendering callback
@@ -112,7 +118,8 @@ namespace Display
 	inline void
 	Window::SetSize(int32 width, int32 height)
 	{
-		Render::RenderDevice::Instance()->SetResolution(width, height);
+		Render::RenderDevice::Instance()->SetRenderResolution(width, height);
+		Render::RenderDevice::Instance()->SetWindowResolution(width, height);
 		this->width = width;
 		this->height = height;
 		if (nullptr != this->window) this->Resize();
@@ -180,6 +187,15 @@ namespace Display
 	Window::SetMouseScrollFunction(const std::function<void(float64, float64)>& func)
 	{
 		this->mouseScrollCallback = func;
+	}
+
+//------------------------------------------------------------------------------
+/**
+*/
+	inline void
+	Window::SetWindowResizeFunction(const std::function<void(int32, int32)>& func)
+	{
+		this->windowResizeCallback = func;
 	}
 
 //------------------------------------------------------------------------------

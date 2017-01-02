@@ -306,7 +306,7 @@ void PhysicsDevice::Solve()
 
     for(auto rigidbody : this->rigidBodies)
     {
-		//rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
+		rigidbody->applyForce(Math::vec4(0.0f, -1.0f, 0.0f, 0.0f), 0.02f);
         rigidbody->update(this->frameTime);
     }
 
@@ -329,9 +329,30 @@ void PhysicsDevice::Solve()
     this->time = currentTime;
     //--------------
 }
+
 void PhysicsDevice::AddRigidBody(std::shared_ptr<RigidBody> rBody)
 {
-    this->rigidBodies.Append(rBody);
+	auto it = this->rigidBodies.Find(rBody);
+	if (it == nullptr)
+	{
+		this->rigidBodies.Append(rBody);
+	}
+	else
+	{
+		printf("WARNING: Rigidbody already added to PhysicsDevice!\n");
+	}
+
+}
+
+void PhysicsDevice::RemoveRigidBody(std::shared_ptr<RigidBody> rBody)
+{
+	auto it = this->rigidBodies.Find(rBody);
+	if (it != nullptr)
+	{
+		//Erase and move last element to this position.
+		//Destroys sorting!
+		this->rigidBodies.RemoveSwap(it);
+	}
 }
 
 bool PhysicsDevice::GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex)
@@ -789,6 +810,7 @@ void PhysicsDevice::BroadPhase()
     {
         Math::point p = (physicsEntities[i]->GetGraphicsProperty()->getbbox().minPoint + physicsEntities[i]->GetGraphicsProperty()->getbbox().maxPoint) * 0.5f;
 
+		//TODO: Can we exclude static objects from our variance and would that make it faster?
         for (int c = 0; c < 3; ++c)
         {
             sum[c] += p[c];

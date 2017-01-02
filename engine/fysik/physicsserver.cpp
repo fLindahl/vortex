@@ -4,6 +4,7 @@
 #include "foundation/math/math.h"
 #include "surfacecollider.h"
 #include "render/properties/graphicsproperty.h"
+#include "render/server/resourceserver.h"
 
 namespace Physics
 {
@@ -168,9 +169,22 @@ Math::mat4 PhysicsServer::CalculateInertiaTensor(std::shared_ptr<BaseCollider> c
         }
         case SURFACE:
         {
-            printf("Inertia tensor SURFACE not implemented!\n");
-            assert(false);
-            return Math::mat4();
+            //printf("Inertia tensor SURFACE not implemented!\n");
+			//printf("Using box inertia tensor...\n\n");
+			//TODO: Calculate specific inertia tensor for mesh
+			float d = 0.083333333f * mass;
+			Math::vec4 boxExtents = collider->getbbox().maxPoint - collider->getbbox().minPoint;
+			float sqX = (boxExtents.x() * boxExtents.x());
+			float sqY = (boxExtents.y() * boxExtents.y());
+			float sqZ = (boxExtents.z() * boxExtents.z());
+
+			Math::mat4 inertiaTensor = Math::mat4(
+				d * (sqY + sqZ), 0, 0, 0,
+				0, d * (sqX + sqZ), 0, 0,
+				0, 0, d * (sqX + sqY), 0,
+				0, 0, 0, 1
+				);
+			return inertiaTensor;            
         }
         default:
         {
@@ -183,7 +197,53 @@ Math::mat4 PhysicsServer::CalculateInertiaTensor(std::shared_ptr<BaseCollider> c
 }
 void PhysicsServer::addPhysicsEntity(Game::PhysicsEntity *p)
 {
-    this->physicsEntities.Append(p);
+	auto it = this->physicsEntities.Find(p);
+	if (it == nullptr)
+	{
+		this->physicsEntities.Append(p);
+	}
+	else
+	{
+		printf("WARNING: PhysicsServer::addPhysicsEntity() >> Entity already added to list!\n");
+	}
+}
+
+void PhysicsServer::removePhysicsEntity(Game::PhysicsEntity *p)
+{
+	auto it = this->physicsEntities.Find(p);
+	if (it != nullptr)
+	{
+		//Erase and move last element to this position.
+		//Destroys sorting!
+		this->physicsEntities.RemoveSwap(it);
+	}
+}
+
+std::shared_ptr<Physics::BaseCollider> PhysicsServer::LoadCollider(const std::string& meshName, const Physics::ColliderShape& shape)
+{
+	if (this->collidersByMeshName.count(meshName) > 0)
+	{
+		//Mesh has already been cooked and we#ll just return that one.
+		return this->collidersByMeshName[meshName];
+	}
+	else
+	{
+		//We need to create a physics collider and cook the mesh
+		if (shape == Physics::ColliderShape::SURFACE)
+		{
+			std::shared_ptr<SurfaceCollider> coll = std::make_shared<SurfaceCollider>();
+			coll->SetShape(shape);
+			coll->CookMeshData(Render::ResourceServer::Instance()->LoadMesh(meshName));
+			return coll;
+		}
+		else
+		{
+			printf("ERROR: We only support surface colliders so far!");
+			assert(false);
+		}
+		return nullptr;
+	}
+
 }
 
 }

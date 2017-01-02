@@ -16,13 +16,11 @@ StaticEntity::~StaticEntity()
 
 void StaticEntity::Activate()
 {
-    Game::Entity::Activate();
-
-    Physics::PhysicsServer::Instance()->addPhysicsEntity(this);
+    PhysicsEntity::Activate();
 }
 void StaticEntity::Deactivate()
 {
-    Entity::Deactivate();
+	PhysicsEntity::Deactivate();
 }
 void StaticEntity::SetTransform(const Math::mat4 &t)
 {

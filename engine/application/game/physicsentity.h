@@ -5,6 +5,7 @@
 namespace Render
 {
 class GraphicsProperty;
+class ModelInstance;
 }
 
 namespace Physics
@@ -25,13 +26,17 @@ namespace Game
 class PhysicsEntity : public Entity
 {
 public:
-    PhysicsEntity() {}
-    ~PhysicsEntity() {}
+	PhysicsEntity();
+	~PhysicsEntity();
 
-    void SetCollider(std::shared_ptr<Physics::SurfaceCollider> coll) { this->collider = coll; }
+    //void SetCollider(std::shared_ptr<Physics::SurfaceCollider> coll) { this->collider = coll; }
     std::shared_ptr<Physics::SurfaceCollider> GetCollider() { return this->collider; }
 
-    void SetGraphicsProperty(Render::GraphicsProperty* gp);
+	void SetModel(std::shared_ptr<Render::ModelInstance> mdl);
+
+	///Registers this entity to the physics server
+	void Activate();
+	void Deactivate();
 
     Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty; }
 

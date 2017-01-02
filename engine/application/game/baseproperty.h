@@ -16,10 +16,14 @@ public:
     virtual void Update() {}
 
     //void HandleMsg(const BaseGameFeature::Msg& msg);
+	
+	virtual void Activate() { active = true; }
+	virtual void Deactivate() { active = false; }
 
     void SetOwner(Entity* o) {this->owner = o;}
 
 protected:
+	bool active = false;
     friend class Entity;
 
     Entity* owner;
