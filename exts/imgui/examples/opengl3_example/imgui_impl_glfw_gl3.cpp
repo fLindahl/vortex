@@ -329,6 +329,8 @@ bool    ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks)
 	io.KeyMap[ImGuiKey_W] = GLFW_KEY_W;
 	io.KeyMap[ImGuiKey_E] = GLFW_KEY_E;
 	io.KeyMap[ImGuiKey_R] = GLFW_KEY_R;
+	io.KeyMap[ImGuiKey_S] = GLFW_KEY_S;
+	io.KeyMap[ImGuiKey_D] = GLFW_KEY_D;
 
     io.RenderDrawListsFn = ImGui_ImplGlfwGL3_RenderDrawLists;       // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
     io.SetClipboardTextFn = ImGui_ImplGlfwGL3_SetClipboardText;

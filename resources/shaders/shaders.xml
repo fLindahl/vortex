@@ -18,6 +18,13 @@
 			<FragmentShader name="resources/shaders/fragment/toonshader.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
+		
+		<Shader name="lineRender" desc="Shader for rendering lines">    
+			<VertexShader name="resources/shaders/vertex/depthstatic.vert"/>
+			<FragmentShader name="resources/shaders/fragment/line_colored.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
 			
+		
     </Shaders>
 </Vortex>

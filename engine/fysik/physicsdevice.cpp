@@ -634,7 +634,7 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 		//------------------------------------------------
 		// Midpoint for finding true collision
 		//-------
-
+		/*
 
 		//previousState is at t = 0
 		//currentState is at t = frameTime
@@ -715,7 +715,7 @@ bool PhysicsDevice::CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEnti
 		}
 
 		simplex = prevSimplex;
-
+		*/
 		
 
 		//Use EPA to extrapolate collision depth, collision normal and contact point
