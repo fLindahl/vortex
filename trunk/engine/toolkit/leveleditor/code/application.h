@@ -44,6 +44,17 @@ private:
 
 	bool buttonAlreadyPressed = false;
 
+	Math::point cameraPos;
+	float camRotX;
+	float camRotY;
+	void CameraMovement();
+
+	Math::vec4 rayStart;
+	Math::vec4 rayEnd;
+	Physics::PhysicsHit hit;
+
+	void DoPicking();
+
 	/// ImGui functions
 	void RenderUI();
 	void RenderDocks();

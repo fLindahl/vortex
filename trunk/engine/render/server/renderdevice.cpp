@@ -1,4 +1,4 @@
-#include "config.h"
+﻿#include "config.h"
 #include "GL/glew.h"
 #include "renderdevice.h"
 #include "resourceserver.h"
@@ -278,7 +278,43 @@ void RenderDevice::Render(bool drawToScreen)
 				for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
 				{
 					material->GetShader(str)->setModelMatrix(graphicsProperty->getModelMatrix());
-					modelInstance->GetMesh()->Draw();
+
+					//HACK: This is disgusting
+					if (graphicsProperty->outline)
+					{
+						glClearStencil(0);
+						glClear(GL_STENCIL_BUFFER_BIT);
+
+						// Render the mesh into the stencil buffer.
+						glEnable(GL_STENCIL_TEST);
+						glStencilFunc(GL_ALWAYS, 1, -1);
+						glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+						modelInstance->GetMesh()->Draw();
+
+						// Render the thick wireframe version.
+						auto p = ShaderServer::Instance()->LoadShader("lineRender");
+						glUseProgram(p->GetProgram());
+
+						p->setModelMatrix(graphicsProperty->getModelMatrix());
+						
+						glStencilFunc(GL_NOTEQUAL, 1, -1);
+						glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+						glLineWidth(10.0f);
+						glPolygonMode(GL_FRONT, GL_LINE);
+						
+						modelInstance->GetMesh()->Draw();
+
+						glPolygonMode(GL_FRONT, GL_FILL);
+						glDisable(GL_STENCIL_TEST);
+
+						glUseProgram(currentProgram);
+					}
+					else
+					{
+						modelInstance->GetMesh()->Draw();
+					}
 				}
 
 				modelInstance->GetMesh()->Unbind();
