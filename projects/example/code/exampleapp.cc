@@ -68,7 +68,7 @@ ExampleApp::Open()
 		this->window->SetTitle("Vortex Engine Test Environment");
 
 		//Set render resolution. This is set with window->setsize too so we override it here
-		RenderDevice::Instance()->SetRenderResolution(1920, 1080);
+		RenderDevice::Instance()->SetRenderResolution(1600, 900);
 
 		this->consoleBuffer = new char[CONSOLE_BUFFER_SIZE];
 		
@@ -97,17 +97,18 @@ ExampleApp::Open()
         SceneEntity4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
         SceneEntity5->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
         SceneEntity6->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
+		
 		SceneEntity1->Activate();
         SceneEntity2->Activate();
         SceneEntity3->Activate();
         SceneEntity4->Activate();
         SceneEntity5->Activate();
         SceneEntity6->Activate();
-		
+
 		modelInstance = std::make_shared<Render::ModelInstance>();
 		modelInstance1 = std::make_shared<Render::ModelInstance>();
 
-		rigidBodyEntity1 = std::make_shared<Game::RigidBodyEntity>();
+		rigidBodyEntity1 = std::make_shared<Game::StaticEntity>();
 		rigidBodyEntity2 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity3 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity4 = std::make_shared<Game::RigidBodyEntity>();
@@ -155,8 +156,8 @@ ExampleApp::Open()
 		this->rigidBodyEntity4->SetTransform(transf4);
         this->rigidBodyEntity5->SetTransform(transf5);
 
-        const int numEntsX = 1;
-        const int numEntsY = 1;
+        const int numEntsX = 0;
+        const int numEntsY = 0;
 
         for (int i = 0; i < numEntsX; ++i) {
             for (int j = 0; j < numEntsY; ++j) {
@@ -488,15 +489,7 @@ ExampleApp::Run()
 		
 		Physics::PhysicsDevice::Instance()->Solve();
 
-        this->rigidBodyEntity1->Update();
-        this->rigidBodyEntity2->Update();
-		this->rigidBodyEntity3->Update();
-		this->rigidBodyEntity4->Update();
-		this->rigidBodyEntity5->Update();
-
-        for (int i = 0; i < RBEs.Size(); ++i) {
-            RBEs[i]->Update();
-        }
+        BaseGameFeature::EntityManager::Instance()->Update();
 
 		RenderDevice::Instance()->Render();
 
@@ -509,16 +502,21 @@ ExampleApp::Run()
 
         }
 
-		
-		/*
-		this->gProperty->getbbox().debugRender();
-		this->gProperty1->getbbox().debugRender();
-		this->gProperty2->getbbox().debugRender();
-		this->gProperty3->getbbox().debugRender();
-		this->gProperty4->getbbox().debugRender();
+
+		this->SceneEntity1->GetGraphicsProperty()->getbbox().debugRender();
+		this->SceneEntity2->GetGraphicsProperty()->getbbox().debugRender();
+		this->SceneEntity3->GetGraphicsProperty()->getbbox().debugRender();
+		this->SceneEntity4->GetGraphicsProperty()->getbbox().debugRender();
+		this->SceneEntity5->GetGraphicsProperty()->getbbox().debugRender();
+		this->SceneEntity6->GetGraphicsProperty()->getbbox().debugRender();
+		this->rigidBodyEntity1->GetGraphicsProperty()->getbbox().debugRender();
+		this->rigidBodyEntity2->GetGraphicsProperty()->getbbox().debugRender();
+		this->rigidBodyEntity3->GetGraphicsProperty()->getbbox().debugRender();
+		this->rigidBodyEntity4->GetGraphicsProperty()->getbbox().debugRender();
+		this->rigidBodyEntity5->GetGraphicsProperty()->getbbox().debugRender();
 
 		//this->gProperty->getCollider()->debugDraw();
-
+		
         // Render LINES
         glUseProgram(0);
         glEnable(GL_DEPTH_TEST);
@@ -548,7 +546,7 @@ ExampleApp::Run()
         glVertex4f(hitn[0], hitn[1], hitn[2], hitn[3]);
 
         glEnd();
-		*/
+		
 
 
 

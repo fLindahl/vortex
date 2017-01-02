@@ -58,6 +58,7 @@ void GraphicsProperty::Activate()
 		{
 			this->modelInstance->AddGraphicsProperty(this);
 			this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
+			this->bbox.transform(this->getModelMatrix());
 		}
 		else
 		{

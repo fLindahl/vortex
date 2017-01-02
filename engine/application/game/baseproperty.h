@@ -20,13 +20,13 @@ public:
 	virtual void Activate() { active = true; }
 	virtual void Deactivate() { active = false; }
 
-    void SetOwner(Entity* o) {this->owner = o;}
+	void SetOwner(std::shared_ptr<Entity> o) { this->owner = o; }
 
 protected:
 	bool active = false;
     friend class Entity;
 
-    Entity* owner;
+    std::shared_ptr<Entity> owner;
 };
 
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include "foundation/util/linkedlist.h"
 #include <memory>
 #include "application/game/entity.h"
 
