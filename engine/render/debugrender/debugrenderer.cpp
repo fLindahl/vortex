@@ -11,7 +11,7 @@ DebugRenderer::DebugRenderer()
 
 void DebugRenderer::Initialize()
 {
-    this->line.shaderProgram = Render::ShaderServer::Instance()->LoadShader("outline")->GetProgram();
+    this->line.shaderProgram = Render::ShaderServer::Instance()->LoadShader("debugLines")->GetProgram();
     return;
 }
 
@@ -31,6 +31,7 @@ void DebugRenderer::DrawLine(const Math::point &startPoint,
 
     this->commandQueue.push(cmd);
 }
+
 void DebugRenderer::DrawCommands()
 {
     while (!this->commandQueue.empty())
@@ -43,7 +44,7 @@ void DebugRenderer::DrawCommands()
             case DebugShape::LINE:
             {
                 glUseProgram(this->line.shaderProgram);
-                //glPolygonMode(GL_FRONT, GL_LINE);
+                glPolygonMode(GL_FRONT, GL_LINE);
                 this->line.Draw(currentCommand);
                 break;
             }
