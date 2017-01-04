@@ -9,7 +9,7 @@ namespace Edit
 {
 
 class Command;
-template <class T = Command>
+template <class T>
 class CommandManagerT;
 
 

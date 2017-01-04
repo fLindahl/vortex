@@ -7,6 +7,7 @@
 #include <cstring>
 #include <render/server/renderdevice.h>
 #include <fysik/physicsdevice.h>
+#include <render/debugrender/debugrenderer.h>
 #include "foundation/math/plane.h"
 #include "imgui.h"
 #include "render/server/frameserver.h"
@@ -62,7 +63,10 @@ ExampleApp::Open()
 		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
 		//Load all materials
 		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
-	
+	    //Init debugrenderer. Always do this AFTER setting up shaders!
+        Debug::DebugRenderer::Instance()->Initialize();
+
+
 		//Never set resolution before initializing rendering and framepasses
 		this->window->SetSize(1600, 900);
 		this->window->SetTitle("Vortex Engine Test Environment");

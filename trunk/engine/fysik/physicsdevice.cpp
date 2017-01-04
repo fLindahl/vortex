@@ -437,7 +437,6 @@ bool PhysicsDevice::GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::
 		int res = DoSimplex(simplex, D);
 		if (res == 1)
 		{
-			collision = true;
 			return true;
 		}
 		else if (res == -1)

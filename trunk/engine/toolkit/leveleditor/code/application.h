@@ -49,8 +49,8 @@ private:
 	float camRotY;
 	void CameraMovement();
 
-	Math::vec4 rayStart;
-	Math::vec4 rayEnd;
+	Math::point rayStart;
+	Math::point rayEnd;
 	Physics::PhysicsHit hit;
 
 	void DoPicking();

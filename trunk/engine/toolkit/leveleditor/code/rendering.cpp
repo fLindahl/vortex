@@ -199,11 +199,11 @@ void Application::DoPicking()
 		Math::vec4 rayDirection = rayWorldPos - invView.get_position();
 		rayDirection = Math::vec4::normalize(rayDirection);
 
-		this->rayStart = rayWorldPos;
-
 		Physics::PhysicsHit newHit;
 		if (Physics::PhysicsServer::Instance()->Raycast(newHit, rayWorldPos, rayDirection, 400.0f))
 		{
+			this->rayStart = rayWorldPos;
+
 			printf("--- Hit object! ---\n");
 
 			//Start by removing outline from previous hit object
