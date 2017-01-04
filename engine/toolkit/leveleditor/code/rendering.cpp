@@ -112,8 +112,8 @@ void Application::CameraMovement()
 	const float speedIncrease = 0.02f;
 	float speedMultiplier = 1.0f;
 
-	camRotX += ImGui::GetIO().MouseDelta.y * 0.01f;
-	camRotY += ImGui::GetIO().MouseDelta.x * 0.01f;
+	camRotX += ImGui::GetIO().MouseDelta.y * 0.005f;
+	camRotY += ImGui::GetIO().MouseDelta.x * 0.005f;
 
 	if (camRotX > 1.57075f)
 	{

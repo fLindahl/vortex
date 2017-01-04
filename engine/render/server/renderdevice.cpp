@@ -301,7 +301,7 @@ void RenderDevice::Render(bool drawToScreen)
 						glStencilFunc(GL_NOTEQUAL, 1, -1);
 						glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-						glLineWidth(10.0f);
+						glLineWidth(3.0f);
 						glPolygonMode(GL_FRONT, GL_LINE);
 						
 						modelInstance->GetMesh()->Draw();
