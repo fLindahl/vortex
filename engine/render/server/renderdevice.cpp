@@ -1,5 +1,4 @@
-﻿#include <render/debugrender/debugrenderer.h>
-#include "config.h"
+﻿#include "config.h"
 #include "GL/glew.h"
 #include "renderdevice.h"
 #include "resourceserver.h"
@@ -16,6 +15,7 @@
 #include "render/resources/surface.h"
 #include "lightserver.h"
 #include "render/resources/framepass.h"
+#include "render/debugrender/debugrenderer.h"
 
 namespace Render
 {

@@ -360,6 +360,7 @@ Application::Run()
 	while (this->window->IsOpen() && !this->shutdown)
 	{
 		double time = glfwGetTime();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
        	
 		Physics::PhysicsDevice::Instance()->Solve();
@@ -370,10 +371,9 @@ Application::Run()
 			CameraMovement();
 		}
 
-		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
 		RenderDevice::Instance()->Render(false);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		this->window->SwapBuffers();
 		this->frameTime = glfwGetTime() - time;
