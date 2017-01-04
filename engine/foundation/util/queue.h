@@ -15,7 +15,7 @@ public:
 	};
 
 	/// Creates the list with a dummy node
-	class Queue();
+	Queue();
 
 	// Destucts the list and makes sure the entire content gets deleted
 	~Queue();
@@ -25,6 +25,8 @@ public:
 
 	/// removes and returns the first element from the list
 	TYPE Pop();
+
+	bool IsEmpty();
 	
 private:
 	///Specifies the first node in the list
@@ -43,8 +45,9 @@ inline Queue<TYPE>::Queue()
 {
 	preNode = nullptr;
 	head = new Node;
-	head->data = -1;
+	//head->data = -1;
 	head->next = nullptr;
+
 }
 
 template<class TYPE>
@@ -94,15 +97,14 @@ inline void Queue<TYPE>::Push(TYPE i)
 }
 
 template<class TYPE>
-inline typename TYPE Queue<TYPE>::Pop()
+inline TYPE Queue<TYPE>::Pop()
 {
 	this->nodeIter = this->head;
 
 	if (this->head->next == nullptr)
 	{
 		//We did not find a matching element
-		printf("Queue is empty.");
-		return -1;
+		return TYPE();
 	}
 
 	this->preNode = this->nodeIter;
@@ -113,6 +115,19 @@ inline typename TYPE Queue<TYPE>::Pop()
 	TYPE val = this->nodeIter->data;
 	delete this->nodeIter;
 	return val;	
+}
+
+template<class TYPE>
+inline bool Queue<TYPE>::IsEmpty()
+{
+	if (this->head->next == nullptr)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 }

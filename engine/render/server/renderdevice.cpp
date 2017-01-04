@@ -1,4 +1,5 @@
-﻿#include "config.h"
+﻿#include <render/debugrender/debugrenderer.h>
+#include "config.h"
 #include "GL/glew.h"
 #include "renderdevice.h"
 #include "resourceserver.h"
@@ -30,8 +31,6 @@ RenderDevice::RenderDevice()
 
 void RenderDevice::Initialize()
 {
-
-	
 #ifdef _LIGHT_DEBUG
 	this->lightDebugShader = std::make_shared<ShaderObject>();
 
@@ -45,7 +44,6 @@ void RenderDevice::Initialize()
 	this->lightDebugShader->setFragmentShader(fragmentShader);
 	this->lightDebugShader->LinkShaders();
 #endif // _DEBUG
-
 }
 
 void RenderDevice::SetRenderResolution(const Resolution& res)
@@ -293,7 +291,7 @@ void RenderDevice::Render(bool drawToScreen)
 						modelInstance->GetMesh()->Draw();
 
 						// Render the thick wireframe version.
-						auto p = ShaderServer::Instance()->LoadShader("lineRender");
+						auto p = ShaderServer::Instance()->LoadShader("outline");
 						glUseProgram(p->GetProgram());
 
 						p->setModelMatrix(graphicsProperty->getModelMatrix());
@@ -321,6 +319,11 @@ void RenderDevice::Render(bool drawToScreen)
 			}
 		}
     }
+
+	//-------------------
+	// Render Debug Shapes!
+	Debug::DebugRenderer::Instance()->DrawCommands();
+
 
 	glViewport(0, 0, windowResolution.x, windowResolution.y);
 
