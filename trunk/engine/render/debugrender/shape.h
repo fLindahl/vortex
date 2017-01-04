@@ -33,14 +33,6 @@ namespace Debug
 	protected:
 		DebugShape shape;
 
-		/// Override and set static size
-		static const int meshSize = 0;
-		Math::vec4 mesh[0];
-
-		/// Override and set static size
-		static const int indicesSize = 0;
-		int indices[0];
-
 		GLuint vao[1];
 		GLuint ib[1];
 		GLuint vbo[1];

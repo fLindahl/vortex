@@ -33,11 +33,7 @@ private:
 
     ///Vertex structure is (vec4 pos, vec4 color)
     static const int meshSize = 4;
-    Math::vec4 mesh[meshSize] = {{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f},
-                                 {0.0f, 0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}};
-
-    static const int indicesSize = 2;
-    int indices[indicesSize] = {0, 1};
+	Math::vec4 mesh[4];
 };
 
 inline RenderLine::RenderLine()
@@ -58,21 +54,15 @@ inline void RenderLine::SetupBuffers()
 
     glGenBuffers(1, this->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, this->meshSize, mesh, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->meshSize * sizeof(Math::vec4), &mesh[0], GL_DYNAMIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, NULL);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(4 * sizeof(GLfloat)));
-
-    glGenBuffers(1, this->ib);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ib[0]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indicesSize, indices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, NULL);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(4 * sizeof(GLfloat)));
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 inline void RenderLine::Draw(RenderCommand* command)
@@ -91,13 +81,13 @@ inline void RenderLine::Draw(RenderCommand* command)
     this->mesh[3] = lineCommand->endcolor;
 
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, this->meshSize * sizeof(Math::vec4), mesh, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glDrawElements(GL_LINES, this->indicesSize, GL_UNSIGNED_INT, NULL);
+	glBufferData(GL_ARRAY_BUFFER, this->meshSize * sizeof(Math::vec4), &mesh[0], GL_DYNAMIC_DRAW);
+	
+	glDrawArrays(GL_LINES, 0, 2);
 
     glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 }
 
 }
