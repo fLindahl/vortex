@@ -7,6 +7,7 @@
 #include <cstring>
 #include <render/server/renderdevice.h>
 #include <fysik/physicsdevice.h>
+#include <render/debugrender/debugrenderer.h>
 #include "foundation/math/plane.h"
 #include "imgui.h"
 #include "render/server/frameserver.h"
@@ -64,7 +65,9 @@ Application::Open()
 		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
 		//Load all materials
 		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
-		
+		//Init debugrenderer. Always do this AFTER setting up shaders!
+		Debug::DebugRenderer::Instance()->Initialize();
+
 		//Never set resolution before initializing rendering and framepasses
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Vortex Level Editor");
@@ -351,6 +354,9 @@ Application::Run()
 	camRotX = 0;
 	camRotY = 0;
 
+	this->rayStart = Math::vec4::zerovector();
+	this->rayEnd = Math::vec4::zerovector();
+
 	while (this->window->IsOpen() && !this->shutdown)
 	{
 		double time = glfwGetTime();
@@ -364,25 +370,12 @@ Application::Run()
 			CameraMovement();
 		}
 
+		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
 		RenderDevice::Instance()->Render(false);
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		this->window->SwapBuffers();
-		/*
-		if (!keyhandler->Y && !keyhandler->Z)
-			buttonAlreadyPressed = false;
-
-		if (!buttonAlreadyPressed && ((keyhandler->leftCtrl && keyhandler->Y) || (keyhandler->leftCtrl && keyhandler->leftShift && keyhandler->Z)))
-		{
-			
-			buttonAlreadyPressed = true;
-		}
-		if (!buttonAlreadyPressed && keyhandler->leftCtrl && keyhandler->Z)
-		{
-			commandManager.Undo();
-			buttonAlreadyPressed = true;
-		}
-		*/
 		this->frameTime = glfwGetTime() - time;
 	}
 

@@ -1,26 +1,48 @@
 #pragma once
+#include "GL/glew.h"
+#include <foundation/math/vector4.h>
+
 
 namespace Debug
 {
+	enum DebugShape
+	{
+		POINT,
+		LINE,
+		SPHERE,
+		BOX,
+		CONE,
+		CAPSULE,
+		FRUSTUM
+	};
+
+	struct RenderCommand
+	{
+		DebugShape shape;
+		//TODO: Add render on top
+	};
+
 	class RenderShape
 	{
 	public:
-		virtual ~RenderShape() = 0;
+		RenderShape() {}
+		virtual ~RenderShape() {}
 
-		virtual void Draw();
+		virtual void Draw(RenderCommand* command) = 0;
 	
 	protected:
-		///Contains all vertices/indices
-		void* mesh;
-		void* indices;
+		DebugShape shape;
 
-		///PrimitiveGroups for this mesh
-		//Util::Array<PrimitiveGroup> primitiveGroups;
+		/// Override and set static size
+		static const int meshSize = 0;
+		Math::vec4 mesh[0];
 
-		//GLuint vao[1];
-		//GLuint ib[1];
-		//GLuint vbo[1];
+		/// Override and set static size
+		static const int indicesSize = 0;
+		int indices[0];
 
-
+		GLuint vao[1];
+		GLuint ib[1];
+		GLuint vbo[1];
 	};
 }
