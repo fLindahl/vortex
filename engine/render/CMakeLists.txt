@@ -80,6 +80,13 @@ SET(files_render_softwarerender
 	softwarerender/rasterizer.h
 	softwarerender/rasterizer.cpp
 	)	
+
+SET(files_render_debugrender
+	debugrender/debugrenderer.h
+	debugrender/debugrenderer.cpp
+	debugrender/line.h
+	debugrender/shape.h
+	)
 	
 SOURCE_GROUP("render" FILES ${files_render_render})
 
@@ -97,6 +104,7 @@ SOURCE_GROUP("server" FILES ${files_render_server})
 
 SOURCE_GROUP("softwarerender" FILES ${files_render_softwarerender})
 
+SOURCE_GROUP("debugrender" FILES ${files_render_debugrender})
 
 SET(files_render
 	${files_render_render}
@@ -107,6 +115,7 @@ SET(files_render
 	${files_render_resources}
 	${files_render_server}
 	${files_render_softwarerender}
+	${files_render_debugrender}
 	)
 
 SET(files_pch ../config.h ../config.cc)
