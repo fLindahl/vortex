@@ -73,7 +73,6 @@ namespace Render
 
    private:
 		friend class LightServer;
-		void DoPass();
 
 		void UpdateWorkGroups();
 		void UpdateLightBuffer();
@@ -99,6 +98,4 @@ namespace Render
 #endif // _DEBUG
 
     };
-
-
 }

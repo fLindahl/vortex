@@ -19,4 +19,15 @@ namespace Render
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
 	}
+
+	void FramePass::Execute()
+	{
+
+	}
+
+    void FramePass::Setup()
+    {
+
+    }
+
 }

@@ -58,7 +58,7 @@ SET(files_render_resources
 	resources/surface.h
 	resources/surface.cpp	
 	resources/nvx2fileformatstructs.h
-	)
+        resources/drawpass.h resources/drawpass.cpp resources/depthpass.h resources/depthpass.cpp)
 
 SET(files_render_server
 	server/lightserver.h
