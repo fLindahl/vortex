@@ -95,8 +95,6 @@ void RenderDevice::UpdateLightBuffer()
 
 void RenderDevice::Render(bool drawToScreen)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glViewport(0, 0, renderResolution.x, renderResolution.y);
 
     //Set global matrix uniform buffer block for this frame
