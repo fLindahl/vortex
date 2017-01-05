@@ -12,7 +12,7 @@ namespace Render
 	{
 	public:
 		FramePass();
-		~FramePass();
+		virtual ~FramePass();
 
 		/// get OGL Framebuffer object
 		GLuint& GetFrameBufferObject() { return this->frameBufferObject; }
@@ -22,9 +22,13 @@ namespace Render
 
 		void AddMaterial(Material* mat) { this->materials.Append(mat); }
 
+        virtual void Setup();
+
 		void Bind();
 
-	private:
+		virtual void Execute();
+
+	protected:
 		friend class RenderDevice;
 		friend class FrameServer;
 		std::string name;

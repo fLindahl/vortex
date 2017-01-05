@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include "GL/glew.h"
 #include "foundation/util/array.h"
 
@@ -44,7 +44,7 @@ private:
 
 	//Contains all Framepasses.
 	//Key must be unique to each Pass. the key is the pass name
-	std::unordered_map<std::string, std::shared_ptr<FramePass>> framePassByName;
+	std::map<std::string, std::shared_ptr<FramePass>> framePassByName;
 
 	Util::Array<std::shared_ptr<FramePass>> framePasses;
 	
