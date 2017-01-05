@@ -1,6 +1,11 @@
 #pragma once
 #include <stddef.h>
 #include <algorithm>
+#include <cassert>
+
+#ifndef InvalidIndex
+#define InvalidIndex -1
+#endif
 
 namespace Util
 {

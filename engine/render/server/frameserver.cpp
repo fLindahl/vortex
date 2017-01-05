@@ -2,6 +2,8 @@
 #include "frameserver.h"
 #include "renderdevice.h"
 #include "render/resources/framepass.h"
+#include "render/resources/depthpass.h"
+#include "render/resources/drawpass.h"
 
 namespace Render
 {
@@ -16,25 +18,9 @@ namespace Render
 		//TODO: these should be moved to a loader and their own xml list like everything else.
 
 		// depth pre-pass
-		this->Depth = std::make_shared<FramePass>();
+		this->Depth = std::make_shared<DepthPass>();
 		this->Depth->name = "Depth";
-		glGenFramebuffers(1, &this->Depth->frameBufferObject);
-		glGenTextures(1, &this->Depth->buffer);
-
-		glBindTexture(GL_TEXTURE_2D, this->Depth->buffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, this->Depth->frameBufferObject);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, this->Depth->buffer, 0);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		this->Depth->Setup();
 
 		this->framePassByName.insert(std::make_pair(this->Depth->name, this->Depth));
 
@@ -54,7 +40,7 @@ namespace Render
 		}
 				
 		// FlatGeometryLit pass
-		this->FlatGeometryLit = std::make_shared<FramePass>();
+		this->FlatGeometryLit = std::make_shared<DrawPass>();
 		this->FlatGeometryLit->name = "FlatGeometryLit";
 		this->FlatGeometryLit->frameBufferObject = 0;
 		this->FlatGeometryLit->buffer = 0;
@@ -70,6 +56,7 @@ namespace Render
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, this->finalColorFrameBufferObject);
@@ -108,10 +95,7 @@ namespace Render
 
 	bool FrameServer::HasPassNamed(const std::string &nName)
 	{
-		if (this->framePassByName.count(nName) > 0)
-			return true;
-		else
-			return false;
+		return (this->framePassByName.count(nName) > 0);
 	}
 
 }
