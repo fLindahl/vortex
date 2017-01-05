@@ -31,5 +31,11 @@
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		
+		<Shader name="debug" desc="Shader for rendering debug shapes">    
+			<VertexShader name="resources/shaders/vertex/debug.vert"/>
+			<FragmentShader name="resources/shaders/fragment/debug.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
     </Shaders>
 </Vortex>
