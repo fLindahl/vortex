@@ -373,6 +373,9 @@ Application::Run()
 
 		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
+		Debug::DebugRenderer::Instance()->DrawBox(this->rigidBodyEntity1->GetGraphicsProperty()->getbbox(), Math::vec4(1.0f), 2.0f);
+		Debug::DebugRenderer::Instance()->DrawBox(this->rigidBodyEntity2->GetGraphicsProperty()->getbbox(), Math::vec4(1.0f), 2.0f);
+
 		RenderDevice::Instance()->Render(false);
 
 		this->window->SwapBuffers();

@@ -1,13 +1,13 @@
 #pragma once
 #include "GL/glew.h"
 #include <foundation/math/vector4.h>
+#include "render/resources/shaderobject.h"
 
 
 namespace Debug
 {
 	enum DebugShape
 	{
-		POINT,
 		LINE,
 		SPHERE,
 		BOX,
@@ -32,6 +32,9 @@ namespace Debug
 	
 	protected:
 		DebugShape shape;
+
+		///Shader that this renderer uses
+		std::shared_ptr<Render::ShaderObject> shader;
 
 		GLuint vao[1];
 		GLuint ib[1];
