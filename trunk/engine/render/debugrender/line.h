@@ -28,9 +28,6 @@ private:
 
     void SetupBuffers();
 
-    ///Shader that this line renderer uses
-    GLuint shaderProgram;
-
     ///Vertex structure is (vec4 pos, vec4 color)
     static const int meshSize = 4;
 	Math::vec4 mesh[4];
@@ -69,6 +66,10 @@ inline void RenderLine::Draw(RenderCommand* command)
 {
     LineCommand* lineCommand = (LineCommand*)command;
 
+	glUseProgram(this->shader->GetProgram());
+
+	glPolygonMode(GL_FRONT, GL_LINE);
+	
     glLineWidth(lineCommand->width);
 
     glBindVertexArray(vao[0]); // Bind our Vertex Array Object so we can use it
@@ -88,6 +89,7 @@ inline void RenderLine::Draw(RenderCommand* command)
     glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	glPolygonMode(GL_FRONT, GL_FILL);
 }
 
 }
