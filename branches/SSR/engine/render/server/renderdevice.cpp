@@ -111,7 +111,7 @@ void RenderDevice::Render(bool drawToScreen)
 	uniformBufferBlock.ScreenSize = this->renderResolution;
 	uniformBufferBlock.TimeAndRandom[0] = (GLfloat)glfwGetTime();
 
-	//TODO: Add some interesting random function here!
+	//TODO: Add some interesting random function here.
 	uniformBufferBlock.TimeAndRandom[1] = 0.0f; 
 
 	uniformBufferBlock.LightTileWorkGroups[0] = workGroupsX;
