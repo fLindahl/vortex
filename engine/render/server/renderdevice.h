@@ -74,22 +74,11 @@ namespace Render
    private:
 		friend class LightServer;
 
-		void UpdateWorkGroups();
-		void UpdateLightBuffer();
-
 		Resolution renderResolution;
 		Resolution windowResolution;
 
 		GLuint currentProgram;
 		
-		// Used for storage buffer objects to hold light data and visible light indicies data
-		GLuint lightBuffer = 0;
-		GLuint visibleLightIndicesBuffer = 0;
-
-		// X and Y work group dimension variables for compute shader
-		GLuint workGroupsX = 0;
-		GLuint workGroupsY = 0;
-
         //contains all the shader objects that we've loaded
         Util::Array<Material*> materials;
 

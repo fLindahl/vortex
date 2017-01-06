@@ -1,9 +1,11 @@
 #include "config.h"
 #include "frameserver.h"
 #include "renderdevice.h"
-#include "render/resources/framepass.h"
-#include "render/resources/depthpass.h"
-#include "render/resources/drawpass.h"
+#include "render/frame/framepass.h"
+#include "render/frame/depthpass.h"
+#include "render/frame/drawpass.h"
+#include "render/frame/lightcullingpass.h"
+#include "render/frame/flatgeometrylitpass.h"
 
 namespace Render
 {
@@ -23,24 +25,17 @@ namespace Render
 		this->Depth->Setup();
 
 		this->framePassByName.insert(std::make_pair(this->Depth->name, this->Depth));
+		
 
-		// Setup light culling compute shader program
-		this->lightCullingProgram = glCreateProgram();
-		const char filepath[] = "resources/shaders/compute/lightculling.comp";
-		glAttachShader(this->lightCullingProgram, ShaderServer::Instance()->LoadComputeShader(filepath));
-		glLinkProgram(this->lightCullingProgram);
-		GLint shaderLogSize;
-		glGetProgramiv(this->lightCullingProgram, GL_INFO_LOG_LENGTH, &shaderLogSize);
-		if (shaderLogSize > 0)
-		{
-			GLchar* buf = new GLchar[shaderLogSize];
-			glGetProgramInfoLog(this->lightCullingProgram, shaderLogSize, NULL, buf);
-			printf("[PROGRAM LINK ERROR]: %s", buf);
-			delete[] buf;
-		}
-				
+		//Light culling compute shader pass
+		this->lightCullingPass = std::make_shared<LightCullingPass>();
+		this->lightCullingPass->name = "LightCulling";
+		this->lightCullingPass->Setup();
+		
+		this->framePassByName.insert(std::make_pair(this->lightCullingPass->name, this->lightCullingPass));
+
 		// FlatGeometryLit pass
-		this->FlatGeometryLit = std::make_shared<DrawPass>();
+		this->FlatGeometryLit = std::make_shared<FlatGeometryLitPass>();
 		this->FlatGeometryLit->name = "FlatGeometryLit";
 		this->FlatGeometryLit->frameBufferObject = 0;
 		this->FlatGeometryLit->buffer = 0;
@@ -92,10 +87,19 @@ namespace Render
 			return nullptr;
 		}
 	}
-
+	
 	bool FrameServer::HasPassNamed(const std::string &nName)
 	{
 		return (this->framePassByName.count(nName) > 0);
 	}
 
+	std::shared_ptr<DrawPass> FrameServer::GetDepthPass()
+	{
+		return this->Depth;
+	}
+
+	std::shared_ptr<FramePass> FrameServer::GetLightCullingPass()
+	{
+		return this->lightCullingPass;
+	}
 }

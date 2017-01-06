@@ -10,7 +10,7 @@ Contains all compiled resources and is used to load, store and retrieve them.
 #include <unordered_map>
 #include "render/resources/meshresource.h"
 #include "render/resources/textureresource.h"
-#include "render/resources/framepass.h"
+#include "render/frame/framepass.h"
 #include "GLFW/glfw3.h"
 #include "render/resources/material.h"
 
