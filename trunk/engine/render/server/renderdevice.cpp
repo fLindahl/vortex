@@ -28,19 +28,7 @@ RenderDevice::RenderDevice()
 
 void RenderDevice::Initialize()
 {
-#ifdef _LIGHT_DEBUG
-	this->lightDebugShader = std::make_shared<ShaderObject>();
 
-	// Set name
-	this->lightDebugShader->SetName("lightShader");
-
-	GLuint vertShader = ShaderServer::Instance()->LoadVertexShader("resources/shaders/vertex/static_obj.vert");
-	GLuint fragmentShader = ShaderServer::Instance()->LoadFragmentShader("resources/shaders/fragment/light_debug.frag");
-
-	this->lightDebugShader->setVertexShader(vertShader);
-	this->lightDebugShader->setFragmentShader(fragmentShader);
-	this->lightDebugShader->LinkShaders();
-#endif // _DEBUG
 }
 
 void RenderDevice::SetRenderResolution(const Resolution& res)
@@ -119,29 +107,6 @@ void RenderDevice::Render(bool drawToScreen)
 	glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-#ifdef _LIGHT_DEBUG
-	glUseProgram(this->lightDebugShader->GetProgram());
-
-	glUniform1i(glGetUniformLocation(this->lightDebugShader->GetProgram(), "totalLightCount"), LightServer::Instance()->pointLights.Size());
-
-	// Render Lights only within tiles
-	for (Material* material : FrameServer::Instance()->FlatGeometryLit->materials)
-	{
-		for (ModelInstance* modelInstance : material->getModelInstances())
-		{
-			//Bind mesh
-			modelInstance->GetMesh()->Bind();
-			for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
-			{
-				material->GetShader(str)->setModelMatrix(graphicsProperty->getModelMatrix());
-				modelInstance->GetMesh()->Draw();
-			}
-			modelInstance->GetMesh()->Unbind();
-		}
-	}
-#else
-
 	framePass = FrameServer::Instance()->FlatGeometryLit;
 	auto flatGeometryLitPass = framePass.lock();
 
@@ -167,8 +132,6 @@ void RenderDevice::Render(bool drawToScreen)
 		//This is only for OGL 4.5 and it might cause issues with older cards...
 		//glBlitNamedFramebuffer(FrameServer::Instance()->finalColorFrameBufferObject, 0, 0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->windowResolution.x, this->windowResolution.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
-
-#endif
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
