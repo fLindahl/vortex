@@ -81,10 +81,5 @@ namespace Render
 		
         //contains all the shader objects that we've loaded
         Util::Array<Material*> materials;
-
-#ifdef _LIGHT_DEBUG
-		std::shared_ptr<ShaderObject> lightDebugShader;
-#endif // _DEBUG
-
     };
 }

@@ -506,54 +506,6 @@ ExampleApp::Run()
 
         }
 
-
-		this->SceneEntity1->GetGraphicsProperty()->getbbox().debugRender();
-		this->SceneEntity2->GetGraphicsProperty()->getbbox().debugRender();
-		this->SceneEntity3->GetGraphicsProperty()->getbbox().debugRender();
-		this->SceneEntity4->GetGraphicsProperty()->getbbox().debugRender();
-		this->SceneEntity5->GetGraphicsProperty()->getbbox().debugRender();
-		this->SceneEntity6->GetGraphicsProperty()->getbbox().debugRender();
-		this->rigidBodyEntity1->GetGraphicsProperty()->getbbox().debugRender();
-		this->rigidBodyEntity2->GetGraphicsProperty()->getbbox().debugRender();
-		this->rigidBodyEntity3->GetGraphicsProperty()->getbbox().debugRender();
-		this->rigidBodyEntity4->GetGraphicsProperty()->getbbox().debugRender();
-		this->rigidBodyEntity5->GetGraphicsProperty()->getbbox().debugRender();
-
-		//this->gProperty->getCollider()->debugDraw();
-		
-        // Render LINES
-        glUseProgram(0);
-        glEnable(GL_DEPTH_TEST);
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf((GLfloat*)&view.mat.m[0][0]);
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf((GLfloat*)&projection.mat.m[0][0]);
-
-        glBegin(GL_LINES);
-
-        Math::point v1 = rayStart;
-        Math::point v2 = rayEnd;
-
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glVertex4f(v1[0], v1[1], v1[2], v1[3]);
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex4f(v2[0], v2[1], v2[2], v2[3]);
-
-        Math::point hitp = hit.point;
-        Math::point hitn = hit.point + (hit.surfaceNormal * 0.1f);
-
-        glColor3f(1.0f, 0.0f, 1.0f);
-        glVertex4f(hitp[0], hitp[1], hitp[2], hitp[3]);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex4f(hitn[0], hitn[1], hitn[2], hitn[3]);
-
-        glEnd();
-		
-
-
-
 		this->window->SwapBuffers();
 
 		this->frameTime = glfwGetTime() - time;

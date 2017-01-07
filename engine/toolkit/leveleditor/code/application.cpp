@@ -51,6 +51,12 @@ Application::Open()
 	keyhandler = BaseGameFeature::KeyHandler::Instance();
 	keyhandler->Init(this->window);
 	
+	cameraPos = Math::point::zerovector();
+	camRotX = 0;
+	camRotY = 0;
+
+	this->rayStart = Math::vec4::zerovector();
+	this->rayEnd = Math::vec4::zerovector();
 	hit.object = nullptr;
 
 	// Initiate everything we need
@@ -330,6 +336,7 @@ void Application::RenderUI()
 void Application::RenderNano(NVGcontext * vg)
 {
 	nvgSave(vg);
+
 	/*
 	nvgBeginPath(vg);
 	nvgCircle(vg,600, 100, 50);
@@ -349,13 +356,6 @@ void
 Application::Run()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	
-	cameraPos = Math::point::zerovector();
-	camRotX = 0;
-	camRotY = 0;
-
-	this->rayStart = Math::vec4::zerovector();
-	this->rayEnd = Math::vec4::zerovector();
 
 	while (this->window->IsOpen() && !this->shutdown)
 	{
