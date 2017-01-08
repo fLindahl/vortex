@@ -24,6 +24,7 @@
 #include "imgui_dock.h"
 #include "undo.h"
 #include "commands.h"
+#include "userinterface.h"
 
 namespace LevelEditor
 {
@@ -40,35 +41,30 @@ public:
 	/// run app
 	void Run();
 private:
+	friend class Toolkit::UserInterface;
+
 	bool shutdown = false;
 
-	bool buttonAlreadyPressed = false;
+	void CameraMovement();
+	
+	void DoPicking();
 
 	Math::point cameraPos;
 	float camRotX;
 	float camRotY;
-	void CameraMovement();
 
+	Toolkit::UserInterface* UI;
+	
 	Math::point rayStart;
 	Math::point rayEnd;
 	Physics::PhysicsHit hit;
-
-	void DoPicking();
-
+	
 	/// ImGui functions
 	void RenderUI();
-	void RenderDocks();
-	void ExecShortCuts();
-	void ShowFileMenu();
-	/// ImGui Variables
 
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
-
-	double frameTime;
-	double prevFPSTime;
-	double currentFPS;
-
+	
 	std::shared_ptr<Render::ModelInstance> modelInstance;
 	std::shared_ptr<Render::ModelInstance> modelInstance1;
 	std::shared_ptr<Render::ModelInstance> modelInstanceScene;
@@ -89,11 +85,8 @@ private:
 
 	BaseGameFeature::KeyHandler* keyhandler;
 	
-	Edit::CommandManager commandManager;
+	Edit::CommandManager* commandManager;
 
 	Display::Window* window;
-
-	std::string consoleBuffer;
-	std::string a;
 };
 } // namespace LevelEditor

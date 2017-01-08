@@ -17,6 +17,8 @@ public:
 	void loadFromFile(const char * filename);
 	void BindTexture(GLuint slot);
 
+	GLuint GetHandle() { return this->texture; }
+
 	std::string GetName();
 
 private:

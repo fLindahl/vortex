@@ -8,128 +8,6 @@
 namespace LevelEditor
 {
 
-void Application::RenderDocks()
-{
-	const int toolbarWidth = 48;
-	const int toolButtonSize = 32;
-
-	ImGui::Begin("ToolBar", NULL,
-		ImGuiWindowFlags_NoSavedSettings |
-		ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoScrollWithMouse |
-		ImGuiWindowFlags_NoBringToFrontOnFocus);
-	{
-		ImGui::SetWindowSize(ImVec2(toolbarWidth, window->GetHeight() - 16), ImGuiSetCond_Once);
-		ImGui::SetWindowPos(ImVec2(0, 16), ImGuiSetCond_Once);
-
-		ImGui::Button("Select", ImVec2(toolButtonSize, toolButtonSize));
-		ImGui::Button("Translate", ImVec2(toolButtonSize, toolButtonSize));
-		ImGui::Button("Rotate", ImVec2(toolButtonSize, toolButtonSize));
-		ImGui::Button("Scale", ImVec2(toolButtonSize, toolButtonSize));
-
-		ImGui::End();
-	}
-
-
-
-	ImGui::RootDock(ImVec2(toolbarWidth, 16), ImVec2(window->GetWidth() - toolbarWidth, window->GetHeight() - 16));
-
-	ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
-	{
-		ImVec2 dockSize = ImGui::GetWindowSize();
-		ImGui::Image((void*)Render::FrameServer::Instance()->GetFinalColorBuffer(), dockSize);
-
-		if (ImGui::IsItemHovered())
-		{
-			DoPicking();
-		}
-	}
-	ImGui::EndDock();
-
-	//ImGui::BeginDock("Top View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
-	//ImGui::EndDock();
-
-	//ImGui::BeginDock("Right View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
-	//ImGui::EndDock();
-
-	//ImGui::BeginDock("Front View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
-	//ImGui::EndDock();
-
-	ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings);
-	{
-		if (hit.object != nullptr)
-		{
-			ImGui::Text("Transform:");
-			ImGui::Text("%f | %f | %f | %f", hit.object->GetTransform().getrow(0).x(), hit.object->GetTransform().getrow(0).y(), hit.object->GetTransform().getrow(0).z(), hit.object->GetTransform().getrow(0).w());
-			ImGui::Text("%f | %f | %f | %f", hit.object->GetTransform().getrow(1).x(), hit.object->GetTransform().getrow(1).y(), hit.object->GetTransform().getrow(1).z(), hit.object->GetTransform().getrow(1).w());
-			ImGui::Text("%f | %f | %f | %f", hit.object->GetTransform().getrow(2).x(), hit.object->GetTransform().getrow(2).y(), hit.object->GetTransform().getrow(2).z(), hit.object->GetTransform().getrow(2).w());
-			ImGui::Text("%f | %f | %f | %f", hit.object->GetTransform().getrow(3).x(), hit.object->GetTransform().getrow(3).y(), hit.object->GetTransform().getrow(3).z(), hit.object->GetTransform().getrow(3).w());
-
-			Game::PhysicsEntity* pe = dynamic_cast<Game::PhysicsEntity*>(hit.object);
-
-			if (pe != nullptr)
-			{
-				ImGui::Text("Mesh: %s", pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName().c_str());
-				ImGui::Text("Type: %i", pe->GetPhysicsType());
-
-				if (pe->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
-				{
-					Game::RigidBodyEntity* rb = dynamic_cast<Game::RigidBodyEntity*>(pe);
-
-					ImGui::Text("Orientation: %f, %f, %f, %f\n", rb->GetRigidBody()->getOrientation().x(), rb->GetRigidBody()->getOrientation().y(), rb->GetRigidBody()->getOrientation().z(), rb->GetRigidBody()->getOrientation().w());
-					ImGui::Text("Position: %f, %f, %f, %f\n", rb->GetRigidBody()->getPosition().x(), rb->GetRigidBody()->getPosition().y(), rb->GetRigidBody()->getPosition().z(), rb->GetRigidBody()->getPosition().w());
-					ImGui::Text("LinearVelocity: %f, %f, %f, %f\n", rb->GetRigidBody()->getLinearVelocity().x(), rb->GetRigidBody()->getLinearVelocity().y(), rb->GetRigidBody()->getLinearVelocity().z(), rb->GetRigidBody()->getLinearVelocity().w());
-					ImGui::Text("AngularVelocity: %f, %f, %f, %f\n", rb->GetRigidBody()->getAngularVelocity().x(), rb->GetRigidBody()->getAngularVelocity().y(), rb->GetRigidBody()->getAngularVelocity().z(), rb->GetRigidBody()->getAngularVelocity().w());
-					ImGui::Text("Acceleration: %f, %f, %f, %f\n", rb->GetRigidBody()->getAcceleration().x(), rb->GetRigidBody()->getAcceleration().y(), rb->GetRigidBody()->getAcceleration().z(), rb->GetRigidBody()->getAcceleration().w());
-				}
-			}
-		}
-		/*
-		static bool enabled = true;
-		ImGui::BeginChild("child", ImVec2(0, 60), true);
-		for (int i = 0; i < 10; i++)
-			ImGui::Text("Scrolling Text %d", i);
-		ImGui::EndChild();
-		static float f = 0.5f;
-		static int n = 0;
-		ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-		ImGui::InputFloat("Input", &f, 0.1f);
-		ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-		ImGui::Checkbox("Checkbox", &enabled);
-		*/
-	}
-	ImGui::EndDock();
-
-	ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings);
-	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		ImGui::Text("MousePos: (%g, %g)", io.MousePos.x, io.MousePos.y);
-		ImGui::Text("Mouse down:");     for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++) if (io.MouseDownDuration[i] >= 0.0f)   { ImGui::SameLine(); ImGui::Text("b%d (%.02f secs)", i, io.MouseDownDuration[i]); }
-		ImGui::Text("Mouse clicked:");  for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++) if (ImGui::IsMouseClicked(i))          { ImGui::SameLine(); ImGui::Text("b%d", i); }
-		ImGui::Text("Mouse dbl-clicked:"); for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++) if (ImGui::IsMouseDoubleClicked(i)) { ImGui::SameLine(); ImGui::Text("b%d", i); }
-		ImGui::Text("Mouse released:"); for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++) if (ImGui::IsMouseReleased(i))         { ImGui::SameLine(); ImGui::Text("b%d", i); }
-		ImGui::Text("MouseWheel: %.1f", io.MouseWheel);
-
-		ImGui::Text("Keys down:");      for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++) if (io.KeysDownDuration[i] >= 0.0f)     { ImGui::SameLine(); ImGui::Text("%d (%.02f secs)", i, io.KeysDownDuration[i]); }
-		ImGui::Text("Keys pressed:");   for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++) if (ImGui::IsKeyPressed(i))             { ImGui::SameLine(); ImGui::Text("%d", i); }
-		ImGui::Text("Keys release:");   for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++) if (ImGui::IsKeyReleased(i))            { ImGui::SameLine(); ImGui::Text("%d", i); }
-	}
-	ImGui::EndDock();
-
-	ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
-	if (ImGui::Button("New Entity", { 100, 40 }))
-	{
-		std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), this->modelInstance1);
-		commandManager.DoCommand(command);
-	}
-	ImGui::EndDock();
-}
-
 void Application::CameraMovement()
 {
 
@@ -191,6 +69,11 @@ void Application::CameraMovement()
 void Application::DoPicking()
 {
 	ImVec2 dockPos = ImGui::GetWindowPos();
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	dockPos.x += style.WindowPadding.x;
+	dockPos.y += style.WindowPadding.y;
+
 	ImVec2 dockSize = ImGui::GetWindowSize();
 	ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
 	if (ImGui::GetIO().MouseDown[0])
