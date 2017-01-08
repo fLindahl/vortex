@@ -32,11 +32,9 @@ private:
 	CommandList m_redoList;
 	int m_nUndoLevel;
 	int m_nCleanCount;
-
-// Constructor & destructor
-public:
-	CommandManagerT(int nUndoLevel = 100) : 
-		m_nUndoLevel(nUndoLevel), 
+	
+	CommandManagerT() :
+		m_nUndoLevel(100),
 		m_nCleanCount(0)
 	{ }
 
@@ -44,6 +42,17 @@ public:
 	{
 		Clear();
 	}
+public:
+	static CommandManagerT* Instance()
+	{
+		static CommandManagerT instance;
+		return &instance;
+	}
+
+	// C++ 11
+	// Delete the methods we don't want.
+	CommandManagerT(CommandManagerT const&) = delete;
+	void operator=(CommandManagerT const&) = delete;
 
 // Attributes
 public:
