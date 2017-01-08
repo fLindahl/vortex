@@ -10,9 +10,35 @@ namespace LevelEditor
 
 void Application::RenderDocks()
 {
-	ImGui::RootDock(ImVec2(0, 16), ImVec2(window->GetWidth(), window->GetHeight() - 16));
+	const int toolbarWidth = 48;
+	const int toolButtonSize = 32;
 
-	ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings);
+	ImGui::Begin("ToolBar", NULL,
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoScrollWithMouse |
+		ImGuiWindowFlags_NoBringToFrontOnFocus);
+	{
+		ImGui::SetWindowSize(ImVec2(toolbarWidth, window->GetHeight() - 16), ImGuiSetCond_Once);
+		ImGui::SetWindowPos(ImVec2(0, 16), ImGuiSetCond_Once);
+
+		ImGui::Button("Select", ImVec2(toolButtonSize, toolButtonSize));
+		ImGui::Button("Translate", ImVec2(toolButtonSize, toolButtonSize));
+		ImGui::Button("Rotate", ImVec2(toolButtonSize, toolButtonSize));
+		ImGui::Button("Scale", ImVec2(toolButtonSize, toolButtonSize));
+
+		ImGui::End();
+	}
+
+
+
+	ImGui::RootDock(ImVec2(toolbarWidth, 16), ImVec2(window->GetWidth() - toolbarWidth, window->GetHeight() - 16));
+
+	ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
 	{
 		ImVec2 dockSize = ImGui::GetWindowSize();
 		ImGui::Image((void*)Render::FrameServer::Instance()->GetFinalColorBuffer(), dockSize);
@@ -24,13 +50,13 @@ void Application::RenderDocks()
 	}
 	ImGui::EndDock();
 
-	//ImGui::BeginDock("Top View", NULL, ImGuiWindowFlags_NoSavedSettings);
+	//ImGui::BeginDock("Top View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
 	//ImGui::EndDock();
 
-	//ImGui::BeginDock("Right View", NULL, ImGuiWindowFlags_NoSavedSettings);
+	//ImGui::BeginDock("Right View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
 	//ImGui::EndDock();
 
-	//ImGui::BeginDock("Front View", NULL, ImGuiWindowFlags_NoSavedSettings);
+	//ImGui::BeginDock("Front View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
 	//ImGui::EndDock();
 
 	ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings);
