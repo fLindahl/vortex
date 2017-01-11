@@ -93,20 +93,21 @@ Application::Open()
         SceneEntity4 = std::make_shared<Game::StaticEntity>();
         SceneEntity5 = std::make_shared<Game::StaticEntity>();
         SceneEntity6 = std::make_shared<Game::StaticEntity>();
-
+		
 		SceneEntity1->SetModel(modelInstanceScene);
 		SceneEntity2->SetModel(modelInstanceScene);
 		SceneEntity3->SetModel(modelInstanceScene);
 		SceneEntity4->SetModel(modelInstanceScene);
 		SceneEntity5->SetModel(modelInstanceScene);
 		SceneEntity6->SetModel(modelInstanceScene);
-
+		
 		SceneEntity1->SetTransform(Math::mat4::translation(0.0f, -2.0f, 0.0f));
         SceneEntity2->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(10.0f, 8.0f, 0.0f)));
         SceneEntity3->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(-10.0f, 8.0f, 0.0f)));
         SceneEntity4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
         SceneEntity5->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
         SceneEntity6->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
+		
 		SceneEntity1->Activate();
         SceneEntity2->Activate();
         SceneEntity3->Activate();
@@ -122,30 +123,13 @@ Application::Open()
 		rigidBodyEntity3 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity4 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity5 = std::make_shared<Game::RigidBodyEntity>();
-
+		
 		modelInstance->SetSurface("resources/surfaces/player.surface");
 		modelInstance->SetMesh("resources/models/kung.obj");
-
+		
 		modelInstance1->SetSurface("resources/surfaces/placeholder.surface");
 		modelInstance1->SetMesh("resources/models/cube.obj");
 
-		PointLight pLight;
-		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
-		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		pLight.radiusAndPadding.set_x(10.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-		
-		pLight.position = Math::vec4(3.0f, 2.0f, 5.0f, 1.0f);
-		pLight.color = Math::vec4(0.7f, 0.5f, 0.3f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-
-		pLight.position = Math::vec4(8.0f, -1.5f, 5.0f, 1.0f);
-		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-
-		pLight.position = Math::vec4(10.0f, -1.5f, 10.0f, 1.0f);
-		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
 
 		rigidBodyEntity1->SetModel(modelInstance1);
 		rigidBodyEntity2->SetModel(modelInstance1);
@@ -180,11 +164,29 @@ Application::Open()
             }
         }
 
-        rigidBodyEntity1->Activate();
-        rigidBodyEntity2->Activate();
-        rigidBodyEntity3->Activate();
-        rigidBodyEntity4->Activate();
-        rigidBodyEntity5->Activate();
+        //rigidBodyEntity1->Activate();
+        //rigidBodyEntity2->Activate();
+        //rigidBodyEntity3->Activate();
+        //rigidBodyEntity4->Activate();
+        //rigidBodyEntity5->Activate();
+
+		PointLight pLight;
+		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
+		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		pLight.radiusAndPadding.set_x(10.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+		
+		pLight.position = Math::vec4(3.0f, 2.0f, 5.0f, 1.0f);
+		pLight.color = Math::vec4(0.7f, 0.5f, 0.3f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+
+		pLight.position = Math::vec4(8.0f, -1.5f, 5.0f, 1.0f);
+		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+
+		pLight.position = Math::vec4(10.0f, -1.5f, 10.0f, 1.0f);
+		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
 		
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -249,9 +251,6 @@ Application::Run()
 		}
 
 		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
-		Debug::DebugRenderer::Instance()->DrawBox(this->rigidBodyEntity1->GetGraphicsProperty()->getbbox(), Math::vec4(1.0f), 2.0f);
-		Debug::DebugRenderer::Instance()->DrawBox(this->rigidBodyEntity2->GetGraphicsProperty()->getbbox(), Math::vec4(1.0f), 2.0f);
 
 		RenderDevice::Instance()->Render(false);
 
