@@ -42,21 +42,30 @@ private:
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
 
-
 	double frameTime;
 	double prevFPSTime;
 	double currentFPS;
+
+	void CameraMovement();
+
+	void DoPicking();
+
+	Math::point cameraPos;
+	float camRotX;
+	float camRotY;
+
+	Math::point rayStart;
+	Math::point rayEnd;
 
 	std::shared_ptr<Render::ModelInstance> modelInstance;
 	std::shared_ptr<Render::ModelInstance> modelInstance1;
 	std::shared_ptr<Render::ModelInstance> modelInstanceScene;
 	
-	std::shared_ptr<Game::StaticEntity> rigidBodyEntity1;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity1;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity2;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity3;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity4;
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity5;
-    Util::Array<std::shared_ptr<Game::RigidBodyEntity>> RBEs;
 
 	std::shared_ptr<Game::StaticEntity> SceneEntity1;
     std::shared_ptr<Game::StaticEntity> SceneEntity2;
