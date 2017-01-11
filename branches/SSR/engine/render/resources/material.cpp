@@ -2,6 +2,7 @@
 #include "material.h"
 #include "render/server/resourceserver.h"
 #include "render/server/frameserver.h"
+#include "render/frame/drawpass.h"
 
 namespace Render
 {
@@ -88,7 +89,12 @@ namespace Render
 	{
 		if (FrameServer::Instance()->HasPassNamed(pass.c_str()))
 		{
-			FrameServer::Instance()->GetFramePass(pass.c_str())->AddMaterial(this);
+			auto drawpass = std::dynamic_pointer_cast<DrawPass>(FrameServer::Instance()->GetFramePass(pass.c_str()));
+			
+			//Make sure we can actually cast
+			assert(drawpass != nullptr);
+
+			drawpass->AddMaterial(this);
 			this->framepasses.insert(std::make_pair(pass, ShaderServer::Instance()->LoadShader(std::string(shader.c_str()))));
 		}
 		else

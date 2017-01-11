@@ -26,7 +26,7 @@ void EntityManager::RegisterEntity(std::shared_ptr<Game::Entity> entity)
 
 void EntityManager::UnregisterEntity(const int& ID)
 {
-	if (EntityList.count(ID))
+	if (EntityList.size() > 0 && EntityList.count(ID) > 0)
 	{
 		EntityList.erase(ID);
 	}
