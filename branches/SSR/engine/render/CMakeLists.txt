@@ -50,6 +50,8 @@ SET(files_render_frame
 	frame/depthpass.cpp
 	frame/lightcullingpass.h
 	frame/lightcullingpass.cpp
+	frame/reflectionpass.h
+	frame/reflectionpass.cpp
 	)
 	
 SET(files_render_resources

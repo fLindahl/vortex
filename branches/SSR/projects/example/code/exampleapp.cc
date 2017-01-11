@@ -28,7 +28,9 @@ namespace Example
 */
 ExampleApp::ExampleApp()
 {
-	// empty
+	cameraPos = Math::point::zerovector();
+	camRotX = 0;
+	camRotY = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -51,6 +53,9 @@ ExampleApp::Open()
 	keyhandler = BaseGameFeature::KeyHandler::Instance();
 	keyhandler->Init(this->window);
 	
+	this->rayStart = Math::vec4::zerovector();
+	this->rayEnd = Math::vec4::zerovector();
+
 	// Initiate everything we need
 	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
 	if (this->window->Open())
@@ -68,11 +73,8 @@ ExampleApp::Open()
 
 
 		//Never set resolution before initializing rendering and framepasses
-		this->window->SetSize(1600, 900);
+		this->window->SetSize(1920, 1050);
 		this->window->SetTitle("Vortex Engine Test Environment");
-
-		//Set render resolution. This is set with window->setsize too so we override it here
-		RenderDevice::Instance()->SetRenderResolution(1600, 900);
 
 		this->consoleBuffer = new char[CONSOLE_BUFFER_SIZE];
 		
@@ -160,21 +162,6 @@ ExampleApp::Open()
 		this->rigidBodyEntity4->SetTransform(transf4);
         this->rigidBodyEntity5->SetTransform(transf5);
 
-        const int numEntsX = 0;
-        const int numEntsY = 0;
-
-        for (int i = 0; i < numEntsX; ++i) {
-            for (int j = 0; j < numEntsY; ++j) {
-                std::shared_ptr<Game::RigidBodyEntity> ent = std::make_shared<Game::RigidBodyEntity>();
-                RBEs.Append(ent);
-				ent->SetModel(modelInstance1);
-
-                Math::mat4 transf1 = Math::mat4::translation(i*1.0f - (numEntsX/2), numEntsY/4 + j*1.0f, 5.0f);
-                ent->SetTransform(transf1);
-                ent->Activate();
-            }
-        }
-
         rigidBodyEntity1->Activate();
         rigidBodyEntity2->Activate();
         rigidBodyEntity3->Activate();
@@ -197,137 +184,17 @@ ExampleApp::Open()
 	return false;
 }
 
-void ShowExampleMenuFile()
-{
-	ImGui::MenuItem("(dummy menu)", NULL, false, false);
-	if (ImGui::MenuItem("New")) {}
-	if (ImGui::MenuItem("Open", "Ctrl+O")) {}
-	if (ImGui::BeginMenu("Open Recent"))
-	{
-		ImGui::MenuItem("fish_hat.c");
-		ImGui::MenuItem("fish_hat.inl");
-		ImGui::MenuItem("fish_hat.h");
-		if (ImGui::BeginMenu("More.."))
-		{
-			ImGui::MenuItem("Hello");
-			ImGui::MenuItem("Sailor");
-			if (ImGui::BeginMenu("Recurse.."))
-			{
-				ShowExampleMenuFile();
-				ImGui::EndMenu();
-			}
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenu();
-	}
-	if (ImGui::MenuItem("Save", "Ctrl+S")) {}
-	if (ImGui::MenuItem("Save As..")) {}
-	ImGui::Separator();
-	if (ImGui::BeginMenu("Options"))
-	{
-		static bool enabled = true;
-		ImGui::MenuItem("Enabled", "", &enabled);
-		ImGui::BeginChild("child", ImVec2(0, 60), true);
-		for (int i = 0; i < 10; i++)
-			ImGui::Text("Scrolling Text %d", i);
-		ImGui::EndChild();
-		static float f = 0.5f;
-		static int n = 0;
-		ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-		ImGui::InputFloat("Input", &f, 0.1f);
-		ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-		ImGui::EndMenu();
-	}
-	if (ImGui::BeginMenu("Colors"))
-	{
-		for (int i = 0; i < ImGuiCol_COUNT; i++)
-			ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
-		ImGui::EndMenu();
-	}
-	if (ImGui::BeginMenu("Disabled", false)) // Disabled
-	{
-		IM_ASSERT(0);
-	}
-	if (ImGui::MenuItem("Checked", NULL, true)) {}
-	if (ImGui::MenuItem("Quit", "Alt+F4")) {}
-}
-
-
 void ExampleApp::RenderUI()
 {
 	if (this->window->IsOpen())
 	{
-		bool show = true;
-
-		if (ImGui::BeginMainMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				ShowExampleMenuFile();
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Edit"))
-			{
-				if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-				ImGui::EndMenu();
-			}
-			ImGui::EndMainMenuBar();
-		}
-
+		static bool show = true;
 		// create a new window
 		ImGui::Begin("Console", &show, ImGuiWindowFlags_NoSavedSettings);
-
 		ImGui::SetWindowSize(ImVec2(450.0f,210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
-
 		ImGui::Text("Frame time: %f\n", this->frameTime);
-
-		currentFPS = 1.0f / this->frameTime;
-		
+		currentFPS = 1.0f / this->frameTime;		
 		ImGui::Text("FPS: %f\n", currentFPS);
-
-		// create text editors for shader code
-		ImGui::Text("Selected Mesh: %s\n", consoleBuffer.c_str());
-
-        if(Physics::PhysicsDevice::Instance()->hasCollision)
-            a = "#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n#########################################\n";
-        else
-            a = "0";
-
-        ImGui::Text("Collision: %s\n", a.c_str());
-
-
-
-		if (hit.object != nullptr)
-		{
-			//ImGui::Text("Orientation: %f, %f, %f, %f\n", std::static_pointer_cast<Game::PhysicsEntity>(hit.object)->GetRigidBody->getOrientation().x(), hit.object->rigidBody->getOrientation().y(), hit.object->rigidBody->getOrientation().z(), hit.object->rigidBody->getOrientation().w());
-			//ImGui::Text("Position: %f, %f, %f, %f\n", hit.object->rigidBody->getPosition().x(), hit.object->rigidBody->getPosition().y(), hit.object->rigidBody->getPosition().z(), hit.object->rigidBody->getPosition().w());
-			//ImGui::Text("LinearVelocity: %f, %f, %f, %f\n", hit.object->rigidBody->getLinearVelocity().x(), hit.object->rigidBody->getLinearVelocity().y(), hit.object->rigidBody->getLinearVelocity().z(), hit.object->rigidBody->getLinearVelocity().w());
-			//ImGui::Text("AngularVelocity: %f, %f, %f, %f\n", hit.object->rigidBody->getAngularVelocity().x(), hit.object->rigidBody->getAngularVelocity().y(), hit.object->rigidBody->getAngularVelocity().z(), hit.object->rigidBody->getAngularVelocity().w());
-			//ImGui::Text("Acceleration: %f, %f, %f, %f\n", hit.object->rigidBody->getAcceleration().x(), hit.object->rigidBody->getAcceleration().y(), hit.object->rigidBody->getAcceleration().z(), hit.object->rigidBody->getAcceleration().w());
-		}
-		
-		//ImGui::InputTextMultiline("Vertex Shader", consoleBuffer, CONSOLE_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput);
-
-		//ImGui::InputTextMultiline("Pixel Shader", fsBuffer, STRING_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
-		//						  ImGuiInputTextFlags_AllowTabInput);
-
-		// apply button
-		//if (ImGui::Button("Apply"))
-		//{
-			// if pressed we compile the shaders
-			//	this->CompileShaders();
-		//}
-		//if (this->compilerLog.length())
-		//{
-			// if compilation produced any output we display it here
-		//	ImGui::TextWrapped(this->compilerLog.c_str());
-		//}
-		// close window
 		ImGui::End();
 	}
 }
@@ -335,15 +202,6 @@ void ExampleApp::RenderUI()
 void ExampleApp::RenderNano(NVGcontext * vg)
 {
 	nvgSave(vg);
-	/*
-	nvgBeginPath(vg);
-	nvgCircle(vg,600, 100, 50);
-	NVGpaint paint;
-	paint = nvgLinearGradient(vg, 600, 100, 650, 150, nvgRGBA(255, 0, 0, 255), nvgRGBA(0, 255, 0, 255));
-	nvgFillPaint(vg, paint);
-	nvgFill(vg);
-
-	*/
 	nvgRestore(vg);
 }
 
@@ -356,161 +214,168 @@ ExampleApp::Run()
 	// set clear color to gray
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-	int xangle = 0;
-	int yangle = 0;
-	float radians = 0.0f;
-	bool decrease = false;
-	float speed = 0.1f;
-
-	float x = 0.0f;
-	float y = 0.0f;
-	//float z = 0.0f;
-
-	Math::mat4 projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
-    Math::mat4 invProj = Math::mat4::inverse(projection);
-
-	double cursorPosX = 0.0f;
-	double cursorPosY = 0.0f;
-
-    Math::point cameraPos = Math::vec4::zerovector();
-
-    Math::vec4 rayStart = Math::vec4::zerovector();
-    Math::vec4 rayEnd= Math::vec4::zerovector();
-
-	hit.object = nullptr;
-
 	while (this->window->IsOpen())
 	{
 		double time = glfwGetTime();
 		this->window->Update();
-		
-		Math::vec4 translation = Math::vec4::zerovector();
 
-        const float speedIncrease = 0.02f;
-        float speedMultiplier = 1.0f;
-
-        if(keyhandler->leftShift)
-        {
-            speedMultiplier = 3.0f;
-        }
-        if(keyhandler->W)
-        {
-                translation.z() += speedIncrease * speedMultiplier;
-        }
-        if(keyhandler->S)
-        {
-            translation.z() -= speedIncrease * speedMultiplier;
-        }
-        if(keyhandler->A)
-        {
-            translation.x() -= speedIncrease * speedMultiplier;
-        }
-        if(keyhandler->D)
-        {
-            translation.x() += speedIncrease * speedMultiplier;
-        }
-
-		Math::mat4 xMat = Math::mat4::rotationx(-keyhandler->mouseX * 0.01f);
-		Math::mat4 yMat = Math::mat4::rotationy(-keyhandler->mouseY * 0.01f);
-		Math::mat4 rotation = Math::mat4::multiply(xMat, yMat);
-
-		//Math::mat4 rotation = Math::mat4::rotationyawpitchroll(nvgDegToRad(keyhandler->mouseY) * 0.5f, nvgDegToRad(keyhandler->mouseX) * 0.5f, 0.0f);
-
-		const Math::point& left = rotation.get_xaxis();
-		const Math::point& up = rotation.get_yaxis();
-        const Math::point& forward = rotation.get_zaxis();
-
-		translation = Math::mat4::transform(translation, rotation);
-		cameraPos += translation;
-
-		Graphics::MainCamera::Instance()->SetPosition(cameraPos);
-        Graphics::MainCamera::Instance()->LookAt(cameraPos + forward, up);
-
-        Math::mat4 view = Graphics::MainCamera::Instance()->getViewMatrix();
-        Math::mat4 invView = Math::mat4::inverse(view);
-		Math::mat4 invViewProj = Math::mat4::multiply(invView, invProj);
-		Math::mat4 viewProj = Math::mat4::multiply(view, projection);
-
-		if(keyhandler->leftMousePressed)
-		{
-            printf("\n\n\n\n\n\n\n\n");
-			double time = glfwGetTime();
-			glfwGetCursorPos(this->window->GetGLFWWindow(), &cursorPosX, &cursorPosY);
-
-            printf("CameraPos: %f %f %f %f\n", cameraPos.x(), cameraPos.y(), cameraPos.z(), cameraPos.w());
-
-            // Transform to world coordinates
-			cursorPosX = (((cursorPosX / this->window->GetWidth()) -0.5f) * 2.0f);
-			cursorPosY = (((cursorPosY / this->window->GetHeight()) - 0.5f) * 2.0f);
-
-            Math::vec4 cursorTransform = Math::vec4(cursorPosX, -cursorPosY, 1.0, 1.0f);
-
-            printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
-
-			cursorTransform = Math::mat4::transform(cursorTransform, invProj);
-
-            Math::point ray = (cursorTransform * 0.01f);
-
-			Math::vec4 rayWorldPos = Math::mat4::transform(ray, invView);
-
-            printf("rayWorldPos: %f %f %f %f\n", rayWorldPos.x(), rayWorldPos.y(), rayWorldPos.z(), rayWorldPos.w());
-
-            Math::vec4 rayDirection = rayWorldPos - invView.get_position();
-
-            rayDirection = Math::vec4::normalize(rayDirection);
-
-            //Create ray to render
-            rayStart = rayWorldPos;
-
-			if(Physics::PhysicsServer::Instance()->Raycast(hit, rayWorldPos, rayDirection, 40.0f))
-            {
-                printf("--- Hit object! ---\n");
-                Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
-
-                if(rbe != nullptr)
-                    rbe->GetRigidBody()->applyForceAtPoint(rayDirection, .1f, hit.point);
-
-                rayEnd = hit.point;
-
-                if(keyhandler->rightMousePressed)
-                {
-                    PointLight pLight;
-                    pLight.position = hit.point + (hit.surfaceNormal);
-                    pLight.color = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-                    pLight.radiusAndPadding.set_x(5.0f);
-
-                    LightServer::Instance()->AddPointLight(pLight);
-                }
-			}
-            else
-            {
-                rayEnd = rayWorldPos + (rayDirection*10.0f);
-            }
-
-			double endtime = glfwGetTime();
-			printf("Raycast time elapsed: %f\n", endtime - time);
-		}
-		
 		Physics::PhysicsDevice::Instance()->Solve();
+		BaseGameFeature::EntityManager::Instance()->Update();
 
-        BaseGameFeature::EntityManager::Instance()->Update();
+		if (ImGui::GetIO().KeyAlt)
+		{
+			CameraMovement();
+		}
+
+		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
 		RenderDevice::Instance()->Render();
-
-		if(hit.object != nullptr)
-        {
-            Game::PhysicsEntity* pe = dynamic_cast<Game::PhysicsEntity*>(hit.object);
-
-            if(pe != nullptr)
-                consoleBuffer = pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName();
-
-        }
 
 		this->window->SwapBuffers();
 
 		this->frameTime = glfwGetTime() - time;
 
 	}
+}
+
+
+void ExampleApp::CameraMovement()
+{
+
+	Math::vec4 translation = Math::vec4::zerovector();
+
+	const float speedIncrease = 0.02f;
+	float speedMultiplier = 1.0f;
+
+	camRotX += ImGui::GetIO().MouseDelta.y * 0.005f;
+	camRotY += ImGui::GetIO().MouseDelta.x * 0.005f;
+
+	if (camRotX > 1.57075f)
+	{
+		camRotX = 1.57075f;
+	}
+	else if (camRotX < -1.57075f)
+	{
+		camRotX = -1.57075f;
+	}
+
+	if (ImGui::GetIO().KeyShift)
+	{
+		speedMultiplier = 3.0f;
+	}
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_W)))
+	{
+		translation.z() += speedIncrease * speedMultiplier;
+	}
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_S)))
+	{
+		translation.z() -= speedIncrease * speedMultiplier;
+	}
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)))
+	{
+		translation.x() -= speedIncrease * speedMultiplier;
+	}
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_D)))
+	{
+		translation.x() += speedIncrease * speedMultiplier;
+	}
+
+	Math::mat4 xMat = Math::mat4::rotationx(camRotX);
+	Math::mat4 yMat = Math::mat4::rotationy(camRotY);
+	Math::mat4 rotation = Math::mat4::multiply(xMat, yMat);
+
+	//Math::mat4 rotation = Math::mat4::rotationyawpitchroll(nvgDegToRad(keyhandler->mouseY) * 0.5f, nvgDegToRad(keyhandler->mouseX) * 0.5f, 0.0f);
+
+	const Math::point& left = rotation.get_xaxis();
+	const Math::point& up = rotation.get_yaxis();
+	const Math::point& forward = rotation.get_zaxis();
+
+	translation = Math::mat4::transform(translation, rotation);
+	cameraPos += translation;
+
+	Graphics::MainCamera::Instance()->SetPosition(cameraPos);
+	Graphics::MainCamera::Instance()->LookAt(cameraPos + forward, up);
+}
+void ExampleApp::DoPicking()
+{
+	ImVec2 dockPos = ImGui::GetWindowPos();
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	dockPos.x += style.WindowPadding.x;
+	dockPos.y += style.WindowPadding.y;
+
+	ImVec2 dockSize = ImGui::GetWindowSize();
+	ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
+	if (ImGui::GetIO().MouseDown[0])
+	{
+		//mouse_pos_in_dock.x = Math::min(mouse_pos_in_dock.x, mouse_pos_in_dock.y);
+
+		//TODO: This is unnecessary work
+		Math::mat4 view = Graphics::MainCamera::Instance()->getViewMatrix();
+		Math::mat4 invView = Math::mat4::inverse(view);
+		Math::mat4 invProj = Math::mat4::inverse(Graphics::MainCamera::Instance()->getProjectionMatrix());
+		Math::mat4 invViewProj = Math::mat4::multiply(invView, invProj);
+		Math::mat4 viewProj = Math::mat4::multiply(view, Graphics::MainCamera::Instance()->getProjectionMatrix());
+
+		double cursorPosX = 0.0f;
+		double cursorPosY = 0.0f;
+
+		printf("mouse x : %f\n", mouse_pos_in_dock.x / dockSize.x);
+
+		// Transform to world coordinates
+		cursorPosX = (((mouse_pos_in_dock.x / dockSize.x) - 0.5f) * 2.0f);
+		cursorPosY = (((mouse_pos_in_dock.y / dockSize.y) - 0.5f) * 2.0f);
+		Math::vec4 cursorTransform = Math::vec4(cursorPosX, cursorPosY, 1.0, 1.0f);
+
+		printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
+
+		cursorTransform = Math::mat4::transform(cursorTransform, invProj);
+		Math::point ray = (cursorTransform * 0.01f);
+		Math::vec4 rayWorldPos = Math::mat4::transform(ray, invView);
+
+		printf("rayWorldPos: %f %f %f %f\n", rayWorldPos.x(), rayWorldPos.y(), rayWorldPos.z(), rayWorldPos.w());
+
+		Math::vec4 rayDirection = rayWorldPos - invView.get_position();
+		rayDirection = Math::vec4::normalize(rayDirection);
+
+		Physics::PhysicsHit newHit;
+		if (Physics::PhysicsServer::Instance()->Raycast(newHit, rayWorldPos, rayDirection, 400.0f))
+		{
+			this->rayStart = rayWorldPos;
+
+			printf("--- Hit object! ---\n");
+
+			//Start by removing outline from previous hit object
+			if (hit.object != nullptr)
+			{
+				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
+
+				if (rbe != nullptr)
+				{
+					rbe->GetGraphicsProperty()->outline = false;
+				}
+			}
+
+			hit = newHit;
+
+
+			//Select new object!
+			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
+			if (rbe != nullptr)
+			{
+				rbe->GetGraphicsProperty()->outline = true;
+				rbe->GetRigidBody()->applyForceAtPoint(rayDirection, .1f, hit.point);
+			}
+
+			this->rayEnd = hit.point;
+		}
+		else
+		{
+			rayEnd = rayWorldPos + (rayDirection*10.0f);
+		}
+
+	}
+
 }
 
 } // namespace Example
