@@ -1,9 +1,9 @@
 #pragma once
-#include "framepass.h"
+#include "drawpass.h"
 
 namespace Render
 {
-class DepthPass : public FramePass
+class DepthPass : public DrawPass
 {
 public:
     DepthPass();

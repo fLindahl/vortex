@@ -39,9 +39,20 @@ SET(files_render_properties
 	properties/graphicsproperty.cpp
 	)
 
+SET(files_render_frame
+	frame/framepass.h
+	frame/framepass.cpp
+	frame/drawpass.h
+	frame/drawpass.cpp
+	frame/flatgeometrylitpass.h
+	frame/flatgeometrylitpass.cpp
+	frame/depthpass.h
+	frame/depthpass.cpp
+	frame/lightcullingpass.h
+	frame/lightcullingpass.cpp
+	)
+	
 SET(files_render_resources
-	resources/framepass.h
-	resources/framepass.cpp
 	resources/lightnode.h
 	resources/lightnode.cpp
 	resources/meshresource.h
@@ -58,7 +69,7 @@ SET(files_render_resources
 	resources/surface.h
 	resources/surface.cpp	
 	resources/nvx2fileformatstructs.h
-        resources/drawpass.h resources/drawpass.cpp resources/depthpass.h resources/depthpass.cpp)
+	)
 
 SET(files_render_server
 	server/lightserver.h
@@ -99,6 +110,8 @@ SOURCE_GROUP("character" FILES ${files_render_character})
 
 SOURCE_GROUP("properties" FILES ${files_render_properties})
 
+SOURCE_GROUP("frame" FILES ${files_render_frame})
+
 SOURCE_GROUP("resources" FILES ${files_render_resources})
 
 SOURCE_GROUP("server" FILES ${files_render_server})
@@ -113,6 +126,7 @@ SET(files_render
 	${files_render_animation}
 	${files_render_character}
 	${files_render_properties}
+	${files_render_frame}
 	${files_render_resources}
 	${files_render_server}
 	${files_render_softwarerender}

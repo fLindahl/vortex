@@ -17,8 +17,7 @@
 
 using namespace Display;
 using namespace Render;
-
-#define CONSOLE_BUFFER_SIZE 8096
+using namespace Toolkit;
 
 namespace LevelEditor
 {
@@ -28,7 +27,10 @@ namespace LevelEditor
 */
 Application::Application()
 {
-	// empty
+	this->commandManager = Edit::CommandManager::Instance();
+	cameraPos = Math::point::zerovector();
+	camRotX = 0;
+	camRotY = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -51,6 +53,8 @@ Application::Open()
 	keyhandler = BaseGameFeature::KeyHandler::Instance();
 	keyhandler->Init(this->window);
 	
+	this->rayStart = Math::vec4::zerovector();
+	this->rayEnd = Math::vec4::zerovector();
 	hit.object = nullptr;
 
 	// Initiate everything we need
@@ -67,13 +71,13 @@ Application::Open()
 		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
 		//Init debugrenderer. Always do this AFTER setting up shaders!
 		Debug::DebugRenderer::Instance()->Initialize();
+		//Setup UI
+		this->UI = new UserInterface(this);
+
 
 		//Never set resolution before initializing rendering and framepasses
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Vortex Level Editor");
-
-
-		this->consoleBuffer = new char[CONSOLE_BUFFER_SIZE];
 
 		this->rayStart = Math::vec4::zerovector();
 		this->rayEnd = Math::vec4::zerovector();
@@ -89,20 +93,21 @@ Application::Open()
         SceneEntity4 = std::make_shared<Game::StaticEntity>();
         SceneEntity5 = std::make_shared<Game::StaticEntity>();
         SceneEntity6 = std::make_shared<Game::StaticEntity>();
-
+		
 		SceneEntity1->SetModel(modelInstanceScene);
 		SceneEntity2->SetModel(modelInstanceScene);
 		SceneEntity3->SetModel(modelInstanceScene);
 		SceneEntity4->SetModel(modelInstanceScene);
 		SceneEntity5->SetModel(modelInstanceScene);
 		SceneEntity6->SetModel(modelInstanceScene);
-
+		
 		SceneEntity1->SetTransform(Math::mat4::translation(0.0f, -2.0f, 0.0f));
         SceneEntity2->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(10.0f, 8.0f, 0.0f)));
         SceneEntity3->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(-10.0f, 8.0f, 0.0f)));
         SceneEntity4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
         SceneEntity5->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
         SceneEntity6->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
+		
 		SceneEntity1->Activate();
         SceneEntity2->Activate();
         SceneEntity3->Activate();
@@ -118,30 +123,13 @@ Application::Open()
 		rigidBodyEntity3 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity4 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity5 = std::make_shared<Game::RigidBodyEntity>();
-
+		
 		modelInstance->SetSurface("resources/surfaces/player.surface");
 		modelInstance->SetMesh("resources/models/kung.obj");
-
+		
 		modelInstance1->SetSurface("resources/surfaces/placeholder.surface");
 		modelInstance1->SetMesh("resources/models/cube.obj");
 
-		PointLight pLight;
-		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
-		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		pLight.radiusAndPadding.set_x(10.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-		
-		pLight.position = Math::vec4(3.0f, 2.0f, 5.0f, 1.0f);
-		pLight.color = Math::vec4(0.7f, 0.5f, 0.3f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-
-		pLight.position = Math::vec4(8.0f, -1.5f, 5.0f, 1.0f);
-		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-
-		pLight.position = Math::vec4(10.0f, -1.5f, 10.0f, 1.0f);
-		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
 
 		rigidBodyEntity1->SetModel(modelInstance1);
 		rigidBodyEntity2->SetModel(modelInstance1);
@@ -176,14 +164,30 @@ Application::Open()
             }
         }
 
-        rigidBodyEntity1->Activate();
-        rigidBodyEntity2->Activate();
-        rigidBodyEntity3->Activate();
-        rigidBodyEntity4->Activate();
-        rigidBodyEntity5->Activate();
-		
-		ImGui::LoadDock();
+        //rigidBodyEntity1->Activate();
+        //rigidBodyEntity2->Activate();
+        //rigidBodyEntity3->Activate();
+        //rigidBodyEntity4->Activate();
+        //rigidBodyEntity5->Activate();
 
+		PointLight pLight;
+		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
+		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		pLight.radiusAndPadding.set_x(10.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+		
+		pLight.position = Math::vec4(3.0f, 2.0f, 5.0f, 1.0f);
+		pLight.color = Math::vec4(0.7f, 0.5f, 0.3f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+
+		pLight.position = Math::vec4(8.0f, -1.5f, 5.0f, 1.0f);
+		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+
+		pLight.position = Math::vec4(10.0f, -1.5f, 10.0f, 1.0f);
+		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+		
 		// set ui rendering function
 		this->window->SetUiRender([this]()
 		  {
@@ -200,136 +204,18 @@ Application::Open()
 	return false;
 }
 
-void Application::ShowFileMenu()
-{
-	if (ImGui::MenuItem("New")) {}
-	if (ImGui::MenuItem("Open", "Ctrl+O")) {}
-	if (ImGui::BeginMenu("Open Recent"))
-	{
-		ImGui::MenuItem("example1.map");
-		ImGui::MenuItem("example2.map");
-		ImGui::MenuItem("example3.map");
-		ImGui::EndMenu();
-	}
-	if (ImGui::MenuItem("Save", "Ctrl+S")) {}
-	if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S")) {}
-	ImGui::Separator();
-
-	if (ImGui::BeginMenu("Layout"))
-	{
-		if (ImGui::MenuItem("Save Layout...")) { ImGui::SaveDock("layout/default.layout"); }
-		if (ImGui::MenuItem("Load Layout...")) { ImGui::LoadDock(); }
-		ImGui::EndMenu();
-	}
-
-	//if (ImGui::BeginMenu("Options"))
-	//{
-	//	ImGui::EndMenu();
-	//}
-	//if (ImGui::BeginMenu("Colors"))
-	//{
-		//for (int i = 0; i < ImGuiCol_COUNT; i++)
-		//	ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
-		//ImGui::EndMenu();
-	//}
-	//if (ImGui::BeginMenu("Disabled", false)) // Disabled
-	//{
-	//	IM_ASSERT(0);
-	//}
-	//if (ImGui::MenuItem("Checked", NULL, true)) {}
-	if (ImGui::MenuItem("Quit", "Alt+F4")) { this->shutdown = true; }
-}
-
-void Application::ExecShortCuts()
-{	
-	if ((ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Y))) || 
-		(ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeyShift && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Z))))
-	{
-		commandManager.Redo();
-	}
-	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Z)))
-	{
-		commandManager.Undo();
-	}
-}
-
 void Application::RenderUI()
 {
 	if (this->window->IsOpen())
-	{
-		static bool showStatistics = false;
-		
-		RenderDocks();
-		
-		//TODO: Make sure we're not editing a textbox before querying for shortcuts
-		ExecShortCuts();
-
-		if (ImGui::BeginMainMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				ShowFileMenu();
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Edit"))
-			{
-				if (ImGui::MenuItem("Undo", "CTRL+Z")) { commandManager.Undo(); }
-				if (ImGui::MenuItem("Redo", "CTRL+Y")) { commandManager.Redo(); }  // Disabled item
-				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Window"))
-			{
-				if (ImGui::BeginMenu("Show"))
-				{
-					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
-					ImGui::EndMenu();
-				}
-				ImGui::EndMenu();
-			}
-			ImGui::EndMainMenuBar();
-		}
-
-		// create a new window
-		if (showStatistics)
-		{
-			ImGui::Begin("Statistics", &showStatistics, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_ShowBorders);
-
-			ImGui::SetWindowSize(ImVec2(450.0f, 210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
-			ImGui::Text("Frame time: %f\n", this->frameTime);
-
-			currentFPS = 1.0f / this->frameTime;
-
-			ImGui::Text("FPS: %f\n", currentFPS);
-
-			//ImGui::InputTextMultiline("Vertex Shader", consoleBuffer, CONSOLE_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput);
-
-			//ImGui::InputTextMultiline("Pixel Shader", fsBuffer, STRING_BUFFER_SIZE, ImVec2(-1.0f, ImGui::GetTextLineHeight() * 16),
-			//						  ImGuiInputTextFlags_AllowTabInput);
-
-			// apply button
-			//if (ImGui::Button("Apply"))
-			//{
-			// if pressed we compile the shaders
-			//	this->CompileShaders();
-			//}
-			//if (this->compilerLog.length())
-			//{
-			// if compilation produced any output we display it here
-			//	ImGui::TextWrapped(this->compilerLog.c_str());
-			//}
-			// close window
-			ImGui::End();
-		}
+	{		
+		UI->Run();		
 	}
 }
 
 void Application::RenderNano(NVGcontext * vg)
 {
 	nvgSave(vg);
+
 	/*
 	nvgBeginPath(vg);
 	nvgCircle(vg,600, 100, 50);
@@ -349,13 +235,6 @@ void
 Application::Run()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	
-	cameraPos = Math::point::zerovector();
-	camRotX = 0;
-	camRotY = 0;
-
-	this->rayStart = Math::vec4::zerovector();
-	this->rayEnd = Math::vec4::zerovector();
 
 	while (this->window->IsOpen() && !this->shutdown)
 	{
@@ -373,13 +252,10 @@ Application::Run()
 
 		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
-		Debug::DebugRenderer::Instance()->DrawBox(this->rigidBodyEntity1->GetGraphicsProperty()->getbbox(), Math::vec4(1.0f), 2.0f);
-		Debug::DebugRenderer::Instance()->DrawBox(this->rigidBodyEntity2->GetGraphicsProperty()->getbbox(), Math::vec4(1.0f), 2.0f);
-
 		RenderDevice::Instance()->Render(false);
 
 		this->window->SwapBuffers();
-		this->frameTime = glfwGetTime() - time;
+		UI->frameTime = glfwGetTime() - time;
 	}
 
 	this->window->Close();

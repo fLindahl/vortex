@@ -1,9 +1,9 @@
 #include "config.h"
 #include "render/server/frameserver.h"
 #include "depthpass.h"
-#include "material.h"
-#include "surface.h"
-#include "meshresource.h"
+#include "render/resources/material.h"
+#include "render/resources/surface.h"
+#include "render/resources/meshresource.h"
 #include "render/properties/graphicsproperty.h"
 #include "render/server/renderdevice.h"
 
@@ -22,6 +22,10 @@ DepthPass::~DepthPass()
 
 void DepthPass::Execute()
 {
+	// Bind the depth map's frame buffer and draw the depth map to it
+	this->BindFrameBuffer();
+	glClear(GL_DEPTH_BUFFER_BIT);
+
     GLuint currentProgram = 0;
 
     for (Material* material : this->materials)
@@ -53,6 +57,9 @@ void DepthPass::Execute()
             }
         }
     }
+
+	//Unbind Depth FrameBufferObject
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     FramePass::Execute();
 }

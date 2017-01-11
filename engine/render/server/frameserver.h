@@ -8,6 +8,8 @@ namespace Render
 {
 
 class FramePass;
+class DepthPass;
+class DrawPass;
 
 class FrameServer
 {
@@ -30,17 +32,22 @@ public:
 	void UpdateResolutions();
 
 	std::shared_ptr<FramePass> GetFramePass(const std::string& name);
+
 	bool HasPassNamed(const std::string& name);
+
+	std::shared_ptr<DrawPass> GetDepthPass();
+	std::shared_ptr<FramePass> GetLightCullingPass();
 
 	GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
 
 private:
+	friend class RenderDevice;
+
 	GLuint finalColorFrameBufferObject;
 	GLuint finalColorBuffer;
 
 	const unsigned int MAX_NUM_LIGHTS = 1024;
 
-	friend class RenderDevice;
 
 	//Contains all Framepasses.
 	//Key must be unique to each Pass. the key is the pass name
@@ -49,14 +56,16 @@ private:
 	Util::Array<std::shared_ptr<FramePass>> framePasses;
 	
 	/// Early depth testing
-	std::shared_ptr<FramePass> Depth;
+	std::shared_ptr<DrawPass> Depth;
 	
 	/// Used for lightculling as part of tiled forward rendering.
-	//std::shared_ptr<ComputeShaderObject> lightCulling;
-	GLuint lightCullingProgram;
+	std::shared_ptr<FramePass> lightCullingPass;
+	//GLuint lightCullingProgram;
 
 	/// For lit objects
-	std::shared_ptr<FramePass> FlatGeometryLit;
+	std::shared_ptr<DrawPass> FlatGeometryLit;
+
+
 
 
 
