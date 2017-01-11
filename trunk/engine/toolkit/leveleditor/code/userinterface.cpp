@@ -13,6 +13,10 @@ namespace Toolkit
 	{
 		this->application = app;
 
+		this->selectTool = new Tools::SelectTool();
+		this->translateTool = new Tools::TranslateTool();
+		this->currentTool = this->selectTool;
+
 		//Load textures
 		this->selectToolTextureHandle = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/leveleditor/resources/textures/cursor.png")->GetHandle();
 		this->translateToolTextureHandle = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/leveleditor/resources/textures/translate.png")->GetHandle();
@@ -31,6 +35,8 @@ namespace Toolkit
 
 	UserInterface::~UserInterface()
 	{
+		delete this->selectTool;
+		delete this->translateTool;
 	}
 
 	void UserInterface::Run()
@@ -158,13 +164,34 @@ namespace Toolkit
 			ImGui::SetWindowSize(ImVec2(toolbarWidth, application->window->GetHeight() - 16), ImGuiSetCond_Once);
 			ImGui::SetWindowPos(ImVec2(0, 16), ImGuiSetCond_Once);
 
-			ImGui::ImageButton((void*)this->selectToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize));
-			ImGui::ImageButton((void*)this->translateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize));
-			ImGui::ImageButton((void*)this->rotateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize));
-			ImGui::ImageButton((void*)this->scaleToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize));
-			ImGui::ImageButton((void*)this->entityToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize));
-			ImGui::ImageButton((void*)this->brushToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize));
-			ImGui::ImageButton((void*)this->polygonEditTextureHandle, ImVec2(toolButtonSize, toolButtonSize));
+			if (ImGui::ImageButton((void*)this->selectToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
+			{
+				this->currentTool = selectTool;
+			}
+			if (ImGui::ImageButton((void*)this->translateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
+			{
+				this->currentTool = translateTool;
+			}
+			if (ImGui::ImageButton((void*)this->rotateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
+			{
+				//this->currentTool = rotateTool;
+			}
+			if (ImGui::ImageButton((void*)this->scaleToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
+			{
+				//this->currentTool = scaleTool;
+			}
+			if (ImGui::ImageButton((void*)this->entityToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
+			{
+				//this->currentTool = entityTool;
+			}
+			if (ImGui::ImageButton((void*)this->brushToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
+			{
+				//this->currentTool = brushTool;
+			}
+			if (ImGui::ImageButton((void*)this->polygonEditTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
+			{
+				//this->currentTool = polygonEditTool;
+			}
 
 			ImGui::End();
 		}

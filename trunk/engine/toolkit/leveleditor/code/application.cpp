@@ -202,9 +202,6 @@ Application::Open()
 	return false;
 }
 
-
-
-
 void Application::RenderUI()
 {
 	if (this->window->IsOpen())

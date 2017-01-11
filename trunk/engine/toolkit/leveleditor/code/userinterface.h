@@ -3,6 +3,9 @@
 #include <string>
 #include "foundation/math/point.h"
 #include "undo.h"
+#include "tools/basetool.h"
+#include "tools/selecttool.h"
+#include "tools/translatetool.h"
 
 namespace LevelEditor { class Application; }
 
@@ -32,6 +35,12 @@ namespace Toolkit
 		std::string consoleBuffer;
 		std::string a;
 		
+		//Tools
+		Tools::BaseTool* currentTool;
+		
+		Tools::SelectTool* selectTool;
+		Tools::TranslateTool* translateTool;
+
 		///Texture Handles
 		//Toolbar
 		GLuint selectToolTextureHandle;
@@ -41,6 +50,8 @@ namespace Toolkit
 		GLuint entityToolTextureHandle;
 		GLuint brushToolTextureHandle;
 		GLuint polygonEditTextureHandle;
+
+
 	};
 
 }
