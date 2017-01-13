@@ -71,7 +71,7 @@ void RenderDevice::Render(bool drawToScreen)
 	uniformBufferBlock.ScreenSize = this->renderResolution;
 	uniformBufferBlock.TimeAndRandom[0] = (GLfloat)glfwGetTime();
 
-	std::srand(glfwGetTime());
+	std::srand((unsigned int)time(0));
 	uniformBufferBlock.TimeAndRandom[1] = (GLfloat)std::rand();
 
 	uniformBufferBlock.LightTileWorkGroups[0] = LightServer::Instance()->workGroupsX;

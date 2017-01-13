@@ -6,8 +6,6 @@
 //
 
 #ifdef _MSC_VER
-// disable _s warnings
-#define _CRT_SECURE_NO_WARNINGS
 // disable pragma warnings
 #pragma warning( disable : 4068 )
 // standard function missing from MS library
@@ -393,7 +391,7 @@ namespace Util
 
     inline long int String::CharFind(const char &match) const
     {
-        for (size_t i = 0; str[i]; ++i)
+        for (long i = 0; str[i]; ++i)
         {
             if(str[i] == match)
                 return i;

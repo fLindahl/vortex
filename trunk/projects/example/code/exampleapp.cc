@@ -410,8 +410,8 @@ ExampleApp::Run()
             translation.x() += speedIncrease * speedMultiplier;
         }
 
-		Math::mat4 xMat = Math::mat4::rotationx(-keyhandler->mouseX * 0.01f);
-		Math::mat4 yMat = Math::mat4::rotationy(-keyhandler->mouseY * 0.01f);
+		Math::mat4 xMat = Math::mat4::rotationx((float)-keyhandler->mouseX * 0.01f);
+		Math::mat4 yMat = Math::mat4::rotationy((float)-keyhandler->mouseY * 0.01f);
 		Math::mat4 rotation = Math::mat4::multiply(xMat, yMat);
 
 		//Math::mat4 rotation = Math::mat4::rotationyawpitchroll(nvgDegToRad(keyhandler->mouseY) * 0.5f, nvgDegToRad(keyhandler->mouseX) * 0.5f, 0.0f);
@@ -443,7 +443,7 @@ ExampleApp::Run()
 			cursorPosX = (((cursorPosX / this->window->GetWidth()) -0.5f) * 2.0f);
 			cursorPosY = (((cursorPosY / this->window->GetHeight()) - 0.5f) * 2.0f);
 
-            Math::vec4 cursorTransform = Math::vec4(cursorPosX, -cursorPosY, 1.0, 1.0f);
+			Math::vec4 cursorTransform = Math::vec4((float)cursorPosX, (float)-cursorPosY, 1.0, 1.0f);
 
             printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
 

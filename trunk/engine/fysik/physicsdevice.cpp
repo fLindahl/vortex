@@ -452,10 +452,8 @@ bool PhysicsDevice::GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::
 		}
 	}
 
-	if (i >= maxIterations)
-	{
-		return false;
-	}
+	//No collision found
+	return false;
 }
 
 PhysicsDevice::PhysicsCollision PhysicsDevice::EPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex)
@@ -855,7 +853,7 @@ void PhysicsDevice::BroadPhase()
     }
 
     // Compute Variance
-    const float div = 1 / physicsEntities.Size();
+    const float div = 1.0f / (float)physicsEntities.Size();
     v[0] = sqsum[0] - sum[0] * sum[0] * div;
     v[1] = sqsum[1] - sum[1] * sum[1] * div;
     v[2] = sqsum[2] - sum[2] * sum[2] * div;

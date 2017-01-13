@@ -30,8 +30,8 @@ private:
 	typedef std::list<std::shared_ptr<T>>	CommandList;
 	CommandList m_undoList;
 	CommandList m_redoList;
-	int m_nUndoLevel;
-	int m_nCleanCount;
+	size_t m_nUndoLevel;
+	size_t m_nCleanCount;
 	
 	CommandManagerT() :
 		m_nUndoLevel(100),

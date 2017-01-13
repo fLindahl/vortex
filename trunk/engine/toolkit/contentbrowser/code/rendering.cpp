@@ -87,8 +87,8 @@ void Application::DoPicking()
 		Math::mat4 invViewProj = Math::mat4::multiply(invView, invProj);
 		Math::mat4 viewProj = Math::mat4::multiply(view, Graphics::MainCamera::Instance()->getProjectionMatrix());
 
-		double cursorPosX = 0.0f;
-		double cursorPosY = 0.0f;
+		float cursorPosX = 0.0f;
+		float cursorPosY = 0.0f;
 
 		printf("mouse x : %f\n", mouse_pos_in_dock.x / dockSize.x);
 

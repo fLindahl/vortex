@@ -19,12 +19,12 @@ AnimationResource::~AnimationResource()
 
 const AnimationClip& AnimationResource::GetClipByIndex(size_t clipIndex) const
 {
-  return this->animationClips[clipIndex];
+	return this->animationClips[(uint)clipIndex];
 }
 
 const AnimKeyBuffer* AnimationResource::GetKeyBuffer() const
 {
-  return animKeyBuffer;
+	return animKeyBuffer;
 }
 
 const AnimKeyBuffer* AnimationResource::SetupKeyBuffer(size_t numKeys)
@@ -93,7 +93,7 @@ bool AnimationResource::LoadAnimations(const char* fileName)
 		    ptr += sizeof(Nax3Clip);
 
 		    // setup anim clip object
-		    AnimationClip& clip = this->animationClips[clipIndex];
+		    AnimationClip& clip = this->animationClips[(uint)clipIndex];
 		    clip.SetNumCurves(naxClip->numCurves);
 		    clip.SetStartKeyIndex(naxClip->startKeyIndex);
 		    clip.SetNumKeys(naxClip->numKeys);

@@ -145,7 +145,7 @@ void SkinnedCharacter::SetupVertices()
 				fmt = VertexComponent::Float3;
 				break;
 			}
-			this->vertexComponents.push_back(VertexComponent(sem, index, fmt));
+			this->vertexComponents.push_back(VertexComponent(sem, (uint)index, fmt));
 		}
 	}
 }

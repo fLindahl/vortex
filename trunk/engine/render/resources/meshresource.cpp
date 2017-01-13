@@ -114,7 +114,7 @@ namespace Render
 
 		//Count numverices and numindices
 		//Set size and name for our primitive groups
-		for (size_t i = 0; i < scene->mNumMeshes; ++i)
+		for (uint i = 0; i < scene->mNumMeshes; ++i)
 		{
 			//Add to total amount of vertices
 			this->numVertices += scene->mMeshes[i]->mNumVertices;
@@ -128,7 +128,7 @@ namespace Render
 			this->primitiveGroups[i].numIndices = 0;
 
 			//count indices
-			for (size_t j = 0; j < scene->mMeshes[i]->mNumFaces; ++j)
+			for (uint j = 0; j < scene->mMeshes[i]->mNumFaces; ++j)
 			{
 				this->numIndices += scene->mMeshes[i]->mFaces[j].mNumIndices;
 				this->primitiveGroups[i].numIndices += scene->mMeshes[i]->mFaces[j].mNumIndices;
@@ -164,9 +164,9 @@ namespace Render
 						memcpy(this->indexDataPtr, mesh->mFaces[j].mIndices, triangleByteSize);
 						
 						//We need to compensate for appending them to the same indexbuffer. We do this by increasing every index with the sum of the number of vertices that are in the meshes before it
-						*(GLuint*)indexDataPtr = *(GLuint*)this->indexDataPtr + sumNumVertices;
-						*((GLuint*)indexDataPtr + 1) = *((GLuint*)indexDataPtr + 1) + sumNumVertices;
-						*((GLuint*)indexDataPtr + 2) = *((GLuint*)indexDataPtr + 2) + sumNumVertices;
+						*(GLuint*)indexDataPtr = *(GLuint*)this->indexDataPtr + (GLuint)sumNumVertices;
+						*((GLuint*)indexDataPtr + 1) = *((GLuint*)indexDataPtr + 1) + (GLuint)sumNumVertices;
+						*((GLuint*)indexDataPtr + 2) = *((GLuint*)indexDataPtr + 2) + (GLuint)sumNumVertices;
 
 						this->indexDataPtr = (byte*)indexDataPtr + triangleByteSize;
 					}
@@ -517,7 +517,7 @@ namespace Render
 	void MeshResource::Draw(const unsigned int& primitiveGroup)
 	{
 		//glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
-		glDrawElements(GL_TRIANGLES, primitiveGroups[primitiveGroup].numIndices, GL_UNSIGNED_INT, (void*)primitiveGroups[primitiveGroup].indexOffset);
+		glDrawElements(GL_TRIANGLES, (GLsizei)primitiveGroups[primitiveGroup].numIndices, GL_UNSIGNED_INT, (void*)primitiveGroups[primitiveGroup].indexOffset);
 	}
 
 }
