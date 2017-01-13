@@ -6,6 +6,7 @@
 #include "toolkit/tools/style.h"
 #include "nfd.h"
 #include "render/resources/surface.h"
+#include "dirent.h"
 
 namespace Toolkit
 {
@@ -22,6 +23,48 @@ namespace Toolkit
 	UserInterface::~UserInterface()
 	{
 
+	}
+
+	void UserInterface::BrowseDirectory(const char* directory, Util::Array<std::string>& outArray)
+	{
+		DIR *dir;
+		struct dirent *ent;
+		int i = 0;
+		if ((dir = opendir(directory)) != NULL)
+		{
+			//list the files and directories within directory
+			while ((ent = readdir(dir)) != NULL) 
+			{
+				//skip the first two entries as they're not needed.
+				if (i > 1)
+					outArray.Append(ent->d_name);
+
+				i++;
+			}
+			
+		}
+		else
+		{
+			//could not open directory
+			_assert(false, "Could not open surface directory: \"resources/surfaces/\"");
+			return;
+		}
+
+		closedir(dir);
+		return;
+	}
+
+	void UserInterface::ImGuiListDirectory(const char* label, int* selectedItem, Util::Array<std::string>& list)
+	{
+		//We have to convert from std::string to const char* for imgui to accept it. This is ugly as hell, but it works.
+		Util::Array<const char *> cStrArray;
+		for (int i = 0; i < list.Size(); ++i)
+		{
+			cStrArray.Append(list[i].c_str());
+		}
+
+		//Start list at index 2 because otherwise we list "." and ".." too
+		ImGui::ListBox(label, selectedItem, &cStrArray[0], list.Size());
 	}
 
 	void UserInterface::Run()
@@ -58,63 +101,7 @@ namespace Toolkit
 			}
 			ImGui::EndMainMenuBar();
 
-			if (this->openFilePopup){ ImGui::OpenPopup("OpenFile"); }
-			if (this->confirmNewModelPopup){ ImGui::OpenPopup("ConfirmNewModel"); }
-
-			if (ImGui::BeginPopupModal("OpenFile", &this->openFilePopup))
-			{
-				nfdchar_t* outpath;
-				nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outpath);
-
-				if (result = NFD_OKAY)
-				{
-					printf("path: %s\n", outpath);
-					if (this->application->loadedModel != nullptr)
-					{
-						this->application->loadedModel->Deactivate();
-					}
-
-					this->application->loadedModel = std::make_shared<Game::ModelEntity>();
-					
-					this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
-
-					this->application->loadedModel->Activate();
-
-					this->openFilePopup = false;
-					free(outpath);
-				}
-				else if (result == NFD_CANCEL)
-				{
-					printf("User pressed cancel.\n");
-				}
-				else 
-				{
-					printf("Error: %s\n", NFD_GetError());
-					assert(false);
-				}
-
-				ImGui::EndPopup();
-			}
-
-			if (ImGui::BeginPopupModal("ConfirmNewModel", &this->confirmNewModelPopup))
-			{
-				ImGui::SetWindowSize(ImVec2(300, 300), ImGuiSetCond_::ImGuiSetCond_Once);
-
-				ImGui::Text("Are you sure you want to create a new model?");
-				ImGui::Text("Any unsaved progress will be lost.");
-
-				if (ImGui::Button("Yes"))
-				{
-					this->application->NewModel();
-					this->confirmNewModelPopup = false;
-				}
-				if (ImGui::Button("No"))
-				{
-					this->confirmNewModelPopup = false;
-				}
-
-				ImGui::EndPopup();
-			}
+			this->ModalWindows();
 		}
 	}
 
@@ -195,33 +182,11 @@ namespace Toolkit
 					ImGui::Text("Model: %s", this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetName().c_str());
 					ImGui::Text("Mesh: %s", this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetPath().c_str());
 					
+					ImGui::SameLine();
+
 					if (ImGui::Button("Browse...", ImVec2(48, 16)))
 					{
-						nfdchar_t* outpath;
-						nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outpath);
-
-						if (result = NFD_OKAY)
-						{
-							printf("mesh path: %s\n", outpath);
-							
-							this->application->loadedModel->Deactivate();
-							
-							this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->SetMesh(outpath);
-
-							this->application->loadedModel->Activate();
-
-							this->openFilePopup = false;
-							free(outpath);
-						}
-						else if (result == NFD_CANCEL)
-						{
-							//Do nothing
-						}
-						else
-						{
-							printf("Error: %s\n", NFD_GetError());
-							assert(false);
-						}
+						this->meshBrowserPopup = true;
 					}
 
 					ImGui::BeginChild("child", ImVec2(0, 500), true);
@@ -231,33 +196,12 @@ namespace Toolkit
 						for (auto node : this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetModelNodes())
 						{
 							ImGui::Text("Node: %i | Surface: %s", node->primitiveGroup, node->surface->GetPath().c_str());
+							ImGui::SameLine();
 							ImGui::PushID(i);
 							if (ImGui::ImageButton((void*)this->browseButtonTextureHandle, ImVec2(16, 16)))
 							{
-								nfdchar_t* outpath;
-								nfdresult_t result = NFD_OpenDialog("surface", NULL, &outpath);
-
-								if (result = NFD_OKAY)
-								{
-									printf("surface path: %s\n", outpath);
-
-									node->surface->RemoveModelNode(node);
-									auto surface = Render::ResourceServer::Instance()->LoadSurface(outpath);
-									surface->AppendModelNode(node);
-									node->surface = surface.get();
-
-									this->openFilePopup = false;
-									free(outpath);
-								}
-								else if (result == NFD_CANCEL)
-								{
-									//Do nothing
-								}
-								else
-								{
-									printf("Error: %s\n", NFD_GetError());
-									assert(false);
-								}
+								this->surfaceBrowserPopup = true;
+								this->selectedNode = node;
 							}
 							ImGui::PopID();
 							i++;
@@ -270,6 +214,145 @@ namespace Toolkit
 				}
 			}
 			ImGui::EndDock();
+		}
+	}
+
+	void UserInterface::ModalWindows()
+	{
+		if (this->openFilePopup){ ImGui::OpenPopup("OpenFile"); }
+		if (this->confirmNewModelPopup){ ImGui::OpenPopup("New Model"); }
+		if (this->surfaceBrowserPopup){ ImGui::OpenPopup("Surface Browser"); }
+		if (this->meshBrowserPopup){ ImGui::OpenPopup("Mesh Browser"); }
+
+		if (ImGui::BeginPopupModal("OpenFile", &this->openFilePopup))
+		{
+			nfdchar_t* outpath;
+			nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outpath);
+
+			if (result == NFD_OKAY)
+			{
+				printf("path: %s\n", outpath);
+				if (this->application->loadedModel != nullptr)
+				{
+					this->application->loadedModel->Deactivate();
+				}
+
+				this->application->loadedModel = std::make_shared<Game::ModelEntity>();
+
+				this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
+
+				this->application->loadedModel->Activate();
+
+				this->openFilePopup = false;
+				free(outpath);
+			}
+			else if (result == NFD_CANCEL)
+			{
+				this->openFilePopup = false;
+			}
+			else
+			{
+				printf("Error: %s\n", NFD_GetError());
+				assert(false);
+				this->openFilePopup = false;
+			}
+
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::BeginPopupModal("New Model", &this->confirmNewModelPopup, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::SetWindowSize(ImVec2(300, 300), ImGuiSetCond_::ImGuiSetCond_Once);
+
+			ImGui::Text("Are you sure you want to create a new model?\nAny unsaved progress will be lost.\n\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Yes", ImVec2(120, 0)))
+			{
+				this->application->NewModel();
+				this->confirmNewModelPopup = false;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("No", ImVec2(120, 0)))
+			{
+				this->confirmNewModelPopup = false;
+			}
+
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::BeginPopupModal("Surface Browser", &this->surfaceBrowserPopup))
+		{
+			Util::Array<std::string> list;
+
+			static int selected = 0;
+
+			BrowseDirectory("resources/surfaces/", list);
+			ImGuiListDirectory("Surfaces", &selected, list);
+
+			ImGui::Separator();
+
+			//Unique id
+			ImGui::PushID(194985);
+			if (ImGui::Button("Ok", ImVec2(120, 0)))
+			{
+				std::string path = "resources/surfaces/" + list[selected];
+				printf("surface path: %s\n", path.c_str());
+
+				selectedNode->surface->RemoveModelNode(selectedNode);
+				auto surface = Render::ResourceServer::Instance()->LoadSurface(path.c_str());
+				surface->AppendModelNode(selectedNode);
+				selectedNode->surface = surface.get();
+
+				this->surfaceBrowserPopup = false;
+				this->selectedNode = nullptr;
+			}
+			ImGui::PopID();
+			ImGui::SameLine();
+			ImGui::PushID(194986);
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				this->surfaceBrowserPopup = false;
+			}
+			ImGui::PopID();
+
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::BeginPopupModal("Mesh Browser", &this->meshBrowserPopup))
+		{
+			Util::Array<std::string> list;
+
+			static int selected = 0;
+
+			BrowseDirectory("resources/meshes/", list);
+			ImGuiListDirectory("Meshes", &selected, list);
+
+			ImGui::Separator();
+
+			//Unique id
+			ImGui::PushID(194988);
+			if (ImGui::Button("Ok", ImVec2(120, 0)))
+			{
+				std::string path = "resources/meshes/" + list[selected];
+				printf("mesh path: %s\n", path.c_str());
+
+				this->application->loadedModel->Deactivate();
+				this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->SetMesh(path.c_str());
+				this->application->loadedModel->Activate();
+
+				this->meshBrowserPopup = false;
+			}
+			ImGui::PopID();
+			ImGui::SameLine();
+			ImGui::PushID(194989);
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				this->meshBrowserPopup = false;
+			}
+			ImGui::PopID();
+
+			ImGui::EndPopup();
 		}
 	}
 
@@ -292,17 +375,17 @@ namespace Toolkit
 			nfdchar_t* outpath = nullptr;
 			nfdresult_t result = NFD_SaveDialog("mdl", NULL, &outpath);
 
-			std::string newFilePath = outpath;
+			if (result == NFD_OKAY)
+			{
+				std::string newFilePath = outpath;
 			
-			free(outpath);
+				free(outpath);
 
-			if (newFilePath.substr(newFilePath.find_last_of(".") + 1) != "mdl") 
-			{
-				newFilePath.append(".mdl");
-			}			
-
-			if (result = NFD_OKAY)
-			{
+				if (newFilePath.substr(newFilePath.find_last_of(".") + 1) != "mdl") 
+				{
+					newFilePath.append(".mdl");
+				}			
+				
 				this->savePath = newFilePath;
 			}
 			else if (result == NFD_CANCEL)

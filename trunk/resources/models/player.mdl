@@ -1,28 +1,28 @@
 <Vortex>
     <Model name="resources/models/placeholdercube.mdl">
-        <Mesh name="C:\Vortex\resources\meshes\player_bear.fbx">
+        <Mesh name="resources/meshes/player_bear.fbx">
             <Node primitivegroup="0" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="1" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="2" surface="resources/surfaces/placeholder.surface"/>
-            <Node primitivegroup="3" surface="C:\Vortex\resources\surfaces\placeholder.surface"/>
+            <Node primitivegroup="3" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="4" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="5" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="6" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="7" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="8" surface="resources/surfaces/placeholder.surface"/>
-            <Node primitivegroup="9" surface="C:\Vortex\resources\surfaces\player.surface"/>
+            <Node primitivegroup="9" surface="resources/surfaces/player.surface"/>
             <Node primitivegroup="10" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="11" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="12" surface="resources/surfaces/placeholder.surface"/>
-            <Node primitivegroup="13" surface="C:\Vortex\resources\surfaces\player.surface"/>
-            <Node primitivegroup="14" surface="C:\Vortex\resources\surfaces\player.surface"/>
+            <Node primitivegroup="13" surface="resources/surfaces/player.surface"/>
+            <Node primitivegroup="14" surface="resources/surfaces/player.surface"/>
             <Node primitivegroup="15" surface="resources/surfaces/placeholder.surface"/>
-            <Node primitivegroup="16" surface="C:\Vortex\resources\surfaces\rock.surface"/>
+            <Node primitivegroup="16" surface="resources/surfaces/rock.surface"/>
             <Node primitivegroup="17" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="18" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="19" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="20" surface="resources/surfaces/placeholder.surface"/>
-            <Node primitivegroup="21" surface="C:\Vortex\resources\surfaces\player.surface"/>
+            <Node primitivegroup="21" surface="resources/surfaces/player.surface"/>
         </Mesh>
     </Model>
 </Vortex>
