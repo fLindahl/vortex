@@ -5,6 +5,7 @@
 #include "render/resources/surface.h"
 #include "render/resources/meshresource.h"
 #include "render/properties/graphicsproperty.h"
+#include "render/resources/modelinstance.h"
 
 namespace Render
 {
@@ -63,56 +64,59 @@ void FlatGeometryLitPass::Execute()
                 }
             }
 
-            for (ModelInstance* modelInstance : surface->getModelInstances())
+            for (auto modelNode : surface->GetModelNodes())
             {
-                //Bind mesh
-                //TODO: We should probably check and make sure we don't bind these more than once
-                modelInstance->GetMesh()->Bind();
+				//Make sure we only handle models with graphics properties
+				if (modelNode->modelInstance->GetGraphicsProperties().Size() > 0)
+				{
+					//Bind mesh
+					//TODO: We should probably check and make sure we don't bind these more than once
+					modelNode->modelInstance->GetMesh()->Bind();
 
+					for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())
+					{
+						shader->setModelMatrix(graphicsProperty->getModelMatrix());
 
-                for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
-                {
-                    shader->setModelMatrix(graphicsProperty->getModelMatrix());
+						//HACK: This is disgusting
+						if (graphicsProperty->outline)
+						{
+							glClearStencil(0);
+							glClear(GL_STENCIL_BUFFER_BIT);
 
-                    //HACK: This is disgusting
-                    if (graphicsProperty->outline)
-                    {
-                        glClearStencil(0);
-                        glClear(GL_STENCIL_BUFFER_BIT);
+							// Render the mesh into the stencil buffer.
+							glEnable(GL_STENCIL_TEST);
+							glStencilFunc(GL_ALWAYS, 1, -1);
+							glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-                        // Render the mesh into the stencil buffer.
-                        glEnable(GL_STENCIL_TEST);
-                        glStencilFunc(GL_ALWAYS, 1, -1);
-                        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+							modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
 
-                        modelInstance->GetMesh()->Draw();
+							// Render the thick wireframe version.
+							auto p = ShaderServer::Instance()->LoadShader("outline");
+							glUseProgram(p->GetProgram());
 
-                        // Render the thick wireframe version.
-                        auto p = ShaderServer::Instance()->LoadShader("outline");
-                        glUseProgram(p->GetProgram());
+							p->setModelMatrix(graphicsProperty->getModelMatrix());
 
-                        p->setModelMatrix(graphicsProperty->getModelMatrix());
+							glStencilFunc(GL_NOTEQUAL, 1, -1);
+							glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-                        glStencilFunc(GL_NOTEQUAL, 1, -1);
-                        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+							glLineWidth(3.0f);
+							glPolygonMode(GL_FRONT, GL_LINE);
 
-                        glLineWidth(3.0f);
-                        glPolygonMode(GL_FRONT, GL_LINE);
+							modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
 
-                        modelInstance->GetMesh()->Draw();
+							glPolygonMode(GL_FRONT, GL_FILL);
+							glDisable(GL_STENCIL_TEST);
 
-                        glPolygonMode(GL_FRONT, GL_FILL);
-                        glDisable(GL_STENCIL_TEST);
+							glUseProgram(currentProgram);
+						}
+						else
+						{
+							modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
+						}
+					}
 
-                        glUseProgram(currentProgram);
-                    }
-                    else
-                    {
-                        modelInstance->GetMesh()->Draw();
-                    }
-                }
-
-                modelInstance->GetMesh()->Unbind();
+					modelNode->modelInstance->GetMesh()->Unbind();
+				}
             }
         }
     }

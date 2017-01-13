@@ -310,8 +310,11 @@ void PhysicsDevice::Solve()
         rigidbody->update(this->frameTime);
     }
 
-    BroadPhase();
-    NarrowPhase();
+	if (PhysicsServer::Instance()->physicsEntities.Size() > 0)
+	{
+		BroadPhase();
+		NarrowPhase();
+	}
 
 	//Update Derivative Quantities (transforms and such)
 	for (auto rigidbody : this->rigidBodies)

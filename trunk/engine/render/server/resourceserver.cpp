@@ -247,6 +247,7 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
 		mat->surfaces.Append(sur);
 
         sur->name = filepath;
+		sur->filePath = filepath;
         sur->material = mat;
 
         // Get all parameters that this surface overrides
@@ -299,6 +300,116 @@ bool ResourceServer::HasSurfaceNamed(const std::string &nName)
         return true;
     else
         return false;
+}
+
+std::shared_ptr<ModelInstance> ResourceServer::LoadModel(const char* filepath)
+{
+	if (this->HasModelNamed(filepath))
+		return this->modelInstances[filepath];
+
+	tinyxml2::XMLDocument data;
+	int result = data.LoadFile(filepath);
+
+	if (result != 0)
+	{
+		printf("ERROR: Could not load .mdl file!");
+
+#ifdef DEBUG
+		assert(false);
+#endif // DEBUG
+
+		return false;
+	}
+
+	tinyxml2::XMLElement* model = data.RootElement()->FirstChildElement();
+
+	const tinyxml2::XMLAttribute* name = model->FirstAttribute();
+
+	// create our surface
+	std::shared_ptr<ModelInstance> mdl = std::make_shared<ModelInstance>();
+
+	//Append this surface to materials surfacelist
+	this->modelInstances.insert(std::make_pair(filepath,mdl));
+
+	mdl->name = filepath;
+	
+	// Get all parameters that this surface overrides
+	const tinyxml2::XMLElement* mesh = model->FirstChildElement("Mesh");
+	
+	Util::String meshName = mesh->FirstAttribute()->Value();
+
+	mdl->mesh = this->LoadMesh(meshName.c_str());
+	
+	const tinyxml2::XMLElement* nodeElement = mesh->FirstChildElement("Node");
+
+	while (nodeElement != nullptr)
+	{
+		ModelNode* node = new ModelNode;
+
+		node->modelInstance = mdl.get();
+		node->primitiveGroup = nodeElement->FindAttribute("primitivegroup")->IntValue();
+
+		auto surface = this->LoadSurface(nodeElement->FindAttribute("surface")->Value());
+		node->surface = surface.get();
+
+		mdl->modelNodes.Append(node);
+		surface->modelNodes.Append(node);
+
+		nodeElement = nodeElement->NextSiblingElement("Node");
+	}
+	
+	return mdl;
+}
+
+bool ResourceServer::HasModelNamed(const std::string &nName)
+{
+	if (this->surfaces.count(nName) > 0)
+		return true;
+	else
+		return false;
+}
+
+Util::Array<std::shared_ptr<Render::Surface>> ResourceServer::LoadMTLFile(const char* filepath)
+{
+	//Load surfaces/textures/materials
+	FILE * file = fopen(filepath, "r");
+	if (file == NULL){
+		printf("ERROR: Cannot load .mtl scene!\n");
+		assert(false);
+		fclose(file);
+	}
+
+	Util::Array<std::shared_ptr<Render::Surface>> surfaces;
+
+	const std::string directory = "resources/scenes/surfaces/";
+
+	std::string surfaceName;
+
+	//Loop through the .mtl file and load surfaces for everything in order
+	while (true)
+	{
+		char lineHeader[128];
+		// read the first word of the line
+		int res = fscanf(file, "%s", lineHeader);
+		if (res == EOF)
+			break;
+
+		if (strcmp(lineHeader, "newmtl") == 0)
+		{
+			char s[128];
+			fscanf(file, "%s\n", s);
+			surfaceName = s;
+			//Append directory and extension.
+			surfaceName = directory + surfaceName;
+			surfaceName.append(".surface");
+			
+			surfaces.Append(LoadSurface(surfaceName.c_str()));
+		}
+	}
+
+	fclose(file);
+
+	return surfaces;
 }
 
 

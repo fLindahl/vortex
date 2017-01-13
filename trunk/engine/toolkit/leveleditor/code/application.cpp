@@ -12,6 +12,7 @@
 #include "imgui.h"
 #include "render/server/frameserver.h"
 #include "render/server/lightserver.h"
+#include "application/basegamefeature/managers/scenemanager.h"
 
 #include "application/basegamefeature/keyhandler.h"
 
@@ -82,10 +83,14 @@ Application::Open()
 		this->rayStart = Math::vec4::zerovector();
 		this->rayEnd = Math::vec4::zerovector();
 		
+		//Load Sponza
+		//this->sponza = std::make_shared<Game::ModelEntity>();
+		//this->sponza->SetModel(BaseGameFeature::SceneManager::Instance()->LoadOBJScene("resources/scenes/sponza.obj", "resources/scenes/sponza.mtl"));
+		//this->sponza->Activate();
+		//this->sponza->SetTransform(Math::mat4::scaling(0.2f, 0.2f, 0.2f));
+
 		// Load Scene
-		modelInstanceScene = std::make_shared<Render::ModelInstance>();
-		modelInstanceScene->SetSurface("resources/surfaces/rock.surface");
-		modelInstanceScene->SetMesh("resources/models/groundfloor.obj");
+		modelInstanceScene = ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl");
 
 		SceneEntity1 = std::make_shared<Game::StaticEntity>();
         SceneEntity2 = std::make_shared<Game::StaticEntity>();
@@ -109,32 +114,24 @@ Application::Open()
         SceneEntity6->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
 		
 		SceneEntity1->Activate();
-        SceneEntity2->Activate();
-        SceneEntity3->Activate();
+		SceneEntity2->Activate();
+		SceneEntity3->Activate();
         SceneEntity4->Activate();
         SceneEntity5->Activate();
         SceneEntity6->Activate();
 		
-		modelInstance = std::make_shared<Render::ModelInstance>();
-		modelInstance1 = std::make_shared<Render::ModelInstance>();
+		modelInstance = ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl");
 
 		rigidBodyEntity1 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity2 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity3 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity4 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity5 = std::make_shared<Game::RigidBodyEntity>();
-		
-		modelInstance->SetSurface("resources/surfaces/player.surface");
-		modelInstance->SetMesh("resources/models/kung.obj");
-		
-		modelInstance1->SetSurface("resources/surfaces/placeholder.surface");
-		modelInstance1->SetMesh("resources/models/cube.obj");
 
-
-		rigidBodyEntity1->SetModel(modelInstance1);
-		rigidBodyEntity2->SetModel(modelInstance1);
-		rigidBodyEntity3->SetModel(modelInstance1);
-		rigidBodyEntity4->SetModel(modelInstance1);
+		rigidBodyEntity1->SetModel(modelInstance);
+		rigidBodyEntity2->SetModel(modelInstance);
+		rigidBodyEntity3->SetModel(modelInstance);
+		rigidBodyEntity4->SetModel(modelInstance);
 		rigidBodyEntity5->SetModel(modelInstance);
 
 		Math::mat4 transf1 = Math::mat4::translation(2.0f, -0.5f, 1.5f);
@@ -149,26 +146,11 @@ Application::Open()
 		this->rigidBodyEntity4->SetTransform(transf4);
         this->rigidBodyEntity5->SetTransform(transf5);
 
-        const int numEntsX = 1;
-        const int numEntsY = 1;
-
-        for (int i = 0; i < numEntsX; ++i) {
-            for (int j = 0; j < numEntsY; ++j) {
-                std::shared_ptr<Game::RigidBodyEntity> ent = std::make_shared<Game::RigidBodyEntity>();
-                RBEs.Append(ent);
-				ent->SetModel(modelInstance1);
-
-                Math::mat4 transf1 = Math::mat4::translation(i*1.001f - (numEntsX/2), numEntsY/4 + j*1.001f, 5.0f);
-                ent->SetTransform(transf1);
-                ent->Activate();
-            }
-        }
-
-        //rigidBodyEntity1->Activate();
-        //rigidBodyEntity2->Activate();
-        //rigidBodyEntity3->Activate();
-        //rigidBodyEntity4->Activate();
-        //rigidBodyEntity5->Activate();
+        rigidBodyEntity1->Activate();
+        rigidBodyEntity2->Activate();
+        rigidBodyEntity3->Activate();
+        rigidBodyEntity4->Activate();
+        rigidBodyEntity5->Activate();
 
 		PointLight pLight;
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);

@@ -34,7 +34,8 @@ namespace Render
 			return false;
 		}
 
-		this->name = filename;//mesh->mName.C_Str();
+		this->filePath = filename;
+		this->name = filename;
 
 		//Start by checking our vertex width and number of vertices so that we can reserve memory
 		//We use the first mesh for determining our vertexlayout and vertexwidth. 
@@ -81,32 +82,32 @@ namespace Render
 			this->vertexWidth += 2;
 		}
 		//HACK: Our shaders don't support this yet, so we just ignore it.
-		//if (mesh->HasTextureCoords(1))
-		//{
-		//	VertexComponent::SemanticName sem = VertexComponent::TexCoord2;
-		//	VertexComponent::Format fmt = VertexComponent::Float2;
-		//	this->vertexComponents.Append(VertexComponent(sem, 1, fmt));
-		//	this->vertexWidth += 2;
-		//}
-		//if (mesh->HasTangentsAndBitangents())
-		//{
-		//	VertexComponent::SemanticName sem = VertexComponent::Tangent;
-		//	VertexComponent::Format fmt = VertexComponent::Float3;
-		//	this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
-		//	this->vertexWidth += 3;
-		//
-		//	sem = VertexComponent::Binormal;
-		//	fmt = VertexComponent::Float3;
-		//	this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
-		//	this->vertexWidth += 3;
-		//}
-		//if (mesh->HasVertexColors(0))
-		//{
-		//	VertexComponent::SemanticName sem = VertexComponent::Color;
-		//	VertexComponent::Format fmt = VertexComponent::Float3;
-		//	this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
-		//	this->vertexWidth += 3;
-		//}
+		if (mesh->HasTextureCoords(1))
+		{
+			VertexComponent::SemanticName sem = VertexComponent::TexCoord2;
+			VertexComponent::Format fmt = VertexComponent::Float2;
+			this->vertexComponents.Append(VertexComponent(sem, 1, fmt));
+			this->vertexWidth += 2;
+		}
+		if (mesh->HasTangentsAndBitangents())
+		{
+			VertexComponent::SemanticName sem = VertexComponent::Tangent;
+			VertexComponent::Format fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+		
+			sem = VertexComponent::Binormal;
+			fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+		}
+		if (mesh->HasVertexColors(0))
+		{
+			VertexComponent::SemanticName sem = VertexComponent::Color;
+			VertexComponent::Format fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+		}
 
 		//Sort to make sure that our components are in the correct order when we construct our vertexbuffer
 		this->vertexComponents.Sort();
@@ -121,6 +122,8 @@ namespace Render
 			this->primitiveGroups[i].name = scene->mMeshes[i]->mName.C_Str();
 			//this->primitiveGroups[i].numVertices = scene->mMeshes[i]->mNumVertices;
 			//this->primitiveGroups[i].vertexDataSize = this->primitiveGroups[i].numVertices * this->vertexWidth * sizeof(GLfloat);
+
+			this->primitiveGroups[i].surfaceIndex = scene->mMeshes[i]->mMaterialIndex - 1;
 
 			this->primitiveGroups[i].numIndices = 0;
 
@@ -280,6 +283,7 @@ namespace Render
 		this->N2File = true;
 
 		this->name = filename;
+		this->filePath = filename;
 
 		// obtain file size:
 		fseek(file, 0, SEEK_END);
@@ -510,10 +514,10 @@ namespace Render
 		glBindVertexArray(0);
 	}
 
-	void MeshResource::Draw()
+	void MeshResource::Draw(const unsigned int& primitiveGroup)
 	{
-		glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
-		//glDrawElements(GL_TRIANGLES, primitiveGroups.Back().numIndices, GL_UNSIGNED_INT, (void*)primitiveGroups.Back().indexOffset);
+		//glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
+		glDrawElements(GL_TRIANGLES, primitiveGroups[primitiveGroup].numIndices, GL_UNSIGNED_INT, (void*)primitiveGroups[primitiveGroup].indexOffset);
 	}
 
 }
