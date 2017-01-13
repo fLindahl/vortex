@@ -78,8 +78,8 @@ ExampleApp::Open()
 		
 		// Load Scene
 		modelInstanceScene = std::make_shared<Render::ModelInstance>();
-		modelInstanceScene->SetSurface("resources/surfaces/rock.surface");
-		modelInstanceScene->SetMesh("resources/models/groundfloor.obj");
+		//modelInstanceScene->SetSurface("resources/surfaces/rock.surface");
+		//modelInstanceScene->SetMesh("resources/models/groundfloor.obj");
 
 		SceneEntity1 = std::make_shared<Game::StaticEntity>();
         SceneEntity2 = std::make_shared<Game::StaticEntity>();
@@ -118,11 +118,11 @@ ExampleApp::Open()
 		rigidBodyEntity4 = std::make_shared<Game::RigidBodyEntity>();
 		rigidBodyEntity5 = std::make_shared<Game::RigidBodyEntity>();
 
-		modelInstance->SetSurface("resources/surfaces/player.surface");
-		modelInstance->SetMesh("resources/models/kung.obj");
+		//modelInstance->SetSurface("resources/surfaces/player.surface");
+		//modelInstance->SetMesh("resources/models/kung.obj");
 
-		modelInstance1->SetSurface("resources/surfaces/placeholder.surface");
-		modelInstance1->SetMesh("resources/models/cube.obj");
+		//modelInstance1->SetSurface("resources/surfaces/placeholder.surface");
+		//modelInstance1->SetMesh("resources/models/cube.obj");
 
 		PointLight pLight;
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);

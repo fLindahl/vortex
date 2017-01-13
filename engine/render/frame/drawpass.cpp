@@ -68,20 +68,19 @@ void DrawPass::Execute()
                 }
             }
 
-            for (ModelInstance* modelInstance : surface->getModelInstances())
+            for (auto modelNode : surface->GetModelNodes())
             {
                 //Bind mesh
                 //TODO: We should probably check and make sure we don't bind these more than once
-                modelInstance->GetMesh()->Bind();
+                modelNode->modelInstance->GetMesh()->Bind();
 
-
-                for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
+                for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())
                 {
                     shader->setModelMatrix(graphicsProperty->getModelMatrix());
-                    modelInstance->GetMesh()->Draw();
+                    modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
                 }
 
-                modelInstance->GetMesh()->Unbind();
+                modelNode->modelInstance->GetMesh()->Unbind();
             }
         }
     }

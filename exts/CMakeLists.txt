@@ -44,4 +44,28 @@ TARGET_LINK_LIBRARIES(imgui PUBLIC exts)
 TARGET_INCLUDE_DIRECTORIES(imgui PUBLIC imgui imgui/examples/opengl3_example)
 SET_TARGET_PROPERTIES(imgui PROPERTIES FOLDER "exts/imgui")
 
+IF(CMAKE_COMPILER_IS_GNUCXX)
+	SET(files_nativefiledialog
+	nativefiledialog/src/nfd_gtk.cpp
+	)
+ENDIF()
+
+IF(MSVC)
+	SET(files_nativefiledialog
+	nativefiledialog/src/nfd_win.cpp
+	)
+ENDIF()	
+
+ADD_LIBRARY(nativefiledialog STATIC
+			nativefiledialog/src/include/nfd.h
+			nativefiledialog/src/nfd_common.h
+			nativefiledialog/src/nfd_common.c
+			${files_nativefiledialog}
+			)
+			
+
+TARGET_LINK_LIBRARIES(nativefiledialog PUBLIC exts)
+TARGET_INCLUDE_DIRECTORIES(nativefiledialog PUBLIC nativefiledialog nativefiledialog/src/include)
+SET_TARGET_PROPERTIES(nativefiledialog PROPERTIES FOLDER "exts/nativefiledialog")
+			
 TARGET_LINK_LIBRARIES(exts INTERFACE imgui nanovg)

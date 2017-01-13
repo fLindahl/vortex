@@ -5,6 +5,8 @@
 SET(files_application_basegamefeature
 	basegamefeature/managers/entitymanager.h
 	basegamefeature/managers/entitymanager.cpp
+	basegamefeature/managers/scenemanager.h
+	basegamefeature/managers/scenemanager.cpp
 	basegamefeature/keyhandler.h
 	basegamefeature/keyhandler.cpp
 	)
@@ -12,6 +14,8 @@ SET(files_application_basegamefeature
 SET(files_application_game
 	game/entity.h
 	game/entity.cpp
+	game/modelentity.h
+	game/modelentity.cpp
 	game/baseproperty.h
 	game/rigidbodyentity.h
 	game/staticentity.h

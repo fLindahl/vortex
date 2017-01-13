@@ -18,6 +18,10 @@ namespace Render
 		//name of this primitivegroup
 		std::string name;
 
+		///Surfaceindex for this primitivegroup.
+		///Warning: Do not use this unless you know what you're doing! (read: Consulting Fredrik)
+		unsigned int surfaceIndex;
+
 		//Pointer to this primitivegroups first element in the total buffer
 		size_t indexOffset;
 
@@ -47,12 +51,12 @@ public:
 	/// Unbind VAO
 	void Unbind();
 	///Draw elements
-	void Draw();
+	void Draw(const unsigned int& primitiveGroup = 0);
 
 	void* getMesh();
 	void* getIndices();
 
-	const PrimitiveGroup& getPrimitiveGroup(const int& i);
+	const PrimitiveGroup& getPrimitiveGroup(const int& i) { return this->primitiveGroups[i]; }
 
 	///Total amount of indices in mesh
 	size_t getNumIndices() { return this->numIndices; }
@@ -61,14 +65,18 @@ public:
 	///Returns the amount of floats that a vertex contains
 	uint getVertexWidth() { return this->vertexWidth; }
 
+	uint getNumPrimitiveGroups() { return this->primitiveGroups.Size(); }
+
 	///Returns the base bbox for this entity.
 	Math::bbox getBaseBBox() { return this->bbox; }
 
 	std::string GetName() { return this->name; }
-	
+	std::string GetPath() { return this->filePath; }
+
 private:
 	// The filename for this mesh
 	std::string name;
+	std::string filePath;
 
 	Math::bbox bbox;
 	///Contains all PrimitiveGroups vertices/indices

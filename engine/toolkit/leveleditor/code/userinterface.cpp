@@ -3,7 +3,11 @@
 #include "imgui.h"
 #include "application.h"
 #include "render/server/frameserver.h"
-#include "style.h"
+#include "toolkit/tools/style.h"
+
+#include "basetool.h"
+#include "selecttool.h"
+#include "translatetool.h"
 
 #define CONSOLE_BUFFER_SIZE 8096
 
@@ -30,7 +34,7 @@ namespace Toolkit
 
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
-		ImGui::LoadDock();
+		ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout");
 	}
 
 	UserInterface::~UserInterface()
@@ -110,8 +114,8 @@ namespace Toolkit
 
 		if (ImGui::BeginMenu("Layout"))
 		{
-			if (ImGui::MenuItem("Save Layout...")) { ImGui::SaveDock("layout/default.layout"); }
-			if (ImGui::MenuItem("Load Layout...")) { ImGui::LoadDock(); }
+			if (ImGui::MenuItem("Save Layout...")) { ImGui::SaveDock("engine/toolkit/leveleditor/layout/default.layout"); }
+			if (ImGui::MenuItem("Load Layout...")) { ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout"); }
 			ImGui::EndMenu();
 		}
 
