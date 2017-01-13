@@ -95,7 +95,7 @@ void Application::DoPicking()
 		// Transform to world coordinates
 		cursorPosX = (((mouse_pos_in_dock.x / dockSize.x) - 0.5f) * 2.0f);
 		cursorPosY = (((mouse_pos_in_dock.y / dockSize.y) - 0.5f) * 2.0f);
-		Math::vec4 cursorTransform = Math::vec4(cursorPosX, cursorPosY, 1.0, 1.0f);
+		Math::vec4 cursorTransform = Math::vec4((float)cursorPosX, (float)cursorPosY, 1.0, 1.0f);
 
 		printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
 

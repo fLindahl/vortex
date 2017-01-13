@@ -83,7 +83,7 @@ void ModelInstance::SetMesh(const char* file)
 	this->modelNodes.Clear();
 
 	//Fill up modelnodes with placeholder surface	
-	for (size_t i = 0; i < this->mesh->getNumPrimitiveGroups(); i++)
+	for (uint i = 0; i < this->mesh->getNumPrimitiveGroups(); i++)
 	{
 		ModelNode* node = new ModelNode();
 		node->modelInstance = this;

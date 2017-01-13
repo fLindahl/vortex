@@ -186,7 +186,7 @@ std::vector<Math::mat4> CharacterSkeleton::EvaluateSkeleton(const int &animIndex
     CharacterJoint* joint = this->jointArray[index];
     //joint->ResetMatrix();
     
-    int numJointCurves = clip.GetNumCurves() / jointArray.size();
+    size_t numJointCurves = clip.GetNumCurves() / jointArray.size();
     
 	Math::vec4 jointTranslation;
 	Math::vec4 nextJointTranslation;
@@ -200,11 +200,11 @@ std::vector<Math::mat4> CharacterSkeleton::EvaluateSkeleton(const int &animIndex
 	Math::vec4 jointVelocity;
 	Math::vec4 nextJointVelocity;
     
-    int nextAnimationFrame = (animationFrame + 1 >= clip.GetNumKeys() ? 0 : animationFrame + 1);
+    size_t nextAnimationFrame = (animationFrame + 1 >= clip.GetNumKeys() ? 0 : animationFrame + 1);
     
     for (int i = 0; i < numJointCurves; i++)
     {
-		AnimCurve jointCurve = clip.CurveByIndex((index * numJointCurves) + i);
+		AnimCurve jointCurve = clip.CurveByIndex(((int)index * (int)numJointCurves) + i);
       
 		Math::vec4* key = (keyBuffer->GetKeyBufferPointer() + (jointCurve.GetFirstKeyIndex() + animationFrame * clip.GetKeyStride()));
       

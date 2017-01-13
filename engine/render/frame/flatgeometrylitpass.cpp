@@ -39,12 +39,12 @@ void FlatGeometryLitPass::Execute()
         //TODO: Per surface
         for (auto surface : material->SurfaceList())
         {
-            for (index_t i = 0; i < surface->TextureList().Size(); i++)
+            for (GLuint i = 0; i < surface->TextureList().Size(); i++)
             {
                 surface->TextureList()[i]->BindTexture(i); //TODO: slot?
             }
 
-            for (index_t i = 0; i < surface->ParameterList().Size(); i++)
+            for (GLuint i = 0; i < surface->ParameterList().Size(); i++)
             {
                 //TODO: Move this elsewhere
                 switch (surface->ParameterList()[i]->var.GetType())

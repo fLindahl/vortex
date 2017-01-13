@@ -31,7 +31,7 @@ public:
     /// assignment operator
     void operator=(const Array<TYPE>& rhs);
     /// [] operator
-    TYPE& operator[](uint index) const;
+    TYPE& operator[](const size_t& index) const;
     /// equality operator
     bool operator==(const Array<TYPE>& rhs) const;
     /// inequality operator
@@ -57,29 +57,29 @@ public:
     bool IsEmpty() const;
 
     /// erase element at index, keep sorting intact. NOTE: Calls destructor. See Remove-functions for not calling destructors.
-    void EraseIndex(uint index);
+    void EraseIndex(size_t index);
     /// erase element pointed to by iterator, keep sorting intact. NOTE: Calls destructor. See Remove-functions for not calling destructors.
     Iterator Erase(Iterator iter);
     /// erase element at index, fill gap by swapping in last element, destroys sorting!. NOTE: Calls destructor. See Remove-functions for not calling destructors.
-    void EraseIndexSwap(uint index);
+    void EraseIndexSwap(size_t index);
     /// erase element at iterator, fill gap by swapping in last element, destroys sorting!. NOTE: Calls destructor. See Remove-functions for not calling destructors.
     Iterator EraseSwap(Iterator iter);
 
 	/// remove element at index, keep sorting intact. NOTE: Does not call destructor. See Erase-functions for calling destructors.
-	void RemoveIndex(uint index);
+	void RemoveIndex(size_t index);
 	/// remove element pointed to by iterator, keep sorting intact. NOTE: Does not call destructor. See Erase-functions for calling destructors.
 	Iterator Remove(Iterator iter);
 	/// remove element at index, fill gap by swapping in last element, destroys sorting!. NOTE: Does not call destructor. See Erase-functions for calling destructors.
-	void RemoveIndexSwap(uint index);
+	void RemoveIndexSwap(size_t index);
 	/// remove element at iterator, fill gap by swapping in last element, destroys sorting!. NOTE: Does not call destructor. See Erase-functions for calling destructors.
 	Iterator RemoveSwap(Iterator iter);
 
     /// insert element before element at index
-    void Insert(uint index, const TYPE& elm);
+    void Insert(size_t index, const TYPE& elm);
     /// insert element into sorted array, return index where element was included
-    uint InsertSorted(const TYPE& elm);
+    size_t InsertSorted(const TYPE& elm);
     /// insert element at the first non-identical position, return index of inclusion position
-    uint InsertAtEndOfIdenticalRange(uint startIndex, const TYPE& elm);
+	size_t InsertAtEndOfIdenticalRange(size_t startIndex, const TYPE& elm);
     /// test if the array is sorted, this is a slow operation!
     bool IsSorted() const;
     /// clear array (calls destructors)
@@ -93,9 +93,9 @@ public:
     /// find identical element in array, return iterator
     Iterator Find(const TYPE& elm) const;
     /// find identical element in array, return index, InvalidIndex if not found
-    uint FindIndex(const TYPE& elm) const;
+	size_t FindIndex(const TYPE& elm) const;
     /// fill array range with element
-    void Fill(uint first, size_t num, const TYPE& elm);
+	void Fill(size_t first, size_t num, const TYPE& elm);
     /// clear contents and preallocate with new attributes
     void Realloc(size_t capacity, size_t grow);
     /// returns new array with elements which are not in rhs (slow!)
@@ -105,7 +105,7 @@ public:
 	/// sort with custom function
 	void SortWithFunc(bool (*func)(const TYPE& lhs, const TYPE& rhs));
     /// do a binary search, requires a sorted array
-    uint BinarySearchIndex(const TYPE& elm) const;
+	size_t BinarySearchIndex(const TYPE& elm) const;
 
 private:
     /// destroy an element (call destructor without freeing memory)
@@ -119,7 +119,7 @@ private:
     /// grow array to target size
     void GrowTo(size_t newCapacity);
     /// move elements, grows array if needed
-    void Move(uint fromIndex, uint toIndex);
+    void Move(size_t fromIndex, size_t toIndex);
 
     static const size_t MinGrowSize = 16;
     static const size_t MaxGrowSize = 65536; // FIXME: big grow size needed for mesh tools
@@ -181,7 +181,7 @@ Array<TYPE>::Array(size_t initialSize, size_t _grow, const TYPE& initialValue) :
     if (initialSize > 0)
     {
         this->elements = new TYPE[this->capacity];
-        uint i;
+		size_t i;
         for (i = 0; i < initialSize; i++)
         {
             this->elements[i] = initialValue;
@@ -206,7 +206,7 @@ Array<TYPE>::Copy(const Array<TYPE>& src)
     if (this->capacity > 0)
     {
         this->elements = new TYPE[this->capacity];
-        uint i;
+		size_t i;
         for (i = 0; i < this->size; i++)
         {
             this->elements[i] = src.elements[i];
@@ -293,7 +293,7 @@ Array<TYPE>::operator=(const Array<TYPE>& rhs)
         {
             // source array fits into our capacity, copy in place
             assert(0 != this->elements);
-            uint i;
+			size_t i;
             for (i = 0; i < rhs.size; i++)
             {
                 this->elements[i] = rhs.elements[i];
@@ -326,7 +326,7 @@ Array<TYPE>::GrowTo(size_t newCapacity)
     if (this->elements)
     {
         // copy over contents
-        uint i;
+		size_t i;
         for (i = 0; i < this->size; i++)
         {
             newArray[i] = this->elements[i];
@@ -374,7 +374,7 @@ Array<TYPE>::Grow()
 	07-Dec-04	jo		bugfix: neededSize >= this->capacity => neededSize > capacity	
 */
 template<class TYPE> void
-Array<TYPE>::Move(uint fromIndex, uint toIndex)
+Array<TYPE>::Move(size_t fromIndex, size_t toIndex)
 {
     // nothing to move?
     if (fromIndex == toIndex)
@@ -395,7 +395,7 @@ Array<TYPE>::Move(uint fromIndex, uint toIndex)
     if (fromIndex > toIndex)
     {
         // this is a backward move
-        uint i;
+        size_t i;
         for (i = 0; i < num; i++)
         {
             this->elements[toIndex + i] = this->elements[fromIndex + i];
@@ -410,7 +410,7 @@ Array<TYPE>::Move(uint fromIndex, uint toIndex)
     else
     {
         // this is a forward move
-        int i;  // NOTE: this must remain signed for the following loop to work!!!
+        size_t i;  // NOTE: this must remain signed for the following loop to work!!!
         for (i = num - 1; i >= 0; --i)
         {
             this->elements[toIndex + i] = this->elements[fromIndex + i];
@@ -447,7 +447,7 @@ Array<TYPE>::Append(const TYPE& elm)
 template<class TYPE> void
 Array<TYPE>::AppendArray(const Array<TYPE>& rhs)
 {
-    uint i;
+	size_t i;
     size_t num = rhs.Size();
     for (i = 0; i < num; i++)
     {
@@ -499,7 +499,7 @@ Array<TYPE>::Capacity() const
     a range check, which may throw an assertion.
 */
 template<class TYPE> TYPE&
-Array<TYPE>::operator[](uint index) const
+Array<TYPE>::operator[](const size_t& index) const
 {
     return this->elements[index];
 }
@@ -514,7 +514,7 @@ Array<TYPE>::operator==(const Array<TYPE>& rhs) const
 {
     if (rhs.Size() == this->Size())
     {
-        uint i;
+		size_t i;
         size_t num = this->Size();
         for (i = 0; i < num; i++)
         {
@@ -573,7 +573,7 @@ Array<TYPE>::IsEmpty() const
 /**
 */
 template<class TYPE> void
-Array<TYPE>::EraseIndex(uint index)
+Array<TYPE>::EraseIndex(size_t index)
 {
     if (index == (this->size - 1))
     {
@@ -592,10 +592,10 @@ Array<TYPE>::EraseIndex(uint index)
     NOTE: this method is fast but destroys the sorting order!
 */
 template<class TYPE> void
-Array<TYPE>::EraseIndexSwap(uint index)
+Array<TYPE>::EraseIndexSwap(size_t index)
 {
     // swap with last element, and destroy last element
-    uint lastElementIndex = this->size - 1;
+	size_t lastElementIndex = this->size - 1;
     if (index < lastElementIndex)
     {
         this->elements[index] = this->elements[lastElementIndex];
@@ -610,7 +610,7 @@ Array<TYPE>::EraseIndexSwap(uint index)
 template<class TYPE> typename Array<TYPE>::Iterator
 Array<TYPE>::Erase(typename Array<TYPE>::Iterator iter)
 {
-    this->EraseIndex(uint(iter - this->elements));
+	this->EraseIndex(size_t(iter - this->elements));
     return iter;
 }
 
@@ -625,9 +625,9 @@ Array<TYPE>::EraseSwap(typename Array<TYPE>::Iterator iter)
 	//this->EraseSwapIndex(uint(iter - this->elements));
 
 	//---- COPY OF 'EraseSwapIndex' FUNCTION -------
-	uint index = uint(iter - this->elements);
+	size_t index = size_t(iter - this->elements);
 	// swap with last element, and destroy last element
-	uint lastElementIndex = this->size - 1;
+	size_t lastElementIndex = this->size - 1;
 	if (index < lastElementIndex)
 	{
 		this->elements[index] = this->elements[lastElementIndex];
@@ -643,7 +643,7 @@ Array<TYPE>::EraseSwap(typename Array<TYPE>::Iterator iter)
 /**
 */
 template<class TYPE> void
-Array<TYPE>::RemoveIndex(uint index)
+Array<TYPE>::RemoveIndex(size_t index)
 {
 	if (index == (this->size - 1))
 	{
@@ -661,10 +661,10 @@ Array<TYPE>::RemoveIndex(uint index)
 NOTE: this method is fast but destroys the sorting order!
 */
 template<class TYPE> void
-Array<TYPE>::RemoveIndexSwap(uint index)
+Array<TYPE>::RemoveIndexSwap(size_t index)
 {
 	// swap with last element, and destroy last element
-	uint lastElementIndex = this->size - 1;
+	size_t lastElementIndex = this->size - 1;
 	if (index < lastElementIndex)
 	{
 		this->elements[index] = this->elements[lastElementIndex];
@@ -678,7 +678,7 @@ Array<TYPE>::RemoveIndexSwap(uint index)
 template<class TYPE> typename Array<TYPE>::Iterator
 Array<TYPE>::Remove(typename Array<TYPE>::Iterator iter)
 {
-	this->RemoveIndex(uint(iter - this->elements));
+	this->RemoveIndex(size_t(iter - this->elements));
 	return iter;
 }
 
@@ -693,9 +693,9 @@ Array<TYPE>::RemoveSwap(typename Array<TYPE>::Iterator iter)
 	//this->RemoveSwapIndex(uint(iter - this->elements));
 
 	//---- COPY OF 'RemoveSwapIndex' FUNCTION -------
-	uint index = uint(iter - this->elements);
+	size_t index = size_t(iter - this->elements);
 	// swap with last element, and destroy last element
-	uint lastElementIndex = this->size - 1;
+	size_t lastElementIndex = this->size - 1;
 	if (index < lastElementIndex)
 	{
 		this->elements[index] = this->elements[lastElementIndex];
@@ -710,7 +710,7 @@ Array<TYPE>::RemoveSwap(typename Array<TYPE>::Iterator iter)
 /**
 */
 template<class TYPE> void
-Array<TYPE>::Insert(uint index, const TYPE& elm)
+Array<TYPE>::Insert(size_t index, const TYPE& elm)
 {
     if (index == this->size)
     {
@@ -732,7 +732,7 @@ Array<TYPE>::Insert(uint index, const TYPE& elm)
 template<class TYPE> void
 Array<TYPE>::Clear()
 {
-    uint i;
+	size_t i;
     for (i = 0; i < this->size; i++)
     {
         this->Destroy(&(this->elements[i]));
@@ -779,7 +779,7 @@ Array<TYPE>::end() const
 template<class TYPE> typename Array<TYPE>::Iterator
 Array<TYPE>::Find(const TYPE& elm) const
 {
-    uint index;
+	size_t index;
     for (index = 0; index < this->size; index++)
     {
         if (this->elements[index] == elm)
@@ -797,10 +797,10 @@ Array<TYPE>::Find(const TYPE& elm) const
     @param  elm     element to find
     @return         index to element, or InvalidIndex if not found
 */
-template<class TYPE> uint
+template<class TYPE> size_t
 Array<TYPE>::FindIndex(const TYPE& elm) const
 {
-    uint index;
+	size_t index;
     for (index = 0; index < this->size; index++)
     {
         if (this->elements[index] == elm)
@@ -820,13 +820,13 @@ Array<TYPE>::FindIndex(const TYPE& elm) const
     @param  elm     fill value
 */
 template<class TYPE> void
-Array<TYPE>::Fill(uint first, size_t num, const TYPE& elm)
+Array<TYPE>::Fill(size_t first, size_t num, const TYPE& elm)
 {
     if ((first + num) > this->size)
     {
         this->GrowTo(first + num);
     }
-    uint i;
+	size_t i;
     for (i = first; i < (first + num); i++)
     {
         this->elements[i] = elm;
@@ -843,7 +843,7 @@ template<class TYPE> Array<TYPE>
 Array<TYPE>::Difference(const Array<TYPE>& rhs)
 {
     Array<TYPE> diff;
-    uint i;
+	size_t i;
     size_t num = rhs.Size();
     for (i = 0; i < num; i++)
     {
@@ -879,16 +879,16 @@ Util::Array<TYPE>::SortWithFunc(bool (*func)(const TYPE& lhs, const TYPE& rhs))
     Does a binary search on the array, returns the index of the identical
     element, or InvalidIndex if not found
 */
-template<class TYPE> uint
+template<class TYPE> size_t
 Array<TYPE>::BinarySearchIndex(const TYPE& elm) const
 {
     size_t num = this->Size();
     if (num > 0)
     {
-        uint half;
-        uint lo = 0;
-	    uint hi = num - 1;
-	    uint mid;
+		size_t half;
+		size_t lo = 0;
+		size_t hi = num - 1;
+		size_t mid;
         while (lo <= hi) 
         {
             if (0 != (half = num/2)) 
@@ -939,7 +939,7 @@ Array<TYPE>::IsSorted() const
 {
     if (this->size > 1)
     {
-        uint i;
+		size_t i;
         for (i = 0; i < this->size - 1; i++)
         {
             if (this->elements[i] > this->elements[i + 1])
@@ -957,10 +957,10 @@ Array<TYPE>::IsSorted() const
     starting at a given index. Performance is O(n). Returns the index
     at which the element was added.
 */
-template<class TYPE> uint
-Array<TYPE>::InsertAtEndOfIdenticalRange(uint startIndex, const TYPE& elm)
+template<class TYPE> size_t
+Array<TYPE>::InsertAtEndOfIdenticalRange(size_t startIndex, const TYPE& elm)
 {
-    uint i = startIndex + 1;
+	size_t i = startIndex + 1;
     for (; i < this->size; i++)
     {
         if (this->elements[i] != elm)
@@ -980,7 +980,7 @@ Array<TYPE>::InsertAtEndOfIdenticalRange(uint startIndex, const TYPE& elm)
     This inserts the element into a sorted array. Returns the index
     at which the element was inserted.
 */
-template<class TYPE> uint
+template<class TYPE> size_t
 Array<TYPE>::InsertSorted(const TYPE& elm)
 {
     size_t num = this->Size();
@@ -992,10 +992,10 @@ Array<TYPE>::InsertSorted(const TYPE& elm)
     }
     else
     {
-        uint half;
-        uint lo = 0;
-	    uint hi = num - 1;
-	    uint mid;
+		size_t half;
+		size_t lo = 0;
+		size_t hi = num - 1;
+		size_t mid;
         while (lo <= hi) 
         {
             if (0 != (half = num/2)) 

@@ -90,7 +90,7 @@ inline void bbox::transform(const mat4& t)
     point temp;
 	point min = point(1000000.0f, 1000000.0f, 1000000.0f);
 	point max = point(-1000000.0f, -1000000.0f, -1000000.0f);
-    index_t i;
+    int i;
 
     for (i = 0; i < 8; ++i)
     {

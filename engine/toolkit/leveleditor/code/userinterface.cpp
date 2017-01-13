@@ -152,8 +152,8 @@ namespace Toolkit
 
 	void UserInterface::RenderDocks()
 	{
-		const int toolbarWidth = 52;
-		const int toolButtonSize = 32;
+		const float toolbarWidth = 52.0f;
+		const float toolButtonSize = 32.0f;
 
 		ImGui::Begin("ToolBar", NULL,
 			ImGuiWindowFlags_NoSavedSettings |
@@ -165,8 +165,8 @@ namespace Toolkit
 			ImGuiWindowFlags_NoScrollWithMouse |
 			ImGuiWindowFlags_NoBringToFrontOnFocus);
 		{
-			ImGui::SetWindowSize(ImVec2(toolbarWidth, application->window->GetHeight() - 16), ImGuiSetCond_Once);
-			ImGui::SetWindowPos(ImVec2(0, 16), ImGuiSetCond_Once);
+			ImGui::SetWindowSize(ImVec2(toolbarWidth, (float)application->window->GetHeight() - 16.0f), ImGuiSetCond_Once);
+			ImGui::SetWindowPos(ImVec2(0.0f, 16.0f), ImGuiSetCond_Once);
 
 			if (ImGui::ImageButton((void*)this->selectToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
@@ -200,7 +200,7 @@ namespace Toolkit
 			ImGui::End();
 		}
 		
-		ImGui::RootDock(ImVec2(toolbarWidth, 16), ImVec2(application->window->GetWidth() - toolbarWidth, application->window->GetHeight() - 16));
+		ImGui::RootDock(ImVec2(toolbarWidth, 16.0f), ImVec2((float)application->window->GetWidth() - toolbarWidth, (float)application->window->GetHeight() - 16));
 		{
 			ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			{

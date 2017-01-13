@@ -110,10 +110,10 @@ BodyState RigidBody::Evaluate(const BodyState& oldState, const double& frameTime
 	Math::point angularAcceleration = Math::mat4::transform(oldState.torque, oldState.invInertiaTensorWorld);
 
 	newState.linearVelocity = oldState.linearVelocity + lastFrameAcceleration;
-	newState.angularVelocity = oldState.angularVelocity + angularAcceleration * frameTime;
-	newState.position = oldState.position + (derivative.linearVelocity * frameTime);
+	newState.angularVelocity = oldState.angularVelocity + angularAcceleration * (float)frameTime;
+	newState.position = oldState.position + (derivative.linearVelocity * (float)frameTime);
 
-	Math::quaternion q = Math::quaternion::multiply(oldState.orientation, Math::quaternion(derivative.angularVelocity.x() * frameTime, derivative.angularVelocity.y() * frameTime, derivative.angularVelocity.z() * frameTime, 0.0f));
+	Math::quaternion q = Math::quaternion::multiply(oldState.orientation, Math::quaternion(derivative.angularVelocity.x() * (float)frameTime, derivative.angularVelocity.y() * (float)frameTime, derivative.angularVelocity.z() * (float)frameTime, 0.0f));
 	Math::quaternion::scale(q, 0.5f);
 
 	newState.orientation.set(oldState.orientation.x() + q.x(), oldState.orientation.y() + q.y(), oldState.orientation.z() + q.z(), oldState.orientation.w() + q.w());

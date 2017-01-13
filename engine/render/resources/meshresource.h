@@ -65,7 +65,7 @@ public:
 	///Returns the amount of floats that a vertex contains
 	uint getVertexWidth() { return this->vertexWidth; }
 
-	uint getNumPrimitiveGroups() { return this->primitiveGroups.Size(); }
+	size_t getNumPrimitiveGroups() { return this->primitiveGroups.Size(); }
 
 	///Returns the base bbox for this entity.
 	Math::bbox getBaseBBox() { return this->bbox; }

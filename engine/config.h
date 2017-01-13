@@ -6,17 +6,12 @@
 	
 	(C) 2015 See the LICENSE file.
 */
-#ifdef _MSC_VER
-// disable _s warnings
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include <stdint.h>
 #include <atomic>
 #include <xmmintrin.h>
 #include <immintrin.h>
 #include <memory>
-#include <assert.h>
+//#include <assert.h>
 
 #define InvalidIndex -1;
 
@@ -50,7 +45,8 @@ typedef double		float64;
 #endif
 
 // assert macro
-#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_Msg, _CRT_WIDE(__FILE__), __LINE__), 0) )
+//#define assert(_Expression) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(#_Expression), _CRT_WIDE(__FILE__), __LINE__), 0) )
+#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(_Msg), _CRT_WIDE(__FILE__), __LINE__), 0) )
 
 #ifdef NULL
 #undef NULL
