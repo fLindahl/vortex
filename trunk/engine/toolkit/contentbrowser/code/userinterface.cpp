@@ -15,6 +15,7 @@ namespace Toolkit
 		this->application = app;
 		this->savePath = "";
 		this->browseButtonTextureHandle = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/leveleditor/resources/textures/texture.png")->GetHandle();
+		this->selectedNode = nullptr;
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
 		ImGui::LoadDock("engine/toolkit/contentbrowser/layout/default.layout");
@@ -189,26 +190,41 @@ namespace Toolkit
 						this->meshBrowserPopup = true;
 					}
 
-					ImGui::BeginChild("ModelNodes", ImVec2(0, 500), true);
+					ImGui::BeginChild("ModelNodes", ImVec2(0, 0), true);
 					{
 						//Unique identifier
 						uint i = 2014235;
 						for (auto node : this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetModelNodes())
 						{
-							std::string nodeName = this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh()->getPrimitiveGroup(node->primitiveGroup).name;
-
-							ImGui::Text("Node: %s", nodeName.c_str());
-							ImGui::Text("Surface: %s", node->surface->GetPath().c_str());
-							ImGui::SameLine();
-							ImGui::PushID(i);
-							if (ImGui::ImageButton((void*)this->browseButtonTextureHandle, ImVec2(16, 16)))
+							ImGui::BeginGroup();
 							{
-								this->surfaceBrowserPopup = true;
+								std::string nodeName = this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh()->getPrimitiveGroup(node->primitiveGroup).name;
+
+								ImGui::Text("Node: %s", nodeName.c_str());
+								
+								ImGui::Text("Surface: %s", node->surface->GetPath().c_str());
+								ImGui::SameLine();
+								ImGui::PushID(i++);
+								if (ImGui::ImageButton((void*)this->browseButtonTextureHandle, ImVec2(16, 16)))
+								{
+									this->surfaceBrowserPopup = true;
+									this->selectedNode = node;
+								}
+								ImGui::PopID();
+								ImGui::Separator();
+							}
+							ImGui::EndGroup();
+
+							if (ImGui::IsItemHovered() && !this->surfaceBrowserPopup)
+							{
 								this->selectedNode = node;
 							}
-							ImGui::PopID();
-							i++;
-							ImGui::Separator();
+
+							if (ImGui::IsItemClicked())
+							{
+
+							}
+
 						}
 						ImGui::EndChild();
 					}
@@ -239,11 +255,10 @@ namespace Toolkit
 				{
 					this->application->loadedModel->Deactivate();
 				}
+				this->selectedNode = nullptr;
 
 				this->application->loadedModel = std::make_shared<Game::ModelEntity>();
-
 				this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
-
 				this->application->loadedModel->Activate();
 
 				this->openFilePopup = false;
