@@ -514,9 +514,13 @@ namespace Render
 		glBindVertexArray(0);
 	}
 
+	void MeshResource::Draw()
+	{
+		glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
+	}
+
 	void MeshResource::Draw(const unsigned int& primitiveGroup)
 	{
-		//glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
 		glDrawElements(GL_TRIANGLES, (GLsizei)primitiveGroups[primitiveGroup].numIndices, GL_UNSIGNED_INT, (void*)primitiveGroups[primitiveGroup].indexOffset);
 	}
 

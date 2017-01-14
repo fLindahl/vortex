@@ -30,8 +30,6 @@ public:
 
 	Math::bbox& getbbox() { return this->bbox; }
 
-	bool outline = false;
-
 private:
 	Math::bbox bbox;
 

@@ -97,6 +97,7 @@ SET(files_render_debugrender
 	debugrender/debugrenderer.cpp
 	debugrender/line.h
 	debugrender/box.h
+	debugrender/mesh.h
 	debugrender/shape.h
 	)
 	

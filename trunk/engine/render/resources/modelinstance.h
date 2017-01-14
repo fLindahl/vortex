@@ -21,7 +21,6 @@ class ModelInstance;
 struct ModelNode
 {
 	~ModelNode();
-	
 	//index for the primitivegroup to render
 	uint primitiveGroup;
 	//pointer back to the surface

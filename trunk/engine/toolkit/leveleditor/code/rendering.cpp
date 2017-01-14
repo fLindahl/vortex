@@ -115,25 +115,12 @@ void Application::DoPicking()
 
 			printf("--- Hit object! ---\n");
 
-			//Start by removing outline from previous hit object
-			if (hit.object != nullptr)
-			{
-				Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
-
-				if (rbe != nullptr)
-				{
-					rbe->GetGraphicsProperty()->outline = false;
-				}
-			}
-
 			hit = newHit;
-
 
 			//Select new object!
 			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
 			if (rbe != nullptr)
 			{
-				rbe->GetGraphicsProperty()->outline = true;
 				rbe->GetRigidBody()->applyForceAtPoint(rayDirection, .1f, hit.point);
 			}
 
