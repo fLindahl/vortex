@@ -42,7 +42,7 @@ inline void RenderBox::SetupBuffers()
 {
 	const int meshSize = 24;
 
-	GLfloat mesh[meshSize] =
+	const GLfloat mesh[meshSize] =
 	{
 		0.5, -0.5, -0.5,
 		0.5, -0.5, 0.5,
@@ -55,7 +55,7 @@ inline void RenderBox::SetupBuffers()
 	};
 
 	const int indicesSize = 60;
-	int indices[] =
+	const int indices[] =
 	{
 		//Triangles
 		0, 1, 2,

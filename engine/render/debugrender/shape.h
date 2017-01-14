@@ -13,7 +13,8 @@ namespace Debug
 		BOX,
 		CONE,
 		CAPSULE,
-		FRUSTUM
+		FRUSTUM,
+		MESH
 	};
 
 	struct RenderCommand

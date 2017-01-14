@@ -64,7 +64,7 @@ namespace Toolkit
 		}
 
 		//Start list at index 2 because otherwise we list "." and ".." too
-		ImGui::ListBox(label, selectedItem, &cStrArray[0], list.Size());
+		ImGui::ListBox(label, selectedItem, &cStrArray[0], (int)list.Size());
 	}
 
 	void UserInterface::Run()
@@ -189,13 +189,16 @@ namespace Toolkit
 						this->meshBrowserPopup = true;
 					}
 
-					ImGui::BeginChild("child", ImVec2(0, 500), true);
+					ImGui::BeginChild("ModelNodes", ImVec2(0, 500), true);
 					{
 						//Unique identifier
 						uint i = 2014235;
 						for (auto node : this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetModelNodes())
 						{
-							ImGui::Text("Node: %i | Surface: %s", node->primitiveGroup, node->surface->GetPath().c_str());
+							std::string nodeName = this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh()->getPrimitiveGroup(node->primitiveGroup).name;
+
+							ImGui::Text("Node: %s", nodeName.c_str());
+							ImGui::Text("Surface: %s", node->surface->GetPath().c_str());
 							ImGui::SameLine();
 							ImGui::PushID(i);
 							if (ImGui::ImageButton((void*)this->browseButtonTextureHandle, ImVec2(16, 16)))

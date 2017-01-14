@@ -51,7 +51,8 @@ public:
 	/// Unbind VAO
 	void Unbind();
 	///Draw elements
-	void Draw(const unsigned int& primitiveGroup = 0);
+	void Draw(); //Draws all primitive groups at once
+	void Draw(const unsigned int& primitiveGroup); //draws a specific primitivegroup
 
 	void* getMesh();
 	void* getIndices();

@@ -234,6 +234,15 @@ Application::Run()
 
 		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
+		if (this->hit.object != nullptr)
+		{
+			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
+			if (rbe != nullptr)
+			{
+				Debug::DebugRenderer::Instance()->DrawMesh(rbe->GetGraphicsProperty()->getModelInstance()->GetMesh(), rbe->GetTransform(), Math::vec4(1.0f, 1.0f, 1.0f, 1.0f), -1, true, 2.0f);
+			}
+		}
+
 		RenderDevice::Instance()->Render(false);
 
 		this->window->SwapBuffers();

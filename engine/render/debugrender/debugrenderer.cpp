@@ -13,6 +13,7 @@ void DebugRenderer::Initialize()
 {
     this->line.shader = Render::ShaderServer::Instance()->LoadShader("debugLines");
 	this->box.shader = Render::ShaderServer::Instance()->LoadShader("debug");
+	this->mesh.shader = Render::ShaderServer::Instance()->LoadShader("debug");
 
     return;
 }
@@ -125,6 +126,29 @@ void DebugRenderer::DrawBox(const Math::bbox& bbox,
 	this->commandQueue.push(cmd);
 }
 
+void DebugRenderer::DrawMesh(std::shared_ptr<Render::MeshResource> mesh,
+							 const Math::mat4& transform, 
+							 const Math::vec4& color,
+							 int primitiveGroup,
+							 bool wireframe,
+							 float lineWidth)
+{
+	MeshCommand* cmd = new MeshCommand();
+	cmd->shape = DebugShape::MESH;
+
+	cmd->mesh = mesh;
+	cmd->primitiveGroup = primitiveGroup;
+
+	cmd->transform = transform;
+
+	cmd->lineWidth = lineWidth;
+	cmd->color = color;
+	//Always draw bboxes with wireframe
+	cmd->wireframe = wireframe;
+
+	this->commandQueue.push(cmd);
+}
+
 
 void DebugRenderer::DrawCommands()
 {
@@ -143,6 +167,11 @@ void DebugRenderer::DrawCommands()
 			case DebugShape::BOX:
 			{
 				this->box.Draw(currentCommand);
+				break;
+			}
+			case DebugShape::MESH:
+			{
+				this->mesh.Draw(currentCommand);
 				break;
 			}
             default:
