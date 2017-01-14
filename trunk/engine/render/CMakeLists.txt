@@ -55,6 +55,8 @@ SET(files_render_frame
 SET(files_render_resources
 	resources/lightnode.h
 	resources/lightnode.cpp
+	resources/meshbuilder.h
+	resources/meshbuilder.cpp
 	resources/meshresource.h
 	resources/meshresource.cpp
 	resources/shaderobject.h
