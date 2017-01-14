@@ -144,8 +144,13 @@ Application::Run()
 		{
 			CameraMovement();
 		}
-		;
+
 		RenderDevice::Instance()->Render(false);
+
+		if (this->UI->selectedNode != nullptr)
+		{
+			Debug::DebugRenderer::Instance()->DrawMesh(this->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh(), this->loadedModel->GetTransform(), Math::vec4(0.5f, 0.5f, 0.0f, 0.5f), this->UI->selectedNode->primitiveGroup, true);
+		}
 
 		this->window->SwapBuffers();
 	}

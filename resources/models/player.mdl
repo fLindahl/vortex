@@ -1,8 +1,8 @@
 <Vortex>
-    <Model name="resources/models/placeholdercube.mdl">
+    <Model name="G:\Programming\Vortex\trunk\resources\models\player.mdl">
         <Mesh name="resources/meshes/player_bear.fbx">
             <Node primitivegroup="0" surface="resources/surfaces/placeholder.surface"/>
-            <Node primitivegroup="1" surface="resources/surfaces/placeholder.surface"/>
+            <Node primitivegroup="1" surface="resources/surfaces/player.surface"/>
             <Node primitivegroup="2" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="3" surface="resources/surfaces/placeholder.surface"/>
             <Node primitivegroup="4" surface="resources/surfaces/placeholder.surface"/>

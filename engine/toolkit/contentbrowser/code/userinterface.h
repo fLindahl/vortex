@@ -20,6 +20,7 @@ namespace Toolkit
 		void Run();
 
 	private:
+		friend class ContentBrowser::Application;
 		ContentBrowser::Application* application;
 		
 		void RenderDocks();
@@ -43,7 +44,7 @@ namespace Toolkit
 		std::string savePath;
 
 		Render::ModelNode* selectedNode;
-
+		
 		///Texture handles
 		GLuint browseButtonTextureHandle;
 	};
