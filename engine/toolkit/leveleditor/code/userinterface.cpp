@@ -4,6 +4,7 @@
 #include "application.h"
 #include "render/server/frameserver.h"
 #include "toolkit/tools/style.h"
+#include "render/frame/flatgeometrylitpass.h"
 
 #include "basetool.h"
 #include "selecttool.h"
@@ -205,7 +206,7 @@ namespace Toolkit
 			ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			{
 				ImVec2 dockSize = ImGui::GetWindowSize();
-				ImGui::Image((void*)Render::FrameServer::Instance()->GetFinalColorBuffer(), dockSize);
+				ImGui::Image((void*)Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer(), dockSize);
 
 				if (ImGui::IsItemHovered())
 				{
@@ -277,8 +278,8 @@ namespace Toolkit
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
 			if (ImGui::Button("New Entity", { 100, 40 }))
 			{
-				//std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), this->modelInstance1);
-				//commandManager->DoCommand(command);
+				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), this->application->modelInstance);
+				commandManager->DoCommand(command);
 			}
 			ImGui::EndDock();
 		}

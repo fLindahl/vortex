@@ -624,7 +624,7 @@ namespace Math
 	__forceinline float&
 		vec4::operator[](const int index)
 	{
-		assert(index < 4);
+		_assert(index < 4, "Subscript out of range!\n");
 		return this->vec.f[index];
 	}
 
@@ -1283,7 +1283,7 @@ namespace Math
 		vec4
 		vec4::splat(const vec4 &v, uint element)
 	{
-		assert(element < 4 && element >= 0);
+		_assert(element < 4 && element >= 0, "Subscript out of range!\n");
 
 		switch (element)
 		{

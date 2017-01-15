@@ -21,7 +21,7 @@ DrawPass::~DrawPass()
 
 void DrawPass::BindFrameBuffer()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->frameBufferObject);
 }
 
 void DrawPass::Execute()
@@ -87,11 +87,17 @@ void DrawPass::Execute()
 
     FramePass::Execute();
 }
+
 void DrawPass::Setup()
 {
 
 
     FramePass::Setup();
+}
+
+void DrawPass::UpdateResolution()
+{
+	
 }
 
 }

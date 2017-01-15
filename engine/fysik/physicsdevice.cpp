@@ -925,7 +925,7 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 
 	float relVelocity = Math::point::dot3(collData.normal, (dPa - dPb));
 
-	float restitution = 1.0f;
+	float restitution = 0.5f;
 
 	float num = -(1 + restitution) * relVelocity;
 

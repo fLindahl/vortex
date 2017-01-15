@@ -17,6 +17,7 @@
 #include "render/debugrender/debugrenderer.h"
 #include "render/frame/framepass.h"
 #include "render/frame/depthpass.h"
+#include "render/frame/flatgeometrylitpass.h"
 
 namespace Render
 {
@@ -28,7 +29,7 @@ RenderDevice::RenderDevice()
 
 void RenderDevice::Initialize()
 {
-
+	this->renderResolution = { 1920, 1020 };
 }
 
 void RenderDevice::SetRenderResolution(const Resolution& res)
@@ -104,11 +105,11 @@ void RenderDevice::Render(bool drawToScreen)
 	lightCullingPass->Execute();
 
 	//Bind the final color buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	framePass = FrameServer::Instance()->FlatGeometryLit;
-	auto flatGeometryLitPass = framePass.lock();
+	std::weak_ptr<FlatGeometryLitPass> fglp = FrameServer::Instance()->FlatGeometryLit;
+	auto flatGeometryLitPass = fglp.lock();
 
 	//Run draw pass
 	flatGeometryLitPass->Execute();

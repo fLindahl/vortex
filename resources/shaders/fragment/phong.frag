@@ -2,7 +2,9 @@ in vec3 FragmentPos;
 in vec3 Normal;
 in vec2 TexCoords;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec3 normalColor;
+
 uniform sampler2D AlbedoMap;
 
 struct PointLight 
@@ -92,5 +94,6 @@ void main()
 	color.rgb += albedoDiffuseColor.rgb * u_lightAmbientIntensity;
 	
 	fragColor = color;
+	normalColor = Normal;
 
 }
