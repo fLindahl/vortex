@@ -11,7 +11,7 @@
 #include <xmmintrin.h>
 #include <immintrin.h>
 #include <memory>
-//#include <assert.h>
+#include <assert.h>
 
 #define InvalidIndex -1;
 

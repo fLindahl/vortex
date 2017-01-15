@@ -7,6 +7,7 @@
 #include "nfd.h"
 #include "render/resources/surface.h"
 #include "dirent.h"
+#include "render/frame/flatgeometrylitpass.h"
 
 namespace Toolkit
 {
@@ -167,7 +168,7 @@ namespace Toolkit
 			ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			{
 				ImVec2 dockSize = ImGui::GetWindowSize();
-				ImGui::Image((void*)Render::FrameServer::Instance()->GetFinalColorBuffer(), dockSize);
+				ImGui::Image((void*)Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer(), dockSize);
 
 				if (ImGui::IsItemHovered())
 				{

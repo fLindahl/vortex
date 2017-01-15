@@ -87,4 +87,14 @@ void DepthPass::Setup()
     FramePass::Setup();
 }
 
+void DepthPass::UpdateResolution()
+{
+	const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
+
+	glBindTexture(GL_TEXTURE_2D, this->buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, newRes.x, newRes.y, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 }

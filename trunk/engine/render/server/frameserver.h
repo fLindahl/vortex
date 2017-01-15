@@ -10,6 +10,7 @@ namespace Render
 class FramePass;
 class DepthPass;
 class DrawPass;
+class FlatGeometryLitPass;
 
 class FrameServer
 {
@@ -37,14 +38,15 @@ public:
 
 	std::shared_ptr<DrawPass> GetDepthPass();
 	std::shared_ptr<FramePass> GetLightCullingPass();
+	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
 
-	GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
+	//GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
 
 private:
 	friend class RenderDevice;
 
-	GLuint finalColorFrameBufferObject;
-	GLuint finalColorBuffer;
+	//GLuint finalColorFrameBufferObject;
+	//GLuint finalColorBuffer;
 
 	const unsigned int MAX_NUM_LIGHTS = 1024;
 
@@ -63,7 +65,7 @@ private:
 	//GLuint lightCullingProgram;
 
 	/// For lit objects
-	std::shared_ptr<DrawPass> FlatGeometryLit;
+	std::shared_ptr<FlatGeometryLitPass> FlatGeometryLit;
 
 
 
