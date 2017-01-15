@@ -49,8 +49,8 @@ void FlatGeometryLitPass::Setup()
 
 	glGenTextures(1, &this->normalBuffer);
 	glBindTexture(GL_TEXTURE_2D, this->normalBuffer);
-	//Might need to use GL_RGBA8_SNORM for signed normalized integers
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	//Might need to use GL_RGB8_SNORM for signed normalized integers
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -62,13 +62,14 @@ void FlatGeometryLitPass::Setup()
 	glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->buffer, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->normalBuffer, 0);
-	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetBuffer(), 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetBuffer(), 0);
 
 	//drawbuffers
+	const GLenum drawbuffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
 	glDrawBuffers(2, &drawbuffers[0]);
-	
+
 	GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	_assert(e == GL_FRAMEBUFFER_COMPLETE, "There is a problem with the FBO");
+	_assert(e == GL_FRAMEBUFFER_COMPLETE, "FlatGeometryLit Framebuffer Status Error!");
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -82,6 +83,9 @@ void FlatGeometryLitPass::UpdateResolution()
 	glBindTexture(GL_TEXTURE_2D, this->buffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newRes.x, newRes.y, 0, GL_RGB, GL_FLOAT, NULL);
 	
+	glBindTexture(GL_TEXTURE_2D, this->normalBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, newRes.x, newRes.y, 0, GL_RGB, GL_FLOAT, NULL);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
