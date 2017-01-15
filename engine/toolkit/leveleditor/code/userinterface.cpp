@@ -206,7 +206,7 @@ namespace Toolkit
 			ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			{
 				ImVec2 dockSize = ImGui::GetWindowSize();
-				ImGui::Image((void*)Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer(), dockSize);
+				ImGui::Image((void*)Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer(), dockSize);
 
 				if (ImGui::IsItemHovered())
 				{

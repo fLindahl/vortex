@@ -19,7 +19,6 @@ public:
 
 private:
 
-	GLenum drawbuffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	GLuint normalBuffer;
 
 };
