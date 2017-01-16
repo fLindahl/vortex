@@ -48,7 +48,7 @@ namespace Toolkit
 	void UserInterface::Run()
 	{
 		static bool showStatistics = false;
-
+		
 		RenderDocks();
 
 		//TODO: Make sure we're not editing a textbox before querying for shortcuts
@@ -211,9 +211,37 @@ namespace Toolkit
 				ImVec2 dockSize = ImGui::GetWindowSize();
 				ImGui::Image((void*)Render::RenderDevice::Instance()->GetFinalColorBuffer(), dockSize);
 
+				this->currentTool->Render();
+
 				if (ImGui::IsItemHovered())
 				{
-					application->DoPicking();
+					if (application->hit.object != nullptr)
+					{
+						if (ImGui::GetIO().MouseClicked[0])
+						{
+							this->currentTool->LeftDown();
+							if (this->currentTool->GetCurrentHandle() != Tools::TransformHandle::NONE)
+							{
+								application->DoPicking();
+							}
+						}
+						if (ImGui::GetIO().MouseReleased[0])
+						{
+							this->currentTool->LeftUp();
+						}
+						if (ImGui::GetIO().MouseDown[0])
+						{
+							this->currentTool->Drag(ImGui::GetIO().MouseDelta.x, ImGui::GetIO().MouseDelta.y);
+						}
+					}
+					else
+					{
+						application->DoPicking();
+						if (application->hit.object != nullptr)
+						{
+							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+						}
+					}
 				}
 			}
 			ImGui::EndDock();
@@ -256,19 +284,6 @@ namespace Toolkit
 						}
 					}
 				}
-				/*
-				static bool enabled = true;
-				ImGui::BeginChild("child", ImVec2(0, 60), true);
-				for (int i = 0; i < 10; i++)
-				ImGui::Text("Scrolling Text %d", i);
-				ImGui::EndChild();
-				static float f = 0.5f;
-				static int n = 0;
-				ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-				ImGui::InputFloat("Input", &f, 0.1f);
-				ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-				ImGui::Checkbox("Checkbox", &enabled);
-				*/
 			}
 			ImGui::EndDock();
 

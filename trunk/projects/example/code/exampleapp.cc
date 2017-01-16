@@ -357,7 +357,7 @@ ExampleApp::Run()
 	float y = 0.0f;
 	//float z = 0.0f;
 
-	Math::mat4 projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
+	Math::mat4 projection = Graphics::MainCamera::Instance()->getProjection();
     Math::mat4 invProj = Math::mat4::inverse(projection);
 
 	double cursorPosX = 0.0f;
@@ -417,7 +417,7 @@ ExampleApp::Run()
 		Graphics::MainCamera::Instance()->SetPosition(cameraPos);
         Graphics::MainCamera::Instance()->LookAt(cameraPos + forward, up);
 
-        Math::mat4 view = Graphics::MainCamera::Instance()->getViewMatrix();
+        Math::mat4 view = Graphics::MainCamera::Instance()->getView();
         Math::mat4 invView = Math::mat4::inverse(view);
 		Math::mat4 invViewProj = Math::mat4::multiply(invView, invProj);
 		Math::mat4 viewProj = Math::mat4::multiply(view, projection);

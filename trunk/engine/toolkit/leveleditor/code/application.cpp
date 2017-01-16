@@ -242,7 +242,7 @@ Application::Run()
 				Debug::DebugRenderer::Instance()->DrawMesh(rbe->GetGraphicsProperty()->getModelInstance()->GetMesh(), rbe->GetTransform(), Math::vec4(1.0f, 1.0f, 1.0f, 1.0f), -1, true, 2.0f);
 			}
 		}
-
+		
 		RenderDevice::Instance()->Render(false);
 
 		this->window->SwapBuffers();
