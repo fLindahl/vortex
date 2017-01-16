@@ -44,6 +44,9 @@ namespace Render
 		this->framePassByName.insert(std::make_pair(this->FlatGeometryLit->name, this->FlatGeometryLit));
 		this->framePasses.Append(this->FlatGeometryLit);
 
+		//Set final color buffer for easy access
+		RenderDevice::Instance()->SetFinalColorBuffer(this->FlatGeometryLit->buffer);
+
 	}
 
 	void FrameServer::UpdateResolutions()

@@ -40,16 +40,10 @@ public:
 	std::shared_ptr<FramePass> GetLightCullingPass();
 	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
 
-	//GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
-
 private:
 	friend class RenderDevice;
-
-	//GLuint finalColorFrameBufferObject;
-	//GLuint finalColorBuffer;
-
+	
 	const unsigned int MAX_NUM_LIGHTS = 1024;
-
 
 	//Contains all Framepasses.
 	//Key must be unique to each Pass. the key is the pass name
