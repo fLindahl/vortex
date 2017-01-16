@@ -101,6 +101,8 @@ SET(files_render_debugrender
 	debugrender/box.h
 	debugrender/mesh.h
 	debugrender/shape.h
+	debugrender/debugserver.h
+	debugrender/debugserver.cpp
 	)
 	
 SOURCE_GROUP("render" FILES ${files_render_render})

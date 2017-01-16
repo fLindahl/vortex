@@ -5,6 +5,7 @@
 #include "render/server/frameserver.h"
 #include "toolkit/tools/style.h"
 #include "render/frame/flatgeometrylitpass.h"
+#include "render/debugrender/debugserver.h"
 
 #include "basetool.h"
 #include "selecttool.h"
@@ -81,6 +82,8 @@ namespace Toolkit
 			}
 			ImGui::EndMainMenuBar();
 		}
+		
+		Debug::DebugServer::Instance()->ImGuiDebugBar();
 
 		// create a new window
 		if (showStatistics)
@@ -206,7 +209,7 @@ namespace Toolkit
 			ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			{
 				ImVec2 dockSize = ImGui::GetWindowSize();
-				ImGui::Image((void*)Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer(), dockSize);
+				ImGui::Image((void*)Render::RenderDevice::Instance()->GetFinalColorBuffer(), dockSize);
 
 				if (ImGui::IsItemHovered())
 				{
@@ -274,7 +277,7 @@ namespace Toolkit
 
 			}
 			ImGui::EndDock();
-
+			
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
 			if (ImGui::Button("New Entity", { 100, 40 }))
 			{
