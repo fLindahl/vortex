@@ -7,6 +7,8 @@ SET(files_application_basegamefeature
 	basegamefeature/managers/entitymanager.cpp
 	basegamefeature/managers/scenemanager.h
 	basegamefeature/managers/scenemanager.cpp
+	basegamefeature/managers/envmanager.h
+	basegamefeature/managers/envmanager.cpp	
 	basegamefeature/keyhandler.h
 	basegamefeature/keyhandler.cpp
 	)

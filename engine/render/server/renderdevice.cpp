@@ -60,13 +60,13 @@ void RenderDevice::Render(bool drawToScreen)
 	glViewport(0, 0, renderResolution.x, renderResolution.y);
 
     //Set global matrix uniform buffer block for this frame
-    uniformBufferBlock.View = Graphics::MainCamera::Instance()->getViewMatrix();
-    uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
-	uniformBufferBlock.ViewProjection = Math::mat4::multiply(Graphics::MainCamera::Instance()->getViewMatrix(), Graphics::MainCamera::Instance()->getProjectionMatrix());
+    uniformBufferBlock.View = Graphics::MainCamera::Instance()->getView();
+    uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjection();
+	uniformBufferBlock.ViewProjection = Math::mat4::multiply(Graphics::MainCamera::Instance()->getView(), Graphics::MainCamera::Instance()->getProjection());
 
-	uniformBufferBlock.InvView = Math::mat4::inverse(uniformBufferBlock.View);
-	uniformBufferBlock.InvProjection = Math::mat4::inverse(uniformBufferBlock.Projection);
-	uniformBufferBlock.InvViewProjection = Math::mat4::inverse(uniformBufferBlock.ViewProjection);
+	uniformBufferBlock.InvView = Graphics::MainCamera::Instance()->getInvView();
+	uniformBufferBlock.InvProjection = Graphics::MainCamera::Instance()->getInvProjection();
+	uniformBufferBlock.InvViewProjection = Graphics::MainCamera::Instance()->getInvViewProjection();
 
 	uniformBufferBlock.CameraPos = Graphics::MainCamera::Instance()->GetPosition();
 

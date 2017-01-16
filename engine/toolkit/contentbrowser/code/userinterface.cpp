@@ -105,6 +105,7 @@ namespace Toolkit
 
 			this->ModalWindows();
 		}
+
 	}
 
 	void UserInterface::ShowFileMenu()

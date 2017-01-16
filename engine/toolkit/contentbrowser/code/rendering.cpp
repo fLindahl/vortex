@@ -81,11 +81,11 @@ void Application::DoPicking()
 		//mouse_pos_in_dock.x = Math::min(mouse_pos_in_dock.x, mouse_pos_in_dock.y);
 				
 		//TODO: This is unnecessary work
-		Math::mat4 view = Graphics::MainCamera::Instance()->getViewMatrix();
+		Math::mat4 view = Graphics::MainCamera::Instance()->getView();
 		Math::mat4 invView = Math::mat4::inverse(view);
-		Math::mat4 invProj = Math::mat4::inverse(Graphics::MainCamera::Instance()->getProjectionMatrix());
+		Math::mat4 invProj = Math::mat4::inverse(Graphics::MainCamera::Instance()->getProjection());
 		Math::mat4 invViewProj = Math::mat4::multiply(invView, invProj);
-		Math::mat4 viewProj = Math::mat4::multiply(view, Graphics::MainCamera::Instance()->getProjectionMatrix());
+		Math::mat4 viewProj = Math::mat4::multiply(view, Graphics::MainCamera::Instance()->getProjection());
 
 		float cursorPosX = 0.0f;
 		float cursorPosY = 0.0f;
