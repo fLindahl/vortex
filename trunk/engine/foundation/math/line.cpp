@@ -11,7 +11,7 @@ line::line()
 
 }
 
-line::line(const vec4& startPos, const vec4& dirAndMagnitude)
+line::line(const vec4& startPos, const vector& dirAndMagnitude)
 {
     this->p = startPos;
     this->m = dirAndMagnitude;
@@ -33,7 +33,7 @@ const vector& line::vec() const
 	return this->m;
 }
 
-const point& line::start() const
+point line::start() const
 {
 	return this->p;
 }
@@ -43,12 +43,11 @@ point line::end() const
 	return this->p + this->m;
 }
 
-void line::set(const vec4& startPos, const vec4& dirAndMagnitude)
+void line::set(const point& startpoint, const point& endpoint)
 {
-	this->p = startPos;
-	this->m = dirAndMagnitude;
+	this->p = startpoint;
+	this->m = endpoint - startpoint;
 }
-
 
 //Get line/line intersection. Returns the shortest line between two lines.
 //Borrowed from nebula

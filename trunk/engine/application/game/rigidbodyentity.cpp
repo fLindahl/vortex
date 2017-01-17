@@ -27,9 +27,7 @@ void RigidBodyEntity::Update()
 
 void RigidBodyEntity::SetTransform(const Math::mat4 &t)
 {
-    Entity::SetTransform(t);
-    this->gProperty->setModelMatrix(t);
-
+	PhysicsEntity::SetTransform(t);
 }
 
 void RigidBodyEntity::Activate()

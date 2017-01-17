@@ -24,6 +24,12 @@ void PhysicsEntity::SetModel(std::shared_ptr<Render::ModelInstance> mdl)
 
 }
 
+void PhysicsEntity::SetTransform(const Math::mat4& t)
+{
+	Entity::SetTransform(t);
+	this->gProperty->setModelMatrix(t);
+}
+
 void PhysicsEntity::Activate()
 {
 	Physics::PhysicsServer::Instance()->addPhysicsEntity(this);

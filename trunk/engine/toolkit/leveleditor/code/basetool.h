@@ -45,9 +45,11 @@ public:
 	virtual void MiddleDown() { this->middleMouse = true; }
 	virtual void MiddleUp() { this->middleMouse = false; }
 
-	virtual void Drag(const int& deltaX, const int& deltaY) { }
+	virtual void Drag() { }
 
 	virtual void Render() { }
+
+	const Math::mat4& GetDeltaMatrix() const { return this->deltaMatrix; }
 
 	virtual const ToolType& Type() { return this->type; }
 

@@ -11,16 +11,16 @@ class line
 {
 public:
     line();
-    line(const vec4& startPos, const vec4& dirAndMagnitude);
+    line(const vec4& startPos, const vector& dirAndMagnitude);
     line(const vec4& startPos, const vec4& direction, const float& magnitude);
     ~line();
 
 
-	void set(const vec4& startPos, const vec4& dirAndMagnitude);
+	void set(const point& startpoint, const point& endpoint);
 
 	const vector& vec() const;
 
-	const point& start() const;
+	point start() const;
 	point end() const;
 
     void transform(const Math::mat4& t);
@@ -51,7 +51,7 @@ public:
 
 //private:
     vec4 p;
-    vec4 m;
+    vector m;
 };
 
 }

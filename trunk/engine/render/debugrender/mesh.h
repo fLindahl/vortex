@@ -63,6 +63,7 @@ inline void RenderMesh::Draw(RenderCommand* command)
 	if ((cmd->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
 	{
 		glDepthFunc(GL_ALWAYS);
+		glDepthRange(0.0f, 0.01f);
 	}
 
 
@@ -83,6 +84,7 @@ inline void RenderMesh::Draw(RenderCommand* command)
 	if ((cmd->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
 	{
 		glDepthFunc(GL_LESS);
+		glDepthRange(0.0f, 1.0f);
 	}
     
 	glBindVertexArray(0);

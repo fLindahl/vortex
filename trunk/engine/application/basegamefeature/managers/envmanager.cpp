@@ -24,13 +24,9 @@ Math::line EnvManager::ComputeMouseWorldRay(const double& cursorX, const double&
 	cursorPosY = (((cursorY / viewPortSizeY) - 0.5f) * 2.0f);
 	Math::vec4 cursorTransform = Math::vec4((float)cursorPosX, (float)cursorPosY, 1.0, 1.0f);
 
-	printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
-
 	cursorTransform = Math::mat4::transform(cursorTransform, invProj);
 	Math::point ray = (cursorTransform * 0.01f);
 	Math::vec4 rayWorldPos = Math::mat4::transform(ray, invView);
-
-	printf("rayWorldPos: %f %f %f %f\n", rayWorldPos.x(), rayWorldPos.y(), rayWorldPos.z(), rayWorldPos.w());
 
 	Math::vec4 rayDirection = rayWorldPos - invView.get_position();
 	rayDirection = Math::vec4::normalize(rayDirection);

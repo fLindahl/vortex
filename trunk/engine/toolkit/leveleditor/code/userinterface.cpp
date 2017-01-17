@@ -234,7 +234,12 @@ namespace Toolkit
 						}
 						if (ImGui::GetIO().MouseDown[0])
 						{
-							this->currentTool->Drag(ImGui::GetIO().MouseDelta.x, ImGui::GetIO().MouseDelta.y);
+							this->currentTool->Drag();
+
+							const Math::mat4& delta = this->currentTool->GetDeltaMatrix();
+							Math::mat4 objTransform = this->application->hit.object->GetTransform();
+							
+							this->application->hit.object->SetTransform(Math::mat4::multiply(objTransform, delta));
 						}
 					}
 					else

@@ -14,10 +14,14 @@ TranslateTool::TranslateTool() :
 			dragPlaneOffset(0.0f),
 			freeModeRequested(false),
 			dragStartMouseRayOffset(0.0f, 0.0f, 0.0f),
-			snapOffset(1.0f)
+			snapOffset(1.0f),
+			snapMode(false)
 {
 	type = ToolType::TRANSLATE;
 	currentHandle = TransformHandle::NONE;
+	this->xAxis = Math::point(1.0f, 0.0f, 0.0f);
+	this->yAxis = Math::point(0.0f, 1.0f, 0.0f);
+	this->zAxis = Math::point(0.0f, 0.0f, 1.0f);
 }
 
 TranslateTool::~TranslateTool()
@@ -45,8 +49,9 @@ TransformHandle TranslateTool::GetMouseHandle(const Math::line& worldMouseRay)
 	// if we're not above the origin handle, we proceed to check the other handles
 	for (index_t i = 0; i < 3; ++i)
 	{
-		// check z handle
+		// check all handles
 		axis.set(this->origin + handlePointSize[i] * 0.5f, handles[i] + handlePointSize[i]);
+
 		worldMouseRay.IntersectLine(axis, rayPoint, handlePoint);
 		axis_t = axis.closestpoint(rayPoint);
 		distance = axis.distance(rayPoint);
@@ -74,7 +79,7 @@ void TranslateTool::LeftDown()
 		//Start Dragging
 
 		BaseTool::LeftDown();
-
+		printf("Starting Drag\n");
 		this->startDragMatrix = Math::mat4::identity();
 		this->startDragMatrix = Math::mat4::multiply(this->startDragMatrix, this->initialMatrix);
 		this->startDragMatrix = Math::mat4::multiply(this->startDragMatrix, this->deltaMatrix);
@@ -93,6 +98,8 @@ void TranslateTool::LeftDown()
 		// get mouse ray
 		const float rayLength = 5000.0f;
 		Math::line worldMouseRay = BaseGameFeature::EnvManager::Instance()->ComputeMouseWorldRay(mousePos.x, mousePos.y, rayLength, dockSize.x, dockSize.y);
+
+		this->currentHandle = this->GetMouseHandle(worldMouseRay);
 
 		// check origin handle
 		if (this->currentHandle == ORIGIN /*|| this->isInFreeDragMode*/)
@@ -198,9 +205,11 @@ void TranslateTool::LeftDown()
 	}
 }
 
-void TranslateTool::Drag(const int& deltaX, const int& deltaY)
+void TranslateTool::Drag()
 {
-	BaseTool::Drag(deltaX, deltaY);
+	BaseTool::Drag();
+
+	printf("DRAGGING\n");
 
 	this->deltaMatrix = Math::mat4::identity();
 
@@ -446,8 +455,7 @@ void TranslateTool::LeftUp()
 
 void TranslateTool::Render()
 {
-	const float lineMultiplier = 20.0f;
-	const float lineWidth = Math::max(this->handleScale * lineMultiplier, 2.0f);
+	const float lineWidth = 4.0f;
 
 	// get mouse position on screen
 	ImVec2 dockPos = ImGui::GetWindowPos();
@@ -639,7 +647,7 @@ void TranslateTool::UpdateHandlePositions()
 	this->zAxis = this->origin + zdir;
 
 	// create view plane
-	Math::vector forward(0, 0, -1);
+	Math::vector forward(0, 0, 1);
 	forward = Math::mat4::transform(forward, camTrans);
 	this->viewPlane = Math::plane(this->origin, forward);
 }
