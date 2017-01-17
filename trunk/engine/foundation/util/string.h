@@ -502,8 +502,8 @@ namespace Util
     {
         if(splitCount > index)
             return *splitArray[index];
-        else
-            return *this;
+        
+        return *this;
     }
 
     inline Util::Array<String> String::Tokenize(Util::String str, Util::String delim)
