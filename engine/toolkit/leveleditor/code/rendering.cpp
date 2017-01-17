@@ -2,6 +2,7 @@
 #include "application.h"
 #include "render/server/frameserver.h"
 #include "foundation/math/math.h"
+#include "application/basegamefeature/managers/envmanager.h"
 
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
@@ -78,37 +79,14 @@ void Application::DoPicking()
 	ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
 	if (ImGui::GetIO().MouseDown[0])
 	{
-		Math::mat4 view = Graphics::MainCamera::Instance()->getView();
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
-		Math::mat4 invProj = Graphics::MainCamera::Instance()->getInvProjection();
-		Math::mat4 invViewProj = Graphics::MainCamera::Instance()->getInvViewProjection();
-		Math::mat4 viewProj = Graphics::MainCamera::Instance()->getViewProjection();
-
-		double cursorPosX = 0.0f;
-		double cursorPosY = 0.0f;
-
-		printf("mouse x : %f\n", mouse_pos_in_dock.x / dockSize.x);
-
-		// Transform to world coordinates
-		cursorPosX = (((mouse_pos_in_dock.x / dockSize.x) - 0.5f) * 2.0f);
-		cursorPosY = (((mouse_pos_in_dock.y / dockSize.y) - 0.5f) * 2.0f);
-		Math::vec4 cursorTransform = Math::vec4((float)cursorPosX, (float)cursorPosY, 1.0, 1.0f);
-
-		printf("cursorpos screenspace : %f, %f, %f, %f\n", cursorTransform.x(), cursorTransform.y(), cursorTransform.z(), cursorTransform.w());
-
-		cursorTransform = Math::mat4::transform(cursorTransform, invProj);
-		Math::point ray = (cursorTransform * 0.01f);
-		Math::vec4 rayWorldPos = Math::mat4::transform(ray, invView);
-
-		printf("rayWorldPos: %f %f %f %f\n", rayWorldPos.x(), rayWorldPos.y(), rayWorldPos.z(), rayWorldPos.w());
-
-		Math::vec4 rayDirection = rayWorldPos - invView.get_position();
-		rayDirection = Math::vec4::normalize(rayDirection);
+		
+		Math::line rayLine = BaseGameFeature::EnvManager::Instance()->ComputeMouseWorldRay(mouse_pos_in_dock.x, mouse_pos_in_dock.y, 5000.0f, dockSize.x, dockSize.y);
 
 		Physics::PhysicsHit newHit;
-		if (Physics::PhysicsServer::Instance()->Raycast(newHit, rayWorldPos, rayDirection, 400.0f))
+		if (Physics::PhysicsServer::Instance()->Raycast(newHit, rayLine))
 		{
-			this->rayStart = rayWorldPos;
+			this->rayStart = rayLine.start();
 
 			printf("--- Hit object! ---\n");
 
@@ -118,7 +96,7 @@ void Application::DoPicking()
 		}
 		else
 		{
-			rayEnd = rayWorldPos + (rayDirection*10.0f);
+			rayEnd = rayLine.end();
 		}
 				
 	}

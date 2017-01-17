@@ -63,7 +63,8 @@ public:
     void operator=(PhysicsServer const&) = delete;
 
     ///Shoot a ray and return first object that it intersects.
-    bool Raycast(PhysicsHit& out, const Math::vec4& position, const Math::vec4& direction, const float& length /*, const ExcludeSet& exclude*/);
+    bool Raycast(PhysicsHit& out, const Math::line& ray/*, const ExcludeSet& exclude*/);
+	bool Raycast(PhysicsHit& out, const Math::vec4& position, const Math::vec4& direction, const float& length /*, const ExcludeSet& exclude*/);
 
     void addPhysicsEntity(Game::PhysicsEntity* p);
 

@@ -28,7 +28,7 @@ namespace Tools
 		void LeftDown();
 		void LeftUp();
 
-		void Drag(const int& deltaX, const int& deltaY);
+		void Drag();
 		void Render();
 		void UpdateHandlePositions();
 		void UpdateTransform(const Math::mat4& transform);
