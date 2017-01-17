@@ -77,9 +77,7 @@ void TranslateTool::LeftDown()
 	if (!this->leftMouse)
 	{
 		//Start Dragging
-
 		BaseTool::LeftDown();
-		printf("Starting Drag\n");
 		this->startDragMatrix = Math::mat4::identity();
 		this->startDragMatrix = Math::mat4::multiply(this->startDragMatrix, this->initialMatrix);
 		this->startDragMatrix = Math::mat4::multiply(this->startDragMatrix, this->deltaMatrix);
@@ -208,9 +206,7 @@ void TranslateTool::LeftDown()
 void TranslateTool::Drag()
 {
 	BaseTool::Drag();
-
-	printf("DRAGGING\n");
-
+	
 	this->deltaMatrix = Math::mat4::identity();
 
 	// get mouse position on screen
@@ -479,10 +475,7 @@ void TranslateTool::Render()
 	Math::mat4 m;
 
 	//-90 degrees
-	Math::mat4 coneRotation = Math::mat4::rotationx(-1.5707f);
-
-	// create buffer for line primitives and triangle primitives
-	//CoreGraphics::RenderShape::RenderShapeVertex line[2];
+	Math::mat4 coneRotation = Math::mat4::rotationx(1.5707f);
 
 	// get camera transform
 	Math::mat4 cameraTrans = Graphics::MainCamera::Instance()->getInvView();
@@ -527,7 +520,7 @@ void TranslateTool::Render()
 	m = Math::mat4::multiply(coneRotation, m);
 	m.scale(Math::vector(this->handleScale, this->handleScale, this->handleScale));
 	m.set_position(this->xAxis);
-	//Debug::DebugRenderer::Instance()->DrawCone(m, color);
+	Debug::DebugRenderer::Instance()->DrawCone(m, color, Debug::RenderMode::AlwaysOnTop);
 
 	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->xAxis, lineWidth, color, color, Debug::RenderMode::AlwaysOnTop);
 	
@@ -556,10 +549,11 @@ void TranslateTool::Render()
 	{
 		m = Math::mat4::lookatrh(Math::point(0, 0, 0), Math::point(0, 1, 0), Math::vector(0, 0, 1));
 	}
+	coneRotation = Math::mat4::rotationx(1.5707f);
 	m = Math::mat4::multiply(coneRotation, m);
 	m.scale(Math::vector(this->handleScale, this->handleScale, this->handleScale));
 	m.set_position(this->yAxis);
-	//Debug::DebugRenderer::Instance()->DrawCone(m, color);
+	Debug::DebugRenderer::Instance()->DrawCone(m, color, Debug::RenderMode::AlwaysOnTop);
 
 	m = Math::mat4::identity();
 	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->yAxis, lineWidth, color, color, Debug::RenderMode::AlwaysOnTop);
@@ -590,10 +584,11 @@ void TranslateTool::Render()
 	{
 		m = Math::mat4::lookatrh(Math::point(0, 0, 0), Math::point(0, 0, 1), Math::vector(0, 1, 0));
 	}
+	coneRotation = Math::mat4::rotationx(-1.5707f);
 	m = Math::mat4::multiply(coneRotation, m);
 	m.scale(Math::vector(this->handleScale, this->handleScale, this->handleScale));
 	m.set_position(this->zAxis);
-	//Debug::DebugRenderer::Instance()->DrawCone(m, color);
+	Debug::DebugRenderer::Instance()->DrawCone(m, color, Debug::RenderMode::AlwaysOnTop);
 
 	m = Math::mat4::identity();
 	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->zAxis, lineWidth, color, color, Debug::RenderMode::AlwaysOnTop);
