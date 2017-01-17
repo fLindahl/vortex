@@ -14,7 +14,8 @@ namespace Debug
 		CONE,
 		CAPSULE,
 		FRUSTUM,
-		MESH
+		MESH,
+		CIRCLE
 	};
 
 	enum RenderMode

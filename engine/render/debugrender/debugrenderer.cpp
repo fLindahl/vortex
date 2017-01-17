@@ -1,6 +1,7 @@
 #include "config.h"
 #include "debugrenderer.h"
 
+
 namespace Debug
 {
 
@@ -14,6 +15,7 @@ void DebugRenderer::Initialize()
     this->line.shader = Render::ShaderServer::Instance()->LoadShader("debugLines");
 	this->box.shader = Render::ShaderServer::Instance()->LoadShader("debug");
 	this->mesh.shader = Render::ShaderServer::Instance()->LoadShader("debug");
+	this->cone.shader = Render::ShaderServer::Instance()->LoadShader("debug");
 
     return;
 }
@@ -129,6 +131,30 @@ void DebugRenderer::DrawBox(const Math::bbox& bbox,
 	this->commandQueue.push(cmd);
 }
 
+void DebugRenderer::DrawCone(const Math::vector& position, 
+							const Math::quaternion& rotation, 
+							const float& radius, 
+							const float& length, 
+							const Math::vec4& color, 
+							const RenderMode& renderModes, 
+							const float& lineWidth)
+{
+	ConeCommand* cmd = new ConeCommand();
+	cmd->shape = DebugShape::CONE;
+
+	Math::mat4 transform = Math::mat4::multiply(Math::mat4::scaling(Math::point(radius, length, radius)), Math::mat4::rotationquaternion(rotation));
+	transform.translate(position);
+
+	cmd->transform = transform;
+
+	cmd->linewidth = lineWidth;
+	cmd->color = color;
+	cmd->rendermode = renderModes;
+
+	this->commandQueue.push(cmd);
+
+}
+
 void DebugRenderer::DrawMesh(std::shared_ptr<Render::MeshResource> mesh,
 							 const Math::mat4& transform, 
 							 const Math::vec4& color,
@@ -177,6 +203,11 @@ void DebugRenderer::DrawCommands()
 				this->mesh.Draw(currentCommand);
 				break;
 			}
+			case DebugShape::CONE:
+	        {
+				this->cone.Draw(currentCommand);
+				break;
+	        }
             default:
             {
                 printf("Debug::RenderShape not fully implemented!\n");
