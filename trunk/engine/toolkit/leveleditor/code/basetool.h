@@ -33,7 +33,7 @@ enum ToolType
 class BaseTool
 {
 public:
-	BaseTool() {}
+	BaseTool() { this->deltaMatrix = Math::mat4::identity(); }
 	virtual ~BaseTool() {}
 
 	virtual void LeftDown() { this->leftMouse = true; }

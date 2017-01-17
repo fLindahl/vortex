@@ -17,10 +17,18 @@ namespace Debug
 		MESH
 	};
 
+	enum RenderMode
+	{
+		Normal = 1,
+		AlwaysOnTop = 2,
+		WireFrame = 4
+	};
+
 	struct RenderCommand
 	{
 		DebugShape shape;
-		//TODO: Add render on top
+		char rendermode = RenderMode::Normal;
+		float linewidth = 1.0f;
 	};
 
 	class RenderShape

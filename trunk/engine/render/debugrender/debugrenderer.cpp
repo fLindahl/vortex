@@ -22,13 +22,15 @@ void DebugRenderer::DrawLine(const Math::point &startPoint,
                              const Math::point &endPoint,
                              const float &lineWidth,
                              const Math::vec4 &startColor,
-                             const Math::vec4 &endColor)
+							 const Math::vec4 &endColor, 
+							 const RenderMode& renderModes)
 {
     LineCommand* cmd = new LineCommand();
     cmd->shape = DebugShape::LINE;
     cmd->startpoint = startPoint;
     cmd->endpoint = endPoint;
-    cmd->width = lineWidth;
+    cmd->linewidth = lineWidth;
+	cmd->rendermode = renderModes;
     cmd->startcolor = startColor;
     cmd->endcolor = endColor;
 
@@ -40,7 +42,7 @@ void DebugRenderer::DrawBox(const Math::vector& position,
 							const Math::quaternion& rotation, 
 							const float& scale, 
 							const Math::vec4& color, 
-							const bool& wireframe, 
+							const RenderMode& renderModes,
 							const float& lineWidth)
 {
 	BoxCommand* cmd = new BoxCommand();
@@ -51,9 +53,9 @@ void DebugRenderer::DrawBox(const Math::vector& position,
 
 	cmd->transform = transform;
 		
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
-	cmd->wireframe = wireframe;
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 
@@ -65,7 +67,7 @@ void DebugRenderer::DrawBox(const Math::vector& position,
 							const float& height, 
 							const float& length, 
 							const Math::vec4& color, 
-							const bool& wireframe, 
+							const RenderMode& renderModes,
 							const float& lineWidth)
 {
 	BoxCommand* cmd = new BoxCommand();
@@ -76,16 +78,16 @@ void DebugRenderer::DrawBox(const Math::vector& position,
 
 	cmd->transform = transform;
 
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
-	cmd->wireframe = wireframe;
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 }
 
 void DebugRenderer::DrawBox(const Math::mat4& transform, 
 							const Math::vec4& color, 
-							const bool& wireframe, 
+							const RenderMode& renderModes,
 							const float& lineWidth)
 {
 	BoxCommand* cmd = new BoxCommand();
@@ -93,15 +95,16 @@ void DebugRenderer::DrawBox(const Math::mat4& transform,
 
 	cmd->transform = transform;
 
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
-	cmd->wireframe = wireframe;
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 }
 
 void DebugRenderer::DrawBox(const Math::bbox& bbox, 
 							const Math::vec4& color, 
+							const RenderMode& renderModes,
 							const float& lineWidth)
 {
 	BoxCommand* cmd = new BoxCommand();
@@ -118,10 +121,10 @@ void DebugRenderer::DrawBox(const Math::bbox& bbox,
 
 	cmd->transform = transform;
 
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
 	//Always draw bboxes with wireframe
-	cmd->wireframe = true;
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 }
@@ -129,8 +132,8 @@ void DebugRenderer::DrawBox(const Math::bbox& bbox,
 void DebugRenderer::DrawMesh(std::shared_ptr<Render::MeshResource> mesh,
 							 const Math::mat4& transform, 
 							 const Math::vec4& color,
+							 const RenderMode& renderModes,
 							 int primitiveGroup,
-							 bool wireframe,
 							 float lineWidth)
 {
 	MeshCommand* cmd = new MeshCommand();
@@ -141,10 +144,10 @@ void DebugRenderer::DrawMesh(std::shared_ptr<Render::MeshResource> mesh,
 
 	cmd->transform = transform;
 
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
 	//Always draw bboxes with wireframe
-	cmd->wireframe = wireframe;
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 }

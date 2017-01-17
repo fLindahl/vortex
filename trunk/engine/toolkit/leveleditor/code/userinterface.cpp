@@ -211,16 +211,19 @@ namespace Toolkit
 				ImVec2 dockSize = ImGui::GetWindowSize();
 				ImGui::Image((void*)Render::RenderDevice::Instance()->GetFinalColorBuffer(), dockSize);
 
+				this->currentTool->UpdateHandlePositions();
 				this->currentTool->Render();
 
 				if (ImGui::IsItemHovered())
 				{
 					if (application->hit.object != nullptr)
 					{
+						this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+
 						if (ImGui::GetIO().MouseClicked[0])
 						{
 							this->currentTool->LeftDown();
-							if (this->currentTool->GetCurrentHandle() != Tools::TransformHandle::NONE)
+							if (this->currentTool->GetCurrentHandle() == Tools::TransformHandle::NONE)
 							{
 								application->DoPicking();
 							}

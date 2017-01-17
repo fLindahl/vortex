@@ -3,11 +3,18 @@
 #include "imgui.h"
 #include "application/basegamefeature/managers/envmanager.h"
 #include "render/debugrender/debugrenderer.h"
-
+#include "foundation/math/math.h"
 namespace Tools
 {
 
-TranslateTool::TranslateTool()
+TranslateTool::TranslateTool() : 
+			handleDistance(5.0f),
+			relativeMode(false),
+			axisLockingMode(false),
+			dragPlaneOffset(0.0f),
+			freeModeRequested(false),
+			dragStartMouseRayOffset(0.0f, 0.0f, 0.0f),
+			snapOffset(1.0f)
 {
 	type = ToolType::TRANSLATE;
 	currentHandle = TransformHandle::NONE;
@@ -67,6 +74,10 @@ void TranslateTool::LeftDown()
 		//Start Dragging
 
 		BaseTool::LeftDown();
+
+		this->startDragMatrix = Math::mat4::identity();
+		this->startDragMatrix = Math::mat4::multiply(this->startDragMatrix, this->initialMatrix);
+		this->startDragMatrix = Math::mat4::multiply(this->startDragMatrix, this->deltaMatrix);
 
 		Math::point rayPoint, handlePoint;
 
@@ -435,6 +446,9 @@ void TranslateTool::LeftUp()
 
 void TranslateTool::Render()
 {
+	const float lineMultiplier = 20.0f;
+	const float lineWidth = Math::max(this->handleScale * lineMultiplier, 2.0f);
+
 	// get mouse position on screen
 	ImVec2 dockPos = ImGui::GetWindowPos();
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -478,7 +492,7 @@ void TranslateTool::Render()
 	m = Math::mat4::identity();
 	m.scale(Math::vector(this->handleScale, this->handleScale, this->handleScale));
 	m.set_position(this->origin);
-	Debug::DebugRenderer::Instance()->DrawBox(m, color);
+	Debug::DebugRenderer::Instance()->DrawBox(m, color, Debug::RenderMode::AlwaysOnTop);
 
 	// draw X axis + handle
 	if (XAXIS == this->currentHandle || XAXIS == mode)
@@ -507,7 +521,7 @@ void TranslateTool::Render()
 	m.set_position(this->xAxis);
 	//Debug::DebugRenderer::Instance()->DrawCone(m, color);
 
-	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->xAxis, 1.0f, color, color);
+	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->xAxis, lineWidth, color, color, Debug::RenderMode::AlwaysOnTop);
 	
 	// draw Y axis + handle  
 	if (YAXIS == this->currentHandle || YAXIS == mode)
@@ -540,7 +554,7 @@ void TranslateTool::Render()
 	//Debug::DebugRenderer::Instance()->DrawCone(m, color);
 
 	m = Math::mat4::identity();
-	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->yAxis, 1.0f, color, color);
+	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->yAxis, lineWidth, color, color, Debug::RenderMode::AlwaysOnTop);
 
 	// draw Z axis + handle    
 	if (ZAXIS == this->currentHandle || ZAXIS == mode)
@@ -574,7 +588,7 @@ void TranslateTool::Render()
 	//Debug::DebugRenderer::Instance()->DrawCone(m, color);
 
 	m = Math::mat4::identity();
-	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->zAxis, 1.0f, color, color);
+	Debug::DebugRenderer::Instance()->DrawLine(this->origin, this->zAxis, lineWidth, color, color, Debug::RenderMode::AlwaysOnTop);
 }
 
 /*

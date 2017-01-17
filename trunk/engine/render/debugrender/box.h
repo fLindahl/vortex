@@ -9,8 +9,6 @@ struct BoxCommand : public RenderCommand
 {
 	Math::mat4 transform = Math::mat4::identity();
     Math::vec4 color = Math::vec4(1.0f);
-	float lineWidth = 1.0f;
-	bool wireframe = false;
 };
 
 class RenderBox : public RenderShape
@@ -118,10 +116,15 @@ inline void RenderBox::Draw(RenderCommand* command)
 
 	this->shader->setModelMatrix(cmd->transform);
 
-	if (cmd->wireframe)
+	if ((cmd->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
+	{
+		glDepthFunc(GL_ALWAYS);
+	}
+
+	if ((cmd->rendermode & RenderMode::WireFrame) == RenderMode::WireFrame)
 	{
 		glPolygonMode(GL_FRONT, GL_LINE);
-		glLineWidth(cmd->lineWidth);
+		glLineWidth(cmd->linewidth);
 
 		glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, (void*)(36 * sizeof(GLuint)));
 		glPolygonMode(GL_FRONT, GL_FILL);
@@ -129,6 +132,11 @@ inline void RenderBox::Draw(RenderCommand* command)
 	else
 	{
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
+	}
+
+	if ((cmd->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
+	{
+		glDepthFunc(GL_LESS);
 	}
     
 	glBindVertexArray(0);
