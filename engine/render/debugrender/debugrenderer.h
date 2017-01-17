@@ -47,6 +47,10 @@ public:
 
 	///Draws a unit colored cone at position with rotation and scale
 	void DrawCone(const Math::vector& position, const Math::quaternion& rotation, const float& radius, const float& length, const Math::vec4& color, const RenderMode& renderModes = RenderMode::Normal, const float& lineWidth = 1.0f);
+	
+	///Draws a colored cone with transform
+	void DrawCone(const Math::mat4& transform, const Math::vec4& color, const RenderMode& renderModes = RenderMode::Normal, const float& lineWidth = 1.0f);
+
 
 	///Draw a mesh at transform with solid color. Primitive group decides which group to render. if primitive group is -1, the entire mesh will be rendered.
 	void DrawMesh(std::shared_ptr<Render::MeshResource> mesh, const Math::mat4& transform, const Math::vec4& color, const RenderMode& renderModes = RenderMode::Normal, int primitiveGroup = -1, float lineWidth = 1.0f);

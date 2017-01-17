@@ -132,12 +132,12 @@ void DebugRenderer::DrawBox(const Math::bbox& bbox,
 }
 
 void DebugRenderer::DrawCone(const Math::vector& position, 
-							const Math::quaternion& rotation, 
-							const float& radius, 
-							const float& length, 
-							const Math::vec4& color, 
-							const RenderMode& renderModes, 
-							const float& lineWidth)
+							 const Math::quaternion& rotation, 
+							 const float& radius, 
+							 const float& length, 
+							 const Math::vec4& color, 
+							 const RenderMode& renderModes, 
+							 const float& lineWidth)
 {
 	ConeCommand* cmd = new ConeCommand();
 	cmd->shape = DebugShape::CONE;
@@ -145,6 +145,24 @@ void DebugRenderer::DrawCone(const Math::vector& position,
 	Math::mat4 transform = Math::mat4::multiply(Math::mat4::scaling(Math::point(radius, length, radius)), Math::mat4::rotationquaternion(rotation));
 	transform.translate(position);
 
+	cmd->transform = transform;
+
+	cmd->linewidth = lineWidth;
+	cmd->color = color;
+	cmd->rendermode = renderModes;
+
+	this->commandQueue.push(cmd);
+
+}
+
+void DebugRenderer::DrawCone(const Math::mat4& transform,
+							 const Math::vec4& color,
+							 const RenderMode& renderModes,
+							 const float& lineWidth)
+{
+	ConeCommand* cmd = new ConeCommand();
+	cmd->shape = DebugShape::CONE;
+	
 	cmd->transform = transform;
 
 	cmd->linewidth = lineWidth;
