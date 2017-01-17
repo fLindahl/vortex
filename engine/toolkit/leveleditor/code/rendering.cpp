@@ -78,8 +78,6 @@ void Application::DoPicking()
 	ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
 	if (ImGui::GetIO().MouseDown[0])
 	{
-		//mouse_pos_in_dock.x = Math::min(mouse_pos_in_dock.x, mouse_pos_in_dock.y);
-
 		Math::mat4 view = Graphics::MainCamera::Instance()->getView();
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
 		Math::mat4 invProj = Graphics::MainCamera::Instance()->getInvProjection();

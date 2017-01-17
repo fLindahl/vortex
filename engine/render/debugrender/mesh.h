@@ -15,9 +15,6 @@ struct MeshCommand : public RenderCommand
 	std::shared_ptr<Render::MeshResource> mesh;
 	//Primitive group to render. -1 renders all primitivegroups
 	int primitiveGroup = -1;
-
-	float lineWidth = 1.0f;
-	bool wireframe = false;
 };
 
 class RenderMesh : public RenderShape
@@ -57,12 +54,17 @@ inline void RenderMesh::Draw(RenderCommand* command)
 
 	this->shader->setModelMatrix(cmd->transform);
 
-	if (cmd->wireframe)
+	if ((cmd->rendermode & RenderMode::WireFrame) == RenderMode::WireFrame)
 	{
 		glDepthFunc(GL_LEQUAL);
 		glPolygonMode(GL_FRONT, GL_LINE);
-		glLineWidth(cmd->lineWidth);
+		glLineWidth(cmd->linewidth);
 	}
+	if ((cmd->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
+	{
+		glDepthFunc(GL_ALWAYS);
+	}
+
 
 	if (cmd->primitiveGroup != -1)
 	{
@@ -73,9 +75,13 @@ inline void RenderMesh::Draw(RenderCommand* command)
 		cmd->mesh->Draw();
 	}
 
-	if (cmd->wireframe)
+	if ((cmd->rendermode & RenderMode::WireFrame) == RenderMode::WireFrame)
 	{
 		glPolygonMode(GL_FRONT, GL_FILL);
+		glDepthFunc(GL_LESS);
+	}
+	if ((cmd->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
+	{
 		glDepthFunc(GL_LESS);
 	}
     

@@ -239,7 +239,7 @@ Application::Run()
 			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
 			if (rbe != nullptr)
 			{
-				Debug::DebugRenderer::Instance()->DrawMesh(rbe->GetGraphicsProperty()->getModelInstance()->GetMesh(), rbe->GetTransform(), Math::vec4(1.0f, 1.0f, 1.0f, 1.0f), -1, true, 2.0f);
+				Debug::DebugRenderer::Instance()->DrawMesh(rbe->GetGraphicsProperty()->getModelInstance()->GetMesh(), rbe->GetTransform(), Math::vec4(1.0f, 1.0f, 1.0f, 1.0f), Debug::RenderMode::WireFrame, -1, 2.0f);
 			}
 		}
 		
