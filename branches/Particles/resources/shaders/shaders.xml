@@ -1,0 +1,41 @@
+<Vortex>
+    <Shaders>
+		
+		<Shader name="depthStatic" desc="Default shader for writing to the depth buffer">
+			<VertexShader name="resources/shaders/vertex/depthstatic.vert"/>
+			<FragmentShader name="resources/shaders/fragment/depth.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
+		<Shader name="defaultLit" desc="Default shader for rendering opaque lit geometry">            
+			<VertexShader name="resources/shaders/vertex/static.vert"/>
+			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
+		<Shader name="toonShader" desc="Shader for rendering cartoon-like lit geometry">    
+			<VertexShader name="resources/shaders/vertex/static.vert"/>
+			<FragmentShader name="resources/shaders/fragment/toonshader.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
+		<Shader name="outline" desc="Shader for rendering outlines">    
+			<VertexShader name="resources/shaders/vertex/depthstatic.vert"/>
+			<FragmentShader name="resources/shaders/fragment/outline.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+			
+		<Shader name="debugLines" desc="Shader for rendering debug lines">    
+			<VertexShader name="resources/shaders/vertex/line.vert"/>
+			<FragmentShader name="resources/shaders/fragment/line_colored.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
+		<Shader name="debug" desc="Shader for rendering debug shapes">    
+			<VertexShader name="resources/shaders/vertex/debug.vert"/>
+			<FragmentShader name="resources/shaders/fragment/debug.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
+    </Shaders>
+</Vortex>
