@@ -218,11 +218,10 @@ namespace Toolkit
 				{
 					if (application->hit.object != nullptr)
 					{
-						this->currentTool->UpdateTransform(application->hit.object->GetTransform());
-
 						if (ImGui::GetIO().MouseClicked[0])
 						{
 							this->currentTool->LeftDown();
+							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
 							if (this->currentTool->GetCurrentHandle() == Tools::TransformHandle::NONE)
 							{
 								application->DoPicking();
@@ -240,6 +239,7 @@ namespace Toolkit
 							Math::mat4 objTransform = this->application->hit.object->GetTransform();
 							
 							this->application->hit.object->SetTransform(Math::mat4::multiply(objTransform, delta));
+							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
 						}
 					}
 					else

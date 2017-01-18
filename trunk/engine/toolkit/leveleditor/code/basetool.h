@@ -16,7 +16,8 @@ enum TransformHandle
 	XAXIS,
 	YAXIS,
 	ZAXIS,
-	ORIGIN
+	ORIGIN,
+	VIEWAXIS
 };
 
 enum ToolType
