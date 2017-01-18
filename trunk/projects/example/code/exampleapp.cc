@@ -486,15 +486,19 @@ ExampleApp::Run()
 
         BaseGameFeature::EntityManager::Instance()->Update();
 
+		Debug::DebugRenderer::Instance()->DrawLine(rayStart, rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
 		RenderDevice::Instance()->Render();
 
 		if(hit.object != nullptr)
         {
             Game::PhysicsEntity* pe = dynamic_cast<Game::PhysicsEntity*>(hit.object);
 
-            if(pe != nullptr)
-                consoleBuffer = pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName();
-
+			if (pe != nullptr)
+			{
+				consoleBuffer = pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName();
+				Debug::DebugRenderer::Instance()->DrawMesh(pe->GetGraphicsProperty()->getModelInstance()->GetMesh(), pe->GetTransform(), Math::vec4(1.0f, 1.0f, 1.0f, 1.0f), Debug::RenderMode::WireFrame, -1, 2.0f);
+			}
         }
 
 		this->window->SwapBuffers();
