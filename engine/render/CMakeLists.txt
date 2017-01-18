@@ -93,6 +93,11 @@ SET(files_render_softwarerender
 	softwarerender/rasterizer.h
 	softwarerender/rasterizer.cpp
 	)	
+	
+SET(files_render_particlesystem
+	particlesystem/particlesystem.h
+	particlesystem/particlesystem.cpp
+	)	
 
 SET(files_render_debugrender
 	debugrender/debugrenderer.h
@@ -123,6 +128,8 @@ SOURCE_GROUP("resources" FILES ${files_render_resources})
 
 SOURCE_GROUP("server" FILES ${files_render_server})
 
+SOURCE_GROUP("particlesystem" FILES ${files_render_particlesystem})
+
 SOURCE_GROUP("softwarerender" FILES ${files_render_softwarerender})
 
 SOURCE_GROUP("debugrender" FILES ${files_render_debugrender})
@@ -136,6 +143,7 @@ SET(files_render
 	${files_render_frame}
 	${files_render_resources}
 	${files_render_server}
+	${files_render_particlesystem}
 	${files_render_softwarerender}
 	${files_render_debugrender}
 	)
