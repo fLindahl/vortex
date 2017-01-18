@@ -149,7 +149,7 @@ Application::Run()
 
 		if (this->UI->selectedNode != nullptr)
 		{
-			Debug::DebugRenderer::Instance()->DrawMesh(this->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh(), this->loadedModel->GetTransform(), Math::vec4(0.5f, 0.5f, 0.0f, 0.5f), this->UI->selectedNode->primitiveGroup, true);
+			Debug::DebugRenderer::Instance()->DrawMesh(this->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh(), this->loadedModel->GetTransform(), Math::vec4(0.5f, 0.5f, 0.0f, 0.5f), Debug::RenderMode::Normal, this->UI->selectedNode->primitiveGroup);
 		}
 
 		this->window->SwapBuffers();
