@@ -66,22 +66,6 @@ private:
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
 	
-	std::shared_ptr<Render::ModelInstance> modelInstance;
-	std::shared_ptr<Render::ModelInstance> modelInstanceScene;
-	
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity1;
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity2;
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity3;
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity4;
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity5;
-
-	std::shared_ptr<Game::StaticEntity> SceneEntity1;
-    std::shared_ptr<Game::StaticEntity> SceneEntity2;
-    std::shared_ptr<Game::StaticEntity> SceneEntity3;
-    std::shared_ptr<Game::StaticEntity> SceneEntity4;
-    std::shared_ptr<Game::StaticEntity> SceneEntity5;
-    std::shared_ptr<Game::StaticEntity> SceneEntity6;
-
 	std::shared_ptr<Game::ModelEntity> sponza;
 
 	BaseGameFeature::KeyHandler* keyhandler;

@@ -357,7 +357,7 @@ namespace Render
 		PrimitiveGroup primGroup;
 		//primGroup.SetBaseVertex(group->firstVertex);
 		//primGroup.SetNumVertices(group->numVertices);
-		//primGroup.name = group->name;
+		primGroup.name = group->name;
 		primGroup.indexOffset = group->indexpointer; // .SetBaseIndex(group->firstTriangle * 3);
 		primGroup.numIndices = group->numindices; // .SetNumIndices(group->numTriangles * 3);
 		//primGroup.SetPrimitiveTopology(PrimitiveTopology::TriangleList);

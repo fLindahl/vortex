@@ -96,6 +96,7 @@ void Application::DoPicking()
 		}
 		else
 		{
+			rayStart = cameraPos;
 			rayEnd = rayLine.end();
 		}
 				
