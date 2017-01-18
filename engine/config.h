@@ -46,7 +46,12 @@ typedef double		float64;
 
 // assert macro
 //#define assert(_Expression) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(#_Expression), _CRT_WIDE(__FILE__), __LINE__), 0) )
+
+#ifdef __GNUC__
+#define _assert(expr, msg) ((expr) ? __ASSERT_VOID_CAST (0) : __assert_fail (#msg, __FILE__, __LINE__, __ASSERT_FUNCTION))
+#else
 #define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(_Msg), _CRT_WIDE(__FILE__), __LINE__), 0) )
+#endif
 
 #ifdef NULL
 #undef NULL

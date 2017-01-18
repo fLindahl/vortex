@@ -6,7 +6,7 @@
 #include "toolkit/tools/style.h"
 #include "nfd.h"
 #include "render/resources/surface.h"
-#include "dirent.h"
+#include <dirent.h>
 #include "render/frame/flatgeometrylitpass.h"
 
 namespace Toolkit
