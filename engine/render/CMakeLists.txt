@@ -101,6 +101,7 @@ SET(files_render_debugrender
 	debugrender/box.h
 	debugrender/mesh.h
 	debugrender/cone.h
+	debugrender/circle.h
 	debugrender/shape.h
 	debugrender/debugserver.h
 	debugrender/debugserver.cpp
