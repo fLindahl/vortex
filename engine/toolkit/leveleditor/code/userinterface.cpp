@@ -304,7 +304,7 @@ namespace Toolkit
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
 			if (ImGui::Button("New Entity", { 100, 40 }))
 			{
-				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), this->application->modelInstance);
+				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 				commandManager->DoCommand(command);
 			}
 			ImGui::EndDock();
