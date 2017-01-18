@@ -18,7 +18,8 @@ struct MeshFileHeader
 
 struct MeshFilePrimitiveGroup
 {
-	//char name[256];
+	//256 is primitivegroup name limit!
+	char name[256];
 	size_t indexpointer;
 	size_t numindices;
 	//uint firstVertex;
