@@ -1,9 +1,9 @@
 uniform vec4 color;
 
-in float depth;
+in float diffuse;
 out vec4 diffuseColor;
 
 void main()
 {
-	diffuseColor = color*depth;
+	diffuseColor = vec4(color.xyz*diffuse, color.w);
 }
