@@ -191,6 +191,10 @@ namespace Toolkit
 					{
 						this->meshBrowserPopup = true;
 					}
+					if (ImGui::Button("EXPORT..", ImVec2(48, 16)))
+					{
+						this->ExportMesh();
+					}
 
 					ImGui::BeginChild("ModelNodes", ImVec2(0, 0), true);
 					{
@@ -248,7 +252,7 @@ namespace Toolkit
 		if (ImGui::BeginPopupModal("OpenFile", &this->openFilePopup))
 		{
 			nfdchar_t* outpath;
-			nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outpath);
+			nfdresult_t result = NFD_OpenDialog("mdl", NULL, &outpath);
 
 			if (result == NFD_OKAY)
 			{
@@ -357,6 +361,8 @@ namespace Toolkit
 				std::string path = "resources/meshes/" + list[selected];
 				printf("mesh path: %s\n", path.c_str());
 
+				this->selectedNode = nullptr;
+
 				this->application->loadedModel->Deactivate();
 				this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->SetMesh(path.c_str());
 				this->application->loadedModel->Activate();
@@ -422,6 +428,39 @@ namespace Toolkit
 		}		
 		printf("Save Path: %s\n", this->savePath.c_str());
 		this->application->SaveModel(this->savePath.c_str());		
+	}
+
+	void UserInterface::ExportMesh()
+	{
+		std::string filepath;
+
+		nfdchar_t* outpath = nullptr;
+		nfdresult_t result = NFD_SaveDialog("mesh", NULL, &outpath);
+
+		if (result == NFD_OKAY)
+		{
+			filepath = outpath;
+
+			free(outpath);
+
+			if (filepath.substr(filepath.find_last_of(".") + 1) != "mesh")
+			{
+				filepath.append(".mesh");
+			}
+		}
+		else if (result == NFD_CANCEL)
+		{
+			//Do nothing!
+			return;
+		}
+		else
+		{
+			printf("Error: %s\n", NFD_GetError());
+			assert(false);
+			return;
+		}
+		printf("Mesh Export Path: %s\n", filepath.c_str());
+		this->application->ExportMesh(filepath.c_str());
 	}
 
 	void UserInterface::NewSurface()

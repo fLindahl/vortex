@@ -5,7 +5,7 @@
 #include <cstring>
 #include "foundation/math/vector4.h"
 #include <GLFW/glfw3.h>
-#include "render/resources/nvx2fileformatstructs.h"
+#include "render/resources/meshfileformatstructs.h"
 
 namespace Render
 {
@@ -72,14 +72,13 @@ bool SkinnedCharacter::loadMeshFromFile(const char* filename)
 
 void SkinnedCharacter::ReadHeaderData()
 {
-	struct Nvx2Header* header = (struct Nvx2Header*) this->mapPtr;
+	struct MeshFileHeader* header = (struct MeshFileHeader*) this->mapPtr;
 	header->numIndices *= 3; // header holds number of tris, not indices
 
 	this->numGroups = header->numGroups;
 	this->numVertices = header->numVertices;
 	this->vertexWidth = header->vertexWidth;
 	this->numIndices = header->numIndices;
-	this->numEdges = header->numEdges;
 	this->vertexComponentMask = header->vertexComponentMask;
 	this->groupDataSize = 6 * sizeof(uint) * this->numGroups;
 	this->vertexDataSize = this->numVertices * this->vertexWidth * sizeof(float);

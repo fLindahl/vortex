@@ -70,7 +70,7 @@ SET(files_render_resources
 	resources/material.cpp
 	resources/surface.h
 	resources/surface.cpp	
-	resources/nvx2fileformatstructs.h
+	resources/meshfileformatstructs.h
 	)
 
 SET(files_render_server
