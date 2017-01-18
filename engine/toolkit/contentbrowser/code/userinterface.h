@@ -35,6 +35,7 @@ namespace Toolkit
 		
 		void NewModel();
 		void SaveModel(bool newPath = false);
+		void ExportMesh();
 		void NewSurface();
 
 		bool openFilePopup = false;

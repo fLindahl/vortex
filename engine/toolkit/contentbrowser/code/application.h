@@ -50,6 +50,7 @@ private:
 
 	void NewModel();
 	void SaveModel(const char* filepath);
+	void ExportMesh(const char* filepath);
 
 	Math::point cameraPos;
 	float camRotX;

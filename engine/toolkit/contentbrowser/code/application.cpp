@@ -15,6 +15,7 @@
 #include "application/basegamefeature/managers/scenemanager.h"
 #include "tinyxml2.h"
 #include "render/resources/surface.h"
+#include "render/resources/meshbuilder.h"
 
 #include "application/basegamefeature/keyhandler.h"
 
@@ -149,7 +150,7 @@ Application::Run()
 
 		if (this->UI->selectedNode != nullptr)
 		{
-			Debug::DebugRenderer::Instance()->DrawMesh(this->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh(), this->loadedModel->GetTransform(), Math::vec4(0.5f, 0.5f, 0.0f, 0.5f), Debug::RenderMode::Normal, this->UI->selectedNode->primitiveGroup);
+			Debug::DebugRenderer::Instance()->DrawMesh(this->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh(), this->loadedModel->GetTransform(), Math::vec4(0.5f, 0.5f, 0.0f, 0.5f), Debug::RenderMode::WireFrame, this->UI->selectedNode->primitiveGroup);
 		}
 
 		this->window->SwapBuffers();
@@ -209,6 +210,15 @@ void Application::SaveModel(const char* filepath)
 		assert(!eResult);
 
 		data.Clear();
+	}
+}
+
+void Application::ExportMesh(const char* filepath)
+{
+	if (this->loadedModel != nullptr)
+	{
+		Render::MeshBuilder::ExportMesh(this->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh(), filepath);
+		this->loadedModel->GetGraphicsProperty()->getModelInstance()->SetMesh(filepath);
 	}
 }
 

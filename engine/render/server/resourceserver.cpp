@@ -20,7 +20,7 @@ std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const std::string& meshpa
         //{
         //    nMesh->loadMeshFromOBJ(meshpath.c_str());
         //}
-        if(fileExtension == ".nvx2")
+        if(fileExtension == ".mesh")
         {
             nMesh->loadMeshFromFile(meshpath.c_str());
         }
