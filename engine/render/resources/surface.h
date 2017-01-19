@@ -46,7 +46,7 @@ namespace Render
 
 		
 		/// loaded textures
-		std::map<Util::String, std::shared_ptr<TextureResource>> texturesByName;
+		std::map<TextureType, std::shared_ptr<TextureResource>> texturesByType;
 		Util::Array<std::shared_ptr<TextureResource>> textures;
 
 		std::map<Util::String, MaterialParameter*> parametersByName;

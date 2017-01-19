@@ -1,4 +1,5 @@
 #pragma once
+#include "render/shadersemantics.h"
 
 namespace Render 
 {
@@ -33,21 +34,22 @@ namespace Render
 		"layout (std140, binding = 0) uniform GlobalBlock\n"
 		"{\n"
 		"#define TILE_SIZE 16\n"
-		"mat4 View;\n"
-		"mat4 Projection;\n"
-		"mat4 ViewProjection;\n"
-		"mat4 InvView;\n"
-		"mat4 InvProjection;\n"
-		"mat4 InvViewProjection;\n"
-		"vec4 CameraPosition;\n"
-		"ivec2 ScreenSize;\n"
-		"vec2 TimeAndRandom;\n"
-		"uvec2 LightTileWorkGroups;\n"
+		"mat4 " VORTEX_SEMANTIC_VIEW ";\n"
+		"mat4 " VORTEX_SEMANTIC_PROJECTION ";\n"
+		"mat4 " VORTEX_SEMANTIC_VIEWPROJECTION ";\n"
+		"mat4 " VORTEX_SEMANTIC_INVVIEW ";\n"
+		"mat4 " VORTEX_SEMANTIC_INVPROJECTION ";\n"
+		"mat4 " VORTEX_SEMANTIC_INVVIEWPROJECTION ";\n"
+		"vec4 " VORTEX_SEMANTIC_CAMERAPOSITION ";\n"
+		"ivec2 " VORTEX_SEMANTIC_SCREENSIZE ";\n"
+		"vec2 " VORTEX_SEMANTIC_TIMEANDRANDOM ";\n"
+		"uvec2 " VORTEX_SEMANTIC_LIGHTTILEWORKGROUPS ";\n"
 		"};\n"
 		"\n";
 
 	const char VertexShaderHeader[] =
-		"uniform mat4 Model;\n";
+		"uniform mat4 " VORTEX_SEMANTIC_MODEL ";\n"
+		"uniform mat4 " VORTEX_SEMANTIC_INVMODEL ";\n";
 
     const char FragmentShaderHeader[] =
         "";

@@ -39,6 +39,7 @@ namespace Toolkit
 		void NewSurface();
 
 		bool openFilePopup = false;
+		bool importFilePopup = false;
 		bool confirmNewModelPopup = false;
 		bool surfaceBrowserPopup = false;
 		bool meshBrowserPopup = false;
