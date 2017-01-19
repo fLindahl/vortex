@@ -1,11 +1,17 @@
 in vec3 FragmentPos;
-in vec3 Normal;
+//in vec3 Normal;
 in vec2 TexCoords;
+// For normalmapping
+in mat3 NormalMatrix;
+in vec3 TangentFragmentPos;
+in vec3 TangentViewPos;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 normalColor;
 
 uniform sampler2D AlbedoMap;
+uniform sampler2D NormalMap;
+uniform sampler2D SpecularMap;
 
 struct PointLight 
 {
@@ -33,8 +39,6 @@ layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer
 
 // parameters of the light and possible values
 const vec3 u_lightAmbientIntensity = vec3(0.1f, 0.1f, 0.1f);
-const vec3 u_lightDiffuseIntensity = vec3(0.8f, 0.8f, 0.8f);
-const vec3 u_lightSpecularIntensity = vec3(1.0f, 1.0f, 1.0f);
 
 // parameters of the material and possible values
 uniform vec4 AmbientReflectance; 
@@ -61,19 +65,21 @@ void main()
 
 	vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 	
+	//Sample textures
 	vec3 albedoDiffuseColor = texture(AlbedoMap,TexCoords).rgb;
+	vec3 normal = texture(NormalMap, TexCoords).rgb;
+	//Linearize colors
+	vec3 N = NormalMatrix * ((normal*2.0f) - 1.0f);
 	
 	vec3 V = normalize(CameraPosition.xyz - FragmentPos.xyz);
-	vec3 N = Normal;
 	
 	uint offset = index * 1024;
-
 	for (uint i = 0; i < 1024 && visibleLightIndicesBuffer.data[offset + i].index != -1; i++) 
 	{
 		uint lightIndex = visibleLightIndicesBuffer.data[offset + i].index;
 		PointLight light = lightBuffer.data[lightIndex];
 
-		vec3 L = (light.position.xyz) - FragmentPos.xyz;
+		vec3 L = light.position.xyz - FragmentPos.xyz;
 		
 		float attenuation = attenuate(L, light.radiusAndPadding.x);
 
@@ -83,10 +89,10 @@ void main()
 
 		// Calculate the diffuse and specular components of the irradiance, then irradiance, and accumulate onto color
 		float diffuse = max(dot(L, N), 0.0);
-		// How do I change the material propery for the spec exponent? is it the alpha of the spec texture?
-		float specular = pow(max(dot(N, H), 0.0), Shininess);
+		float specular = pow(max(dot(N, H), 0.0), Shininess) * (diffuse <= 0 ? 0 : 1);
 
-
+		
+		
 		vec3 irradiance = light.color.rgb * (albedoDiffuseColor.rgb * diffuse + vec3(specular)) * attenuation;
 		color.rgb += irradiance;
 	}
@@ -94,6 +100,6 @@ void main()
 	color.rgb += albedoDiffuseColor.rgb * u_lightAmbientIntensity;
 	
 	fragColor = color;
-	normalColor = Normal;
+	normalColor = N;
 
 }

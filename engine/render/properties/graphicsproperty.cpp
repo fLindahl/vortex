@@ -33,7 +33,12 @@ void GraphicsProperty::setModelInstance(std::shared_ptr<Render::ModelInstance> i
 	this->modelInstance = inModelInstance;
 }
 
-Math::mat4 GraphicsProperty::getModelMatrix() const
+const Math::mat4& GraphicsProperty::getModelMatrix() const
+{
+	return this->modelMat;
+}
+
+const Math::mat4& GraphicsProperty::getInvModelMatrix() const
 {
 	return this->modelMat;
 }
@@ -41,8 +46,9 @@ Math::mat4 GraphicsProperty::getModelMatrix() const
 void GraphicsProperty::setModelMatrix(const Math::mat4 &mat)
 {
 	this->modelMat = mat;
+	this->invMat = Math::mat4::inverse(this->modelMat);
 	this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
-	this->bbox.transform(mat);
+	this->bbox.transform(this->modelMat);
 }
 
 void GraphicsProperty::Update()

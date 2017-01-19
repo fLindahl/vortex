@@ -198,7 +198,7 @@ namespace Display
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glfwWindowHint(GLFW_RED_BITS, 8);
+		glfwWindowHint(GLFW_RED_BITS, 3);
 		glfwWindowHint(GLFW_GREEN_BITS, 8);
 		glfwWindowHint(GLFW_BLUE_BITS, 8);
 		glfwWindowHint(GLFW_SRGB_CAPABLE, GL_TRUE);
