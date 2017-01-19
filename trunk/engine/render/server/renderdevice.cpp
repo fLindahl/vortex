@@ -19,6 +19,10 @@
 #include "render/frame/depthpass.h"
 #include "render/frame/flatgeometrylitpass.h"
 
+#ifdef _DEBUG
+	#include "render/frame/lightdebugpass.h"
+#endif
+
 namespace Render
 {
 RenderDevice::RenderDevice()
@@ -104,6 +108,10 @@ void RenderDevice::Render(bool drawToScreen)
 	auto lightCullingPass = framePass.lock();
 
 	lightCullingPass->Execute();
+
+#ifdef _DEBUG
+	//FrameServer::Instance()->lightdebugpass->Execute();
+#endif
 
 	//Bind the final color buffer
 	//glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);

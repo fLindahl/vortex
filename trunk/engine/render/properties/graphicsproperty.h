@@ -25,7 +25,8 @@ public:
 	std::shared_ptr<Render::ModelInstance> getModelInstance() const;
 	void setModelInstance(std::shared_ptr<Render::ModelInstance> inModelInstance);
 	
-	Math::mat4 getModelMatrix() const;
+	const Math::mat4& getModelMatrix() const;
+	const Math::mat4& getInvModelMatrix() const;
 	void setModelMatrix(const Math::mat4 &mat);
 
 	Math::bbox& getbbox() { return this->bbox; }
@@ -35,6 +36,7 @@ private:
 
 	std::shared_ptr<Render::ModelInstance> modelInstance;
 	Math::mat4 modelMat;
+	Math::mat4 invMat;
 };
 
 }

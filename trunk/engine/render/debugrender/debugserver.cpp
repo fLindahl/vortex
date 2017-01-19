@@ -8,6 +8,7 @@
 #include "render/frame/flatgeometrylitpass.h"
 #include "render/frame/lightcullingpass.h"
 #include "render/frame/framepass.h"
+#include "render/frame/lightdebugpass.h"
 
 namespace Debug
 {
@@ -25,7 +26,7 @@ void DebugServer::ImGuiDebugBar()
 			ImGui::MenuItem("Show Framebuffer:");
 
 			if (ImGui::MenuItem("Depth")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetDepthPass()->GetBuffer()); }
-			if (ImGui::MenuItem("Light Tiles")) {  }
+			if (ImGui::MenuItem("Light Tiles")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->lightdebugpass->GetBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Color")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Normals")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer()); }
 
