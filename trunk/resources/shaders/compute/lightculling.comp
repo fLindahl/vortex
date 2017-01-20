@@ -54,7 +54,7 @@ void main()
 		visibleLightCount = 0;
 	}
 
-	memoryBarrierShared ();
+	memoryBarrierShared();
 
 	// Step 1: Calculate the minimum and maximum depth values (from the depth buffer) for this group's tile
 	float maxDepth, minDepth;
@@ -68,7 +68,7 @@ void main()
 	atomicMin(minDepthInt, depthInt);
 	atomicMax(maxDepthInt, depthInt);
 
-	barrier ();
+	barrier();
 
 	// Step 2: One thread should calculate the frustum planes to be used for this tile
 	if (gl_LocalInvocationIndex == 0) 
@@ -106,7 +106,7 @@ void main()
 		frustumPlanes[5] /= length(frustumPlanes[5].xyz);
 	}
 
-	memoryBarrierShared ();
+	memoryBarrierShared();
 
 	// Step 3: Cull lights.
 	// Parallelize the threads against the lights now.
