@@ -56,6 +56,9 @@ float attenuate(vec3 lightDirection, float radius)
 	return atten;
 }
 
+// Assume the monitor is calibrated to the sRGB color space
+const float screenGamma = 2.2;
+
 void main()
 {
 	// Determine which tile this pixel belongs to
@@ -84,16 +87,18 @@ void main()
 		float attenuation = attenuate(L, light.radiusAndPadding.x);
 
 		L = normalize(L);
-		
-		vec3 H = normalize(L + V);
-
-		// Calculate the diffuse and specular components of the irradiance, then irradiance, and accumulate onto color
 		float diffuse = max(dot(L, N), 0.0);
-		float specular = pow(max(dot(N, H), 0.0), Shininess) * (diffuse <= 0 ? 0 : 1);
-
+		float specular = 0.0f;
 		
+		//Hope this looks better with shadows...
 		
-		vec3 irradiance = light.color.rgb * (albedoDiffuseColor.rgb * diffuse + vec3(specular)) * attenuation;
+		if(diffuse > 0.0f)
+		{
+			vec3 H = normalize(L + V);
+			specular = pow(max(dot(H, N), 0.0), Shininess);		
+		}
+		
+		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + vec3(specular)) * attenuation;
 		color.rgb += irradiance;
 	}
 	
