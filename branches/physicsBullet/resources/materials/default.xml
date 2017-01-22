@@ -1,0 +1,35 @@
+<Vortex>
+    <Materials>
+        <Material name="Static" desc="A lit opaque material">
+			<!-- Examples of future frame passes -->
+			<!--
+			<Pass name="Picking" shader="picking"/>
+			<Pass name="SpotLightShadow" shader="shadow"/>
+			<Pass name="PointLightShadow" shader="shadow"/>
+			<Pass name="GlobalShadow" shader="shadow"/>
+			-->
+			
+			<Pass name="Depth" shader="depthStatic"/>
+			<Pass name="FlatGeometryLit" shader="defaultLit"/>
+			
+            <!-- material textures -->
+            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
+			<Param name="NormalMap" type="string" defaultValue="resources/textures/placeholder_normal.png"/>
+			<!--<Param name="SpecularMap" type="string" defaultValue="resources/textures/placeholder_specular.png"/>-->
+
+            <!-- various parameters -->
+			<Param name="AmbientReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material ambience multiplier"/>
+            <Param name="DiffuseReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material albedo multiplier"/>
+            <Param name="SpecularReflectance" type="vector4" defaultValue="1.0, 1.0, 1.0, 1.0" desc="Material specular reflectivity multiplier"/>
+            <Param name="Shininess" type="float" defaultValue="32" desc="Material shininess"/>
+        </Material>
+		
+        <Material name="Toon" desc="Generic toon-shader material">
+            
+			<Pass name="FlatGeometryLit" shader="toonShader"/>
+			
+			<!-- material textures -->
+            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
+        </Material>
+    </Materials>
+</Vortex>

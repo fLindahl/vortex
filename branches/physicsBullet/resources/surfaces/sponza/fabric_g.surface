@@ -1,0 +1,9 @@
+<Vortex>
+	<Surface material="Static">
+		<!-- Textures -->
+		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/sponza_curtain_blue_diff.tga"/>
+		
+		<!-- Specific Parameters -->
+		<Param name="Shininess" type="float" value="16" desc="Material shininess"/>
+	</Surface>
+</Vortex>
