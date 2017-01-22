@@ -204,6 +204,12 @@ namespace Math
 		static vec4 select(const vec4& v0, const vec4& v1, const vec4& control);
 		/// returns a zero vector
 		static vec4 zerovector();
+		/// returns an up vector
+		static vec4 upvec();
+		/// returns a vector that points along the x axis
+		static vec4 rightvec();
+		/// returns a vector that points along the z axis
+		static vec4 forwardvec();
 
 		/// return true if any XYZ component is less-then
 		static bool less3_any(const vec4 &v0, const vec4 &v1);
@@ -1387,7 +1393,30 @@ namespace Math
 	{
 		return vec4(0, 0, 0, 0);
 	}
-
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	__forceinline vec4
+		vec4::upvec()
+	{
+		return vec4(0, 1, 0, 0);
+	}
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	__forceinline vec4
+		vec4::rightvec()
+	{
+		return vec4(1, 0, 0, 0);
+	}
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	__forceinline vec4
+		vec4::forwardvec()
+	{
+		return vec4(0, 0, 1, 0);
+	}
 } // namespace Math
 //------------------------------------------------------------------------------
 
