@@ -3,7 +3,7 @@
 
 namespace Physics
 {
-class RigidBody;
+	class RigidBody;
 }
 
 namespace Game

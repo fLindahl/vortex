@@ -15,10 +15,8 @@
 #include "render/server/shaderserver.h"
 #include "render/graphics/camera.h"
 #include "application/basegamefeature/keyhandler.h"
-#include "fysik/basecollider.h"
-#include <fysik/surfacecollider.h>
-#include <fysik/rigidbody.h>
-#include <fysik/physicsserver.h>
+#include <physics/server/physicsserver.h>
+#include "application/game/rigidbodyentity.h"
 #include <application/game/staticentity.h>
 namespace Example
 {

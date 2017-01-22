@@ -1,5 +1,6 @@
 #include "config.h"
-#include "fysik/physicsdevice.h"
+#include "rigidbodyentity.h"
+#include "physics/server/physicsdevice.h"
 #include "render/properties/graphicsproperty.h"
 
 namespace Game
@@ -34,10 +35,6 @@ void RigidBodyEntity::Activate()
 {
 	if (!this->active)
 	{
-		if (!this->rigidBody->initialized)
-		{
-			this->rigidBody->initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider, 1.0f), this);
-		}
 		Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
 		PhysicsEntity::Activate();
 	}

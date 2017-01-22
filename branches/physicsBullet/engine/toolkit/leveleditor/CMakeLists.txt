@@ -10,7 +10,7 @@ SET(files_leveleditor ${leveleditor_headers} ${leveleditor_sources})
 SOURCE_GROUP("leveleditor" FILES ${files_leveleditor})
 
 ADD_EXECUTABLE(leveleditor ${files_leveleditor})
-TARGET_LINK_LIBRARIES(leveleditor core render fysik)
-ADD_DEPENDENCIES(leveleditor core render fysik)
+TARGET_LINK_LIBRARIES(leveleditor core render physics)
+ADD_DEPENDENCIES(leveleditor core render physics)
 
 SET_TARGET_PROPERTIES(leveleditor PROPERTIES FOLDER "vortex/toolkit")

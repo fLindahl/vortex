@@ -9,6 +9,7 @@
 #include "render/server/shaderserver.h"
 #include "render/server/resourceserver.h"
 #include "render/debugrender/debugrenderer.h"
+#include "physics/physicsdevice.h"
 
 namespace Core
 {
@@ -50,6 +51,8 @@ App::Open()
 	Render::ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
 	//Init debugrenderer. Always do this AFTER setting up shaders!
 	Debug::DebugRenderer::Instance()->Initialize();
+	//Init PhysicsDevice
+	Physics::PhysicsDevice::Instance()->CreateEmptyDynamicsWorld();
 
 	return true;
 }

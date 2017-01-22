@@ -1,9 +1,9 @@
 #include "config.h"
 #include "physicsentity.h"
 #include "render/properties/graphicsproperty.h"
-#include "fysik/physicsserver.h"
+#include "physics/physicsserver.h"
 #include "render/resources/modelinstance.h"
-
+#include "render/resources/meshresource.h"
 namespace Game
 {
 
