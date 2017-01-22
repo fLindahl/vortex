@@ -77,14 +77,14 @@ Application::Open()
 		sTransform.translate(Math::vector(0.0f, -2.0f, 0.0f));
 
 		this->sponza->SetTransform(sTransform);
-		
+
 		PointLight pLight;
 		pLight.position = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		pLight.radiusAndPadding.set_x(100.0f);
+		pLight.radiusAndPadding.set_x(10.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 		
-		pLight.position = Math::vec4(2.0f, 1.0f, 3.0f, 1.0f);
+		pLight.position = Math::vec4(5.0f, 1.0f, 3.0f, 1.0f);
 		pLight.color = Math::vec4(0.7f, 0.0f, 0.3f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 
