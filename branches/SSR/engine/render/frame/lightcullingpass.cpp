@@ -30,7 +30,7 @@ void LightCullingPass::Execute()
 	// Bind depth map texture to texture location 4 (which will not be used by any model texture)
 	glActiveTexture(GL_TEXTURE4);
 	glUniform1i(glGetUniformLocation(lightCullingProgram, "depthMap"), 4);
-	glUniform1i(glGetUniformLocation(lightCullingProgram, "lightCount"), LightServer::Instance()->GetNumPointLights());
+	glUniform1i(glGetUniformLocation(lightCullingProgram, "lightCount"), (GLuint)LightServer::Instance()->GetNumPointLights());
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetTexture());
 
 	// Bind shader storage buffer objects for the light and index buffers

@@ -17,6 +17,11 @@
 #include "render/debugrender/debugrenderer.h"
 #include "render/frame/framepass.h"
 #include "render/frame/depthpass.h"
+#include "render/frame/flatgeometrylitpass.h"
+
+#ifdef _DEBUG
+	#include "render/frame/lightdebugpass.h"
+#endif
 
 namespace Render
 {
@@ -28,7 +33,8 @@ RenderDevice::RenderDevice()
 
 void RenderDevice::Initialize()
 {
-
+	//We need an initial resolution so that we can build our framebuffers upon something.
+	this->renderResolution = { 800, 600 };
 }
 
 void RenderDevice::SetRenderResolution(const Resolution& res)
@@ -58,20 +64,20 @@ void RenderDevice::Render(bool drawToScreen)
 	glViewport(0, 0, renderResolution.x, renderResolution.y);
 
     //Set global matrix uniform buffer block for this frame
-    uniformBufferBlock.View = Graphics::MainCamera::Instance()->getViewMatrix();
-    uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjectionMatrix();
-	uniformBufferBlock.ViewProjection = Math::mat4::multiply(Graphics::MainCamera::Instance()->getViewMatrix(), Graphics::MainCamera::Instance()->getProjectionMatrix());
+    uniformBufferBlock.View = Graphics::MainCamera::Instance()->getView();
+    uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjection();
+	uniformBufferBlock.ViewProjection = Math::mat4::multiply(Graphics::MainCamera::Instance()->getView(), Graphics::MainCamera::Instance()->getProjection());
 
-	uniformBufferBlock.InvView = Math::mat4::inverse(uniformBufferBlock.View);
-	uniformBufferBlock.InvProjection = Math::mat4::inverse(uniformBufferBlock.Projection);
-	uniformBufferBlock.InvViewProjection = Math::mat4::inverse(uniformBufferBlock.ViewProjection);
+	uniformBufferBlock.InvView = Graphics::MainCamera::Instance()->getInvView();
+	uniformBufferBlock.InvProjection = Graphics::MainCamera::Instance()->getInvProjection();
+	uniformBufferBlock.InvViewProjection = Graphics::MainCamera::Instance()->getInvViewProjection();
 
 	uniformBufferBlock.CameraPos = Graphics::MainCamera::Instance()->GetPosition();
 
 	uniformBufferBlock.ScreenSize = this->renderResolution;
 	uniformBufferBlock.TimeAndRandom[0] = (GLfloat)glfwGetTime();
 
-	std::srand(glfwGetTime());
+	std::srand((unsigned int)time(0));
 	uniformBufferBlock.TimeAndRandom[1] = (GLfloat)std::rand();
 
 	uniformBufferBlock.LightTileWorkGroups[0] = LightServer::Instance()->workGroupsX;
@@ -103,12 +109,16 @@ void RenderDevice::Render(bool drawToScreen)
 
 	lightCullingPass->Execute();
 
-	//Bind the final color buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#ifdef _DEBUG
+	//FrameServer::Instance()->lightdebugpass->Execute();
+#endif
 
-	framePass = FrameServer::Instance()->FlatGeometryLit;
-	auto flatGeometryLitPass = framePass.lock();
+	//Bind the final color buffer
+	//glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	std::weak_ptr<FlatGeometryLitPass> fglp = FrameServer::Instance()->FlatGeometryLit;
+	auto flatGeometryLitPass = fglp.lock();
 
 	//Run draw pass
 	flatGeometryLitPass->Execute();
@@ -116,7 +126,6 @@ void RenderDevice::Render(bool drawToScreen)
 	//-------------------
 	// Render Debug Shapes!
 	Debug::DebugRenderer::Instance()->DrawCommands();
-
 
 	glViewport(0, 0, windowResolution.x, windowResolution.y);
 
@@ -126,11 +135,13 @@ void RenderDevice::Render(bool drawToScreen)
 	//Copy final colorbuffer to screen if specified
 	if (drawToScreen)
 	{
-		//glBindFramebuffer(GL_READ_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, FrameServer::Instance()->FlatGeometryLit->frameBufferObject);
 		glBlitFramebuffer(0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->windowResolution.x, this->windowResolution.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		
+
+
 		//This is only for OGL 4.5 and it might cause issues with older cards...
-		//glBlitNamedFramebuffer(FrameServer::Instance()->finalColorFrameBufferObject, 0, 0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->windowResolution.x, this->windowResolution.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		//glBlitNamedFramebuffer(FrameServer::Instance()->FlatGeometryLit->frameBufferObject, 0, 0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->windowResolution.x, this->windowResolution.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);

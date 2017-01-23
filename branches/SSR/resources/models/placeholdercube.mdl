@@ -1,0 +1,7 @@
+<Vortex>
+	<Model name="placeholdercube">
+		<Mesh name="resources/meshes/cube.mesh">
+			<Node primitivegroup="0" surface="resources/surfaces/placeholder.surface"/>
+		</Mesh>
+	</Model>
+</Vortex>

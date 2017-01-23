@@ -49,6 +49,13 @@ namespace Render
 		glUniformMatrix4fv(matLoc, 1, false, (GLfloat*)&model.mat.m[0][0]);
 	}
 
+	void ShaderObject::setInvModelMatrix(const Math::mat4& invmodel)
+	{
+		//TODO: glUniform is deprecated. we should be using uniform buffer objects instead
+		GLuint matLoc = glGetUniformLocation(this->program, VORTEX_SEMANTIC_INVMODEL);
+		glUniformMatrix4fv(matLoc, 1, false, (GLfloat*)&invmodel.mat.m[0][0]);
+	}
+
 	void ShaderObject::setUniMatrix4fv(const Math::mat4 &mat4, const char* uniformName)
 	{
 		GLuint matLoc = glGetUniformLocation(this->program, uniformName);

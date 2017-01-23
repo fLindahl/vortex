@@ -35,6 +35,8 @@ public:
 
     virtual void Execute();
 
+	virtual void UpdateResolution();
+
 protected:
 	friend class RenderDevice;
 	friend class FrameServer;

@@ -3,7 +3,7 @@
 #include <sstream>
 #include "meshresource.h"
 #include <cstring>
-#include "nvx2fileformatstructs.h"
+#include "meshfileformatstructs.h"
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -34,7 +34,8 @@ namespace Render
 			return false;
 		}
 
-		this->name = filename;//mesh->mName.C_Str();
+		this->filePath = filename;
+		this->name = filename;
 
 		//Start by checking our vertex width and number of vertices so that we can reserve memory
 		//We use the first mesh for determining our vertexlayout and vertexwidth. 
@@ -57,12 +58,15 @@ namespace Render
 		for (size_t i = 0; i < scene->mNumMeshes; i++)
 			this->primitiveGroups.Append(PrimitiveGroup());
 
+		this->vertexComponentMask = 0;
+
 		if (mesh->HasPositions())
 		{
 			VertexComponent::SemanticName sem = VertexComponent::Position;
 			VertexComponent::Format fmt = VertexComponent::Float3;
 			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
 			this->vertexWidth += 3;
+			this->vertexComponentMask |= N2VertexComponent::N2Coord;
 		}
 		if (mesh->HasNormals())
 		{
@@ -70,6 +74,7 @@ namespace Render
 			VertexComponent::Format fmt = VertexComponent::Float3;
 			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
 			this->vertexWidth += 3;
+			this->vertexComponentMask |= N2VertexComponent::N2Normal;
 		}
 		if (mesh->HasTextureCoords(0))
 		{
@@ -79,41 +84,46 @@ namespace Render
 			VertexComponent::Format fmt = VertexComponent::Float2;
 			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
 			this->vertexWidth += 2;
+			this->vertexComponentMask |= N2VertexComponent::N2Uv0;
 		}
 		//HACK: Our shaders don't support this yet, so we just ignore it.
-		//if (mesh->HasTextureCoords(1))
-		//{
-		//	VertexComponent::SemanticName sem = VertexComponent::TexCoord2;
-		//	VertexComponent::Format fmt = VertexComponent::Float2;
-		//	this->vertexComponents.Append(VertexComponent(sem, 1, fmt));
-		//	this->vertexWidth += 2;
-		//}
-		//if (mesh->HasTangentsAndBitangents())
-		//{
-		//	VertexComponent::SemanticName sem = VertexComponent::Tangent;
-		//	VertexComponent::Format fmt = VertexComponent::Float3;
-		//	this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
-		//	this->vertexWidth += 3;
-		//
-		//	sem = VertexComponent::Binormal;
-		//	fmt = VertexComponent::Float3;
-		//	this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
-		//	this->vertexWidth += 3;
-		//}
-		//if (mesh->HasVertexColors(0))
-		//{
-		//	VertexComponent::SemanticName sem = VertexComponent::Color;
-		//	VertexComponent::Format fmt = VertexComponent::Float3;
-		//	this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
-		//	this->vertexWidth += 3;
-		//}
+		if (mesh->HasTextureCoords(1))
+		{
+			VertexComponent::SemanticName sem = VertexComponent::TexCoord2;
+			VertexComponent::Format fmt = VertexComponent::Float2;
+			this->vertexComponents.Append(VertexComponent(sem, 1, fmt));
+			this->vertexWidth += 2;
+			this->vertexComponentMask |= N2VertexComponent::N2Uv1;
+		}
+		if (mesh->HasTangentsAndBitangents())
+		{
+			VertexComponent::SemanticName sem = VertexComponent::Tangent;
+			VertexComponent::Format fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+			this->vertexComponentMask |= N2VertexComponent::N2Tangent;
+		
+			sem = VertexComponent::Binormal;
+			fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+			this->vertexComponentMask |= N2VertexComponent::N2Binormal;
+		}
+		if (mesh->HasVertexColors(0))
+		{
+			VertexComponent::SemanticName sem = VertexComponent::Color;
+			VertexComponent::Format fmt = VertexComponent::Float3;
+			this->vertexComponents.Append(VertexComponent(sem, 0, fmt));
+			this->vertexWidth += 3;
+			this->vertexComponentMask |= N2VertexComponent::N2Color;
+		}
 
 		//Sort to make sure that our components are in the correct order when we construct our vertexbuffer
 		this->vertexComponents.Sort();
 
 		//Count numverices and numindices
 		//Set size and name for our primitive groups
-		for (size_t i = 0; i < scene->mNumMeshes; ++i)
+		for (uint i = 0; i < scene->mNumMeshes; ++i)
 		{
 			//Add to total amount of vertices
 			this->numVertices += scene->mMeshes[i]->mNumVertices;
@@ -122,16 +132,16 @@ namespace Render
 			//this->primitiveGroups[i].numVertices = scene->mMeshes[i]->mNumVertices;
 			//this->primitiveGroups[i].vertexDataSize = this->primitiveGroups[i].numVertices * this->vertexWidth * sizeof(GLfloat);
 
+			//this->primitiveGroups[i].surfaceIndex = scene->mMeshes[i]->mMaterialIndex - 1;
+
 			this->primitiveGroups[i].numIndices = 0;
 
 			//count indices
-			for (size_t j = 0; j < scene->mMeshes[i]->mNumFaces; ++j)
+			for (uint j = 0; j < scene->mMeshes[i]->mNumFaces; ++j)
 			{
 				this->numIndices += scene->mMeshes[i]->mFaces[j].mNumIndices;
 				this->primitiveGroups[i].numIndices += scene->mMeshes[i]->mFaces[j].mNumIndices;
 			}
-
-			this->primitiveGroups[i].indexDataSize = this->primitiveGroups[i].numIndices * sizeof(int);
 		}
 		
 
@@ -161,9 +171,9 @@ namespace Render
 						memcpy(this->indexDataPtr, mesh->mFaces[j].mIndices, triangleByteSize);
 						
 						//We need to compensate for appending them to the same indexbuffer. We do this by increasing every index with the sum of the number of vertices that are in the meshes before it
-						*(GLuint*)indexDataPtr = *(GLuint*)this->indexDataPtr + sumNumVertices;
-						*((GLuint*)indexDataPtr + 1) = *((GLuint*)indexDataPtr + 1) + sumNumVertices;
-						*((GLuint*)indexDataPtr + 2) = *((GLuint*)indexDataPtr + 2) + sumNumVertices;
+						*(GLuint*)indexDataPtr = *(GLuint*)this->indexDataPtr + (GLuint)sumNumVertices;
+						*((GLuint*)indexDataPtr + 1) = *((GLuint*)indexDataPtr + 1) + (GLuint)sumNumVertices;
+						*((GLuint*)indexDataPtr + 2) = *((GLuint*)indexDataPtr + 2) + (GLuint)sumNumVertices;
 
 						this->indexDataPtr = (byte*)indexDataPtr + triangleByteSize;
 					}
@@ -253,7 +263,7 @@ namespace Render
 		{
 			//this->primitiveGroups[i].vertices = (size_t*)this->mesh + this->primitiveGroups[i - 1].vertexDataSize;
 			this->primitiveGroups[i].indexOffset = offset;
-			offset += this->primitiveGroups[i].indexDataSize;
+			offset += this->primitiveGroups[i].numIndices * sizeof(int);
 		}
 
 		this->SetupVertexBuffer();
@@ -280,6 +290,7 @@ namespace Render
 		this->N2File = true;
 
 		this->name = filename;
+		this->filePath = filename;
 
 		// obtain file size:
 		fseek(file, 0, SEEK_END);
@@ -301,8 +312,6 @@ namespace Render
 		fclose(file);
 
 		//LETS GO
-		this->mapPtr = new uchar[10];
-
 		this->mapPtr = buffer;
 		// read data
 		this->ReadHeaderData();
@@ -315,23 +324,21 @@ namespace Render
 		}
 
 		//TODO: Shouldn't we delete the buffer?
-
+		delete buffer;
 
 		return true;
 	}
 
 	void MeshResource::ReadHeaderData()
 	{
-		struct Nvx2Header* header = (struct Nvx2Header*) this->mapPtr;
-		header->numIndices *= 3; // header holds number of tris, not indices
-
+		struct MeshFileHeader* header = (struct MeshFileHeader*) this->mapPtr;
+		
 		this->numGroups = header->numGroups;
 		this->numVertices = header->numVertices;
 		this->vertexWidth = header->vertexWidth;
 		this->numIndices = header->numIndices;
-		this->numEdges = header->numEdges;
 		this->vertexComponentMask = header->vertexComponentMask;
-		this->groupDataSize = 6 * sizeof(uint) * this->numGroups;
+		this->groupDataSize = sizeof(MeshFilePrimitiveGroup) * this->numGroups;
 		this->vertexDataSize = this->numVertices * this->vertexWidth * sizeof(float);
 		this->indexDataSize = this->numIndices * sizeof(int);
 
@@ -342,22 +349,23 @@ namespace Render
 
 	void MeshResource::ReadPrimitiveGroups()
 	{
-		/*Nvx2Group* group = (Nvx2Group*) this->groupDataPtr;
+		MeshFilePrimitiveGroup* group = (MeshFilePrimitiveGroup*) this->groupDataPtr;
 		size_t i;
 		for (i = 0; i < (size_t)this->numGroups; i++)
 		{
 		// setup a primitive group object
 		PrimitiveGroup primGroup;
 		//primGroup.SetBaseVertex(group->firstVertex);
-		primGroup.SetNumVertices(group->numVertices);
-		primGroup.SetBaseIndex(group->firstTriangle * 3);
-		primGroup.SetNumIndices(group->numTriangles * 3);
-		primGroup.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
-		this->primGroups.Append(primGroup);
+		//primGroup.SetNumVertices(group->numVertices);
+		primGroup.name = group->name;
+		primGroup.indexOffset = group->indexpointer; // .SetBaseIndex(group->firstTriangle * 3);
+		primGroup.numIndices = group->numindices; // .SetNumIndices(group->numTriangles * 3);
+		//primGroup.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
+		this->primitiveGroups.Append(primGroup);
 
 		// set top next group
 		group++;
-		}*/
+		}
 	}
 
 	void MeshResource::SetupVertices()
@@ -513,7 +521,13 @@ namespace Render
 	void MeshResource::Draw()
 	{
 		glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
-		//glDrawElements(GL_TRIANGLES, primitiveGroups.Back().numIndices, GL_UNSIGNED_INT, (void*)primitiveGroups.Back().indexOffset);
+	}
+
+	void MeshResource::Draw(const unsigned int& primitiveGroup)
+	{
+		GLsizei numind = (GLsizei)primitiveGroups[primitiveGroup].numIndices;
+		uint offset = primitiveGroups[primitiveGroup].indexOffset;
+		glDrawElements(GL_TRIANGLES, (GLsizei)primitiveGroups[primitiveGroup].numIndices, GL_UNSIGNED_INT, (void*)primitiveGroups[primitiveGroup].indexOffset);
 	}
 
 }

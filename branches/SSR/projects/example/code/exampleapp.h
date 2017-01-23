@@ -58,7 +58,6 @@ private:
 	Math::point rayEnd;
 
 	std::shared_ptr<Render::ModelInstance> modelInstance;
-	std::shared_ptr<Render::ModelInstance> modelInstance1;
 	std::shared_ptr<Render::ModelInstance> modelInstanceScene;
 	
 	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity1;

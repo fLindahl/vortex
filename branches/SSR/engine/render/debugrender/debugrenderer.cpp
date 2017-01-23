@@ -1,6 +1,7 @@
 #include "config.h"
 #include "debugrenderer.h"
 
+
 namespace Debug
 {
 
@@ -13,6 +14,9 @@ void DebugRenderer::Initialize()
 {
     this->line.shader = Render::ShaderServer::Instance()->LoadShader("debugLines");
 	this->box.shader = Render::ShaderServer::Instance()->LoadShader("debug");
+	this->mesh.shader = Render::ShaderServer::Instance()->LoadShader("debug");
+	this->cone.shader = Render::ShaderServer::Instance()->LoadShader("debug");
+	this->circle.shader = Render::ShaderServer::Instance()->LoadShader("debug");
 
     return;
 }
@@ -21,13 +25,15 @@ void DebugRenderer::DrawLine(const Math::point &startPoint,
                              const Math::point &endPoint,
                              const float &lineWidth,
                              const Math::vec4 &startColor,
-                             const Math::vec4 &endColor)
+							 const Math::vec4 &endColor, 
+							 const RenderMode& renderModes)
 {
     LineCommand* cmd = new LineCommand();
     cmd->shape = DebugShape::LINE;
     cmd->startpoint = startPoint;
     cmd->endpoint = endPoint;
-    cmd->width = lineWidth;
+    cmd->linewidth = lineWidth;
+	cmd->rendermode = renderModes;
     cmd->startcolor = startColor;
     cmd->endcolor = endColor;
 
@@ -39,7 +45,7 @@ void DebugRenderer::DrawBox(const Math::vector& position,
 							const Math::quaternion& rotation, 
 							const float& scale, 
 							const Math::vec4& color, 
-							const bool& wireframe, 
+							const RenderMode& renderModes,
 							const float& lineWidth)
 {
 	BoxCommand* cmd = new BoxCommand();
@@ -50,9 +56,9 @@ void DebugRenderer::DrawBox(const Math::vector& position,
 
 	cmd->transform = transform;
 		
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
-	cmd->wireframe = wireframe;
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 
@@ -64,7 +70,7 @@ void DebugRenderer::DrawBox(const Math::vector& position,
 							const float& height, 
 							const float& length, 
 							const Math::vec4& color, 
-							const bool& wireframe, 
+							const RenderMode& renderModes,
 							const float& lineWidth)
 {
 	BoxCommand* cmd = new BoxCommand();
@@ -75,16 +81,16 @@ void DebugRenderer::DrawBox(const Math::vector& position,
 
 	cmd->transform = transform;
 
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
-	cmd->wireframe = wireframe;
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 }
 
 void DebugRenderer::DrawBox(const Math::mat4& transform, 
 							const Math::vec4& color, 
-							const bool& wireframe, 
+							const RenderMode& renderModes,
 							const float& lineWidth)
 {
 	BoxCommand* cmd = new BoxCommand();
@@ -92,15 +98,16 @@ void DebugRenderer::DrawBox(const Math::mat4& transform,
 
 	cmd->transform = transform;
 
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
-	cmd->wireframe = wireframe;
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 }
 
 void DebugRenderer::DrawBox(const Math::bbox& bbox, 
 							const Math::vec4& color, 
+							const RenderMode& renderModes,
 							const float& lineWidth)
 {
 	BoxCommand* cmd = new BoxCommand();
@@ -117,10 +124,111 @@ void DebugRenderer::DrawBox(const Math::bbox& bbox,
 
 	cmd->transform = transform;
 
-	cmd->lineWidth = lineWidth;
+	cmd->linewidth = lineWidth;
 	cmd->color = color;
 	//Always draw bboxes with wireframe
-	cmd->wireframe = true;
+	cmd->rendermode = renderModes;
+
+	this->commandQueue.push(cmd);
+}
+
+void DebugRenderer::DrawCone(const Math::vector& position, 
+							 const Math::quaternion& rotation, 
+							 const float& radius, 
+							 const float& length, 
+							 const Math::vec4& color, 
+							 const RenderMode& renderModes, 
+							 const float& lineWidth)
+{
+	ConeCommand* cmd = new ConeCommand();
+	cmd->shape = DebugShape::CONE;
+
+	Math::mat4 transform = Math::mat4::multiply(Math::mat4::scaling(Math::point(radius, length, radius)), Math::mat4::rotationquaternion(rotation));
+	transform.translate(position);
+
+	cmd->transform = transform;
+
+	cmd->linewidth = lineWidth;
+	cmd->color = color;
+	cmd->rendermode = renderModes;
+
+	this->commandQueue.push(cmd);
+
+}
+
+void DebugRenderer::DrawCone(const Math::mat4& transform,
+							 const Math::vec4& color,
+							 const RenderMode& renderModes,
+							 const float& lineWidth)
+{
+	ConeCommand* cmd = new ConeCommand();
+	cmd->shape = DebugShape::CONE;
+	
+	cmd->transform = transform;
+
+	cmd->linewidth = lineWidth;
+	cmd->color = color;
+	cmd->rendermode = renderModes;
+
+	this->commandQueue.push(cmd);
+
+}
+
+void DebugRenderer::DrawCircle(const Math::vector& position, const Math::quaternion& rotation, const float& radius, const Math::vec4& color, const RenderMode& renderModes, const float& lineWidth)
+{
+	CircleCommand* cmd = new CircleCommand();
+	cmd->shape = DebugShape::CIRCLE;
+
+	Math::mat4 transform = Math::mat4::multiply(Math::mat4::scaling(Math::point(radius, 1.0f, radius)), Math::mat4::rotationquaternion(rotation));
+	transform.translate(position);
+
+	cmd->transform = transform;
+
+	cmd->linewidth = lineWidth;
+	cmd->color = color;
+	cmd->rendermode = renderModes;
+
+	this->commandQueue.push(cmd);
+
+}
+
+void DebugRenderer::DrawCircle(const Math::mat4& transform,
+						const Math::vec4& color,
+						const RenderMode& renderModes,
+						const float& lineWidth)
+{
+	CircleCommand* cmd = new CircleCommand();
+	cmd->shape = DebugShape::CIRCLE;
+
+	cmd->transform = transform;
+
+	cmd->linewidth = lineWidth;
+	cmd->color = color;
+	cmd->rendermode = renderModes;
+
+	this->commandQueue.push(cmd);
+
+}
+
+	void DebugRenderer::DrawMesh(std::shared_ptr<Render::MeshResource> mesh,
+							 const Math::mat4& transform, 
+							 const Math::vec4& color,
+							 const RenderMode& renderModes,
+							 int primitiveGroup,
+							 float lineWidth)
+{
+	MeshCommand* cmd = new MeshCommand();
+	cmd->shape = DebugShape::MESH;
+
+	cmd->mesh = mesh;
+	cmd->primitiveGroup = primitiveGroup;
+
+	cmd->transform = transform;
+
+	cmd->linewidth = lineWidth;
+	cmd->color = color;
+	//Always draw bboxes with wireframe
+	cmd->rendermode = renderModes;
 
 	this->commandQueue.push(cmd);
 }
@@ -145,6 +253,21 @@ void DebugRenderer::DrawCommands()
 				this->box.Draw(currentCommand);
 				break;
 			}
+			case DebugShape::MESH:
+			{
+				this->mesh.Draw(currentCommand);
+				break;
+			}
+			case DebugShape::CONE:
+	        {
+				this->cone.Draw(currentCommand);
+				break;
+	        }
+			case DebugShape::CIRCLE:
+	        {
+				this->circle.Draw(currentCommand);
+				break;
+	        }
             default:
             {
                 printf("Debug::RenderShape not fully implemented!\n");

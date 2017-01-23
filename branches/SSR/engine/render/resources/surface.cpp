@@ -22,11 +22,11 @@ void Surface::AddParameter(const Util::String& name, const Util::Variable& varia
 {
     if (variable.GetType() == Util::Variable::Type::String)
     {
-        //HACK: Since we're loading a string, we're probably loading a texture
+		//HACK: Since we're loading a string, we're probably loading a texture
         //This should probably be done in some other way
 		std::shared_ptr<TextureResource> tex = ResourceServer::Instance()->LoadTexture(*variable.GetString());
 		this->textures.Append(tex);
-		this->texturesByName.insert(std::make_pair(name, tex));
+		this->texturesByType.insert(std::make_pair(Material::TextureTypeFromString(name.c_str()), tex));
     }
     else
     {
@@ -36,6 +36,17 @@ void Surface::AddParameter(const Util::String& name, const Util::Variable& varia
         this->parametersByName.insert(std::make_pair(name, param));
         parameters.Append(param);
     }
+}
+
+bool Surface::RemoveModelNode(ModelNode* node)
+{
+	auto n = this->modelNodes.Find(node);
+	if (n != nullptr)
+	{
+		this->modelNodes.Remove(n);
+		return true;
+	}
+	return false;
 }
 
 Util::Array<std::shared_ptr<TextureResource>>& Surface::TextureList()

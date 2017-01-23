@@ -69,6 +69,7 @@ namespace Render
 			//HACK: Since we're loading a string, we're probably loading a texture
 			//This should probably be done in some other way
 			this->textures.Append(ResourceServer::Instance()->LoadTexture(*variable.GetString()));
+			this->TextureParamTypes.Append(Material::TextureTypeFromString(name.c_str()));
 		}
 		else
 		{
@@ -104,10 +105,28 @@ namespace Render
 		}		
 	}
 
-	/*
-	index_t Material::GetFramePass()
+	TextureType Material::TextureTypeFromString(const std::string& s)
 	{
-		return this->framePass;
+		if (s == VORTEX_SEMANTIC_ALBEDOMAP)
+		{
+			return TextureType::AlbedoMap;
+		}
+		if (s == VORTEX_SEMANTIC_NORMALMAP)
+		{
+			return TextureType::NormalMap;
+		}
+		if (s == VORTEX_SEMANTIC_SPECULARMAP)
+		{
+			return TextureType::SpecularMap;
+		}
+		if (s == VORTEX_SEMANTIC_ROUGHNESSMAP)
+		{
+			return TextureType::RoughnessMap;
+		}
+		else
+		{
+			_assert(false, "ERROR: Texture type name does not exist in semantics!");
+			return TextureType::AlbedoMap;
+		}
 	}
-	*/
 }

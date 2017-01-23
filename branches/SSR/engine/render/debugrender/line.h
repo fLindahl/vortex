@@ -9,7 +9,6 @@ struct LineCommand : public RenderCommand
 {
     Math::vec4 startpoint = Math::point(0.0f);
     Math::vec4 endpoint = Math::point(1.0f);
-    float width;
     Math::vec4 startcolor = Math::vec4(1.0f);
     Math::vec4 endcolor = Math::vec4(1.0f);
 
@@ -68,9 +67,15 @@ inline void RenderLine::Draw(RenderCommand* command)
 
 	glUseProgram(this->shader->GetProgram());
 
+	if ((lineCommand->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
+	{
+		glDepthFunc(GL_ALWAYS);
+		glDepthRange(0.0f,0.01f);
+	}
+
 	glPolygonMode(GL_FRONT, GL_LINE);
 	
-    glLineWidth(lineCommand->width);
+    glLineWidth(lineCommand->linewidth);
 
     glBindVertexArray(vao[0]); // Bind our Vertex Array Object so we can use it
 
@@ -90,6 +95,13 @@ inline void RenderLine::Draw(RenderCommand* command)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glPolygonMode(GL_FRONT, GL_FILL);
+
+	if ((lineCommand->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
+	{
+		glDepthFunc(GL_LESS);
+		glDepthRange(0.0f, 1.0f);
+	}
+
 }
 
 }

@@ -7,57 +7,63 @@
 namespace Render
 {
 
+///////////////////////////////////////////////////////////////////
+
+ModelNode::~ModelNode()
+{
+	if (surface != nullptr)
+	{
+		surface->RemoveModelNode(this);
+	}
+}
+
+//////////////////////////////////////////////////////////////////
+
 ModelInstance::ModelInstance()
 {
 	mesh = nullptr;
-	surface = nullptr;
-	//material = nullptr;
 }
 
 ModelInstance::~ModelInstance()
 {
+	for (size_t i = 0; i < this->modelNodes.Size(); ++i)
+	{
+		delete this->modelNodes[i];
+	}
+
 	//if (this->material != nullptr)
 	//{
 		//HACK: Implement this
-		//this->material->removeModelInstance(this);
+		//this->surfaces->removeModelInstance(this);
 	//}
 }
 
-std::shared_ptr<Surface> ModelInstance::GetSurface()
-{
-	return this->surface;
-}
-
-void ModelInstance::SetSurface(const Util::String& name)
-{
-	if (this->surface != nullptr)
-	{
-		//HACK: Implement this
-		//this->material->removeModelInstance(this);
-	}
-
-	this->surface = ResourceServer::Instance()->LoadSurface(name);
-	this->surface->getModelInstances().Append(this);
-}
-
-//std::shared_ptr<Material> ModelInstance::GetMaterial()
+//const Util::Array<std::shared_ptr<Surface>>& ModelInstance::GetSurfaces()
 //{
-//	return this->material;
+	//return this->surfaces;
 //}
-//
-//void ModelInstance::SetMaterial(const Util::String& name)
+
+//void ModelInstance::SetSurface(const Util::String& name)
 //{
-//	if (this->material != nullptr)
+	//if (this->surfaces.Size() < 1)
+	//{
+	//	this->surfaces.Append(ResourceServer::Instance()->LoadSurface(name));
+	//	this->surfaces[0]->getModelInstances().Append(std::make_pair(this, 0));
+	//}
+	//else
+	//{
+	//	this->surfaces[0] = ResourceServer::Instance()->LoadSurface(name);
+	//	this->surfaces[0]->getModelInstances().Append(std::make_pair(this, 0));
+	//}	
+//}
+
+//void ModelInstance::SetSurfaceList(Util::Array<std::shared_ptr<Surface>> list)
+//{
+//	for (size_t i = 0; i < this->modelNodes.Size(); ++i)
 //	{
-//		//HACK: Implement this
-//		//this->material->removeModelInstance(this);
+//		modelNodes[i]->surface = list[i].get();
 //	}
-//
-//	this->material = ResourceServer::Instance()->GetMaterial(name);
-//	this->material->getModelInstances().Append(this);
 //}
-
-
 
 std::shared_ptr<MeshResource> ModelInstance::GetMesh()
 {
@@ -67,6 +73,26 @@ std::shared_ptr<MeshResource> ModelInstance::GetMesh()
 void ModelInstance::SetMesh(const char* file)
 {
 	this->mesh = ResourceServer::Instance()->LoadMesh(file);
+
+	for (size_t i = 0; i < this->modelNodes.Size(); ++i)
+	{
+		delete this->modelNodes[i];
+	}
+	this->modelNodes.Clear();
+
+	//Fill up modelnodes with placeholder surface	
+	for (uint i = 0; i < this->mesh->getNumPrimitiveGroups(); i++)
+	{
+		ModelNode* node = new ModelNode();
+		node->modelInstance = this;
+		node->primitiveGroup = i;
+		
+		auto surface = ResourceServer::Instance()->LoadSurface("resources/surfaces/placeholder.surface");
+		node->surface = surface.get();
+		surface->AppendModelNode(node);
+
+		this->modelNodes.Append(node);
+	}
 }
 
 void ModelInstance::AddGraphicsProperty(GraphicsProperty* gp)

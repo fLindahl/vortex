@@ -90,7 +90,7 @@ inline void bbox::transform(const mat4& t)
     point temp;
 	point min = point(1000000.0f, 1000000.0f, 1000000.0f);
 	point max = point(-1000000.0f, -1000000.0f, -1000000.0f);
-    index_t i;
+    int i;
 
     for (i = 0; i < 8; ++i)
     {
@@ -157,10 +157,10 @@ inline void bbox::debugRender()
     glUseProgram(0);
 
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getViewMatrix().mat.m[0][0]);
+    glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getView().mat.m[0][0]);
 
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getProjectionMatrix().mat.m[0][0]);
+    glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getProjection().mat.m[0][0]);
 
 	glLineWidth(5.0f);
     glBegin(GL_LINES);

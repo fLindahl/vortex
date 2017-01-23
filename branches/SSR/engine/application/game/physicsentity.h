@@ -41,6 +41,9 @@ public:
     Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty; }
 
 	Physics::PhysicsType GetPhysicsType() const { return this->physicsType; }
+
+	void SetTransform(const Math::mat4& t);
+
 	//void SetPhysicsType(const Physics::PhysicsType& t) { this->physicsType = t; }
 
 protected:

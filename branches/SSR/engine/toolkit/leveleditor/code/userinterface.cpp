@@ -3,7 +3,13 @@
 #include "imgui.h"
 #include "application.h"
 #include "render/server/frameserver.h"
-#include "style.h"
+#include "toolkit/tools/style.h"
+#include "render/frame/flatgeometrylitpass.h"
+#include "render/debugrender/debugserver.h"
+
+#include "basetool.h"
+#include "selecttool.h"
+#include "translatetool.h"
 
 #define CONSOLE_BUFFER_SIZE 8096
 
@@ -30,7 +36,7 @@ namespace Toolkit
 
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
-		ImGui::LoadDock();
+		ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout");
 	}
 
 	UserInterface::~UserInterface()
@@ -42,7 +48,7 @@ namespace Toolkit
 	void UserInterface::Run()
 	{
 		static bool showStatistics = false;
-
+		
 		RenderDocks();
 
 		//TODO: Make sure we're not editing a textbox before querying for shortcuts
@@ -76,6 +82,8 @@ namespace Toolkit
 			}
 			ImGui::EndMainMenuBar();
 		}
+		
+		Debug::DebugServer::Instance()->ImGuiDebugBar();
 
 		// create a new window
 		if (showStatistics)
@@ -110,8 +118,8 @@ namespace Toolkit
 
 		if (ImGui::BeginMenu("Layout"))
 		{
-			if (ImGui::MenuItem("Save Layout...")) { ImGui::SaveDock("layout/default.layout"); }
-			if (ImGui::MenuItem("Load Layout...")) { ImGui::LoadDock(); }
+			if (ImGui::MenuItem("Save Layout...")) { ImGui::SaveDock("engine/toolkit/leveleditor/layout/default.layout"); }
+			if (ImGui::MenuItem("Load Layout...")) { ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout"); }
 			ImGui::EndMenu();
 		}
 
@@ -148,8 +156,8 @@ namespace Toolkit
 
 	void UserInterface::RenderDocks()
 	{
-		const int toolbarWidth = 52;
-		const int toolButtonSize = 32;
+		const float toolbarWidth = 52.0f;
+		const float toolButtonSize = 32.0f;
 
 		ImGui::Begin("ToolBar", NULL,
 			ImGuiWindowFlags_NoSavedSettings |
@@ -161,8 +169,8 @@ namespace Toolkit
 			ImGuiWindowFlags_NoScrollWithMouse |
 			ImGuiWindowFlags_NoBringToFrontOnFocus);
 		{
-			ImGui::SetWindowSize(ImVec2(toolbarWidth, application->window->GetHeight() - 16), ImGuiSetCond_Once);
-			ImGui::SetWindowPos(ImVec2(0, 16), ImGuiSetCond_Once);
+			ImGui::SetWindowSize(ImVec2(toolbarWidth, (float)application->window->GetHeight() - 16.0f), ImGuiSetCond_Once);
+			ImGui::SetWindowPos(ImVec2(0.0f, 16.0f), ImGuiSetCond_Once);
 
 			if (ImGui::ImageButton((void*)this->selectToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
@@ -196,16 +204,52 @@ namespace Toolkit
 			ImGui::End();
 		}
 		
-		ImGui::RootDock(ImVec2(toolbarWidth, 16), ImVec2(application->window->GetWidth() - toolbarWidth, application->window->GetHeight() - 16));
+		ImGui::RootDock(ImVec2(toolbarWidth, 16.0f), ImVec2((float)application->window->GetWidth() - toolbarWidth, (float)application->window->GetHeight() - 16));
 		{
 			ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			{
 				ImVec2 dockSize = ImGui::GetWindowSize();
-				ImGui::Image((void*)Render::FrameServer::Instance()->GetFinalColorBuffer(), dockSize);
+				ImGui::Image((void*)Render::RenderDevice::Instance()->GetFinalColorBuffer(), dockSize);
+
+				this->currentTool->UpdateHandlePositions();
+				this->currentTool->Render();
 
 				if (ImGui::IsItemHovered())
 				{
-					application->DoPicking();
+					if (application->hit.object != nullptr)
+					{
+						if (ImGui::GetIO().MouseClicked[0])
+						{
+							this->currentTool->LeftDown();
+							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+							if (this->currentTool->GetCurrentHandle() == Tools::TransformHandle::NONE)
+							{
+								application->DoPicking();
+							}
+						}
+						if (ImGui::GetIO().MouseReleased[0])
+						{
+							this->currentTool->LeftUp();
+						}
+						if (ImGui::GetIO().MouseDown[0])
+						{
+							this->currentTool->Drag();
+
+							const Math::mat4& delta = this->currentTool->GetDeltaMatrix();
+							Math::mat4 objTransform = this->application->hit.object->GetTransform();
+							
+							this->application->hit.object->SetTransform(Math::mat4::multiply(objTransform, delta));
+							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+						}
+					}
+					else
+					{
+						application->DoPicking();
+						if (application->hit.object != nullptr)
+						{
+							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+						}
+					}
 				}
 			}
 			ImGui::EndDock();
@@ -248,19 +292,6 @@ namespace Toolkit
 						}
 					}
 				}
-				/*
-				static bool enabled = true;
-				ImGui::BeginChild("child", ImVec2(0, 60), true);
-				for (int i = 0; i < 10; i++)
-				ImGui::Text("Scrolling Text %d", i);
-				ImGui::EndChild();
-				static float f = 0.5f;
-				static int n = 0;
-				ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-				ImGui::InputFloat("Input", &f, 0.1f);
-				ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-				ImGui::Checkbox("Checkbox", &enabled);
-				*/
 			}
 			ImGui::EndDock();
 
@@ -269,12 +300,12 @@ namespace Toolkit
 
 			}
 			ImGui::EndDock();
-
+			
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
 			if (ImGui::Button("New Entity", { 100, 40 }))
 			{
-				//std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), this->modelInstance1);
-				//commandManager->DoCommand(command);
+				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+				commandManager->DoCommand(command);
 			}
 			ImGui::EndDock();
 		}

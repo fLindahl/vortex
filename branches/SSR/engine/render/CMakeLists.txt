@@ -50,6 +50,8 @@ SET(files_render_frame
 	frame/depthpass.cpp
 	frame/lightcullingpass.h
 	frame/lightcullingpass.cpp
+	frame/lightdebugpass.h
+	frame/lightdebugpass.cpp
 	frame/reflectionpass.h
 	frame/reflectionpass.cpp
 	)
@@ -57,6 +59,8 @@ SET(files_render_frame
 SET(files_render_resources
 	resources/lightnode.h
 	resources/lightnode.cpp
+	resources/meshbuilder.h
+	resources/meshbuilder.cpp
 	resources/meshresource.h
 	resources/meshresource.cpp
 	resources/shaderobject.h
@@ -70,7 +74,7 @@ SET(files_render_resources
 	resources/material.cpp
 	resources/surface.h
 	resources/surface.cpp	
-	resources/nvx2fileformatstructs.h
+	resources/meshfileformatstructs.h
 	)
 
 SET(files_render_server
@@ -99,7 +103,12 @@ SET(files_render_debugrender
 	debugrender/debugrenderer.cpp
 	debugrender/line.h
 	debugrender/box.h
+	debugrender/mesh.h
+	debugrender/cone.h
+	debugrender/circle.h
 	debugrender/shape.h
+	debugrender/debugserver.h
+	debugrender/debugserver.cpp
 	)
 	
 SOURCE_GROUP("render" FILES ${files_render_render})
