@@ -39,7 +39,7 @@ public:
 
 	bool HasPassNamed(const std::string& name);
 
-	std::shared_ptr<DrawPass> GetDepthPass();
+	std::shared_ptr<DepthPass> GetDepthPass();
 	std::shared_ptr<FramePass> GetLightCullingPass();
 	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
 
@@ -56,7 +56,7 @@ private:
 	Util::Array<std::shared_ptr<FramePass>> framePasses;
 	
 	/// Early depth testing
-	std::shared_ptr<DrawPass> Depth;
+	std::shared_ptr<DepthPass> Depth;
 	
 	/// Used for lightculling as part of tiled forward rendering.
 	std::shared_ptr<FramePass> lightCullingPass;

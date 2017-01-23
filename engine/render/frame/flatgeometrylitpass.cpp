@@ -7,6 +7,7 @@
 #include "render/properties/graphicsproperty.h"
 #include "render/resources/modelinstance.h"
 #include "render/server/renderdevice.h"
+#include "depthpass.h"
 
 namespace Render
 {
@@ -26,12 +27,16 @@ void FlatGeometryLitPass::Execute()
 	//Just use the regular draw pass at the moment
 	this->BindFrameBuffer();
 
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT, GL_FASTEST);
-	glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	//Because we're using the old depthbuffer from the depth prepass, we need to allow equal depth values, or clear the depth buffer. clearing would mean redundant work however.
+	glDepthFunc(GL_LEQUAL);
+
 	DrawPass::Execute();
 
     FramePass::Execute();
+
+	glDepthFunc(GL_LESS);
 }
 
 void FlatGeometryLitPass::Setup()
@@ -50,7 +55,6 @@ void FlatGeometryLitPass::Setup()
 
 	glGenTextures(1, &this->normalBuffer);
 	glBindTexture(GL_TEXTURE_2D, this->normalBuffer);
-	//Might need to use GL_RGB8_SNORM for signed normalized integers
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -61,7 +65,6 @@ void FlatGeometryLitPass::Setup()
 
 	glGenTextures(1, &this->specularBuffer);
 	glBindTexture(GL_TEXTURE_2D, this->specularBuffer);
-	//Might need to use GL_RGB8_SNORM for signed normalized integers
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGBA, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -75,7 +78,7 @@ void FlatGeometryLitPass::Setup()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->buffer, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->normalBuffer, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, this->specularBuffer, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetBuffer(), 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetBuffer(), 0);
 
 	//drawbuffers
 	const GLenum drawbuffers[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};

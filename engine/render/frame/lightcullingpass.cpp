@@ -7,7 +7,7 @@
 #include "render/properties/graphicsproperty.h"
 #include "render/server/renderdevice.h"
 #include "render/server/lightserver.h"
-#include "drawpass.h"
+#include "depthpass.h"
 
 namespace Render
 {
@@ -31,7 +31,7 @@ void LightCullingPass::Execute()
 	glActiveTexture(GL_TEXTURE4);
 	glUniform1i(glGetUniformLocation(lightCullingProgram, "depthMap"), 4);
 	glUniform1i(glGetUniformLocation(lightCullingProgram, "lightCount"), (GLuint)LightServer::Instance()->GetNumPointLights());
-	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetTexture());
+	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer());
 
 	// Bind shader storage buffer objects for the light and index buffers
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lightServer->GetLightBuffer());
