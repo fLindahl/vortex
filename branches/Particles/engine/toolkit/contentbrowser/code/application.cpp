@@ -50,26 +50,15 @@ Application::~Application()
 bool
 Application::Open()
 {
-	App::Open();
-	this->window = new Display::Window;
 	
-	keyhandler = BaseGameFeature::KeyHandler::Instance();
-	keyhandler->Init(this->window);
-
+	this->window = new Display::Window;
 	// Initiate everything we need
-	// TODO: We should be able to cut down on a lot of this code by creating our own resource structures
-	if (this->window->Open())
+	//Always call app::open after initializing a glfwwindow
+	if (this->window->Open() && App::Open())
 	{
-		//Init RenderDevice
-		RenderDevice::Instance()->Initialize();
-		// Setup framepasses
-		FrameServer::Instance()->SetupFramePasses();
-		//Always setup shaders before materials!
-		ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
-		//Load all materials
-		ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
-		//Init debugrenderer. Always do this AFTER setting up shaders!
-		Debug::DebugRenderer::Instance()->Initialize();
+		keyhandler = BaseGameFeature::KeyHandler::Instance();
+		keyhandler->Init(this->window);
+
 		//Setup UI
 		this->UI = new UserInterface(this);
 

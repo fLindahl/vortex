@@ -1,11 +1,17 @@
 #pragma once
-#include "application/game/baseproperty.h"
+//#include "application/game/baseproperty.h"
 
 namespace Property
 {
-class ParticleEmitter : public Game::BaseProperty
+class ParticleEmitter
 {
 	ParticleEmitter();
 	~ParticleEmitter();
+
+	void FixedUpdate();
+	void Update();
+
+	void Activate();
+	void Deactivate();
 };
 }

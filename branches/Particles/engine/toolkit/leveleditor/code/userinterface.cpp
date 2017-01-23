@@ -10,6 +10,8 @@
 #include "basetool.h"
 #include "selecttool.h"
 #include "translatetool.h"
+#include "render/debugrender/debugrenderer.h"
+#include "imgui_internal.h"
 
 #define CONSOLE_BUFFER_SIZE 8096
 
@@ -218,11 +220,10 @@ namespace Toolkit
 				{
 					if (application->hit.object != nullptr)
 					{
-						this->currentTool->UpdateTransform(application->hit.object->GetTransform());
-
 						if (ImGui::GetIO().MouseClicked[0])
 						{
 							this->currentTool->LeftDown();
+							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
 							if (this->currentTool->GetCurrentHandle() == Tools::TransformHandle::NONE)
 							{
 								application->DoPicking();
@@ -240,6 +241,7 @@ namespace Toolkit
 							Math::mat4 objTransform = this->application->hit.object->GetTransform();
 							
 							this->application->hit.object->SetTransform(Math::mat4::multiply(objTransform, delta));
+							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
 						}
 					}
 					else
@@ -295,6 +297,30 @@ namespace Toolkit
 			}
 			ImGui::EndDock();
 
+			ImGui::BeginDock("Particle Settings", NULL, ImGuiWindowFlags_NoSavedSettings);
+			{
+				
+				if (ImGui::CollapsingHeader("Base Settings"))
+				{
+					const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" };
+					static int item2 = 0;
+					ImGui::Combo("combo scroll", &item2, items, IM_ARRAYSIZE(items));
+					if (ImGui::TreeNode("Color"))
+					{
+						ImGui::ColorPicker((float*)&application->pSettings.color, true);
+						ImGui::TreePop();
+					}
+						
+				}
+				if (ImGui::CollapsingHeader("Emitter Shape"))
+				{
+					//ImGui::InputFloat("Cone Radius", &application->pSettings.radius, 0.001f, 5.0f);
+					//ImGui::SliderFloat("Cone Length", &application->pSettings.length, 0.001, 5, "%.3f");
+					//Debug::DebugRenderer::Instance()->DrawCone(Math::point(0, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 0.0f), application->pSettings.radius, 1.0f, application->pSettings.color, Debug::RenderMode::WireFrame, 2.0f);
+				}
+			}
+			ImGui::EndDock();
+
 			ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
 
@@ -304,7 +330,7 @@ namespace Toolkit
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
 			if (ImGui::Button("New Entity", { 100, 40 }))
 			{
-				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), this->application->modelInstance);
+				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 				commandManager->DoCommand(command);
 			}
 			ImGui::EndDock();

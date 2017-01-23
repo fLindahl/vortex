@@ -3,6 +3,8 @@
 #include "tinyxml2.h"
 #include "renderdevice.h"
 #include "render/resources/surface.h"
+#include "render/resources/textureresource.h"
+#include "foundation/util/string.h"
 
 namespace Render
 {
@@ -16,10 +18,6 @@ std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const std::string& meshpa
 
         std::string fileExtension = meshpath.substr(meshpath.find_last_of("."));
 
-        //if(fileExtension == ".obj")
-        //{
-        //    nMesh->loadMeshFromOBJ(meshpath.c_str());
-        //}
         if(fileExtension == ".mesh")
         {
             nMesh->loadMeshFromFile(meshpath.c_str());
@@ -27,9 +25,6 @@ std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const std::string& meshpa
         else
         {
 			nMesh->loadMesh(meshpath.c_str());
-            //printf("Could not load mesh! Invalid file extension!");
-            //assert(false);
-            //_assert(false, "Could not load mesh!");
         }
 		std::pair<const char*, std::shared_ptr<MeshResource>> par(meshpath.c_str(), nMesh);
 		this->meshes.insert(par);
@@ -214,10 +209,8 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
 
     if (result != 0)
     {
-        printf("ERROR: Could not load materials file!");
-
 #ifdef DEBUG
-        assert(false);
+		_assert(false, "ERROR: Could not load surface file!");
 #endif // DEBUG
 
         return false;
@@ -281,12 +274,13 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
             }
         }
 
-		for (auto tex : mat->textures)
+		for (int i = 0; i < mat->textures.Size(); ++i)
 		{
-			if (sur->texturesByName.count(tex->name) == 0)
+			std::shared_ptr<TextureResource> tex = mat->textures[i];
+			if (sur->texturesByType.count(mat->TextureParamTypes[i]) == 0)
 			{
 				sur->textures.Append(tex);
-				sur->texturesByName.insert(std::make_pair(tex->name, tex));
+				sur->texturesByType.insert(std::make_pair(mat->TextureParamTypes[i], tex));
 			}
 		}
     }
@@ -381,7 +375,7 @@ Util::Array<std::shared_ptr<Render::Surface>> ResourceServer::LoadMTLFile(const 
 
 	Util::Array<std::shared_ptr<Render::Surface>> surfaces;
 
-	const std::string directory = "resources/scenes/surfaces/";
+	const std::string directory = "resources/surfaces/sponza/";
 
 	std::string surfaceName;
 

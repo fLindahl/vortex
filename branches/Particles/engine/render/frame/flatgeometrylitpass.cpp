@@ -27,7 +27,8 @@ void FlatGeometryLitPass::Execute()
 	this->BindFrameBuffer();
 
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
+	glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT, GL_FASTEST);
+	glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST);
 	DrawPass::Execute();
 
     FramePass::Execute();

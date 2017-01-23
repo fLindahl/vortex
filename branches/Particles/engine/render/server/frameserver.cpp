@@ -6,6 +6,7 @@
 #include "render/frame/drawpass.h"
 #include "render/frame/lightcullingpass.h"
 #include "render/frame/flatgeometrylitpass.h"
+#include "render/frame/lightdebugpass.h"
 
 namespace Render
 {
@@ -35,6 +36,11 @@ namespace Render
 		
 		this->framePassByName.insert(std::make_pair(this->lightCullingPass->name, this->lightCullingPass));
 		this->framePasses.Append(this->lightCullingPass);
+
+#ifdef _DEBUG
+		this->lightdebugpass = std::make_shared<LightDebugPass>();
+		this->lightdebugpass->Setup();
+#endif
 
 		// FlatGeometryLit pass
 		this->FlatGeometryLit = std::make_shared<FlatGeometryLitPass>();

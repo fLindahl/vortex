@@ -13,6 +13,10 @@
 #include <stdlib.h>
 #include "vector4.h"
 
+#ifndef PI
+#define PI 3.14159265358979323846
+#endif
+
 namespace Math
 {
 	//returns a random float between zero and 1 

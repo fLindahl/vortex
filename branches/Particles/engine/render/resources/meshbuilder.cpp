@@ -35,7 +35,9 @@ bool MeshBuilder::ExportMesh(std::shared_ptr<MeshResource> mesh, const char* fil
 		MeshFilePrimitiveGroup* g = new MeshFilePrimitiveGroup;
 		for (uint i = 0; i < header->numGroups; ++i)
 		{
-			//strcpy_s(g->name, 256, mesh->getPrimitiveGroup(i).name.c_str());
+			//Max limit of primitive group name is 256 letters
+			_assert(mesh->getPrimitiveGroup(i).name.length() <= 256, "ERROR: A primitive groups name is longer than 256 letters! WHY WOULD YOU WANT THAT? :(");
+			strcpy_s(g->name, 256, mesh->getPrimitiveGroup(i).name.c_str());
 			g->indexpointer = mesh->getPrimitiveGroup(i).indexOffset;
 			g->numindices = mesh->getPrimitiveGroup(i).numIndices;
 			fwrite(g, sizeof(MeshFilePrimitiveGroup), 1, file);
