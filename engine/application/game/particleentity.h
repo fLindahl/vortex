@@ -1,7 +1,14 @@
 #pragma once
 #include "entity.h"
 
-namespace Particle
+
+namespace Render
+{
+class GraphicsProperty;
+class ModelInstance;
+}
+
+namespace Game
 {
 class ParticleEntity : public Game::Entity
 {
@@ -14,7 +21,6 @@ class ParticleEntity : public Game::Entity
 	void Deactivate();
 
 	void SetTransform(const Math::mat4& t);
-
 
 protected:
 	

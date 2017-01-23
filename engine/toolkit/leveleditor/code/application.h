@@ -26,6 +26,7 @@
 #include "commands.h"
 #include "userinterface.h"
 #include "application/game/modelentity.h"
+#include "render/particlesystem/particlesystem.h"
 
 namespace LevelEditor
 {
@@ -81,8 +82,12 @@ private:
     std::shared_ptr<Game::StaticEntity> SceneEntity4;
     std::shared_ptr<Game::StaticEntity> SceneEntity5;
     std::shared_ptr<Game::StaticEntity> SceneEntity6;
+	std::shared_ptr<Game::StaticEntity> SceneEntity7;
 
 	std::shared_ptr<Game::ModelEntity> sponza;
+	std::shared_ptr<Game::ModelEntity> billboard;
+
+	Particles::ParticleSettings pSettings;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 	

@@ -59,12 +59,10 @@ ModelInstance::~ModelInstance()
 
 //void ModelInstance::SetSurfaceList(Util::Array<std::shared_ptr<Surface>> list)
 //{
-	//this->surfaces.Clear();
-	//this->surfaces.AppendArray(list);
-	//for (size_t i = 0; i < this->mesh->getNumPrimitiveGroups(); ++i)
-	//{
-	//	surfaces[this->mesh->getPrimitiveGroup(i).surfaceIndex]->getModelInstances().Append(std::make_pair(this, i));
-	//}
+//	for (size_t i = 0; i < this->modelNodes.Size(); ++i)
+//	{
+//		modelNodes[i]->surface = list[i].get();
+//	}
 //}
 
 std::shared_ptr<MeshResource> ModelInstance::GetMesh()

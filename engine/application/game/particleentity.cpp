@@ -1,10 +1,30 @@
 #include "config.h"
 #include "particleentity.h"
+#include "render/properties/graphicsproperty.h"
+#include "render/resources/modelinstance.h"
 
-Particle::ParticleEntity::ParticleEntity()
+namespace Game
+{
+ParticleEntity::ParticleEntity()
 {
 }
 
-Particle::ParticleEntity::~ParticleEntity()
+ParticleEntity::~ParticleEntity()
 {
+}
+
+void ParticleEntity::Activate()
+{
+	Entity::Activate();
+}
+
+void ParticleEntity::Deactivate()
+{
+	Entity::Deactivate();
+}
+
+void ParticleEntity::SetTransform(const Math::mat4 &t)
+{
+	Entity::SetTransform(t);
+}
 }

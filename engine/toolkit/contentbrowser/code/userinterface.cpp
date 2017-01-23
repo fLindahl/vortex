@@ -142,6 +142,11 @@ namespace Toolkit
 			this->SaveModel(true);
 		}
 		ImGui::Separator();
+		if (ImGui::MenuItem("Import MTL..."))
+		{
+			this->importFilePopup = true;
+		}
+		ImGui::Separator();
 
 		if (ImGui::BeginMenu("Layout"))
 		{
@@ -245,6 +250,7 @@ namespace Toolkit
 	void UserInterface::ModalWindows()
 	{
 		if (this->openFilePopup){ ImGui::OpenPopup("OpenFile"); }
+		if (this->importFilePopup){ ImGui::OpenPopup("ImportFile"); }
 		if (this->confirmNewModelPopup){ ImGui::OpenPopup("New Model"); }
 		if (this->surfaceBrowserPopup){ ImGui::OpenPopup("Surface Browser"); }
 		if (this->meshBrowserPopup){ ImGui::OpenPopup("Mesh Browser"); }
@@ -265,9 +271,40 @@ namespace Toolkit
 
 				this->application->loadedModel = std::make_shared<Game::ModelEntity>();
 				this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
+				this->application->loadedModel->SetTransform(Math::mat4::scaling(0.01f, 0.01f, 0.01f));
 				this->application->loadedModel->Activate();
 
 				this->openFilePopup = false;
+				free(outpath);
+			}
+			else if (result == NFD_CANCEL)
+			{
+				this->openFilePopup = false;
+			}
+			else
+			{
+				printf("Error: %s\n", NFD_GetError());
+				assert(false);
+				this->openFilePopup = false;
+			}
+
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::BeginPopupModal("ImportFile", &this->importFilePopup))
+		{
+			nfdchar_t* outpath;
+			nfdresult_t result = NFD_OpenDialog("mtl", NULL, &outpath);
+
+			if (result == NFD_OKAY)
+			{
+				printf("path: %s\n", outpath);
+				if (this->application->loadedModel != nullptr)
+				{
+					//EMPTY
+				}
+				
+				this->importFilePopup = false;
 				free(outpath);
 			}
 			else if (result == NFD_CANCEL)
