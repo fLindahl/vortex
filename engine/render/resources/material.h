@@ -11,6 +11,15 @@ namespace Render
 {
 class Surface;
 
+//TODO: This should also denote location in shader, but isn't currently. We assume everything is in this order in the material list.
+enum TextureType
+{
+	AlbedoMap = 0,
+	NormalMap = 1,
+	SpecularMap = 2,
+	RoughnessMap = 3
+};
+
 struct MaterialParameter
 {
 	Util::String name;
@@ -47,6 +56,8 @@ public:
 	//TEMPORARY
 	Util::Array<ModelInstance*>& getModelInstances() { return this->modelInstances; }
 
+	static TextureType TextureTypeFromString(const std::string& s);
+
 private:
 	friend class ResourceServer;
 
@@ -61,6 +72,8 @@ private:
 
 	/// loaded textures
 	Util::Array<std::shared_ptr<TextureResource>> textures;
+	/// This is adjacent with textures array. e.g. textures[1]'s type == TextureParamTypes[1].
+	Util::Array<TextureType> TextureParamTypes;
 	
 	std::map<Util::String, MaterialParameter*> parametersByName;
 	Util::Array<MaterialParameter*> parameters;

@@ -41,19 +41,19 @@ void DepthPass::Execute()
         //TODO: Renderstates?
         for (auto surface : material->SurfaceList())
         {
-            for (ModelInstance* modelInstance : surface->getModelInstances())
+            for (auto modelNode : surface->GetModelNodes())
             {
                 //Bind mesh
                 //TODO: We should probably check and make sure we don't bind these more than once
-                modelInstance->GetMesh()->Bind();
+                modelNode->modelInstance->GetMesh()->Bind();
 
-                for (GraphicsProperty* graphicsProperty : modelInstance->GetGraphicsProperties())
+				for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())
                 {
                     shader->setModelMatrix(graphicsProperty->getModelMatrix());
-                    modelInstance->GetMesh()->Draw();
+					modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
                 }
 
-                modelInstance->GetMesh()->Unbind();
+				modelNode->modelInstance->GetMesh()->Unbind();
             }
         }
     }
@@ -85,6 +85,16 @@ void DepthPass::Setup()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     FramePass::Setup();
+}
+
+void DepthPass::UpdateResolution()
+{
+	const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
+
+	glBindTexture(GL_TEXTURE_2D, this->buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, newRes.x, newRes.y, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 }

@@ -15,9 +15,13 @@ PhysicsServer::PhysicsServer()
 
 bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const Math::vec4 &direction, const float& length)
 {
-    //Create line from position, in length * direction
-    Math::line ray = Math::line(position, direction, length);
+	//Create line from position, in length * direction
+	Math::line ray = Math::line(position, direction, length);
+	return this->Raycast(out, ray);
+}
 
+bool PhysicsServer::Raycast(PhysicsHit& out, const Math::line& ray)
+{
     Math::plane plane;
     Math::vec4 planeHit;
 

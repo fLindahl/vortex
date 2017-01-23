@@ -4,12 +4,16 @@
 #include "GL/glew.h"
 #include "foundation/util/array.h"
 
+namespace Debug { class DebugServer; }
+
 namespace Render
 {
 
 class FramePass;
 class DepthPass;
 class DrawPass;
+class FlatGeometryLitPass;
+class LightDebugPass;
 
 class FrameServer
 {
@@ -37,17 +41,13 @@ public:
 
 	std::shared_ptr<DrawPass> GetDepthPass();
 	std::shared_ptr<FramePass> GetLightCullingPass();
-
-	GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
+	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
 
 private:
 	friend class RenderDevice;
-
-	GLuint finalColorFrameBufferObject;
-	GLuint finalColorBuffer;
-
+	friend Debug::DebugServer;
+	
 	const unsigned int MAX_NUM_LIGHTS = 1024;
-
 
 	//Contains all Framepasses.
 	//Key must be unique to each Pass. the key is the pass name
@@ -62,8 +62,10 @@ private:
 	std::shared_ptr<FramePass> lightCullingPass;
 	//GLuint lightCullingProgram;
 
+	std::shared_ptr<LightDebugPass> lightdebugpass;
+
 	/// For lit objects
-	std::shared_ptr<DrawPass> FlatGeometryLit;
+	std::shared_ptr<FlatGeometryLitPass> FlatGeometryLit;
 
 
 

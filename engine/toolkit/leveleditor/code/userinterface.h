@@ -3,14 +3,19 @@
 #include <string>
 #include "foundation/math/point.h"
 #include "undo.h"
-#include "tools/basetool.h"
-#include "tools/selecttool.h"
-#include "tools/translatetool.h"
 
 namespace LevelEditor { class Application; }
 
+namespace Tools 
+{
+	class BaseTool;
+	class SelectTool;
+	class TranslateTool;
+}
+
 namespace Toolkit
 {
+
 
 	class UserInterface
 	{

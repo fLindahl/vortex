@@ -31,6 +31,7 @@ public:
 	void SetRenderState(const RenderState& state);
 
 	void setModelMatrix(const Math::mat4& model);
+	void setInvModelMatrix(const Math::mat4& invmodel);
 
 	void setUniMatrix4fv(const Math::mat4& mat4, const char* uniformName);
 	void setUniVector4fv(const float* vec4, const char* uniformName);

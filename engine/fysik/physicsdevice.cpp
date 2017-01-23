@@ -310,8 +310,11 @@ void PhysicsDevice::Solve()
         rigidbody->update(this->frameTime);
     }
 
-    BroadPhase();
-    NarrowPhase();
+	if (PhysicsServer::Instance()->physicsEntities.Size() > 0)
+	{
+		BroadPhase();
+		NarrowPhase();
+	}
 
 	//Update Derivative Quantities (transforms and such)
 	for (auto rigidbody : this->rigidBodies)
@@ -449,10 +452,8 @@ bool PhysicsDevice::GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::
 		}
 	}
 
-	if (i >= maxIterations)
-	{
-		return false;
-	}
+	//No collision found
+	return false;
 }
 
 PhysicsDevice::PhysicsCollision PhysicsDevice::EPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex)
@@ -852,7 +853,7 @@ void PhysicsDevice::BroadPhase()
     }
 
     // Compute Variance
-    const float div = 1 / physicsEntities.Size();
+    const float div = 1.0f / (float)physicsEntities.Size();
     v[0] = sqsum[0] - sum[0] * sum[0] * div;
     v[1] = sqsum[1] - sum[1] * sum[1] * div;
     v[2] = sqsum[2] - sum[2] * sum[2] * div;
@@ -924,7 +925,7 @@ void PhysicsDevice::CollideEntities(Game::PhysicsEntity* a, Game::PhysicsEntity*
 
 	float relVelocity = Math::point::dot3(collData.normal, (dPa - dPb));
 
-	float restitution = 1.0f;
+	float restitution = 0.5f;
 
 	float num = -(1 + restitution) * relVelocity;
 

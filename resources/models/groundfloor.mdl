@@ -1,0 +1,7 @@
+<Vortex>
+	<Model name="groundfloor">
+		<Mesh name="resources/meshes/groundfloor.obj">
+			<Node primitivegroup="0" surface="resources/surfaces/rock.surface"/>
+		</Mesh>
+	</Model>
+</Vortex>

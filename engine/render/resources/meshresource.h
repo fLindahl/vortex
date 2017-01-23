@@ -27,7 +27,6 @@ namespace Render
 		size_t numIndices;
 
 		//How many bytes are our index buffer?
-		size_t indexDataSize;
 
 		//Util::Array<VertexComponent> vertexComponents;
 	};
@@ -47,28 +46,36 @@ public:
 	/// Unbind VAO
 	void Unbind();
 	///Draw elements
-	void Draw();
+	void Draw(); //Draws all primitive groups at once
+	void Draw(const unsigned int& primitiveGroup); //draws a specific primitivegroup
 
 	void* getMesh();
 	void* getIndices();
 
-	const PrimitiveGroup& getPrimitiveGroup(const int& i);
+	const PrimitiveGroup& getPrimitiveGroup(const int& i) { return this->primitiveGroups[i]; }
 
 	///Total amount of indices in mesh
-	size_t getNumIndices() { return this->numIndices; }
+	uint getNumIndices() { return (uint)this->numIndices; }
 	///Total amount of vertices in mesh
 	uint getNumVertices() { return this->numVertices; }
 	///Returns the amount of floats that a vertex contains
 	uint getVertexWidth() { return this->vertexWidth; }
+	///Return vertex component mask
+	uint getVertexComponentMask() { return this->vertexComponentMask; }
+
+
+	uint getNumPrimitiveGroups() { return (uint)this->primitiveGroups.Size(); }
 
 	///Returns the base bbox for this entity.
 	Math::bbox getBaseBBox() { return this->bbox; }
 
 	std::string GetName() { return this->name; }
-	
+	std::string GetPath() { return this->filePath; }
+
 private:
 	// The filename for this mesh
 	std::string name;
+	std::string filePath;
 
 	Math::bbox bbox;
 	///Contains all PrimitiveGroups vertices/indices

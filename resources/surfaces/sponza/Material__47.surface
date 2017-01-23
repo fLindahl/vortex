@@ -1,0 +1,8 @@
+<Vortex>
+	<Surface material="Static">
+		<!-- Textures -->
+		<Param name="AlbedoMap" type="string" value="resources/textures/placeholder.png"/>
+		
+		<!-- Specific Parameters -->
+	</Surface>
+</Vortex>

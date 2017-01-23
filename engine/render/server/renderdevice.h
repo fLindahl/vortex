@@ -71,6 +71,9 @@ namespace Render
 
 		void Initialize();
 
+		void SetFinalColorBuffer(GLuint cbuffer) { this->finalColorBuffer = cbuffer; }
+		GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
+
    private:
 		friend class LightServer;
 
@@ -78,6 +81,8 @@ namespace Render
 		Resolution windowResolution;
 
 		GLuint currentProgram;
+
+		GLuint finalColorBuffer = 0;
 		
         //contains all the shader objects that we've loaded
         Util::Array<Material*> materials;

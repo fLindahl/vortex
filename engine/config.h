@@ -6,11 +6,6 @@
 	
 	(C) 2015 See the LICENSE file.
 */
-#ifdef _MSC_VER
-// disable _s warnings
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include <stdint.h>
 #include <atomic>
 #include <xmmintrin.h>
@@ -50,7 +45,13 @@ typedef double		float64;
 #endif
 
 // assert macro
-#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_Msg, _CRT_WIDE(__FILE__), __LINE__), 0) )
+//#define assert(_Expression) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(#_Expression), _CRT_WIDE(__FILE__), __LINE__), 0) )
+
+#ifdef __GNUC__
+#define _assert(expr, msg) ((expr) ? __ASSERT_VOID_CAST (0) : __assert_fail (#msg, __FILE__, __LINE__, __ASSERT_FUNCTION))
+#else
+#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(_Msg), _CRT_WIDE(__FILE__), __LINE__), 0) )
+#endif
 
 #ifdef NULL
 #undef NULL
