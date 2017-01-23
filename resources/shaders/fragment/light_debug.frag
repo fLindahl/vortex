@@ -1,7 +1,3 @@
-in vec3 WorldPos;
-in vec3 Normal;
-in vec2 TexCoords;
-
 struct PointLight {
 	vec4 color;
 	vec4 position;

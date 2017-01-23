@@ -1,0 +1,38 @@
+#version 430 compatibility
+#extension GL_ARB_compute_shader: enable
+#extension GL_ARB_shader_storage_buffer_object: enable;
+
+layout(local_size_variable) in;
+
+struct ParticleSettings
+{
+	vec4 pos;
+	vec4 vel;
+	vec4 color;
+	float speed;
+	float lifetime;
+	float gravity;
+};
+
+layout(std140, binding=4) buffer set 
+{
+	ParticleSettings  settings[]; // array of structures
+} pSettings;
+
+const vec3 G = vec3( 0.0 , -9.8 , 0.0 );
+const float DT = 0.1;
+
+uint gid = gl_GlobalInvocationID.x;
+
+void Main()
+{
+	vec3 p  = pSettings.settings[gid].pos.xyz;
+	vec3 v  = pSettings.settings[gid].vel.xyz;
+	vec3  pp = p + v*DT + 0.5*DT*DT*G;
+	vec3  vp = v + G*DT;
+	pSettings.settings[gid].pos.xyz  = pp;
+	pSettings.settings[gid].vel.xyz = vp;
+	
+	barrier();
+}
+
