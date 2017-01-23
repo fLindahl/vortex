@@ -15,8 +15,11 @@ public:
 
 	void UpdateResolution();
 
-private:
+	GLuint GetLinearDepthBuffer() { return this->linearDepthBuffer; }
 
+private:
+	// linearized depthbuffer. Used for various effects such as SSR and particle depth collisions
+	GLuint linearDepthBuffer;
 };
 
 }

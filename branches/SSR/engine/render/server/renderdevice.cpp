@@ -98,13 +98,13 @@ void RenderDevice::Render(bool drawToScreen)
 	//TODO: We should iterate through every pass instead of doing it this way!
 
 	// Depth pre-pass
-	std::weak_ptr<FramePass> framePass = FrameServer::Instance()->GetDepthPass();
-    auto depthPass = framePass.lock();
+	std::weak_ptr<DepthPass> dPass = FrameServer::Instance()->GetDepthPass();
+	auto depthPass = dPass.lock();
 
     //Run depth pass
 	depthPass->Execute();
 	
-	framePass = FrameServer::Instance()->GetLightCullingPass();
+	std::weak_ptr<FramePass>framePass = FrameServer::Instance()->GetLightCullingPass();
 	auto lightCullingPass = framePass.lock();
 
 	lightCullingPass->Execute();

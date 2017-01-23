@@ -79,7 +79,7 @@ namespace Render
 		return (this->framePassByName.count(nName) > 0);
 	}
 
-	std::shared_ptr<DrawPass> FrameServer::GetDepthPass()
+	std::shared_ptr<DepthPass> FrameServer::GetDepthPass()
 	{
 		return this->Depth;
 	}
