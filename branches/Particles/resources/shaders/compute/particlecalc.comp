@@ -4,20 +4,21 @@
 
 layout(local_size_variable) in;
 
-struct ParticleSettings
+struct ParticleState
 {
 	vec4 pos;
 	vec4 vel;
-	vec4 color;
-	float speed;
+	vec4 rot;
 	float lifetime;
-	float gravity;
+	float acceleration[3];
 };
 
 layout(std140, binding=4) buffer set 
 {
 	ParticleSettings  settings[]; // array of structures
 } pSettings;
+
+uniform sampler2D depthMap;
 
 const vec3 G = vec3( 0.0 , -9.8 , 0.0 );
 const float DT = 0.1;
@@ -28,8 +29,8 @@ void Main()
 {
 	vec3 p  = pSettings.settings[gid].pos.xyz;
 	vec3 v  = pSettings.settings[gid].vel.xyz;
-	vec3  pp = p + v*DT + 0.5*DT*DT*G;
-	vec3  vp = v + G*DT;
+	vec3  pp = p + v*DT + 0.5*DT*DT*pSettings.settings[gid].acceleration;
+	vec3  vp = v + pSettings.settings[gid].acceleration*DT;
 	pSettings.settings[gid].pos.xyz  = pp;
 	pSettings.settings[gid].vel.xyz = vp;
 	

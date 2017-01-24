@@ -1,7 +1,9 @@
 #include "config.h"
 #include "particlecomputepass.h"
+#include "render/server/frameserver.h"
 #include "render/resources/meshresource.h"
 #include "render/server/renderdevice.h"
+#include "drawpass.h"
 
 namespace Particles
 {
@@ -35,7 +37,14 @@ void ParticleComputePass::Setup()
 
 void ParticleComputePass::Execute()
 {
+	// Light culling compute shader
+	glUseProgram(this->particleComputeProgram);
 
+	// Bind depth map texture to texture location 4 (which will not be used by any model texture)
+	glActiveTexture(GL_TEXTURE4);
+	glUniform1i(glGetUniformLocation(this->particleComputeProgram, "depthMap"), 4);
+	//Get and bind Depth map
+	glBindTexture(GL_TEXTURE_2D, Render::FrameServer::Instance()->GetDepthPass()->GetTexture());
 }
 }
 
