@@ -16,7 +16,8 @@ enum TextureType
 {
 	AlbedoMap = 0,
 	NormalMap = 1,
-	SpecularMap = 2
+	SpecularMap = 2,
+	RoughnessMap = 3
 };
 
 struct MaterialParameter

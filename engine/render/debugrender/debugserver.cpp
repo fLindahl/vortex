@@ -25,10 +25,13 @@ void DebugServer::ImGuiDebugBar()
 		{
 			ImGui::MenuItem("Show Framebuffer:");
 
-			if (ImGui::MenuItem("Depth")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetDepthPass()->GetBuffer()); }
-			if (ImGui::MenuItem("Light Tiles")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->lightdebugpass->GetBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Color")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer()); }
+			if (ImGui::MenuItem("Depth")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetDepthPass()->GetBuffer()); }
+			if (ImGui::MenuItem("Linear Depth")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer()); }
+			//if (ImGui::MenuItem("Depth Cone Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetDepthPass()->GetDepthConeMap()); }
+			if (ImGui::MenuItem("Light Tiles")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->lightdebugpass->GetBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Normals")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer()); }
+			if (ImGui::MenuItem("FlatGeometryLit Specular")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer()); }
 
 			ImGui::Separator();
 			ImGui::EndMenu();

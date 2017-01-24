@@ -2,8 +2,10 @@
 	<Surface material="Static">
 		<!-- Textures -->
 		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/spnza_bricks_a_diff.tga"/>
+		<Param name="NormalMap" type="string" value="resources/textures/sponza/spnza_bricks_a_ddn.tga"/>
+		<Param name="SpecularMap" type="string" value="resources/textures/sponza/spnza_bricks_a_spec.tga"/>
+		<Param name="RoughnessMap" type="string" value="resources/textures/sponza/sponza_bricks_a_roughness.tga"/>
 		
 		<!-- Specific Parameters -->
-		<Param name="Shininess" type="float" value="16" desc="Material shininess"/>
 	</Surface>
 </Vortex>
