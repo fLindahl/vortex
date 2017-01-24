@@ -3,7 +3,7 @@
 #include "render/server/frameserver.h"
 #include "render/resources/meshresource.h"
 #include "render/server/renderdevice.h"
-#include "drawpass.h"
+#include "depthpass.h"
 
 namespace Particles
 {
