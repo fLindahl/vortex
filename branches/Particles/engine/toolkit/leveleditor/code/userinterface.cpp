@@ -307,7 +307,7 @@ namespace Toolkit
 					ImGui::Combo("combo scroll", &item2, items, IM_ARRAYSIZE(items));
 					if (ImGui::TreeNode("Color"))
 					{
-						ImGui::ColorPicker((float*)&application->pSettings.color, true);
+						//ImGui::ColorPicker((float*)&application->pSettings.color, true);
 						ImGui::TreePop();
 					}
 						

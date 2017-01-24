@@ -87,7 +87,7 @@ private:
 	std::shared_ptr<Game::ModelEntity> sponza;
 	std::shared_ptr<Game::ModelEntity> billboard;
 
-	Particles::ParticleSettings pSettings;
+	//Particles::ParticleSettings pSettings;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 	
