@@ -66,6 +66,8 @@ Application::Open()
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Vortex Level Editor");
 
+		//RenderDevice::Instance()->SetRenderResolution(256, 256);
+
 		this->rayStart = Math::vec4::zerovector();
 		this->rayEnd = Math::vec4::zerovector();
 		
@@ -80,7 +82,7 @@ Application::Open()
 
 		PointLight pLight;
 		pLight.position = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		pLight.color = Math::vec4(1.0f, 0.5f, 1.0f, 1.0f);
 		pLight.radiusAndPadding.set_x(10.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 		
@@ -93,7 +95,7 @@ Application::Open()
 		LightServer::Instance()->AddPointLight(pLight);
 
 		pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
-		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
+		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 		
 		// set ui rendering function

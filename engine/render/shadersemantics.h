@@ -20,4 +20,5 @@
 #define VORTEX_SEMANTIC_ALBEDOMAP				   "AlbedoMap"
 #define VORTEX_SEMANTIC_NORMALMAP				   "NormalMap"
 #define VORTEX_SEMANTIC_SPECULARMAP				   "SpecularMap"
+#define VORTEX_SEMANTIC_ROUGHNESSMAP			   "RoughnessMap"
     
