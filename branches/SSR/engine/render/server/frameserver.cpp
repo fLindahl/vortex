@@ -7,6 +7,7 @@
 #include "render/frame/lightcullingpass.h"
 #include "render/frame/flatgeometrylitpass.h"
 #include "render/frame/lightdebugpass.h"
+#include "render/frame/reflectionpass.h"
 
 namespace Render
 {
@@ -49,6 +50,14 @@ namespace Render
 
 		this->framePassByName.insert(std::make_pair(this->FlatGeometryLit->name, this->FlatGeometryLit));
 		this->framePasses.Append(this->FlatGeometryLit);
+
+		// FlatGeometryLit pass
+		this->ReflectionPass = std::make_shared<Render::ReflectionPass>();
+		this->ReflectionPass->name = "Reflection";
+		this->ReflectionPass->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->ReflectionPass->name, this->ReflectionPass));
+		this->framePasses.Append(this->ReflectionPass);
 
 		//Set final color buffer for easy access
 		RenderDevice::Instance()->SetFinalColorBuffer(this->FlatGeometryLit->buffer);
