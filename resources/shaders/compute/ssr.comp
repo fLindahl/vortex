@@ -14,6 +14,11 @@ shared uint maxDepthInt;
 shared uint visibleLightCount;
 shared vec4 frustumPlanes[6];
 
+bool traceScreenSpaceRay()
+
+
+
+
 layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;
 void main() 
 {
@@ -23,8 +28,7 @@ void main()
 	ivec2 tileNumber = ivec2(gl_NumWorkGroups.xy);
 	uint index = tileID.y * tileNumber.x + tileID.x;
 	uint threadCount = TILE_SIZE * TILE_SIZE;
-	uint passCount = (lightCount + threadCount - 1) / threadCount;
-	
+
 	// Initialize shared global values for depth
 	if (gl_LocalInvocationIndex == 0) 
 	{
