@@ -27,7 +27,6 @@ void ReflectionPass::Execute()
 
 void ReflectionPass::Setup()
 {
-	/*
 	// Setup light culling compute shader program
 	this->SSRComputeProgram = glCreateProgram();
 	const char filepath[] = "resources/shaders/compute/ssr.comp";
@@ -42,7 +41,8 @@ void ReflectionPass::Setup()
 		printf("[PROGRAM LINK ERROR]: %s", buf);
 		delete[] buf;
 	}
-	*/
+
+
     FramePass::Setup();
 }
 
