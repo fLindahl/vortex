@@ -14,6 +14,7 @@ class DepthPass;
 class DrawPass;
 class FlatGeometryLitPass;
 class LightDebugPass;
+class ReflectionPass;
 
 class FrameServer
 {
@@ -42,6 +43,7 @@ public:
 	std::shared_ptr<DepthPass> GetDepthPass();
 	std::shared_ptr<FramePass> GetLightCullingPass();
 	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
+	std::shared_ptr<ReflectionPass> GetReflectionPass();
 
 private:
 	friend class RenderDevice;
@@ -66,6 +68,9 @@ private:
 
 	/// For lit objects
 	std::shared_ptr<FlatGeometryLitPass> FlatGeometryLit;
+
+	/// For computing reflections
+	std::shared_ptr<ReflectionPass> ReflectionPass;
 
 
 

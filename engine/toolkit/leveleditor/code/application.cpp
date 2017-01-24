@@ -66,6 +66,8 @@ Application::Open()
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Vortex Level Editor");
 
+		//RenderDevice::Instance()->SetRenderResolution(256, 256);
+
 		this->rayStart = Math::vec4::zerovector();
 		this->rayEnd = Math::vec4::zerovector();
 		
