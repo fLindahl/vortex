@@ -52,6 +52,8 @@ void DrawPass::Execute()
 					glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_NORMALMAP), i);
 				else if (i == 2)
 					glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_SPECULARMAP), i);
+				else if (i == 3)
+					glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_ROUGHNESSMAP), i);
             }
 
             for (uint i = 0; i < surface->ParameterList().Size(); i++)

@@ -119,6 +119,10 @@ namespace Render
 		{
 			return TextureType::SpecularMap;
 		}
+		if (s == VORTEX_SEMANTIC_ROUGHNESSMAP)
+		{
+			return TextureType::RoughnessMap;
+		}
 		else
 		{
 			_assert(false, "ERROR: Texture type name does not exist in semantics!");

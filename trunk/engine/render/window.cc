@@ -317,6 +317,7 @@ namespace Display
 				this->uiFunc();
 				ImGui::Render();
 			}
+
 			glfwSwapBuffers(this->window);
 		}
 	}
