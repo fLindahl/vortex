@@ -1,6 +1,5 @@
-#version 430 compatibility
-#extension GL_ARB_compute_shader: enable
-#extension GL_ARB_shader_storage_buffer_object: enable;
+
+#extension GL_ARB_compute_variable_group_size: enable
 
 layout(local_size_variable) in;
 
@@ -10,29 +9,30 @@ struct ParticleState
 	vec4 vel;
 	vec4 rot;
 	float lifetime;
-	float acceleration[3];
+	vec3 acceleration;
 };
 
-layout(std140, binding=4) buffer set 
+layout(std140, binding=4) buffer source 
 {
-	ParticleSettings  settings[]; // array of structures
-} pSettings;
+	ParticleState settings[]; // array of structures
+};
 
 uniform sampler2D depthMap;
 
 const vec3 G = vec3( 0.0 , -9.8 , 0.0 );
-const float DT = 0.1;
+const float DT = 0.16;
 
-uint gid = gl_GlobalInvocationID.x;
 
-void Main()
+void main()
 {
-	vec3 p  = pSettings.settings[gid].pos.xyz;
-	vec3 v  = pSettings.settings[gid].vel.xyz;
-	vec3  pp = p + v*DT + 0.5*DT*DT*pSettings.settings[gid].acceleration;
-	vec3  vp = v + pSettings.settings[gid].acceleration*DT;
-	pSettings.settings[gid].pos.xyz  = pp;
-	pSettings.settings[gid].vel.xyz = vp;
+	uint gid = gl_GlobalInvocationID.x;
+
+	vec3 p  = settings[gid].pos.xyz;
+	vec3 v  = settings[gid].vel.xyz;
+	vec3  pp = p + v*DT + 0.5*DT*DT*settings[gid].acceleration;
+	vec3  vp = v + settings[gid].acceleration*DT;
+	settings[gid].pos.xyz = pp;
+	settings[gid].vel.xyz = vp;
 	
 	barrier();
 }
