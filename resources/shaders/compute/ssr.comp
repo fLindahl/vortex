@@ -1,25 +1,123 @@
-layout(std430, binding = 1) readonly buffer LightBuffer 
+layout(std140, binding = 1) uniform UniformBlock
 {
-	PointLight data[];
-} lightBuffer;
+	float zThickness; // How thick is each depth fragment? higher value yields some wierd smudging at edges of reflection, but thinner z means we might miss some geometry. This should essentially be the average thickness of the geometry. to do dynamically would be a nightmare however...
+	float stride; // lets you skip pixels during iteration. Larger stride means longer rays with same number of samples.
+	float jitter; // if stride > 1 we ge banding results. This can be traded for noise by jittering the start position of each ray.
+	float maxSteps; //Less steps means shorter reflections, but better performance
+	float maxDistance; //Not orthogonal to max steps. reflection of surfaces far away in world space are prone to rapid shifts with only a slight change in camera positioning, which can lead to objectionable temporal flicker. Setting this parameter can help mitigate that.
+	uvec2 workGroups; // How many workgroups do we have?
+	float padding; // Just padding. Might not be needed because std140
+};
 
-// Uniforms
+#define THREADS_X 16
+#define THREADS_Y 16
+
+// All the samplers we need!
 uniform sampler2D depthMap;
+uniform sampler2D normalMap;
 uniform sampler2D specularMap;
 uniform sampler2D colorMap;
 
 // Shared values between all the threads in a group
-shared uint minDepthInt;
-shared uint maxDepthInt;
-shared uint visibleLightCount;
-shared vec4 frustumPlanes[6];
+//shared DepthSamples
 
-bool traceScreenSpaceRay()
+layout (rgba32f) uniform writeonly image2D reflectionImage;
+
+float distanceSquared(vec2 a, vec2 b) 
+{
+	a -= b;
+	return dot(a, a);
+}
+
+bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin, 
+						 in vec3 viewSpaceDirection, 
+						 in vec2 texelCoordinate, // For fetching data from specularbuffer
+						 out vec2 hitTexCoord						 
+						 )
+{
+	float nearPlaneZ = 0.01f;
+
+	// Clip with near plane
+	float rayLength = ((viewSpaceOrigin.z + viewSpaceDirection.z * maxDistance) > nearPlaneZ) ? (nearPlaneZ - viewSpaceOrigin.z) / viewSpaceDirection.z : maxDistance;
+    vec3 viewSpaceEndPoint = viewSpaceOrigin + viewSpaceDirection * rayLength;
+	
+	 // Project into homogeneous clip space
+    vec4 H0 = Projection * vec4(viewSpaceOrigin, 1.0);
+    vec4 H1 = Projection * vec4(viewSpaceEndPoint, 1.0);
+    float k0 = 1.0 / H0.w, k1 = 1.0 / H1.w;
+ 
+    // The interpolated homogeneous version of the camera-space points  
+    vec3 Q0 = viewSpaceOrigin * k0, Q1 = viewSpaceEndPoint * k1;
+ 
+    // Screen-space endpoints
+    vec2 P0 = H0.xy * k0, P1 = H1.xy * k1;
+ 
+    // If the line is degenerate, make it cover at least one pixel
+    // to avoid handling zero-pixel extent as a special case later
+    P1 += vec2((distanceSquared(P0, P1) < 0.0001) ? 0.01 : 0.0);
+    vec2 delta = P1 - P0;
+ 
+    // Permute so that the primary iteration is in x to collapse
+    // all quadrant-specific DDA cases later
+    bool permute = false;
+    if (abs(delta.x) < abs(delta.y)) 
+	{	
+        // This is a more-vertical line
+        permute = true; 
+		delta = delta.yx; 
+		P0 = P0.yx; 
+		P1 = P1.yx; 
+    }
+ 
+    float stepDir = sign(delta.x);
+    float invdx = stepDir / delta.x;
+ 
+    // Track the derivatives of Q and k
+    vec3  dQ = (Q1 - Q0) * invdx;
+    float dk = (k1 - k0) * invdx;
+    vec2  dP = vec2(stepDir, delta.y * invdx);
+ 
+    // Scale derivatives by the desired pixel stride and then
+    // offset the starting values by the jitter fraction
+    dP *= stride; dQ *= stride; dk *= stride;
+    P0 += dP * jitter; Q0 += dQ * jitter; k0 += dk * jitter;
+ 
+    // Slide P from P0 to P1, (now-homogeneous) Q from Q0 to Q1, k from k0 to k1
+    vec3 Q = Q0; 
+ 
+    // Adjust end condition for iteration direction
+    float  end = P1.x * stepDir;
+ 
+    float k = k0, stepCount = 0.0, prevZMaxEstimate = viewSpaceOrigin.z;
+    float rayZMin = prevZMaxEstimate, rayZMax = prevZMaxEstimate;
+    float sceneZMax = rayZMax + 100;
+    for (vec2 P = P0; ((P.x * stepDir) <= end) && (stepCount < maxSteps) && ((rayZMax < sceneZMax - zThickness) || (rayZMin > sceneZMax)) && (sceneZMax != 0); P += dP, Q.z += dQ.z, k += dk, ++stepCount) 
+	{
+        rayZMin = prevZMaxEstimate;
+        rayZMax = (dQ.z * 0.5 + Q.z) / (dk * 0.5 + k);
+        prevZMaxEstimate = rayZMax;
+        if (rayZMin > rayZMax) 
+		{ 
+			float t = rayZMin; rayZMin = rayZMax; rayZMax = t;
+        }
+ 
+        // You may need hitPixel.y = csZBufferSize.y - hitPixel.y; here if your vertical axis
+        // is different than ours in screen space
+        hitTexCoord = permute ? P.yx : P;
+		//hitTexCoord.y = ScreenSize.y - hitTexCoord.y;
+		
+		// TexelFetch wants texel position, not UVs
+        sceneZMax = texelFetch(depthMap, ivec2(hitTexCoord), 0).r;
+    }
+     
+    // Advance Q based on the number of steps
+  //  Q.xy += dQ.xy * stepCount;
+ //   hitPoint = Q * (1.0 / k);
+    return (rayZMax >= sceneZMax - zThickness) && (rayZMin < sceneZMax);
+}
 
 
-
-
-layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;
+layout(local_size_x = THREADS_X, local_size_y = THREADS_Y, local_size_z = 1) in;
 void main() 
 {
 	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
@@ -27,120 +125,55 @@ void main()
 	ivec2 tileID = ivec2(gl_WorkGroupID.xy);
 	ivec2 tileNumber = ivec2(gl_NumWorkGroups.xy);
 	uint index = tileID.y * tileNumber.x + tileID.x;
-	uint threadCount = TILE_SIZE * TILE_SIZE;
+	uint threadCount = THREADS_X * THREADS_Y;
 
-	// Initialize shared global values for depth
-	if (gl_LocalInvocationIndex == 0) 
-	{
-		minDepthInt = 0xFFFFFFFF;
-		maxDepthInt = 0;
-	}
-
-	memoryBarrierShared();
-
-	// Step 1: Calculate the minimum and maximum depth values (from the depth buffer) for this group's tile
-	float maxDepth, minDepth;
-	vec2 text = vec2(location) / ScreenSize;
-	float depth = texture(depthMap, text).r;
-
-	// Convert depth to uint so we can do atomic min and max comparisons between the threads
-	uint depthInt = floatBitsToUint(depth);
-	atomicMin(minDepthInt, depthInt);
-	atomicMax(maxDepthInt, depthInt);
-
-	barrier();
+	//Per pixel on depthbuffer
 	
-
-	// Step 2: One thread should calculate the frustum planes to be used for this tile
-	if (gl_LocalInvocationIndex == 0) 
+	vec2 TexCoord = vec2(location) / ScreenSize;
+	
+	//First of all we need to generate a reflection vector that we can raytrace
+	
+	//Get normal from normal map. This only needs to be done once per pixel
+	vec3 worldNormal = texelFetch(normalMap, location, 0).rgb;
+	
+	//We need the normal to be in viewspace coordinates.
+	vec3 viewSpaceNormal = (View * vec4(worldNormal, 1.0f)).rgb;
+	
+	float pixelDepth = texelFetch(depthMap, location, 0).r;
+	
+	//Calculate world pos
+	vec4 clipSpacePosition = vec4(TexCoord, -1.0f, 1.0);
+    vec4 viewSpacePosition = InvProjection * clipSpacePosition;
+    //viewSpacePosition /= viewSpacePosition.w; // Perspective division
+	viewSpacePosition.z = pixelDepth;
+	
+	vec3 viewDir = normalize(viewSpacePosition.xyz);
+	
+	//Reflect vector against normal
+	vec3 reflectionDir = -2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir;
+	//vec3 reflectionDir = normalize(reflect(viewDir, viewSpaceNormal));
+	
+	//pixelWPos = View * pixelWPos;
+	
+	vec2 hitTexCoord;
+	
+	if (TraceScreenSpaceRay(viewSpacePosition.xyz, reflectionDir, TexCoord, hitTexCoord))
 	{
-		// Convert the min and max across the entire tile back to float
-		minDepth = uintBitsToFloat(minDepthInt);
-		maxDepth = uintBitsToFloat(maxDepthInt);
-
-		// Steps based on tile sale
-		vec2 negativeStep = (2.0 * vec2(tileID)) / vec2(tileNumber);
-		vec2 positiveStep = (2.0 * vec2(tileID + ivec2(1, 1))) / vec2(tileNumber);
-
-		// Set up starting values for planes using steps and min and max z values
-		frustumPlanes[0] = vec4(1.0, 0.0, 0.0, 1.0 - negativeStep.x); // Left
-		frustumPlanes[1] = vec4(-1.0, 0.0, 0.0, -1.0 + positiveStep.x); // Right
-		frustumPlanes[2] = vec4(0.0, 1.0, 0.0, 1.0 - negativeStep.y); // Bottom
-		frustumPlanes[3] = vec4(0.0, -1.0, 0.0, -1.0 + positiveStep.y); // Top
-		frustumPlanes[4] = vec4(0.0, 0.0, -1.0, -minDepth); // Near
-		frustumPlanes[5] = vec4(0.0, 0.0, 1.0, maxDepth); // Far
-
-		// Transform the first four planes
-		frustumPlanes[0] *= ViewProjection;
-		frustumPlanes[0] /= length(frustumPlanes[0].xyz);
-		frustumPlanes[1] *= ViewProjection;
-		frustumPlanes[1] /= length(frustumPlanes[1].xyz);
-		frustumPlanes[2] *= ViewProjection;
-		frustumPlanes[2] /= length(frustumPlanes[2].xyz);
-		frustumPlanes[3] *= ViewProjection;
-		frustumPlanes[3] /= length(frustumPlanes[3].xyz);
+		vec3 hitColor = texelFetch(colorMap, ivec2(hitTexCoord), 0).rgb;
+		vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
 		
-		// Transform the depth planes
-		frustumPlanes[4] *= View;
-		frustumPlanes[4] /= length(frustumPlanes[4].xyz);
-		frustumPlanes[5] *= View;
-		frustumPlanes[5] /= length(frustumPlanes[5].xyz);
+		float roughness = specularAndRoughness.w;
+		
+		vec4 finalColor = vec4(hitColor /* * specularAndRoughness.rgb */, 1.0f);
+	
+		imageStore(reflectionImage, location, finalColor);
 	}
-
-	memoryBarrierShared();
-
-	// Step 3: Cull lights.
-	// Parallelize the threads against the lights now.
-	// Can handle 256 simultaniously. Anymore lights than that and additional passes are performed
-	for (uint i = 0; i < passCount; i++) 
+	else
 	{
-		// Get the lightIndex to test for this thread / pass. If the index is >= light count, then this thread can stop testing lights
-		uint lightIndex = i * threadCount + gl_LocalInvocationIndex;
-		if (lightIndex >= lightCount) 
-		{
-			break;
-		}
-
-		vec4 position = lightBuffer.data[lightIndex].position;
-		float radius = lightBuffer.data[lightIndex].radiusAndPadding.x;
-
-		// We check if the light exists in our frustum
-		float distance = 0.0;
-		for (uint j = 0; j < 6; j++) 
-		{
-			distance = dot(position, frustumPlanes[j]) + radius;
-
-			// If one of the tests fails, then there is no intersection
-			if (distance <= 0.0) {
-				break;
-			}
-		}
-
-		// If greater than zero, then it is a visible light
-		if (distance > 0.0) 
-		{
-			// Add index to the shared array of visible indices
-			uint offset = atomicAdd(visibleLightCount, 1);
-			visibleLightIndices[offset] = int(lightIndex);
-		}
-	}
-
-	memoryBarrierShared();
-
-	// One thread should fill the global light buffer
-	if (gl_LocalInvocationIndex == 0) 
-	{
-		uint offset = index * 1024; // Determine position in global buffer
-		for (uint i = 0; i < visibleLightCount; i++) 
-		{
-			visibleLightIndicesBuffer.data[offset + i].index = visibleLightIndices[i];
-		}
-
-		if (visibleLightCount != 1024) 
-		{
-			// Unless we have totally filled the entire array, mark it's end with -1
-			// Final shader step will use this to determine where to stop (without having to pass the light count)
-			visibleLightIndicesBuffer.data[offset + visibleLightCount].index = -1;
-		}
-	}
+		//Get fall-back value.
+		//TEMPORARY set to RED
+		imageStore(reflectionImage, location, vec4(1.0f,0.0f,0.0f,1.0f));
+	}	
+	
+	groupMemoryBarrier();
 }
