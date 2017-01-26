@@ -12,6 +12,12 @@
 
 namespace Render
 {
+enum ShaderObjectType
+{
+	VERTEX_FRAGMENT,
+	COMPUTE
+};
+
 
 class ShaderObject
 {
@@ -19,17 +25,9 @@ public:
 	ShaderObject();
 	~ShaderObject();
 
-	void loadVertexShader(const std::string& vertFile);
-	void loadFragmentShader(const std::string& fragFile);
-
 	void SetName(const Util::String& name) { this->name = name; }
 	Util::String GetName() { return this->name; }
-
-    void setVertexShader(const GLuint& in);
-    void setFragmentShader(const GLuint& in);
-
-	void SetRenderState(const RenderState& state);
-
+	
 	void setModelMatrix(const Math::mat4& model);
 	void setInvModelMatrix(const Math::mat4& invmodel);
 
@@ -39,17 +37,26 @@ public:
 
 	void setUni1f(const float& f, const char* uniformName);
 
-	void LinkShaders();
-
 	GLuint GetProgram();
 	
 private:
+	ShaderObjectType type;
+
+	friend class ShaderServer;
+
+	void SetRenderState(const RenderState& state);
+
+	void AddShader(const GLuint& in);
+	const Util::Array<GLuint>& GetShaders() { return this->shaders; }
+
+	void LinkShaders();
+
 	Util::String name;
 
 	GLuint program;
 
-	GLuint vertexShader;
-	GLuint fragmentShader;
+	Util::Array<GLuint> shaders;
+	
 
 	// TODO: Add renderstates to the rendering system
 	RenderState renderState;

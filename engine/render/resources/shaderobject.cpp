@@ -9,7 +9,7 @@ namespace Render
 
 	ShaderObject::ShaderObject()
 	{
-
+		this->program = glCreateProgram();
 	}
 
 	ShaderObject::~ShaderObject()
@@ -17,24 +17,10 @@ namespace Render
 		glDeleteProgram(this->program);
 	}
 
-	void ShaderObject::loadVertexShader(const std::string &vertFile)
+	void ShaderObject::AddShader(const GLuint& in)
 	{
-		this->vertexShader = ShaderServer::Instance()->LoadVertexShader(vertFile);
-	}
-
-	void ShaderObject::loadFragmentShader(const std::string &fragFile)
-	{
-		this->fragmentShader = ShaderServer::Instance()->LoadFragmentShader(fragFile);
-	}
-
-	void ShaderObject::setVertexShader(const GLuint& in)
-	{
-		this->vertexShader = in;
-	}
-
-	void ShaderObject::setFragmentShader(const GLuint &in)
-	{
-		this->fragmentShader = in;
+		this->shaders.Append(in);
+		glAttachShader(this->program, in);
 	}
 
 	void ShaderObject::SetRenderState(const RenderState& state)
@@ -82,9 +68,6 @@ namespace Render
 
 	void ShaderObject::LinkShaders()
 	{
-		this->program = glCreateProgram();
-		glAttachShader(this->program, this->vertexShader);
-		glAttachShader(this->program, this->fragmentShader);
 		glLinkProgram(this->program);
 		GLint shaderLogSize;
 		glGetProgramiv(this->program, GL_INFO_LOG_LENGTH, &shaderLogSize);

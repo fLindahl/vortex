@@ -22,6 +22,28 @@ ReflectionPass::~ReflectionPass()
 
 }
 
+void ReflectionPass::Setup()
+{
+	GLfloat borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+	glGenTextures(1, &this->reflectionBuffer);
+	glBindTexture(GL_TEXTURE_2D, this->reflectionBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Setup light culling compute shader program
+	this->SSRComputeProgram = ShaderServer::Instance()->LoadShader("SSR")->GetProgram();
+	
+	glGenBuffers(1, this->ubo);
+
+	FramePass::Setup();
+}
+
 void ReflectionPass::Execute()
 {
 	// Set uniforms
@@ -83,40 +105,6 @@ void ReflectionPass::Execute()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	FramePass::Execute();
-}
-
-void ReflectionPass::Setup()
-{
-	GLfloat borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-	glGenTextures(1, &this->reflectionBuffer);
-	glBindTexture(GL_TEXTURE_2D, this->reflectionBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Setup light culling compute shader program
-	this->SSRComputeProgram = glCreateProgram();
-	const char filepath[] = "resources/shaders/compute/ssr.comp";
-	glAttachShader(this->SSRComputeProgram, ShaderServer::Instance()->LoadComputeShader(filepath));
-	glLinkProgram(this->SSRComputeProgram);
-	GLint shaderLogSize;
-	glGetProgramiv(this->SSRComputeProgram, GL_INFO_LOG_LENGTH, &shaderLogSize);
-	if (shaderLogSize > 0)
-	{
-		GLchar* buf = new GLchar[shaderLogSize];
-		glGetProgramInfoLog(this->SSRComputeProgram, shaderLogSize, NULL, buf);
-		printf("[PROGRAM LINK ERROR]: %s", buf);
-		delete[] buf;
-	}
-
-	glGenBuffers(1, this->ubo);
-	
-    FramePass::Setup();
 }
 
 void ReflectionPass::UpdateResolution()

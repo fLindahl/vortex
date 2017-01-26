@@ -41,20 +41,20 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
 	float rayLength = ((viewSpaceOrigin.z + viewSpaceDirection.z * maxDistance) > nearPlaneZ) ? (nearPlaneZ - viewSpaceOrigin.z) / viewSpaceDirection.z : maxDistance;
     vec3 viewSpaceEndPoint = viewSpaceOrigin + viewSpaceDirection * rayLength;
 
-	//mat4 viewToTextureSpaceMatrix = mat4(0.5f, 0.0f, 0.0f, 0.5f,
-	//									 0.0f, -0.5f, 0.0f, 0.5f,
-	//									 0.0f, 0.0f, 1.0f, 0.0f,
-	//									 0.0f, 0.0f, 0.0f, 1.0f);
-	//
-	//viewToTextureSpaceMatrix = Projection * viewToTextureSpaceMatrix;
+	mat4 viewToTextureSpaceMatrix = mat4(0.5f, 0.0f, 0.0f, 0.0f,
+										 0.0f, 0.5f, 0.0f, 0.0f,
+										 0.0f, 0.0f, 1.0f, 0.0f,
+										 0.0f, 0.5f, 0.0f, 1.0f);
+	
+	viewToTextureSpaceMatrix = Projection * viewToTextureSpaceMatrix;
 
 	// Project into homogeneous clip space
-    vec4 H0 = Projection * vec4(viewSpaceOrigin, 1.0);
+    vec4 H0 = viewToTextureSpaceMatrix * vec4(viewSpaceOrigin, 1.0);
 	//H0.xy /= H0.w;
 	//H0.xy = (((H0.xy / H0.w) + 1.0f) * 0.5) * ScreenSize;
 	//H0.xy = ((H0.xy + 1.0f) / 2.0f);
 	//H0.xy = H0.xy * ScreenSize;
-    vec4 H1 = Projection * vec4(viewSpaceEndPoint, 1.0);
+    vec4 H1 = viewToTextureSpaceMatrix * vec4(viewSpaceEndPoint, 1.0);
 	//H1.xy /= H1.w;
 	//H1.xy = (((H1.xy / H1.w) + 1.0f) * 0.5) * ScreenSize;
 	//H1.xy = ((H1.xy + 1.0f) / 2.0f);
