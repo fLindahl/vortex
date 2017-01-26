@@ -54,6 +54,8 @@ SET(files_render_frame
 	frame/particlecomputepass.cpp
 	frame/lightdebugpass.h
 	frame/lightdebugpass.cpp
+	frame/reflectionpass.h
+	frame/reflectionpass.cpp
 	)
 	
 SET(files_render_resources

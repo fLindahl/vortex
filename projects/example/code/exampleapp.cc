@@ -146,6 +146,33 @@ ExampleApp::Open()
         const int numEntsX = 2;
         const int numEntsY = 2;
 
+		Math::mat4 transf1 = Math::mat4::translation(2.0f, -0.5f, 1.5f);
+        Math::mat4 transf2 = Math::mat4::translation(0.0f, -0.5f, 1.5f);
+		Math::mat4 transf3 = Math::mat4::translation(2.0f, -0.5f, -1.5f);
+		Math::mat4 transf4 = Math::mat4::translation(0.0f, -0.5f, -1.5f);
+        Math::mat4 transf5 = Math::mat4::translation(0.0f, -0.5f, -3.0f);
+
+        this->rigidBodyEntity1->SetTransform(transf1);
+		this->rigidBodyEntity2->SetTransform(transf2);
+		this->rigidBodyEntity3->SetTransform(transf3);
+		this->rigidBodyEntity4->SetTransform(transf4);
+        this->rigidBodyEntity5->SetTransform(transf5);
+
+        const int numEntsX = 0;
+        const int numEntsY = 0;
+
+        for (int i = 0; i < numEntsX; ++i) {
+            for (int j = 0; j < numEntsY; ++j) {
+                std::shared_ptr<Game::RigidBodyEntity> ent = std::make_shared<Game::RigidBodyEntity>();
+                RBEs.Append(ent);
+				ent->SetModel(modelInstance1);
+
+                Math::mat4 transf1 = Math::mat4::translation(i*1.0f - (numEntsX/2), numEntsY/4 + j*1.0f, 5.0f);
+                ent->SetTransform(transf1);
+                ent->Activate();
+            }
+        }
+
         for (int i = 0; i < numEntsX; ++i) {
             for (int j = 0; j < numEntsY; ++j) {
                 std::shared_ptr<Game::RigidBodyEntity> ent = std::make_shared<Game::RigidBodyEntity>();

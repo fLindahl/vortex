@@ -12,6 +12,7 @@
 #include "translatetool.h"
 #include "render/debugrender/debugrenderer.h"
 #include "imgui_internal.h"
+#include "render/particlesystem/particlesystem.h"
 
 #define CONSOLE_BUFFER_SIZE 8096
 
@@ -314,7 +315,7 @@ namespace Toolkit
 				}
 				if (ImGui::CollapsingHeader("Emitter Shape"))
 				{
-					//ImGui::InputFloat("Cone Radius", &application->pSettings.radius, 0.001f, 5.0f);
+					//ImGui::InputFloat("Cone Radius", &radius, 0.001f, 5.0f);
 					//ImGui::SliderFloat("Cone Length", &application->pSettings.length, 0.001, 5, "%.3f");
 					//Debug::DebugRenderer::Instance()->DrawCone(Math::point(0, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 0.0f), application->pSettings.radius, 1.0f, application->pSettings.color, Debug::RenderMode::WireFrame, 2.0f);
 				}

@@ -14,8 +14,8 @@
 		</Shader>
 		
 		<Shader name="defaultUnLitBillboard" desc="Default shader for rendering opaque lit billboards">            
-			<VertexShader name="resources/shaders/vertex/static.vert"/>
-			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
+			<VertexShader name="resources/shaders/vertex/particleshader.vert"/>
+			<FragmentShader name="resources/shaders/fragment/particleshader.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		

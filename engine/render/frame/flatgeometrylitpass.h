@@ -17,9 +17,14 @@ public:
 
 	GLuint GetNormalBuffer() { return this->normalBuffer; }
 
-private:
+	//Specular buffer contains roughness in it's alpha channel
+	GLuint GetSpecularBuffer() { return this->specularBuffer; }
 
+private:
 	GLuint normalBuffer;
+
+	//Specular buffer contains roughness in it's alpha channel
+	GLuint specularBuffer;
 
 };
 

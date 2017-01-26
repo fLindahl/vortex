@@ -2,17 +2,13 @@
 #include "entity.h"
 
 
-namespace Render
-{
-class GraphicsProperty;
-class ModelInstance;
-}
+namespace Property{ class ParticleEmitter; }
 
 namespace Game
 {
 class ParticleEntity : public Game::Entity
 {
-
+public:
 	ParticleEntity();
 	~ParticleEntity();
 
@@ -21,8 +17,11 @@ class ParticleEntity : public Game::Entity
 	void Deactivate();
 
 	void SetTransform(const Math::mat4& t);
+	
+	std::shared_ptr<Property::ParticleEmitter>& GetEmitter(){ return this->emitter; }
 
 protected:
 	
+	std::shared_ptr<Property::ParticleEmitter> emitter;
 };
 }

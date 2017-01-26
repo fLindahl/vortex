@@ -2,9 +2,11 @@
 #include "framepass.h"
 #include "render/particlesystem/particlesystem.h"
 
-namespace Particles
+namespace Render{ class ShaderObject; }
+
+namespace Render
 {
-class ParticleComputePass : public Render::FramePass
+class ParticleComputePass : public FramePass
 {
 public:
 	ParticleComputePass();
@@ -15,9 +17,11 @@ public:
 	void Execute();
 
 private:
-	ParticleSystem* particleSystem;
+	Particles::ParticleSystem* particleSystem;
 	//std::shared_ptr<ShaderObject> computeShader;
 	GLuint particleComputeProgram;
+
+	std::shared_ptr<Render::ShaderObject> sh;
 
 };
 

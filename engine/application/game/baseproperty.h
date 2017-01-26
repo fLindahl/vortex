@@ -1,6 +1,6 @@
 #pragma once
 #include "foundation/messaging/messagehandler.h"
-#include "entity.h"
+//#include "entity.h"
 
 namespace Game
 {
