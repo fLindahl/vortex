@@ -13,8 +13,9 @@
 #include "render/server/frameserver.h"
 #include "render/server/lightserver.h"
 #include "application/basegamefeature/managers/scenemanager.h"
-
+#include "application/properties/particleemitter.h"
 #include "application/basegamefeature/keyhandler.h"
+
 
 using namespace Display;
 using namespace Render;
@@ -66,6 +67,8 @@ Application::Open()
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Vortex Level Editor");
 
+		//RenderDevice::Instance()->SetRenderResolution(256, 256);
+
 		this->rayStart = Math::vec4::zerovector();
 		this->rayEnd = Math::vec4::zerovector();
 		
@@ -79,14 +82,14 @@ Application::Open()
 		this->sponza->SetTransform(sTransform);
 
 
-		billboard = std::make_shared<Game::ModelEntity>();
-		billboard->SetModel(ResourceServer::Instance()->LoadModel("resources/models/billboard.mdl"));
-		billboard->SetTransform(Math::mat4::translation(0.0f, 1.0f, 0.0f));
+		billboard = std::make_shared<Game::ParticleEntity>();
+		billboard->SetTransform(Math::mat4::translation(0.0f, 10.5f, 0.0f));
 		billboard->Activate();
+		billboard->GetEmitter()->CreateEmitter(131072, "resources/textures/particles/fireparticle2.tga");
 
 		PointLight pLight;
 		pLight.position = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		pLight.color = Math::vec4(1.0f, 0.5f, 1.0f, 1.0f);
 		pLight.radiusAndPadding.set_x(10.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 		
@@ -99,7 +102,7 @@ Application::Open()
 		LightServer::Instance()->AddPointLight(pLight);
 
 		pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
-		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
+		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);
 		
 		// set ui rendering function
@@ -151,20 +154,9 @@ Application::Run()
 
 		if (ImGui::GetIO().KeyAlt)
 		{
-			glfwSetInputMode(window->GetGLFWWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			CameraMovement();
 		}
-		else
-		{
-			glfwSetInputMode(window->GetGLFWWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		}
 
-		Math::mat4 mat = billboard->GetTransform();
-		mat.set_zaxis(Graphics::MainCamera::Instance()->getInvView().get_zaxis());
-		mat.set_xaxis(Graphics::MainCamera::Instance()->getInvView().get_xaxis());
-		mat.set_yaxis(Graphics::MainCamera::Instance()->getInvView().get_yaxis());
-
-		billboard->SetTransform(mat);
 
 		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		

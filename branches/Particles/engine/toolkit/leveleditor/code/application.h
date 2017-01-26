@@ -26,7 +26,8 @@
 #include "commands.h"
 #include "userinterface.h"
 #include "application/game/modelentity.h"
-#include "render/particlesystem/particlesystem.h"
+#include "application/game/particleentity.h"
+
 
 namespace LevelEditor
 {
@@ -85,7 +86,7 @@ private:
 	std::shared_ptr<Game::StaticEntity> SceneEntity7;
 
 	std::shared_ptr<Game::ModelEntity> sponza;
-	std::shared_ptr<Game::ModelEntity> billboard;
+	std::shared_ptr<Game::ParticleEntity> billboard;
 
 	//Particles::ParticleSettings pSettings;
 

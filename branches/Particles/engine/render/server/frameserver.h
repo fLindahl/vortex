@@ -13,7 +13,10 @@ class FramePass;
 class DepthPass;
 class DrawPass;
 class FlatGeometryLitPass;
+
 class LightDebugPass;
+class ReflectionPass;
+class ParticleComputePass;
 
 class FrameServer
 {
@@ -39,9 +42,11 @@ public:
 
 	bool HasPassNamed(const std::string& name);
 
-	std::shared_ptr<DrawPass> GetDepthPass();
+	std::shared_ptr<DepthPass> GetDepthPass();
 	std::shared_ptr<FramePass> GetLightCullingPass();
 	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
+	std::shared_ptr<ReflectionPass> GetReflectionPass();
+	std::shared_ptr<ParticleComputePass> GetParticleComputePass();
 
 private:
 	friend class RenderDevice;
@@ -56,16 +61,22 @@ private:
 	Util::Array<std::shared_ptr<FramePass>> framePasses;
 	
 	/// Early depth testing
-	std::shared_ptr<DrawPass> Depth;
+	std::shared_ptr<DepthPass> Depth;
 	
 	/// Used for lightculling as part of tiled forward rendering.
 	std::shared_ptr<FramePass> lightCullingPass;
+
+	//Used for particle computing
+	std::shared_ptr<ParticleComputePass> particleComputePass;
 	//GLuint lightCullingProgram;
 
 	std::shared_ptr<LightDebugPass> lightdebugpass;
 
 	/// For lit objects
 	std::shared_ptr<FlatGeometryLitPass> FlatGeometryLit;
+
+	/// For computing reflections
+	std::shared_ptr<ReflectionPass> ReflectionPass;
 
 
 
