@@ -16,7 +16,7 @@ void main()
 	// position in world space
 	FragmentPos = wPos.xyz;	
 		
-	mat3 model33 = mat3(Model);
+	mat3 model33 = mat3(View * Model);
 		
 	vec3 t = normalize(model33 * (tangent));
 	vec3 b = normalize(model33 * (binormal));
