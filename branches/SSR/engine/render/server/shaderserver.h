@@ -61,12 +61,15 @@ public:
 	//Checks whether a shader with given name exists
 	bool HasShaderNamed(const std::string& nName);
 
+	// Reloads all shaders from source. This might be useful for debugging.
+	void ReloadShaders();
+
 private:
 	std::string ReadFromFile(const std::string &filename);
 
 	//This contains all shaders.
 	//Key must be unique to each shader, and in this case, the key is the shader's filename
-	std::unordered_map<std::string, GLuint> shaderPrograms;
+	std::unordered_map<std::string, GLuint> shaders;
 
 	//This contains all RenderStates.
 	//Key must be unique to each state, and in this case, the key is the state's filename

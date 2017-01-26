@@ -48,7 +48,8 @@ namespace Toolkit
 	void UserInterface::Run()
 	{
 		static bool showStatistics = false;
-		
+		static bool showShaderDebugger = true;
+
 		RenderDocks();
 
 		//TODO: Make sure we're not editing a textbox before querying for shortcuts
@@ -76,10 +77,12 @@ namespace Toolkit
 				if (ImGui::BeginMenu("Show"))
 				{
 					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
+					if (ImGui::MenuItem("Shader Debugger", NULL, &showStatistics)) {}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
 			}
+			
 			ImGui::EndMainMenuBar();
 		}
 		
@@ -96,6 +99,21 @@ namespace Toolkit
 			currentFPS = 1.0f / this->frameTime;
 
 			ImGui::Text("FPS: %f\n", currentFPS);
+
+			ImGui::End();
+		}
+
+		if (showShaderDebugger)
+		{
+			ImGui::Begin("Shader Debugger", &showStatistics, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_ShowBorders);
+
+			ImGui::SetWindowSize(ImVec2(200.0f, 210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
+			ImGui::SetWindowPos(ImVec2(1700.0f, 60.0f), ImGuiSetCond_::ImGuiSetCond_Once);
+			
+			if (ImGui::Button("RELOAD SHADERS"))
+			{
+				Render::ShaderServer::Instance()->ReloadShaders();
+			}
 
 			ImGui::End();
 		}
