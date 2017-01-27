@@ -3,8 +3,8 @@ in vec3 FragmentPos;
 in vec2 TexCoords;
 // For normalmapping
 in mat3 NormalMatrix;
-in vec3 TangentFragmentPos;
-in vec3 TangentViewPos;
+
+in vec3 ViewSpaceNormal;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 normalColor;
@@ -82,7 +82,7 @@ void main()
 		uint lightIndex = visibleLightIndicesBuffer.data[offset + i].index;
 		PointLight light = lightBuffer.data[lightIndex];
 
-		vec3 L = light.position.xyz - FragmentPos.xyz;
+		vec3 L = (light.position.xyz - FragmentPos.xyz);
 		
 		float attenuation = attenuate(L, light.radiusAndPadding.x);
 
@@ -104,7 +104,7 @@ void main()
 	color.rgb += albedoDiffuseColor.rgb * u_lightAmbientIntensity;
 	
 	fragColor = color;
-	normalColor = N;
+	normalColor = N; // normalize(ViewSpaceNormal * normal);
 	specularAndRoughness.rgb = spec;
 	specularAndRoughness.a = roughness;
 	

@@ -6,6 +6,8 @@
 #include "toolkit/tools/style.h"
 #include "render/frame/flatgeometrylitpass.h"
 #include "render/debugrender/debugserver.h"
+#include "render/frame/reflectionpass.h"
+#include "render/server/frameserver.h"
 
 #include "basetool.h"
 #include "selecttool.h"
@@ -105,7 +107,7 @@ namespace Toolkit
 
 		if (showShaderDebugger)
 		{
-			ImGui::Begin("Shader Debugger", &showStatistics, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_ShowBorders);
+			ImGui::Begin("Shader Debugger", &showShaderDebugger, ImGuiWindowFlags_ShowBorders);
 
 			ImGui::SetWindowSize(ImVec2(200.0f, 210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
 			ImGui::SetWindowPos(ImVec2(1700.0f, 60.0f), ImGuiSetCond_::ImGuiSetCond_Once);
@@ -315,7 +317,13 @@ namespace Toolkit
 
 			ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
+				Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->Settings();
 
+				ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
+				ImGui::SliderFloat("Stride", &settings.stride, 0.0f, 100.0f, "%.3f", 4.0f);
+				ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 100.0f, "%.3f", 4.0f);
+				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
+				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);				
 			}
 			ImGui::EndDock();
 			

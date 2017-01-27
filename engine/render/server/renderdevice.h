@@ -36,6 +36,7 @@ namespace Render
 			Math::mat4 InvView;
 			Math::mat4 InvProjection;
 			Math::mat4 InvViewProjection;
+			Math::mat4 viewToTextureSpace;
 			Math::vec4 CameraPos;
 			Resolution ScreenSize;
 			GLfloat TimeAndRandom[2];

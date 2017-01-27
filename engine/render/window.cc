@@ -25,7 +25,6 @@ namespace Display
 	static void GLAPIENTRY
 	GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
-		/*
 		std::string msg("[OPENGL DEBUG MESSAGE] ");
 
 		// print error severity
@@ -58,7 +57,6 @@ namespace Display
 		default:		// Portability, Deprecated, Other
 			break;
 		}
-		*/
 	}
 
 	int32 Window::WindowCount = 0;

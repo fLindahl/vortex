@@ -44,6 +44,8 @@ public:
 	Math::mat4 getViewProjection() const { return viewProjection; }
 	Math::mat4 getInvViewProjection() const { return invViewProjection; }
 
+	Math::mat4 getViewToTextureSpace() const { return viewToTextureSpaceMatrix; }
+
 	Math::vec4 GetPosition() { return this->cameraPos; }
 	void SetPosition(const Math::vec4& pos) { this->cameraPos = pos; }
 
@@ -52,6 +54,7 @@ private:
 	const float fov = -1.5708f;
 	const float nearZ = 0.05f;
 	const float farZ = 1000.0f;
+	float aspectRatio;
 
 	Math::mat4 view;
 	Math::mat4 invView;
@@ -59,6 +62,9 @@ private:
 	Math::mat4 invProjection;
 	Math::mat4 viewProjection;
 	Math::mat4 invViewProjection;
+
+	//For converting viewspace coordinates to screen pixel coordinates.
+	Math::mat4 viewToTextureSpaceMatrix;
 
 	Math::vec4 cameraPos;
 };
