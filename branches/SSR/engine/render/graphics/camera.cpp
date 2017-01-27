@@ -5,7 +5,8 @@
 namespace Graphics
 {
 
-MainCamera::MainCamera()
+MainCamera::MainCamera() : 
+	aspectRatio(0.0f)
 {
 	//windowWidth = GameHandler::getInstance()->getWindowWidth();
 	//windowHeight = GameHandler::getInstance()->getWindowHeight();
@@ -31,10 +32,19 @@ void MainCamera::setViewMatrix(const Math::mat4& mat)
 
 void MainCamera::UpdateProjectionMatrix()
 {
-	this->projection = Math::mat4::perspfovrh(fov, (float)Render::RenderDevice::Instance()->GetRenderResolution().x / (float)Render::RenderDevice::Instance()->GetRenderResolution().y, nearZ, farZ);
+	this->aspectRatio = (float)Render::RenderDevice::Instance()->GetRenderResolution().x / (float)Render::RenderDevice::Instance()->GetRenderResolution().y;
+	
+	this->projection = Math::mat4::perspfovrh(this->fov, this->aspectRatio, this->nearZ, this->farZ);
 	this->invProjection = Math::mat4::inverse(this->projection);
 	this->viewProjection = Math::mat4::multiply(this->view, this->projection);
 	this->invViewProjection = Math::mat4::multiply(this->invView, this->invProjection);
+
+	float l = 0;
+	float r = (float)Render::RenderDevice::Instance()->GetRenderResolution().x;
+	float b = (float)Render::RenderDevice::Instance()->GetRenderResolution().y;
+	float t = 0;
+	
+	this->viewToTextureSpaceMatrix = Math::mat4::perspoffcenterrh(l, r, b, t, this->nearZ, this->farZ);
 }
 
 }
