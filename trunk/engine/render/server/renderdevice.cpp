@@ -125,7 +125,7 @@ void RenderDevice::Render(bool drawToScreen)
 	flatGeometryLitPass->Execute();
 
 	//Reflections
-	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->ReflectionPass;
+	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->reflectionPass;
 	auto reflectionPass = ref.lock();
 	reflectionPass->Execute();
 
