@@ -18,6 +18,7 @@
 #include "render/frame/framepass.h"
 #include "render/frame/depthpass.h"
 #include "render/frame/flatgeometrylitpass.h"
+#include "render/frame/reflectionpass.h"
 
 #ifdef _DEBUG
 	#include "render/frame/lightdebugpass.h"
@@ -122,6 +123,13 @@ void RenderDevice::Render(bool drawToScreen)
 
 	//Run draw pass
 	flatGeometryLitPass->Execute();
+
+	//Reflections
+	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->ReflectionPass;
+	auto reflectionPass = ref.lock();
+	reflectionPass->Execute();
+
+
 
 	//-------------------
 	// Render Debug Shapes!
