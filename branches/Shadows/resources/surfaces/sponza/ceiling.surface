@@ -1,0 +1,11 @@
+<Vortex>
+	<Surface material="Static">
+		<!-- Textures -->
+		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/sponza_ceiling_a_diff.tga"/>
+		<Param name="NormalMap" type="string" value="resources/textures/sponza/sponza_ceiling_a_ddn.tga"/>
+		<Param name="SpecularMap" type="string" value="resources/textures/sponza/sponza_ceiling_a_spec.tga"/>
+		<Param name="RoughnessMap" type="string" value="resources/textures/sponza/sponza_ceiling_roughness.tga"/>
+				
+		<!-- Specific Parameters -->
+	</Surface>
+</Vortex>

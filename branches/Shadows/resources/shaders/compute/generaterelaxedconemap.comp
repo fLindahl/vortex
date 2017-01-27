@@ -1,0 +1,73 @@
+uniform sampler2D depthMap;
+//uniform vec3 Offset;
+
+layout (r32f) uniform image2D coneMap;
+
+#define MAX_CONE_SIZE 1.0f
+
+#define KERNEL_RADIUS (NUM_STEPS*STEP_SIZE)
+
+#define SHARED_MEM_SIZE (KERNEL_RADIUS + HBAO_TILE_WIDTH + KERNEL_RADIUS)
+
+shared float sharedDepthBuffer[SHARED_MEM_SIZE]; 
+
+float FetchTexelFromSharedMemory(ivec2 texcoord)
+{
+	int texel = (ScreenSize.x * TexCoord.y) + TexCoord.x;
+	return sharedDepthBuffer[texel];
+}
+
+layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;
+void main() 
+{
+	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
+	ivec2 itemID = ivec2(gl_LocalInvocationID.xy);
+	ivec2 tileID = ivec2(gl_WorkGroupID.xy);
+	ivec2 tileNumber = ivec2(gl_NumWorkGroups.xy);
+	uint index = tileID.y * tileNumber.x + tileID.x;
+	uint threadCount = TILE_SIZE * TILE_SIZE;
+	
+	// Have all texels fetched into shared memory
+	ivec2 TexCoord = ivec2(location) / ScreenSize;
+	int texel = (ScreenSize.x * TexCoord.y) + TexCoord.x;
+	sharedDepthBuffer[texel] = texture(depthMap, TexCoord).r;
+	barrier();
+	
+	const int search_steps = 128;  
+	vec3 src = vec3(TexCoord, 0.0f);  // Source texel  
+	vec3 dst = src;  // Destination texel + offset?
+	dst.z = FetchTexelFromSharedMemory(dst.xy);  // Set dest. depth  
+	vec3 vec = dst - src; // Ray direction  
+	vec /= vec.z;  // Scale ray direction so that vec.z = 1.0  
+	vec *= 1.0 - dst.z;  // Scale again  
+	vec3 step_fwd = vec/search_steps;  // Length of a forward step  
+	
+	// Search until a new point outside the surface  
+	vec3 ray_pos = dst + step_fwd;  
+	
+	for (int i = 1; i < search_steps; i++)
+	{  
+		float current_depth = FetchTexelFromSharedMemory(ray_pos.xy);  
+		if ( current_depth <= ray_pos.z )  
+		{
+			ray_pos += step_fwd;  
+		}
+	}  
+	
+	// Original texel depth  
+	float src_texel_depth = FetchTexelFromSharedMemory(TexCoord);  
+	// Compute the cone ratio  
+	float cone_ratio = (ray_pos.z >= src_texel_depth) ? MAX_CONE_SIZE : length(ray_pos.xy - TexCoord) / (src_texel_depth - ray_pos.z);  
+	
+	// Check for minimum value with previous pass result  
+	float best_ratio = imageLoad(coneMap, TexCoord).x;  
+	
+	if (cone_ratio > best_ratio)
+	{
+		cone_ratio = best_ratio;
+	}
+	
+	float pixelColor = cone_ratio;
+	
+	imageStore(coneMap, TexCoord, vec4(pixelColor));
+}

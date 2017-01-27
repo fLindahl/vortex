@@ -1,0 +1,7 @@
+<Vortex>
+	<Surface material="Static">
+		<!-- override textures -->
+		<Param name="AlbedoMap" type="string" value="resources/textures/player.png"/>
+		
+	</Surface>
+</Vortex>

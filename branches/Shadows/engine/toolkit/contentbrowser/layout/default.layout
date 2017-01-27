@@ -1,0 +1,7 @@
+<Vortex>
+    <Docks>
+        <Dock index="0" label="3D View" x="0" y="16" location="" size_x="1485" size_y="1131" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="2"/>
+        <Dock index="1" label="Inspector" x="1485" y="16" location="" size_x="435" size_y="1131" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="2"/>
+        <Dock index="2" label="" x="0" y="16" location="" size_x="1920" size_y="1131" status="0" active="1" opened="0" prev="-1" next="-1" child0="0" child1="1" parent="-1"/>
+    </Docks>
+</Vortex>
