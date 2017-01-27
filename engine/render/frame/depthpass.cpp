@@ -62,6 +62,10 @@ void DepthPass::Execute()
 	//Unbind Depth FrameBufferObject
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	//glBindTexture(GL_TEXTURE_2D, this->linearDepthBuffer);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+
 	/*
 
 	// generate cone map depth buffer compute shader
@@ -117,6 +121,8 @@ void DepthPass::Setup()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
     glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->buffer, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->linearDepthBuffer, 0);
@@ -128,8 +134,9 @@ void DepthPass::Setup()
 	_assert(e == GL_FRAMEBUFFER_COMPLETE, "Depth Framebuffer Status Error!");
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+	
 	//Setup compute pass for generating cone map
+	/*
 	this->genDepthConeMapComputeProgram = glCreateProgram();
 	const char filepath[] = "resources/shaders/compute/generaterelaxedconemap.comp";
 	glAttachShader(this->genDepthConeMapComputeProgram, ShaderServer::Instance()->LoadComputeShader(filepath));
@@ -152,7 +159,7 @@ void DepthPass::Setup()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
+	*/
     FramePass::Setup();
 }
 

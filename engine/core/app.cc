@@ -42,10 +42,10 @@ App::Open()
 
 	//Init RenderDevice
 	Render::RenderDevice::Instance()->Initialize();
-	// Setup framepasses
-	Render::FrameServer::Instance()->SetupFramePasses();
-	//Always setup shaders before materials!
+	//Setup shaders before framepasses and materials!
 	Render::ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
+	//Setup framepasses before materials
+	Render::FrameServer::Instance()->SetupFramePasses();
 	//Load all materials
 	Render::ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
 	//Init debugrenderer. Always do this AFTER setting up shaders!
