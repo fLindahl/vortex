@@ -36,6 +36,8 @@ void FlatGeometryLitPass::Execute()
 
     FramePass::Execute();
 
+	// TEST COMMIT!
+
 	glDepthFunc(GL_LESS);
 }
 
