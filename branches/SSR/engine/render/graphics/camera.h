@@ -51,7 +51,7 @@ public:
 
 private:
 
-	const float fov = -1.5708f;
+	const float fov = 1.5708f;
 	const float nearZ = 0.05f;
 	const float farZ = 1000.0f;
 	float aspectRatio;

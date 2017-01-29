@@ -227,6 +227,8 @@ namespace Display
 			GLuint unusedIds;
 			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
 
+			//glDepthRange(0, -1);
+
 			// setup stuff
 			glEnable(GL_FRAMEBUFFER_SRGB);
 			//glEnable(GL_LINE_SMOOTH);
