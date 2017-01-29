@@ -19,7 +19,7 @@ MainCamera::MainCamera() :
 
 void MainCamera::LookAt(const Math::vec4& target, const Math::vec4& up)
 {
-	this->setViewMatrix(Math::mat4::lookatrh(cameraPos, target, up));
+	this->setViewMatrix(Math::mat4::lookatlh(cameraPos, target, up));
 }
 
 void MainCamera::setViewMatrix(const Math::mat4& mat)
@@ -34,7 +34,7 @@ void MainCamera::UpdateProjectionMatrix()
 {
 	this->aspectRatio = (float)Render::RenderDevice::Instance()->GetRenderResolution().x / (float)Render::RenderDevice::Instance()->GetRenderResolution().y;
 	
-	this->projection = Math::mat4::perspfovrh(this->fov, this->aspectRatio, this->nearZ, this->farZ);
+	this->projection = Math::mat4::perspfovrh(-this->fov, this->aspectRatio, this->nearZ, this->farZ);
 	this->invProjection = Math::mat4::inverse(this->projection);
 	this->viewProjection = Math::mat4::multiply(this->view, this->projection);
 	this->invViewProjection = Math::mat4::multiply(this->invView, this->invProjection);

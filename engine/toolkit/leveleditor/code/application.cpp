@@ -35,7 +35,12 @@ Application::Application()
 
 	this->rayStart = Math::vec4::zerovector();
 	this->rayEnd = Math::vec4::zerovector();
+	this->reflectStart = Math::vec4::zerovector();
+	this->reflectEnd = Math::vec4::zerovector();
 	hit.object = nullptr;
+
+	this->depthPixels = new GLfloat[1920 * 1020];
+	this->normalPixels = new GLfloat[1920 * 1020 * 3];
 }
 
 //------------------------------------------------------------------------------
@@ -150,7 +155,8 @@ Application::Run()
 			CameraMovement();
 		}
 
-		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		Debug::DebugRenderer::Instance()->DrawLine(this->reflectStart, this->reflectEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		
 		if (this->hit.object != nullptr)
 		{

@@ -117,6 +117,10 @@ namespace Toolkit
 				Render::ShaderServer::Instance()->ReloadShaders();
 			}
 
+			Math::vec4 cameraZ = Graphics::MainCamera::Instance()->getView().get_zaxis();
+
+			ImGui::Text("Camera Z axis = %f, %f, %f", cameraZ.x(), cameraZ.y(), cameraZ.z());
+
 			ImGui::End();
 		}
 	}

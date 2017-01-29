@@ -58,6 +58,8 @@ private:
 	
 	Math::point rayStart;
 	Math::point rayEnd;
+	Math::point reflectStart;
+	Math::point reflectEnd;
 	Physics::PhysicsHit hit;
 	
 	/// ImGui functions
@@ -73,5 +75,8 @@ private:
 	Edit::CommandManager* commandManager;
 
 	Display::Window* window;
+
+	GLfloat* depthPixels;
+	GLfloat* normalPixels;
 };
 } // namespace LevelEditor
