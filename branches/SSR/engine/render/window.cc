@@ -212,9 +212,9 @@ namespace Display
 		{
 			GLenum res = glewInit();
 			assert(res == GLEW_OK);
-			if (!(GLEW_VERSION_4_0))
+			if (!(GLEW_VERSION_4_3))
 			{
-				printf("[WARNING]: OpenGL 4.0+ is not supported on this hardware!\n");
+				printf("[WARNING]: OpenGL 4.3+ is not supported on this hardware!\n");
 				glfwDestroyWindow(this->window);
 				this->window = nullptr;
 				return false;
