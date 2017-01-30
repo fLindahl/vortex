@@ -19,7 +19,7 @@ void Application::CameraMovement()
 	const float speedIncrease = 0.02f;
 	float speedMultiplier = 1.0f;
 
-	camRotX += ImGui::GetIO().MouseDelta.y * -0.005f;
+	camRotX += ImGui::GetIO().MouseDelta.y * 0.005f;
 	camRotY += ImGui::GetIO().MouseDelta.x * 0.005f;
 
 	if (camRotX > 1.57075f)
@@ -37,19 +37,19 @@ void Application::CameraMovement()
 	}
 	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_W)))
 	{
-		translation.z() -= speedIncrease * speedMultiplier;
+		translation.z() += speedIncrease * speedMultiplier;
 	}
 	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_S)))
 	{
-		translation.z() += speedIncrease * speedMultiplier;
+		translation.z() -= speedIncrease * speedMultiplier;
 	}
 	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)))
 	{
-		translation.x() += speedIncrease * speedMultiplier;
+		translation.x() -= speedIncrease * speedMultiplier;
 	}
 	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_D)))
 	{
-		translation.x() -= speedIncrease * speedMultiplier;
+		translation.x() += speedIncrease * speedMultiplier;
 	}
 
 	Math::mat4 xMat = Math::mat4::rotationx(camRotX);
@@ -123,11 +123,6 @@ void Application::DoPicking()
 	{
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
 
-		Math::line rayLine = BaseGameFeature::EnvManager::Instance()->ComputeMouseWorldRay(mouse_pos_in_dock.x, mouse_pos_in_dock.y, 5000.0f, dockSize.x, dockSize.y);
-
-		this->rayStart = rayLine.start();
-		this->rayEnd = rayLine.end();
-		
 		GLuint texture = Render::FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer();
 		
 		// Get depth buffer
@@ -139,8 +134,6 @@ void Application::DoPicking()
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, this->normalPixels);
 
-		int pPos = (int)(mouse_pos_in_dock.x + (mouse_pos_in_dock.y * 1920) + 0.5f);
-
 		int pixelx = (mouse_pos_in_dock.x / dockSize.x) * 1920;
 		int pixely = (mouse_pos_in_dock.y / dockSize.y) * 1020;
 
@@ -151,37 +144,38 @@ void Application::DoPicking()
 		normal.y() = this->normalPixels[(uint)((pixelx * 3) + 1 + (pixely * (1920 * 3)))];
 		normal.z() = this->normalPixels[(uint)((pixelx * 3) + 2 + (pixely * (1920 * 3)))];
 
-		//normal = Math::mat4::transform(normal, Graphics::MainCamera::Instance()->getView());
-
-		//Calculate world pos
-		Math::vec4 clipSpaceLocation;
-		clipSpaceLocation.x() = (mouse_pos_in_dock.x / dockSize.x) * 2 - 1;
-		clipSpaceLocation.y() = (mouse_pos_in_dock.y / dockSize.y) * 2 - 1;
-		clipSpaceLocation.z() = -1.0;
-		clipSpaceLocation.w() = 1.0f;
-		Math::vec4 homogenousLocation = Math::mat4::transform(clipSpaceLocation, Graphics::MainCamera::Instance()->getInvProjection());
-		Math::point viewSpacePosition = homogenousLocation * (1.0f / homogenousLocation.w());
-
-		this->rayStart = Math::mat4::transform(viewSpacePosition, Graphics::MainCamera::Instance()->getInvView());
+		normal = Math::mat4::transform(normal, Math::mat4::transpose(Graphics::MainCamera::Instance()->getInvView()));
 
 		float far = 1000.0f;
 		float near = 0.05f;
 
-		float fn = far * near;
+		float fn = far - near;
 
+		//Calculate world pos
+		Math::vec4 clipSpaceLocation;
+		clipSpaceLocation.x() = ((float)pixelx / 1920.0f) * 2.0f - 1.0f;
+		clipSpaceLocation.y() = ((float)pixely / 1020.0f) * 2.0f - 1.0f;
+		clipSpaceLocation.z() = -1.0f;
+		clipSpaceLocation.w() = 1.0f;
+		Math::vec4 homogenousLocation = Math::mat4::transform(clipSpaceLocation, Graphics::MainCamera::Instance()->getInvProjection());
+		Math::point viewSpacePosition = homogenousLocation; // * (1.0f / homogenousLocation.w());
 
-		Math::point rayOrigin = viewSpacePosition * (pixelDepth * 35);
-		this->rayEnd = Math::mat4::transform(rayOrigin, Graphics::MainCamera::Instance()->getInvView());
+		//Math::point worldPos = Math::mat4::transform(viewSpacePosition, invView);
+
+		this->rayStart = Graphics::MainCamera::Instance()->GetPosition();//Math::mat4::transform(viewSpacePosition, Graphics::MainCamera::Instance()->getInvView());
+
+		Math::point rayOrigin = (viewSpacePosition * pixelDepth);
+		this->rayEnd = Math::mat4::transform(rayOrigin, invView);
 
 		this->reflectStart = this->rayEnd;
 
 		
-		Math::vector viewDir = Math::vector::normalize3(rayOrigin);
+		Math::vector viewDir = Math::vector::normalize(rayOrigin);
 
 		//Reflect vector against normal
-		Math::vector reflectionDir = Math::vec4::reflect(viewDir, Math::vector::normalize3(normal)); // normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir); 
+		Math::vector reflectionDir = Math::vec4::reflect(viewDir, Math::vector::normalize(normal)); // normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir); 
 
-		this->reflectEnd = this->rayEnd + Math::vector::normalize3(normal) * 1000;//Math::mat4::transform(rayOrigin + (reflectionDir * 100.0f), Graphics::MainCamera::Instance()->getInvView());
+		this->reflectEnd = Math::mat4::transform(rayOrigin + (reflectionDir * 10.0f), Graphics::MainCamera::Instance()->getInvView());
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

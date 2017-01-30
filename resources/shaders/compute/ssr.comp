@@ -35,7 +35,7 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
 						 out vec3 hitPoint
 						 )
 {
-	float nearPlaneZ = -0.01f;
+	float nearPlaneZ = -0.05f;
 
 	// Clip with near plane
 	float rayLength = ((viewSpaceOrigin.z + viewSpaceDirection.z * maxDistance) > nearPlaneZ) ? (nearPlaneZ - viewSpaceOrigin.z) / viewSpaceDirection.z : maxDistance;
@@ -137,7 +137,7 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
 		//hitTexCoord.y = ScreenSize.y - hitTexCoord.y;
 
 		// TexelFetch wants texel position, not UVs
-        sceneZMax = texelFetch(depthMap, ivec2(hitTexCoord), 0).r;
+        sceneZMax = -texelFetch(depthMap, ivec2(hitTexCoord), 0).r;
     }
 
     // Advance Q based on the number of steps
@@ -169,22 +169,25 @@ void main()
 	//We need the normal to be in viewspace coordinates.
 	vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
 	
-	float pixelDepth = texelFetch(depthMap, location, 0).r;
+	float pixelDepth = -texelFetch(depthMap, location, 0).r;
 	
 	//Calculate world pos
 	vec4 clipSpaceLocation;
 	clipSpaceLocation.xy = TexCoord * 2.0f - 1.0f;
-	clipSpaceLocation.z = -1.0f;
+	clipSpaceLocation.z = 1.0f;
 	clipSpaceLocation.w = 1.0f;
 	vec4 homogenousLocation = InvProjection * clipSpaceLocation;
-	vec3 viewSpacePosition = homogenousLocation.xyz / homogenousLocation.w;
+	vec3 viewSpacePosition = homogenousLocation.xyz;
 	
 	vec3 rayOrigin = viewSpacePosition * pixelDepth;
 				
+	rayOrigin = -rayOrigin;
+	viewSpaceNormal = viewSpaceNormal;	
+	
 	vec3 viewDir = normalize(rayOrigin.xyz);
 	
 	//Reflect vector against normal
-	vec3 reflectionDir = reflect(viewDir, viewSpaceNormal); // normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir); 
+	vec3 reflectionDir = normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir); 
 
 	vec2 hitTexCoord = vec2(0.0,0.0);
 	vec3 hitPoint = vec3(0.0,0.0,0.0);
@@ -192,12 +195,12 @@ void main()
 	if (TraceScreenSpaceRay(rayOrigin.xyz, reflectionDir, hitTexCoord, hitPoint))
 	{
 		//hitpoint is in viewspace. Convert to texture coordinates.
-		//vec4 clipspace = Projection * vec4(hitPoint.xyz, 1.0f);
+		vec4 clipspace = Projection * vec4(hitPoint.xyz, 1.0f);
 
-		//vec2 coord = ((clipspace.xy / clipspace.w) + 1.0f) * 0.5f;
-		//coord = coord * ScreenSize;
+		vec2 coord = ((clipspace.xy / clipspace.w) + 1.0f) * 0.5f;
+		coord = coord * ScreenSize;
 
-		vec3 reflectionColor = texelFetch(colorMap, ivec2(hitTexCoord), 0).rgb;
+		vec3 reflectionColor = texelFetch(colorMap, ivec2(coord), 0).rgb;
 		vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
 
 		float roughness = specularAndRoughness.w;
