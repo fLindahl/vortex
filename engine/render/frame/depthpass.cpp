@@ -101,7 +101,7 @@ void DepthPass::Execute()
 void DepthPass::Setup()
 {
     glGenFramebuffers(1, &this->frameBufferObject);
-    GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
     glGenTextures(1, &this->buffer);
     glBindTexture(GL_TEXTURE_2D, this->buffer);
@@ -134,32 +134,7 @@ void DepthPass::Setup()
 	_assert(e == GL_FRAMEBUFFER_COMPLETE, "Depth Framebuffer Status Error!");
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
-	//Setup compute pass for generating cone map
-	/*
-	this->genDepthConeMapComputeProgram = glCreateProgram();
-	const char filepath[] = "resources/shaders/compute/generaterelaxedconemap.comp";
-	glAttachShader(this->genDepthConeMapComputeProgram, ShaderServer::Instance()->LoadComputeShader(filepath));
-	glLinkProgram(this->genDepthConeMapComputeProgram);
-	GLint shaderLogSize;
-	glGetProgramiv(this->genDepthConeMapComputeProgram, GL_INFO_LOG_LENGTH, &shaderLogSize);
-	if (shaderLogSize > 0)
-	{
-		GLchar* buf = new GLchar[shaderLogSize];
-		glGetProgramInfoLog(this->genDepthConeMapComputeProgram, shaderLogSize, NULL, buf);
-		printf("[COMPUTE LINK ERROR]: %s", buf);
-		delete[] buf;
-	}
 
-	glGenTextures(1, &this->depthConeMap);
-	glBindTexture(GL_TEXTURE_2D, this->depthConeMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RED, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-	*/
     FramePass::Setup();
 }
 
@@ -171,9 +146,6 @@ void DepthPass::UpdateResolution()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newRes.x, newRes.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, this->linearDepthBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, newRes.x, newRes.y, 0, GL_RED, GL_FLOAT, NULL);
-
-	glBindTexture(GL_TEXTURE_2D, this->depthConeMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, newRes.x, newRes.y, 0, GL_RED, GL_FLOAT, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
