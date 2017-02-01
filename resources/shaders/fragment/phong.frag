@@ -15,25 +15,25 @@ uniform sampler2D NormalMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D RoughnessMap;
 
-struct PointLight 
+struct PointLight
 {
 	vec4 color;
 	vec4 position;
 	vec4 radiusAndPadding;
 };
 
-struct VisibleIndex 
+struct VisibleIndex
 {
 	int index;
 };
 
 // Shader storage buffer objects
-layout(std430, binding = 1) readonly buffer LightBuffer 
+layout(std430, binding = 1) readonly buffer LightBuffer
 {
 	PointLight data[];
 } lightBuffer;
 
-layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer 
+layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer
 {
 	VisibleIndex data[];
 } visibleLightIndicesBuffer;
@@ -43,11 +43,11 @@ layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer
 const vec3 u_lightAmbientIntensity = vec3(0.1f, 0.1f, 0.1f);
 
 // Attenuate the point light intensity
-float attenuate(vec3 lightDirection, float radius) 
+float attenuate(vec3 lightDirection, float radius)
 {
 	vec3 l = lightDirection / radius;
     float atten = max(0.0, 1.0 - dot(l,l));
-		
+
 	return atten;
 }
 
@@ -62,50 +62,50 @@ void main()
 	uint index = tileID.y * LightTileWorkGroups.x + tileID.x;
 
 	vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
-	
+
 	//Sample textures
 	vec3 albedoDiffuseColor = texture(AlbedoMap,TexCoords).rgb;
 	vec3 normal = texture(NormalMap, TexCoords).rgb;
 	vec3 spec = texture(SpecularMap, TexCoords).rgb;
 	float roughness = texture(RoughnessMap, TexCoords).r;
-	
+
 	float shininess = (roughness * 128) + 1;
-	
+
 	//Linearize colors
 	vec3 N = NormalMatrix * ((normal*2.0f) - 1.0f);
-	
+
 	vec3 V = normalize(CameraPosition.xyz - FragmentPos.xyz);
-	
+
 	uint offset = index * 1024;
-	for (uint i = 0; i < 1024 && visibleLightIndicesBuffer.data[offset + i].index != -1; i++) 
+	for (uint i = 0; i < 1024 && visibleLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
 		uint lightIndex = visibleLightIndicesBuffer.data[offset + i].index;
 		PointLight light = lightBuffer.data[lightIndex];
 
 		vec3 L = (light.position.xyz - FragmentPos.xyz);
-		
+
 		float attenuation = attenuate(L, light.radiusAndPadding.x);
 
 		L = normalize(L);
 		float diffuse = max(dot(L, N), 0.0);
 		float specular = 0.0f;
-		
+
 		//Hope this looks better with shadows...
 		//if(diffuse > 0.0f)
 		//{
 			vec3 H = normalize(L + V);
-			specular = pow(max(dot(H, N), 0.0), shininess);		
+			specular = pow(max(dot(H, N), 0.0), shininess);
 		//}
-		
+
 		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
 		color.rgb += irradiance;
 	}
-	
+
 	color.rgb += albedoDiffuseColor.rgb * u_lightAmbientIntensity;
-	
+
 	fragColor = color;
-	normalColor = N; // normalize(ViewSpaceNormal * normal);
+	normalColor = N;
 	specularAndRoughness.rgb = spec;
 	specularAndRoughness.a = roughness;
-	
+
 }

@@ -51,6 +51,14 @@ void Application::CameraMovement()
 	{
 		translation.x() += speedIncrease * speedMultiplier;
 	}
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow)))
+	{
+		translation.y() += speedIncrease * speedMultiplier;
+	}
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow)))
+	{
+		translation.y() -= speedIncrease * speedMultiplier;
+	}
 
 	Math::mat4 xMat = Math::mat4::rotationx(camRotX);
 	Math::mat4 yMat = Math::mat4::rotationy(camRotY);
@@ -71,7 +79,7 @@ void Application::CameraMovement()
 
 void Application::DoPicking()
 {
-	/*
+
 	ImVec2 dockPos = ImGui::GetWindowPos();
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -80,7 +88,7 @@ void Application::DoPicking()
 
 	ImVec2 dockSize = ImGui::GetWindowSize();
 	ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
-	if (ImGui::GetIO().MouseDown[0])
+	if (ImGui::GetIO().MouseDown[1])
 	{
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
 		
@@ -94,6 +102,11 @@ void Application::DoPicking()
 			printf("--- Hit object! ---\n");
 
 			hit = newHit;
+
+			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
+
+			if (rbe != nullptr)
+				rbe->GetRigidBody()->applyForceAtPoint(Math::vec4::normalize(rayLine.vec()), .1f, hit.point);
 			
 			this->rayEnd = hit.point;
 		}
@@ -104,21 +117,12 @@ void Application::DoPicking()
 		}
 				
 	}
-	*/
+	
 
 
 	//---------------------
 	// Get position from depthbuffer
-
-
-	ImVec2 dockPos = ImGui::GetWindowPos();
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	dockPos.x += style.WindowPadding.x;
-	dockPos.y += style.WindowPadding.y;
-
-	ImVec2 dockSize = ImGui::GetWindowSize();
-	ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
+	
 	if (ImGui::GetIO().MouseDown[0])
 	{
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
@@ -144,7 +148,7 @@ void Application::DoPicking()
 		normal.y() = this->normalPixels[(uint)((pixelx * 3) + 1 + (pixely * (1920 * 3)))];
 		normal.z() = this->normalPixels[(uint)((pixelx * 3) + 2 + (pixely * (1920 * 3)))];
 
-		normal = Math::mat4::transform(normal, Math::mat4::transpose(Graphics::MainCamera::Instance()->getInvView()));
+		normal = Math::mat4::transform(normal, Math::mat4::transpose(Graphics::MainCamera::Instance()->getView()));
 
 		float far = 1000.0f;
 		float near = 0.05f;
@@ -155,11 +159,11 @@ void Application::DoPicking()
 		Math::vec4 clipSpaceLocation;
 		clipSpaceLocation.x() = ((float)pixelx / 1920.0f) * 2.0f - 1.0f;
 		clipSpaceLocation.y() = ((float)pixely / 1020.0f) * 2.0f - 1.0f;
-		clipSpaceLocation.z() = -1.0f;
+		clipSpaceLocation.z() = 1.0f;
 		clipSpaceLocation.w() = 1.0f;
 		Math::vec4 homogenousLocation = Math::mat4::transform(clipSpaceLocation, Graphics::MainCamera::Instance()->getInvProjection());
-		Math::point viewSpacePosition = homogenousLocation; // * (1.0f / homogenousLocation.w());
-
+		Math::point viewSpacePosition = homogenousLocation;// *(1.0f / homogenousLocation.w());
+		
 		//Math::point worldPos = Math::mat4::transform(viewSpacePosition, invView);
 
 		this->rayStart = Graphics::MainCamera::Instance()->GetPosition();//Math::mat4::transform(viewSpacePosition, Graphics::MainCamera::Instance()->getInvView());
@@ -169,16 +173,45 @@ void Application::DoPicking()
 
 		this->reflectStart = this->rayEnd;
 
+		Math::mat4 textureScale = Math::mat4(	0.5f, 0.0f, 0.0f, 0.0f,
+												0.0f, 0.5f, 0.0f, 0.0f,
+												0.0f, 0.0f, 1.0f, 0.0f,
+												0.0f, 0.0f, 0.0f, 1.0f);
+
+		float sx = 1920.0f / 2.0f;
+		float sy = 1020.0f / 2.0f;
+
+		float xOffset = Graphics::MainCamera::Instance()->getProjection().getrow2().x() * 1920.0f * -0.5f;
+		float yOffset = Graphics::MainCamera::Instance()->getProjection().getrow2().y() * 1020.0f * 0.5f;
+
+		Math::mat4  scrScale = Math::mat4(	sx, 0.0f, 0.0f, 0.0f,
+											0.0f, -sy, 0.0f, 0.0f,
+											0.0f, 0.0f, 1.0f, 0.0f,
+											sx - xOffset, sy + yOffset, 0.0f, 1.0f);
+
+		//setPixelOffset(proj.column(2).xy() * viewportExtent * Vector2(-0.5f, 0.5f));
+
+		Math::mat4 proj = (Math::mat4::multiply(Graphics::MainCamera::Instance()->getProjection(), scrScale));
+
+		Math::vec4 position = rayOrigin;
+		position = Math::mat4::transform(position, proj);
+
+		printf("%f, %f, %f, %f\n", position.x(), position.y(), position.z(), position.w());
+		position *= (1.0f / position.w());
+		printf("%f, %f, %f, %f\n\n\n\n\n", position.x(), position.y(), position.z(), position.w());
+
+
 		
 		Math::vector viewDir = Math::vector::normalize(rayOrigin);
 
 		//Reflect vector against normal
-		Math::vector reflectionDir = Math::vec4::reflect(viewDir, Math::vector::normalize(normal)); // normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir); 
+		Math::vector reflectionDir = Math::vec4::reflect(Math::vector::normalize(normal), viewDir); // normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir); 
 
 		this->reflectEnd = Math::mat4::transform(rayOrigin + (reflectionDir * 10.0f), Graphics::MainCamera::Instance()->getInvView());
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+	
 }
 
 }

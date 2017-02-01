@@ -324,8 +324,8 @@ namespace Toolkit
 				Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->Settings();
 
 				ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
-				ImGui::SliderFloat("Stride", &settings.stride, 0.0f, 100.0f, "%.3f", 4.0f);
-				ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 100.0f, "%.3f", 4.0f);
+				ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
+				ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
 				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
 				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);				
 			}

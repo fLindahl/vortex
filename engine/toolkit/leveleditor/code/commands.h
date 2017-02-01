@@ -7,12 +7,12 @@ namespace Edit
 	class AddEntity : public Command
 	{
 	public:
-		std::shared_ptr<Game::ModelEntity> entity;
+		std::shared_ptr<Game::RigidBodyEntity> entity;
 
 	public:
 		AddEntity(const Math::vec4& position, std::shared_ptr<Render::ModelInstance> mdl)
 		{
-			this->entity = std::make_shared<Game::ModelEntity>();
+			this->entity = std::make_shared<Game::RigidBodyEntity>();
 			this->entity->SetModel(mdl);
 			this->entity->SetTransform(Math::mat4::translation(position));
 		}
