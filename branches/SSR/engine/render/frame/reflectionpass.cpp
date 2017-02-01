@@ -15,11 +15,11 @@ namespace Render
 ReflectionPass::ReflectionPass()
 {
 	this->uniformBlock.zThickness = 90.0f;
-	this->uniformBlock.jitter = 0.0f;
-	this->uniformBlock.stride = 1.0f;
+	this->uniformBlock.jitter = 0.45f;
+	this->uniformBlock.stride = 4.0f;
 	this->uniformBlock.workGroups[0] = (RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % 16)) / 16;
 	this->uniformBlock.workGroups[1] = (RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % 16)) / 16;
-	this->uniformBlock.maxSteps = 64.0f;
+	this->uniformBlock.maxSteps = 128.0f;
 	this->uniformBlock.maxDistance = 1000.0f;
 }
 

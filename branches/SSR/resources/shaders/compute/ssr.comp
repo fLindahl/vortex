@@ -29,22 +29,21 @@ float distanceSquared(vec2 a, vec2 b)
 	return dot(a, a);
 }
 
-bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
-						 in vec3 viewSpaceDirection,
+bool TraceScreenSpaceRay(in vec3 rayOrigin,
+						 in vec3 rayDirection,
+						 in float jitterFraction,
 						 out vec2 hitTexCoord,
 						 out vec3 hitPoint
 						 )
 {
+	/*
 	float nearPlaneZ = -0.05f;
-	//float nearPlaneZ = 0.05f;
 
 	// Clip with near plane
-	float rayLength = ((viewSpaceOrigin.z + viewSpaceDirection.z * maxDistance) > nearPlaneZ) ? (nearPlaneZ - viewSpaceOrigin.z) / viewSpaceDirection.z : maxDistance;
-	//float rayLength = ((viewSpaceOrigin.z + viewSpaceDirection.z * maxDistance) < nearPlaneZ) ? (nearPlaneZ + viewSpaceOrigin.z) / viewSpaceDirection.z : maxDistance;
-	//rayLength = maxDistance;
+	float rayLength = ((rayOrigin.z + rayDirection.z * maxDistance) > nearPlaneZ) ? (nearPlaneZ - rayOrigin.z) / rayDirection.z : maxDistance;
 
 
-    vec3 viewSpaceEndPoint = viewSpaceOrigin + viewSpaceDirection * rayLength;
+    vec3 viewSpaceEndPoint = rayOrigin + rayDirection * rayLength;
 	
 	float sx = float(ScreenSize.x) * 0.5f;
 	float sy = float(ScreenSize.y) * 0.5f;
@@ -57,14 +56,14 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
 	mat4 proj = (scrScale * Projection);
 	
 	// Project into homogeneous clip space
-    vec4 H0 = proj * vec4(viewSpaceOrigin, 1.0);
+    vec4 H0 = proj * vec4(rayOrigin, 1.0);
 	vec4 H1 = proj * vec4(viewSpaceEndPoint, 1.0);
 
     float k0 = 1.0 / H0.w;
 	float k1 = 1.0 / H1.w;
 
     // The interpolated homogeneous version of the camera-space points
-    vec3 Q0 = viewSpaceOrigin * k0;
+    vec3 Q0 = rayOrigin * k0;
 	vec3 Q1 = viewSpaceEndPoint * k1;
 
     // Screen-space endpoints
@@ -96,14 +95,16 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
     vec3  dQ = (Q1 - Q0) * invdx;
     float dk = (k1 - k0) * invdx;
 
+	float jitterF = 1 + jitter;
+	
     // Scale derivatives by the desired pixel stride and then
     // offset the starting values by the jitter fraction
     dP *= stride;
 	dQ *= stride;
 	dk *= stride;
-    P0 += dP * jitter;
-	Q0 += dQ * jitter;
-	k0 += dk * jitter;
+    P0 += dP * jitterF;
+	Q0 += dQ * jitterF;
+	k0 += dk * jitterF;
 
     // Slide P from P0 to P1, (now-homogeneous) Q from Q0 to Q1, k from k0 to k1
     vec3 Q = Q0;
@@ -113,7 +114,7 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
     float  end = P1.x * stepDir;
 
     float stepCount = 0.0;
-	float prevZMaxEstimate = viewSpaceOrigin.z;
+	float prevZMaxEstimate = -rayOrigin.z;
 
 	//Set to zero
 	hitTexCoord = vec2(0.0,0.0);
@@ -121,15 +122,12 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
     float rayZMin = prevZMaxEstimate;
 	float rayZMax = prevZMaxEstimate;
     float sceneZMax = rayZMax + 1e4;
-    //float sceneZMax = rayZMax - 1e4;
     for (vec2 P = P0; ((P.x * stepDir) <= end) && (stepCount < maxSteps) && ((rayZMax < sceneZMax - zThickness) || (rayZMin > sceneZMax)) && (sceneZMax != 0); P += dP, Q.z += dQ.z, k += dk, stepCount += 1.0f)
-    //for (vec2 P = P0; ((P.x * stepDir) <= end) && (stepCount < maxSteps) && ((rayZMax > sceneZMax + zThickness) || (rayZMin < sceneZMax)) && (sceneZMax != 0); P += dP, Q.z += dQ.z, k += dk, stepCount += 1.0f)
 	{
         rayZMin = prevZMaxEstimate;
         rayZMax = (dQ.z * 0.5 + Q.z) / (dk * 0.5 + k);
         prevZMaxEstimate = rayZMax;
         if (rayZMin > rayZMax)
-        //if (rayZMin < rayZMax)
 		{
 			//Swap
 			float t = rayZMin;
@@ -141,7 +139,12 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
         // is different than ours in screen space
         hitTexCoord = permute ? P.yx : P;
 		//hitTexCoord.y = ScreenSize.y - hitTexCoord.y;
-
+		
+		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0)
+		{
+			break;
+		}
+		
 		// TexelFetch wants texel position, not UVs
         sceneZMax = -texelFetch(depthMap, ivec2(hitTexCoord), 0).r;
     }
@@ -151,7 +154,150 @@ bool TraceScreenSpaceRay(in vec3 viewSpaceOrigin,
     hitPoint = Q * (1.0 / k);
 
     return (rayZMax >= sceneZMax - zThickness) && (rayZMin <= sceneZMax);
-    //return (rayZMax <= sceneZMax + zThickness) && (rayZMin >= sceneZMax);
+	*/
+	
+	float nearPlane = -0.05f;
+
+	// Clip to the near plane    
+	float rayLength = ((rayOrigin.z + rayDirection.z * maxDistance) > nearPlane) ? (nearPlane - rayOrigin.z) / rayDirection.z : maxDistance;
+	
+	vec3 rayEnd = rayOrigin + rayDirection * rayLength;
+
+	float sx = float(ScreenSize.x) * 0.5f;
+	float sy = float(ScreenSize.y) * 0.5f;
+	
+	mat4 scrScale = mat4(sx, 0.0f, 0.0f, 0.0f,
+						 0.0f, sy, 0.0f, 0.0f,
+						 0.0f, 0.0f, 1.0f, 0.0f,
+						 sx, sy, 0.0f, 1.0f);
+
+	mat4 proj = (scrScale * Projection);
+						 
+	// Project into homogeneous clip space
+	vec4 H0 = proj * vec4( rayOrigin, 1.0f);
+	vec4 H1 = proj * vec4( rayEnd, 1.0f);
+
+	float k0 = 1.0 / H0.w, k1 = 1.0 / H1.w;
+
+	// The interpolated homogeneous version of the camera-space points  
+	vec3 Q0 = rayOrigin * k0, Q1 = rayEnd * k1;
+
+	// Screen-space endpoints
+	vec2 P0 = H0.xy * k0, P1 = H1.xy * k1;
+
+	// If the line is degenerate, make it cover at least one pixel
+	// to avoid handling zero-pixel extent as a special case later
+	P1 += (distanceSquared(P0, P1) < 0.0001) ? 0.01 : 0.0;
+
+	vec2 delta = P1 - P0;
+
+	// Permute so that the primary iteration is in x to collapse
+	// all quadrant-specific DDA cases later
+	bool permute = false;
+
+	if (abs(delta.x) < abs(delta.y)) 
+	{ 
+		// This is a more-vertical line
+		permute = true; delta = delta.yx; P0 = P0.yx; P1 = P1.yx; 
+	}
+
+	float stepDir = sign(delta.x);
+	float invdx = stepDir / delta.x;
+
+	// Track the derivatives of Q and k
+	vec3  dQ = (Q1 - Q0) * invdx;
+	float dk = (k1 - k0) * invdx;
+	vec2  dP = vec2(stepDir, delta.y * invdx);
+
+	// Calculate pixel stride based on distance of ray origin from camera.
+	// Since perspective means distant objects will be smaller in screen space
+	// we can use this to have higher quality reflections for far away objects
+	// while still using a large pixel stride for near objects (and increase performance)
+	// this also helps mitigate artifacts on distant reflections when we use a large
+	// pixel stride.
+	float strideScaler = 1.0 + min( 1.0, -rayOrigin.z / 100.0f);
+	float pixelStride = 1.0 + strideScaler * stride;
+	//float pixelStride = stride;
+	
+
+	// Scale derivatives by the desired pixel stride and then
+	// offset the starting values by the jitter fraction
+	dP *= pixelStride; dQ *= pixelStride; dk *= pixelStride;
+	P0 += dP * jitterFraction; Q0 += dQ * jitterFraction; k0 += dk * jitterFraction;
+
+	float i, zA = 0.0, zB = 0.0;
+
+	// Track ray step and derivatives in a float4 to parallelize
+	vec4 pqk = vec4( P0, Q0.z, k0);
+	vec4 dPQK = vec4( dP, dQ.z, dk);
+	bool intersect = false;
+
+	float end = P1.x * stepDir;
+	
+	for(i=0; i < maxSteps && intersect == false; i++)
+	{
+		pqk += dPQK;
+
+		zA = zB;
+		zB = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
+		if (zB > zA)
+		{
+			//Swap
+			float t = zA;
+			zA = zB;
+			zA = t;
+        }
+
+		hitTexCoord = permute ? pqk.yx : pqk.xy;
+		//hitTexCoord *= (1.0f/ScreenSize);
+		
+		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0 || pqk.x * stepDir>= end)
+		{
+			break;
+		}
+		
+		//intersect = rayIntersectsDepthBF( zA, zB, hitTexCoord);
+		intersect = (zB <= (-texelFetch(depthMap, ivec2(hitTexCoord), 0).r));
+	}
+	/*
+	// Binary search refinement
+	if( pixelStride > 1.0 && intersect)
+	{
+		pqk -= dPQK;
+		dPQK /= pixelStride;
+
+		float originalStride = pixelStride * 0.5;
+		float stride = originalStride;
+		zA = pqk.z / pqk.w;
+		zB = zA;
+		float j;
+		for(j=0; j< 64.0f; j++)
+		{
+			pqk += dPQK * stride;
+			zA = zB;
+			zB = (dPQK.z * -0.5 + pqk.z) / (dPQK.w * -0.5 + pqk.w);
+			if (zB > zA)
+			{
+				//Swap
+				float t = zA;
+				zA = zB;
+				zB = t;
+			}
+
+			hitTexCoord = permute ? pqk.yx : pqk.xy;
+
+			originalStride *= 0.5;
+			stride = (zB <= (-texelFetch(depthMap, ivec2(hitTexCoord), 0).r)) ? -originalStride : originalStride;
+		}
+	}
+	*/
+	
+	Q0.xy += dQ.xy * i;
+	Q0.z = pqk.z;
+	hitPoint = Q0 / pqk.w;
+	//iterationCount = i;
+	
+	return intersect;
 }
 
 
@@ -171,10 +317,10 @@ void main()
 	//First of all we need to generate a reflection vector that we can raytrace
 
 	//Get normal from normal map. This only needs to be done once per pixel
-	vec3 worldNormal = normalize(texelFetch(normalMap, location, 0).rgb);
+	vec3 worldNormal = (texelFetch(normalMap, location, 0).rgb);
 
 	//We need the normal to be in viewspace coordinates.
-	vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
+	vec3 viewSpaceNormal = ((View * vec4(worldNormal, 0.0f)).rgb);
 
 	float pixelDepth = texelFetch(depthMap, location, 0).r;
 
@@ -196,20 +342,26 @@ void main()
 	vec2 hitTexCoord = vec2(0.0,0.0);
 	vec3 hitPoint = vec3(0.0,0.0,0.0);
 
-	if (TraceScreenSpaceRay(rayOrigin.xyz, reflectionDir, hitTexCoord, hitPoint))
+	vec2 uv2 = vec2(location);
+	float c = (uv2.x + uv2.y) * jitter;//0.25;
+	float jitterFraction = c - 1.0f * floor(c/1.0f);
+		
+	if (TraceScreenSpaceRay(rayOrigin.xyz, reflectionDir, jitterFraction, hitTexCoord, hitPoint))
 	{
 		//hitpoint is in viewspace. Convert to texture coordinates.
-		//vec4 clipspace = Projection * vec4(hitPoint.xyz, 1.0f);
+		vec4 clipspace = Projection * vec4(hitPoint.xyz, 1.0f);
 
-		//vec2 coord = ((clipspace.xy / clipspace.w) + 1.0f) * 0.5f;
-		//coord = coord * ScreenSize;
+		vec2 coord = ((clipspace.xy / clipspace.w) + 1.0f) * 0.5f;
+		coord = coord * ScreenSize;
 
-		vec3 reflectionColor = texelFetch(colorMap, ivec2(hitTexCoord), 0).rgb;
+		vec3 reflectionColor = texelFetch(colorMap, ivec2(coord), 0).rgb;
 		vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
 
 		float roughness = specularAndRoughness.w;
 
-		vec4 finalColor = vec4(reflectionColor.rgb, 1.0f);
+		vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
+		
+		vec4 finalColor = vec4(BGColor, 1-roughness) + vec4(reflectionColor.rgb * specularAndRoughness.rgb * roughness, roughness);
 
 		imageStore(reflectionImage, location, finalColor);
 	}
@@ -232,8 +384,9 @@ void main()
 		//Get fall-back value.
 		//TEMPORARY set to RED
 		//imageStore(reflectionImage, location, vec4(color.x,color.y,0.0f, 1.0f));
-		imageStore(reflectionImage, location, vec4(rayOrigin.rgb,1.0f));
-		//imageStore(reflectionImage, location, vec4(1.0f,1.0f,0.0f,1.0f));
+		//imageStore(reflectionImage, location, vec4(rayOrigin.rgb,1.0f));
+		vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
+		imageStore(reflectionImage, location, vec4(BGColor,1.0f));
 	}
 
 	groupMemoryBarrier();

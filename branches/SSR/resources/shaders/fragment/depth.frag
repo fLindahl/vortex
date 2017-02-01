@@ -10,7 +10,7 @@ void main()
 	//Linearize depth so that we can use it later
 	
 	depth = -VSDepth;
-	
+		
 	// DO THIS IF YOU WANT TO LINEARIZE FROM GL Z INSTEAD
 	//depth = (0.5 * Projection[3][2]) / (gl_FragCoord.z + 0.5 * Projection[2][2] - 0.5) + 1.0f;
 	
