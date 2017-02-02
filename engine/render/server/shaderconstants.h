@@ -31,9 +31,9 @@ namespace Render
      */
 	const char ShaderHeader[] =
 		"#version 430\n"
+		"#define TILE_SIZE 16\n"
 		"layout (std140, binding = 0) uniform GlobalBlock\n"
 		"{\n"
-		"#define TILE_SIZE 16\n"
 		"mat4 " VORTEX_SEMANTIC_VIEW ";\n"
 		"mat4 " VORTEX_SEMANTIC_PROJECTION ";\n"
 		"mat4 " VORTEX_SEMANTIC_VIEWPROJECTION ";\n"

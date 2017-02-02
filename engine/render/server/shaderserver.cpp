@@ -1,5 +1,6 @@
 #include <config.h>
 #include "shaderserver.h"
+#include <sstream>
 #include <fstream>
 #include <string>
 #include "shaderconstants.h"
@@ -137,16 +138,41 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 		std::string content = ReadFromFile(file);
 		if (content.empty())
 		{
+			_assert(false, "ERROR: .state file is empty!");
 			return RenderState();
 		}
 
-		//TODO: Implement loader / we should handle the state file here.
-		//HACK: returning default renderstate until this has been implemented
+		RenderState state;
+
+		std::ifstream fin(content);
+		std::string line;
+		std::istringstream sin;
 		
+		while (std::getline(fin, line))
+		{
+			sin.str(line.substr(line.find("=") + 1));
+			if (line.find("cullface") != std::string::npos) { sin >> state.cullface; }
+			else if (line.find("frontface") != std::string::npos) { sin >> state.frontface; }
+			else if (line.find("cullmode") != std::string::npos) { sin >> state.cullmode; }
+			else if (line.find("blend") != std::string::npos) { sin >> state.blend; }
+			else if (line.find("blendsourcefunc") != std::string::npos) { sin >> state.blendsourcefunc; }
+			else if (line.find("blenddestinationfunc") != std::string::npos) { sin >> state.blenddestinationfunc; }
+			else if (line.find("alphatest") != std::string::npos) { sin >> state.alphatest; }
+			else if (line.find("alphafunc") != std::string::npos) { sin >> state.alphafunc; }
+			else if (line.find("alphaclamp") != std::string::npos) { sin >> state.alphaclamp; }
+			else if (line.find("depthtest") != std::string::npos) { sin >> state.depthtest; }
+			else if (line.find("depthfunc") != std::string::npos) { sin >> state.depthfunc; }
+			sin.clear();
+		}
+
+		this->renderStates.insert(std::make_pair<>(file, state));
+		return state;
 	}
-
-	return RenderState();
-
+	else
+	{
+		//Return existing render state from list
+		return this->renderStates[file];
+	}
 }
 
 bool ShaderServer::HasRenderStateLoaded(const std::string& nName)

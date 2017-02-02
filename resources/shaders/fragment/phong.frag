@@ -4,8 +4,6 @@ in vec2 TexCoords;
 // For normalmapping
 in mat3 NormalMatrix;
 
-in vec3 ViewSpaceNormal;
-
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 normalColor;
 layout(location = 2) out vec4 specularAndRoughness;
