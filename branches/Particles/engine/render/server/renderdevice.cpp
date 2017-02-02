@@ -18,6 +18,7 @@
 #include "render/frame/framepass.h"
 #include "render/frame/depthpass.h"
 #include "render/frame/flatgeometrylitpass.h"
+#include "render/frame/reflectionpass.h"
 #include "render/frame/particlecomputepass.h"
 
 #ifdef _DEBUG
@@ -128,6 +129,13 @@ void RenderDevice::Render(bool drawToScreen)
 	auto particleComputePass = particlePass.lock();
 
 	particleComputePass->Execute();
+
+	//Reflections
+	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->ReflectionPass;
+	auto reflectionPass = ref.lock();
+	reflectionPass->Execute();
+
+
 
 	//-------------------
 	// Render Debug Shapes!

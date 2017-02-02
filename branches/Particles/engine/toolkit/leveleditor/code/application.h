@@ -87,6 +87,9 @@ private:
 
 	std::shared_ptr<Game::ModelEntity> sponza;
 	std::shared_ptr<Game::ParticleEntity> billboard;
+	std::shared_ptr<Game::ParticleEntity> billboard2;
+
+	Util::Array<std::shared_ptr<Game::ParticleEntity>> particleList;
 
 	//Particles::ParticleSettings pSettings;
 

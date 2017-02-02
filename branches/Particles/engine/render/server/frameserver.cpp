@@ -78,6 +78,7 @@ namespace Render
 		//TODO: Loop through all framepasses and update each one of their resolutions if needed.
 		this->Depth->UpdateResolution();
 		this->FlatGeometryLit->UpdateResolution();		
+		this->ReflectionPass->UpdateResolution();
 	}
 
 	std::shared_ptr<FramePass> FrameServer::GetFramePass(const std::string& name)
@@ -112,8 +113,14 @@ namespace Render
 		return this->FlatGeometryLit;
 	}
 
+	std::shared_ptr<ReflectionPass> FrameServer::GetReflectionPass()
+	{
+		return this->ReflectionPass;
+	}
+
 	std::shared_ptr<ParticleComputePass> FrameServer::GetParticleComputePass()
 	{
 		return this->particleComputePass;
 	}
 }
+

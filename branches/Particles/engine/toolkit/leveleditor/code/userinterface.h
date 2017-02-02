@@ -3,6 +3,7 @@
 #include <string>
 #include "foundation/math/point.h"
 #include "undo.h"
+#include "application/properties/particleemitter.h"
 
 namespace LevelEditor { class Application; }
 
@@ -15,7 +16,6 @@ namespace Tools
 
 namespace Toolkit
 {
-
 
 	class UserInterface
 	{
@@ -33,6 +33,8 @@ namespace Toolkit
 		void RenderDocks();
 		void ExecShortCuts();
 		void ShowFileMenu();
+
+		void ParticlesSettings(std::shared_ptr<Property::ParticleEmitter> emitter);
 		
 		double prevFPSTime;
 		double currentFPS;
@@ -55,7 +57,8 @@ namespace Toolkit
 		GLuint entityToolTextureHandle;
 		GLuint brushToolTextureHandle;
 		GLuint polygonEditTextureHandle;
-
+	
+		GLuint particleCount;
 
 	};
 

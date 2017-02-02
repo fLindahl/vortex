@@ -68,6 +68,7 @@ private:
 
 	//Used for particle computing
 	std::shared_ptr<ParticleComputePass> particleComputePass;
+
 	//GLuint lightCullingProgram;
 
 	std::shared_ptr<LightDebugPass> lightdebugpass;

@@ -12,7 +12,7 @@
 #include "translatetool.h"
 #include "render/debugrender/debugrenderer.h"
 #include "imgui_internal.h"
-#include "render/particlesystem/particlesystem.h"
+
 
 #define CONSOLE_BUFFER_SIZE 8096
 
@@ -37,6 +37,7 @@ namespace Toolkit
 
 		this->commandManager = Edit::CommandManager::Instance();
 
+
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
 		ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout");
@@ -51,7 +52,8 @@ namespace Toolkit
 	void UserInterface::Run()
 	{
 		static bool showStatistics = false;
-		
+		static bool showShaderDebugger = true;
+
 		RenderDocks();
 
 		//TODO: Make sure we're not editing a textbox before querying for shortcuts
@@ -79,10 +81,12 @@ namespace Toolkit
 				if (ImGui::BeginMenu("Show"))
 				{
 					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
+					if (ImGui::MenuItem("Shader Debugger", NULL, &showShaderDebugger)) {}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
 			}
+			
 			ImGui::EndMainMenuBar();
 		}
 		
@@ -99,6 +103,21 @@ namespace Toolkit
 			currentFPS = 1.0f / this->frameTime;
 
 			ImGui::Text("FPS: %f\n", currentFPS);
+
+			ImGui::End();
+		}
+
+		if (showShaderDebugger)
+		{
+			ImGui::Begin("Shader Debugger", &showShaderDebugger, ImGuiWindowFlags_ShowBorders);
+
+			ImGui::SetWindowSize(ImVec2(200.0f, 210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
+			ImGui::SetWindowPos(ImVec2(1700.0f, 60.0f), ImGuiSetCond_::ImGuiSetCond_Once);
+			
+			if (ImGui::Button("RELOAD SHADERS"))
+			{
+				Render::ShaderServer::Instance()->ReloadShaders();
+			}
 
 			ImGui::End();
 		}
@@ -300,25 +319,13 @@ namespace Toolkit
 
 			ImGui::BeginDock("Particle Settings", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
+				this->particleCount = 0;
+				for (int i = 0; i < application->particleList.Size(); ++i)
+				{
+					ParticlesSettings(application->particleList[i]->GetEmitter());
+					this->particleCount++;
+				}
 				
-				if (ImGui::CollapsingHeader("Base Settings"))
-				{
-					const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" };
-					static int item2 = 0;
-					ImGui::Combo("combo scroll", &item2, items, IM_ARRAYSIZE(items));
-					if (ImGui::TreeNode("Color"))
-					{
-						//ImGui::ColorPicker((float*)&application->pSettings.color, true);
-						ImGui::TreePop();
-					}
-						
-				}
-				if (ImGui::CollapsingHeader("Emitter Shape"))
-				{
-					//ImGui::InputFloat("Cone Radius", &radius, 0.001f, 5.0f);
-					//ImGui::SliderFloat("Cone Length", &application->pSettings.length, 0.001, 5, "%.3f");
-					//Debug::DebugRenderer::Instance()->DrawCone(Math::point(0, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 0.0f), application->pSettings.radius, 1.0f, application->pSettings.color, Debug::RenderMode::WireFrame, 2.0f);
-				}
 			}
 			ImGui::EndDock();
 
@@ -337,5 +344,210 @@ namespace Toolkit
 			ImGui::EndDock();
 		}
 	}
+
+
+void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter> emitter)
+{
+	std::string id = "Particle "+std::to_string(particleCount);
+	if (ImGui::CollapsingHeader(id.c_str()))
+	{
+		id = "Base Settings##" + std::to_string(particleCount);
+		if (ImGui::TreeNode(id.c_str()))
+		{
+
+			emitter->GetParticleUISettings().acc = emitter->GetState().accLife;
+			emitter->GetParticleUISettings().color = emitter->GetState().color;
+			id = "Velocity##" + std::to_string(particleCount);
+			if (ImGui::TreeNode(id.c_str()))
+			{
+				ImGui::Text("Randomize"); ImGui::SameLine(100);
+				id = "##vb" + std::to_string(particleCount);
+				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().vecRand);
+				ImGui::Text("Min"); ImGui::SameLine(60);
+				id = "##v1" + std::to_string(particleCount);
+				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().vel, 0, 30, "%.3f", 5))
+				{
+					if (emitter->GetParticleUISettings().vel > emitter->GetParticleUISettings().vel2)
+					{
+						float temp = emitter->GetParticleUISettings().vel;
+						emitter->GetParticleUISettings().vel = emitter->GetParticleUISettings().vel2;
+						emitter->GetParticleUISettings().vel2 = emitter->GetParticleUISettings().vel;
+					}
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().vecRand);
+				}
+				if (emitter->GetParticleUISettings().vecRand)
+				{
+					ImGui::Text("Max"); ImGui::SameLine(60);
+					id = "##v2" + std::to_string(particleCount);
+					if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().vel2, 0, 30, "%.3f", 5))
+					{
+						if (emitter->GetParticleUISettings().vel > emitter->GetParticleUISettings().vel2)
+						{
+							float temp = emitter->GetParticleUISettings().vel;
+							emitter->GetParticleUISettings().vel = emitter->GetParticleUISettings().vel2;
+							emitter->GetParticleUISettings().vel2 = emitter->GetParticleUISettings().vel;
+						}
+						Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().vecRand);
+					}
+				}
+
+				ImGui::TreePop();
+			}
+			id = "Lifetime##" + std::to_string(particleCount);
+			if (ImGui::TreeNode(id.c_str()))
+			{
+				ImGui::Text("Randomize"); ImGui::SameLine(100);
+				id = "##lb" + std::to_string(particleCount);
+				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().lifeTimeRand);
+				ImGui::Text("Min"); ImGui::SameLine(60);
+				id = "##l1" + std::to_string(particleCount);
+				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().acc[3], 0, 100, "%.3f", 5))
+				{
+					if (emitter->GetParticleUISettings().acc[3] > emitter->GetParticleUISettings().acc2[3])
+					{
+						float temp = emitter->GetParticleUISettings().acc[3];
+						emitter->GetParticleUISettings().acc[3] = emitter->GetParticleUISettings().acc2[3];
+						emitter->GetParticleUISettings().acc2[3] = emitter->GetParticleUISettings().acc[3];
+					}
+					Particles::ParticleSystem::Instance()->UpdateParticleLifetime(emitter, emitter->GetParticleUISettings().acc[3], emitter->GetParticleUISettings().acc2[3], emitter->GetParticleUISettings().lifeTimeRand);
+				}
+				if (emitter->GetParticleUISettings().lifeTimeRand)
+				{
+					ImGui::Text("Max"); ImGui::SameLine(60);
+					id = "##l2" + std::to_string(particleCount);
+					if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().acc2[3], 0, 100, "%.3f", 5))
+					{
+						if (emitter->GetParticleUISettings().acc[3] > emitter->GetParticleUISettings().acc2[3])
+						{
+							float temp = emitter->GetParticleUISettings().acc[3];
+							emitter->GetParticleUISettings().acc[3] = emitter->GetParticleUISettings().acc2[3];
+							emitter->GetParticleUISettings().acc2[3] = emitter->GetParticleUISettings().acc[3];
+						}
+						Particles::ParticleSystem::Instance()->UpdateParticleLifetime(emitter, emitter->GetParticleUISettings().acc[3], emitter->GetParticleUISettings().acc2[3], emitter->GetParticleUISettings().lifeTimeRand);
+					}
+				}
+
+				ImGui::TreePop();
+			}
+			id = "Acceleration##" + std::to_string(particleCount);
+			if (ImGui::TreeNode(id.c_str()))
+			{
+				ImGui::Text("Randomize"); ImGui::SameLine(100);
+				id = "##ab" + std::to_string(particleCount);
+				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().accRand);
+				ImGui::Text("Min"); ImGui::SameLine(60);
+				id = "##amin" + std::to_string(particleCount);
+				if (ImGui::SliderFloat3(id.c_str(), (float*)&emitter->GetParticleUISettings().acc, -50, 50, "%.3f", 5))
+				{
+					if (Math::vec4::greater3_all(emitter->GetParticleUISettings().acc, emitter->GetParticleUISettings().acc2))
+					{
+						Math::vec4 temp = emitter->GetParticleUISettings().acc;
+						emitter->GetParticleUISettings().acc = emitter->GetParticleUISettings().acc2;
+						emitter->GetParticleUISettings().acc2 = emitter->GetParticleUISettings().acc;
+					}
+					Particles::ParticleSystem::Instance()->UpdateParticleAcceleration(emitter, emitter->GetParticleUISettings().acc, emitter->GetParticleUISettings().acc2, emitter->GetParticleUISettings().accRand);
+				}
+				if (emitter->GetParticleUISettings().accRand)
+				{
+					ImGui::Text("Max"); ImGui::SameLine(60);
+					id = "##amax" + std::to_string(particleCount);
+					if (ImGui::SliderFloat3(id.c_str(), (float*)&emitter->GetParticleUISettings().acc2, -50, 50, "%.3f", 5))
+					{
+						if (Math::vec4::greater3_all(emitter->GetParticleUISettings().acc, emitter->GetParticleUISettings().acc2))
+						{
+							Math::vec4 temp = emitter->GetParticleUISettings().acc;
+							emitter->GetParticleUISettings().acc = emitter->GetParticleUISettings().acc2;
+							emitter->GetParticleUISettings().acc2 = emitter->GetParticleUISettings().acc;
+						}
+						Particles::ParticleSystem::Instance()->UpdateParticleAcceleration(emitter, emitter->GetParticleUISettings().acc, emitter->GetParticleUISettings().acc2, emitter->GetParticleUISettings().accRand);
+					}
+				}
+
+				ImGui::TreePop();
+			}
+			id = "Color##" + std::to_string(particleCount);
+			if (ImGui::TreeNode(id.c_str()))
+			{
+				ImGui::Text("Randomize"); ImGui::SameLine(100);
+				id = "##cb" + std::to_string(particleCount);
+				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().colorRand);
+				ImGui::Text("Min"); ImGui::SameLine(60);
+				id = "##c1" + std::to_string(particleCount);
+				if (ImGui::ColorEdit4(id.c_str(), (float*)&emitter->GetParticleUISettings().color, ImGuiColorEditFlags_Alpha))
+				{
+					if (Math::vec4::greater3_all(emitter->GetParticleUISettings().color, emitter->GetParticleUISettings().color2))
+					{
+						Math::vec4 temp = emitter->GetParticleUISettings().color;
+						emitter->GetParticleUISettings().color = emitter->GetParticleUISettings().color2;
+						emitter->GetParticleUISettings().color2 = emitter->GetParticleUISettings().color;
+					}
+					Particles::ParticleSystem::Instance()->UpdateParticleColor(emitter, emitter->GetParticleUISettings().color, emitter->GetParticleUISettings().color2, emitter->GetParticleUISettings().colorRand);
+				}
+				if (emitter->GetParticleUISettings().colorRand)
+				{
+					ImGui::Text("Max"); ImGui::SameLine(60);
+					id = "##c2" + std::to_string(particleCount);
+					if (ImGui::ColorEdit4(id.c_str(), (float*)&emitter->GetParticleUISettings().color2, ImGuiColorEditFlags_Alpha))
+					{
+						if (Math::vec4::greater3_all(emitter->GetParticleUISettings().color, emitter->GetParticleUISettings().color2))
+						{
+							Math::vec4 temp = emitter->GetParticleUISettings().color;
+							emitter->GetParticleUISettings().color = emitter->GetParticleUISettings().color2;
+							emitter->GetParticleUISettings().color2 = emitter->GetParticleUISettings().color;
+						}
+						//ImGui::ColorConvertHSVtoRGB()
+						Particles::ParticleSystem::Instance()->UpdateParticleColor(emitter, emitter->GetParticleUISettings().color, emitter->GetParticleUISettings().color2, emitter->GetParticleUISettings().colorRand);
+					}
+				}
+				ImGui::TreePop();
+			}
+			id = "Size##" + std::to_string(particleCount);
+			if (ImGui::TreeNode(id.c_str()))
+			{
+				ImGui::Text("Start"); ImGui::SameLine(60);
+				id = "##s1" + std::to_string(particleCount);
+				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().startSize, 0, 20, "%.3f", 5))
+				{
+
+					Particles::ParticleSystem::Instance()->UpdateParticleSize(emitter, emitter->GetParticleUISettings().startSize, emitter->GetParticleUISettings().endSize);
+				}
+				ImGui::Text("End"); ImGui::SameLine(60);
+				id = "##s2" + std::to_string(particleCount);
+				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().endSize, 0, 20, "%.3f", 5))
+				{
+					Particles::ParticleSystem::Instance()->UpdateParticleSize(emitter, emitter->GetParticleUISettings().startSize, emitter->GetParticleUISettings().endSize);
+				}
+
+				ImGui::TreePop();
+			}
+
+			ImGui::Text("Max particles"); ImGui::SameLine(95);
+			id = "##mp" + std::to_string(particleCount);
+			if (ImGui::SliderInt(id.c_str(), &emitter->GetParticleUISettings().numParticles, 1, 1000000))
+			{
+				Particles::ParticleSystem::Instance()->GetEmitterBuffer(emitter->GetParticleUISettings().numParticles, application->billboard->GetEmitter(), application->billboard->GetEmitter()->GetEmitterBuffer());
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Emitter Shape Settings"))
+		{
+			const char* items[] = { "Cone", "Sphere", "Hemisphere" };
+			static int item2 = 0;
+			ImGui::Text("Emitter Shape"); ImGui::SameLine(105);
+			id = "##cbs" + std::to_string(particleCount);
+			if (ImGui::Combo(id.c_str(), &item2, items, IM_ARRAYSIZE(items)))
+			{
+
+			}
+			if (ImGui::SliderFloat("Cone Radius", &emitter->GetParticleUISettings().radius, 0.001, 10, "%.3f", 5))
+			{
+				Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().vecRand);
+			}
+			//Debug::DebugRenderer::Instance()->DrawCone(Math::point(0, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 0.0f), application->emitter->GetParticleUISettings()tings.radius, 1.0f, application->emitter->GetParticleUISettings()tings.color, Debug::RenderMode::WireFrame, 2.0f);
+			ImGui::TreePop();
+		}
+	}	
+
+}
 
 }

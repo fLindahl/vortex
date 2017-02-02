@@ -13,6 +13,7 @@ namespace Render
 
 namespace Property
 {
+
 class ParticleEmitter : public Game::BaseProperty
 {
 public:
@@ -26,16 +27,24 @@ public:
 	void Deactivate();
 
 	void CreateEmitter(GLuint numOfParticles, const char* texturepath);
+	void BindUniformBuffer();
 
-	GLuint GetNumberOfParticles(){ return numOfParticles; }
+	GLuint& GetNumberOfParticles(){ return numOfParticles; }
 
 	Particles::ParticleState& GetState(){ return state; }
 
 	std::shared_ptr<Render::TextureResource>& GetEmitterTexture(){ return this->texture; }
 
-	void UpdateParticles();
+	Math::mat4 GetModelMatrix();
+
+	GLuint* GetUniformBuffer(){ return this->ubo; }
+	Particles::EmitterBuffer& GetEmitterBuffer(){ return this->buff; }
+	Particles::ParticleRenderingBuffer& GetRenderBuffer(){ return this->renderBuff; }
+	Particles::ParticleUISettings& GetParticleUISettings(){ return this->pSet; }
 
 private:
+	//uniformBuffer
+	GLuint ubo[1];
 
 	GLuint numOfParticles;
 
@@ -45,7 +54,13 @@ private:
 	//The emitter buffer from the Particle System
 	Particles::EmitterBuffer buff;
 
+	//The uniform render buffer
+	Particles::ParticleRenderingBuffer renderBuff;
+
 	std::shared_ptr<Render::TextureResource> texture;
+
+	//Saved Settings
+	Particles::ParticleUISettings pSet;
 
 };
 }
