@@ -40,7 +40,6 @@ void PickingPass::Execute()
 			for (auto modelNode : surface->GetModelNodes())
 			{
 				//Bind mesh
-				//TODO: We should probably check and make sure we don't bind these more than once
 				modelNode->modelInstance->GetMesh()->Bind();
 
 				for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())

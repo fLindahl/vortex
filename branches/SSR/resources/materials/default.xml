@@ -20,12 +20,12 @@
 			<Param name="RoughnessMap" type="string" defaultValue="resources/textures/placeholder_roughness.png"/>
 
             <!-- various parameters -->
-			
         </Material>
-		
-        <Material name="Toon" desc="Generic toon-shader material">
-            
-			<Pass name="FlatGeometryLit" shader="toonShader"/>
+				
+        <Material name="Billboard" desc="Billboard that always faces the camera">
+			<Pass name="Depth" shader="depthStatic"/>
+			<Pass name="Picking" shader="picking"/>
+			<Pass name="FlatGeometryLit" shader="billboard"/>
 			
 			<!-- material textures -->
             <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>

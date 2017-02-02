@@ -7,7 +7,6 @@ layout(location=4) in vec3 binormal;
 out vec3 FragmentPos;
 out vec2 TexCoords;
 out mat3 NormalMatrix;
-out vec3 ViewSpaceNormal;
 
 void main()
 {
@@ -26,8 +25,6 @@ void main()
 		
 	TexCoords.x = uv.x;
 	TexCoords.y = 1 - uv.y;
-
-	ViewSpaceNormal = mat3(View * Model) * normal;
 	
 	gl_Position = ViewProjection * wPos;
 }
