@@ -25,20 +25,21 @@ namespace Display
 	static void GLAPIENTRY
 	GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
+		/*
 		std::string msg("[OPENGL DEBUG MESSAGE] ");
 
 		// print error severity
 		switch (severity)
 		{
-			case GL_DEBUG_SEVERITY_LOW:
-				msg.append("<Low severity> ");
-				break;
-			case GL_DEBUG_SEVERITY_MEDIUM:
-				msg.append("<Medium severity> ");
-				break;
-			case GL_DEBUG_SEVERITY_HIGH:
-				msg.append("<High severity> ");
-				break;
+		case GL_DEBUG_SEVERITY_LOW:
+			msg.append("<Low severity> ");
+			break;
+		case GL_DEBUG_SEVERITY_MEDIUM:
+			msg.append("<Medium severity> ");
+			break;
+		case GL_DEBUG_SEVERITY_HIGH:
+			msg.append("<High severity> ");
+			break;
 		}
 
 		// append message to output
@@ -47,16 +48,17 @@ namespace Display
 		// print message
 		switch (type)
 		{
-			case GL_DEBUG_TYPE_ERROR:
-			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-				printf("Error: %s\n", msg.c_str());
-				break;
-			case GL_DEBUG_TYPE_PERFORMANCE:
-				printf("Performance issue: %s\n", msg.c_str());
-				break;
-			default:		// Portability, Deprecated, Other
-				break;
+		case GL_DEBUG_TYPE_ERROR:
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+			printf("Error: %s\n", msg.c_str());
+			break;
+		case GL_DEBUG_TYPE_PERFORMANCE:
+			printf("Performance issue: %s\n", msg.c_str());
+			break;
+		default:		// Portability, Deprecated, Other
+			break;
 		}
+		*/
 	}
 
 	int32 Window::WindowCount = 0;

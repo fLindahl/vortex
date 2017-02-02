@@ -7,7 +7,8 @@ namespace Property
 {
 ParticleEmitter::ParticleEmitter()
 {
-	
+	glGenBuffers(1, this->ubo);
+	//BindRenderBuffer();
 }
 
 ParticleEmitter::~ParticleEmitter()
@@ -41,18 +42,23 @@ void ParticleEmitter::CreateEmitter(GLuint numOfParticles, const char* texturepa
 	state = Particles::ParticleState();
 	state.pos = owner->GetTransform().get_position();
 	this->buff = Particles::ParticleSystem::Instance()->GetEmitterBuffer(this->numOfParticles, *this);
+	this->renderBuff.offset = this->buff.startIndex;
+	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 3, this->ubo[0]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(Particles::ParticleRenderingBuffer), &renderBuff, GL_STATIC_DRAW);
 }
 
-void ParticleEmitter::UpdateParticles()
+void ParticleEmitter::BindUniformBuffer()
 {
-	Util::Array<Particles::ParticleState> s;
-	for (int i = buff.startIndex; i < buff.endIndex; i++)
-	{
-		s[i] = state;
-		
-	}
-	buff.arr = &s;
-	buff.startArr = &s;
+	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 3, this->ubo[0]);
+	//glBufferData(GL_UNIFORM_BUFFER, sizeof(renderBuff), &renderBuff, GL_STATIC_DRAW);
 }
+
+Math::mat4 ParticleEmitter::GetModelMatrix()
+{
+	return this->owner->GetTransform();
+}
+
 }
 

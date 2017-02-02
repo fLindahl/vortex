@@ -1,6 +1,8 @@
 <Vortex>
     <Shaders>
 		
+		<!-- SHADER OBJECTS -->
+		
 		<Shader name="depthStatic" desc="Default shader for writing to the depth buffer">
 			<VertexShader name="resources/shaders/vertex/depthstatic.vert"/>
 			<FragmentShader name="resources/shaders/fragment/depth.frag"/>
@@ -49,5 +51,21 @@
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		
+		
+		<!-- --------------- -->
+		<!-- COMPUTE SHADERS -->
+		<!-- --------------- -->
+		
+		<Shader name="SSR" desc="Compute shader for calculating reflections">    
+			<ComputeShader name="resources/shaders/compute/ssr.comp"/>
+		</Shader>
+		
+		<Shader name="LightCulling" desc="Compute shader for culling Lights">    
+			<ComputeShader name="resources/shaders/compute/lightculling.comp"/>
+		</Shader>
+		
+		<Shader name="ParticleCompute" desc="Compute shader for computing Particles">    
+			<ComputeShader name="resources/shaders/compute/particlecalc.comp"/>
+		</Shader>
     </Shaders>
 </Vortex>

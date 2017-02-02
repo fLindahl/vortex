@@ -83,9 +83,17 @@ Application::Open()
 
 
 		billboard = std::make_shared<Game::ParticleEntity>();
-		billboard->SetTransform(Math::mat4::translation(0.0f, 10.5f, 0.0f));
+		billboard->SetTransform(Math::mat4::translation(5.59f, -0.5f, 2.01f));
 		billboard->Activate();
-		billboard->GetEmitter()->CreateEmitter(131072, "resources/textures/particles/fireparticle2.tga");
+		billboard->GetEmitter()->CreateEmitter(10000, "resources/textures/particles/fireparticle2.tga");
+
+		billboard2 = std::make_shared<Game::ParticleEntity>();
+		billboard2->SetTransform(Math::mat4::translation(0.0f, 5.5f, 0.0f));
+		billboard2->Activate();
+		billboard2->GetEmitter()->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");
+		
+		particleList.Append(billboard);
+		particleList.Append(billboard2);
 
 		PointLight pLight;
 		pLight.position = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);

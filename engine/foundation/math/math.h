@@ -24,6 +24,27 @@ namespace Math
 	{ 
 		return ((rand()) / (RAND_MAX + 1.0f)); 
 	}
+	//returns a random float between a and b 
+	inline float randFloat(float a, float b)
+	{
+		if (a > b)
+		{
+			float temp = a;
+			a = b;
+			b = temp;
+		}
+		float r = (float)rand() / (float)RAND_MAX;
+		return a + r * (b - a);
+
+	}
+
+	inline void RandomPointInCircle(const float& radius, float& x, float& y)
+	{
+		float angle = randFloat() * PI * 2;
+		float randRad = sqrtf(randFloat()) * radius;
+		x = randRad * cosf(angle);
+		y = randRad * sinf(angle);
+	}
 
 	//returns a random float in the range -1 < n < 1 
 	inline float randomClamped()    { return randFloat() - randFloat(); }
