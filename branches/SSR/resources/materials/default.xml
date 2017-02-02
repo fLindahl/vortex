@@ -3,13 +3,13 @@
         <Material name="Static" desc="A lit opaque material">
 			<!-- Examples of future frame passes -->
 			<!--
-			<Pass name="Picking" shader="picking"/>
 			<Pass name="SpotLightShadow" shader="shadow"/>
 			<Pass name="PointLightShadow" shader="shadow"/>
 			<Pass name="GlobalShadow" shader="shadow"/>
 			-->
 			
 			<Pass name="Depth" shader="depthStatic"/>
+			<Pass name="Picking" shader="picking"/>
 			<Pass name="FlatGeometryLit" shader="defaultLit"/>
 			
 			

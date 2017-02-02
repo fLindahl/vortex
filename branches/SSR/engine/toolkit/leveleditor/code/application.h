@@ -83,7 +83,6 @@ private:
 
 	Display::Window* window;
 
-	GLfloat* depthPixels;
-	GLfloat* normalPixels;
+	GLuint* pickingPixels;
 };
 } // namespace LevelEditor

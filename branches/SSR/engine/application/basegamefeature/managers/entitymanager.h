@@ -45,6 +45,8 @@ public:
 	//Returns time since last update multiplied with UPDATE_MULTIPLIER
 	double DeltaTime();
 
+	std::shared_ptr<Game::Entity> GetEntityByID(const uint& id);
+
 	//Update frequency multiplier for deltaTime, put this to 1.0f if you want normal speed.
 	//float UPDATE_MULTIPLIER;
 

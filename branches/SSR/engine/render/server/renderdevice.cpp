@@ -19,23 +19,23 @@
 #include "render/frame/depthpass.h"
 #include "render/frame/flatgeometrylitpass.h"
 #include "render/frame/reflectionpass.h"
+#include "render/frame/pickingpass.h"
 
-#ifdef _DEBUG
-	#include "render/frame/lightdebugpass.h"
-#endif
 
 namespace Render
 {
 RenderDevice::RenderDevice()
 {
-	glGenBuffers(1, this->ubo);
 	currentProgram = 0;
+	pickingEnabled = false;
 }
 
 void RenderDevice::Initialize()
 {
 	//We need an initial resolution so that we can build our framebuffers upon something.
 	this->renderResolution = { 800, 600 };
+
+	glGenBuffers(1, this->ubo);
 }
 
 void RenderDevice::SetRenderResolution(const Resolution& res)
@@ -107,14 +107,17 @@ void RenderDevice::Render(bool drawToScreen)
     //Run depth pass
 	depthPass->Execute();
 	
-	std::weak_ptr<FramePass>framePass = FrameServer::Instance()->GetLightCullingPass();
+	std::weak_ptr<FramePass> framePass = FrameServer::Instance()->GetLightCullingPass();
 	auto lightCullingPass = framePass.lock();
 
 	lightCullingPass->Execute();
 
-#ifdef _DEBUG
-	//FrameServer::Instance()->lightdebugpass->Execute();
-#endif
+	if (this->pickingEnabled)
+	{
+		framePass = FrameServer::Instance()->GetPickingPass();
+		auto pickingPass = framePass.lock();
+		pickingPass->Execute();
+	}
 
 	//Bind the final color buffer
 	//glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
@@ -130,9 +133,7 @@ void RenderDevice::Render(bool drawToScreen)
 	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->ReflectionPass;
 	auto reflectionPass = ref.lock();
 	reflectionPass->Execute();
-
-
-
+	
 	//-------------------
 	// Render Debug Shapes!
 	Debug::DebugRenderer::Instance()->DrawCommands();

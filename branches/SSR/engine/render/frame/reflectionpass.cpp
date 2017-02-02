@@ -14,13 +14,13 @@ namespace Render
 
 ReflectionPass::ReflectionPass()
 {
-	this->uniformBlock.zThickness = 90.0f;
+	this->uniformBlock.zThickness = 3.5f;
 	this->uniformBlock.jitter = 0.45f;
 	this->uniformBlock.stride = 4.0f;
 	this->uniformBlock.workGroups[0] = (RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % 16)) / 16;
 	this->uniformBlock.workGroups[1] = (RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % 16)) / 16;
 	this->uniformBlock.maxSteps = 128.0f;
-	this->uniformBlock.maxDistance = 1000.0f;
+	this->uniformBlock.maxDistance = 280.0f;
 }
 
 ReflectionPass::~ReflectionPass()
@@ -56,6 +56,10 @@ void ReflectionPass::Execute()
 	this->uniformBlock.workGroups[0] = (RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % 16)) / 16;
 	this->uniformBlock.workGroups[1] = (RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % 16)) / 16;
 	
+	double time = glfwGetTime();
+
+	//glFinish();
+
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, this->ubo[0]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(SSRSettings), &uniformBlock, GL_STATIC_DRAW);
@@ -104,6 +108,14 @@ void ReflectionPass::Execute()
 
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//glFinish();
+
+	double time1 = glfwGetTime();
+
+	double elapsedTime = time1 - time;
+
+	printf("Elapsed time for sausage to splash the water: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
 
 	FramePass::Execute();
 }
