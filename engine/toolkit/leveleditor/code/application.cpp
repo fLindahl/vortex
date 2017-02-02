@@ -39,8 +39,7 @@ Application::Application()
 	this->reflectEnd = Math::vec4::zerovector();
 	hit.object = nullptr;
 
-	this->depthPixels = new GLfloat[1920 * 1020];
-	this->normalPixels = new GLfloat[1920 * 1020 * 3];
+	this->pickingPixels = new GLuint[1920 * 1020];
 }
 
 //------------------------------------------------------------------------------
@@ -59,7 +58,9 @@ Application::Open()
 {
 	this->window = new Display::Window;
 	// Initiate everything we need
-	//Always call app::open after initializing a glfwwindow
+	RenderDevice::Instance()->SetPickingEnabled(true);
+
+	//Always call app::open _AFTER_ initializing a glfwwindow
 	if (this->window->Open() && App::Open())
 	{
 		keyhandler = BaseGameFeature::KeyHandler::Instance();

@@ -9,6 +9,12 @@
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		
+		<Shader name="picking" desc="Default shader for writing ID to a render buffer">
+			<VertexShader name="resources/shaders/vertex/picking.vert"/>
+			<FragmentShader name="resources/shaders/fragment/picking.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
 		<Shader name="defaultLit" desc="Default shader for rendering opaque lit geometry">            
 			<VertexShader name="resources/shaders/vertex/static.vert"/>
 			<FragmentShader name="resources/shaders/fragment/phong.frag"/>

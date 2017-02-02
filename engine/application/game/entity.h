@@ -17,7 +17,7 @@ public:
 	Entity();
 	~Entity();
 
-	int getID() { return ID; };
+	uint getID() { return ID; };
 	//void setID(const int id) { ID = id; };
 
 	virtual void Activate();
@@ -42,7 +42,7 @@ protected:
 
     Math::mat4 transform;
 
-	int ID;
+	uint ID;
 
 	Util::Array<std::shared_ptr<Game::BaseProperty>> properties;
 };

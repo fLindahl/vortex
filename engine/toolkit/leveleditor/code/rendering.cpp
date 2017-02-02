@@ -3,8 +3,7 @@
 #include "render/server/frameserver.h"
 #include "foundation/math/math.h"
 #include "application/basegamefeature/managers/envmanager.h"
-#include "render/frame/depthpass.h"
-#include "render/frame/flatgeometrylitpass.h"
+#include "render/frame/pickingpass.h"
 
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
@@ -124,90 +123,23 @@ void Application::DoPicking()
 	// Get position from depthbuffer
 	
 	if (ImGui::GetIO().MouseDown[0])
-	{
-		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
-
-		GLuint texture = Render::FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer();
-		
-		// Get depth buffer
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, this->depthPixels);
-
-		texture = Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer();
-
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, this->normalPixels);
+	{		
+		GLuint SelectedID;
 
 		int pixelx = (mouse_pos_in_dock.x / dockSize.x) * 1920;
 		int pixely = (mouse_pos_in_dock.y / dockSize.y) * 1020;
 
-		GLfloat pixelDepth = this->depthPixels[(int)(pixelx + (pixely * 1920) + 0.5f)];
+		//glBindTexture(GL_TEXTURE_2D, texture);
+		GLuint frame = Render::FrameServer::Instance()->GetPickingPass()->GetFrameBufferObject();
 
-		Math::vector normal;
-		normal.x() = this->normalPixels[(uint)((pixelx * 3) + 0 + (pixely * (1920 * 3)))];
-		normal.y() = this->normalPixels[(uint)((pixelx * 3) + 1 + (pixely * (1920 * 3)))];
-		normal.z() = this->normalPixels[(uint)((pixelx * 3) + 2 + (pixely * (1920 * 3)))];
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, frame);
+		glReadPixels(pixelx, pixely, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, (GLvoid*)&SelectedID);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
-		normal = Math::mat4::transform(normal, Math::mat4::transpose(Graphics::MainCamera::Instance()->getView()));
-
-		float far = 1000.0f;
-		float near = 0.05f;
-
-		float fn = far - near;
-
-		//Calculate world pos
-		Math::vec4 clipSpaceLocation;
-		clipSpaceLocation.x() = ((float)pixelx / 1920.0f) * 2.0f - 1.0f;
-		clipSpaceLocation.y() = ((float)pixely / 1020.0f) * 2.0f - 1.0f;
-		clipSpaceLocation.z() = 1.0f;
-		clipSpaceLocation.w() = 1.0f;
-		Math::vec4 homogenousLocation = Math::mat4::transform(clipSpaceLocation, Graphics::MainCamera::Instance()->getInvProjection());
-		Math::point viewSpacePosition = homogenousLocation;// *(1.0f / homogenousLocation.w());
-		
-		//Math::point worldPos = Math::mat4::transform(viewSpacePosition, invView);
-
-		this->rayStart = Graphics::MainCamera::Instance()->GetPosition();//Math::mat4::transform(viewSpacePosition, Graphics::MainCamera::Instance()->getInvView());
-
-		Math::point rayOrigin = (viewSpacePosition * pixelDepth);
-		this->rayEnd = Math::mat4::transform(rayOrigin, invView);
-
-		this->reflectStart = this->rayEnd;
-
-		Math::mat4 textureScale = Math::mat4(	0.5f, 0.0f, 0.0f, 0.0f,
-												0.0f, 0.5f, 0.0f, 0.0f,
-												0.0f, 0.0f, 1.0f, 0.0f,
-												0.0f, 0.0f, 0.0f, 1.0f);
-
-		float sx = 1920.0f / 2.0f;
-		float sy = 1020.0f / 2.0f;
-
-		float xOffset = Graphics::MainCamera::Instance()->getProjection().getrow2().x() * 1920.0f * -0.5f;
-		float yOffset = Graphics::MainCamera::Instance()->getProjection().getrow2().y() * 1020.0f * 0.5f;
-
-		Math::mat4  scrScale = Math::mat4(	sx, 0.0f, 0.0f, 0.0f,
-											0.0f, -sy, 0.0f, 0.0f,
-											0.0f, 0.0f, 1.0f, 0.0f,
-											sx - xOffset, sy + yOffset, 0.0f, 1.0f);
-
-		//setPixelOffset(proj.column(2).xy() * viewportExtent * Vector2(-0.5f, 0.5f));
-
-		Math::mat4 proj = (Math::mat4::multiply(Graphics::MainCamera::Instance()->getProjection(), scrScale));
-
-		Math::vec4 position = rayOrigin;
-		position = Math::mat4::transform(position, proj);
-
-		printf("%f, %f, %f, %f\n", position.x(), position.y(), position.z(), position.w());
-		position *= (1.0f / position.w());
-		printf("%f, %f, %f, %f\n\n\n\n\n", position.x(), position.y(), position.z(), position.w());
-
-
-		
-		Math::vector viewDir = Math::vector::normalize(rayOrigin);
-
-		//Reflect vector against normal
-		Math::vector reflectionDir = Math::vec4::reflect(Math::vector::normalize(normal), viewDir); // normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir); 
-
-		this->reflectEnd = Math::mat4::transform(rayOrigin + (reflectionDir * 10.0f), Graphics::MainCamera::Instance()->getInvView());
+		if (SelectedID != 0)
+		{
+			hit.object = BaseGameFeature::EntityManager::Instance()->GetEntityByID(SelectedID).get();
+		}
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

@@ -75,8 +75,13 @@ namespace Render
 		void SetFinalColorBuffer(GLuint cbuffer) { this->finalColorBuffer = cbuffer; }
 		GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
 
+		void SetPickingEnabled(const bool& val) { this->pickingEnabled = val; }
+		bool GetPickingEnabled() { return this->pickingEnabled; }
+
    private:
 		friend class LightServer;
+
+		bool pickingEnabled;
 
 		Resolution renderResolution;
 		Resolution windowResolution;
