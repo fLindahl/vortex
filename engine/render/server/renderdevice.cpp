@@ -91,9 +91,9 @@ void RenderDevice::Render(bool drawToScreen)
     glBufferData(GL_UNIFORM_BUFFER, sizeof(uniformBufferBlock), &uniformBufferBlock, GL_STATIC_DRAW);
 
     //HACK: Render states should be done per shaderobject (in some cases)
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	//----------------
 	// Start rendering
