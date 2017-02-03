@@ -39,13 +39,10 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 	owner.GetNumberOfParticles() = buf.endIndex - buf.startIndex;
 
 	index_t numPart = particleArray.Size();
-	float x, y;
 	for (int i = buf.startIndex; i < buf.endIndex; i++)
 	{
-		Math::vec4 pos(0.0f, 2.0f, 0.0f, 1.0f);
-		Math::RandomPointInCircle(1.0f, x, y);
-		pos.set_x(x);
-		pos.set_z(y);
+		Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+		RandomPointInSphere(1.0f, pos);
 		particleArray[i].accLife[3] = Math::randFloat(0.0f, 2.5f);
 		particleArray[i].accLife[2] =  Math::randFloat(-0.5f, 1.0f);
 		particleArray[i].accLife[1] =  Math::randFloat(-9.82f, -7.82f);
@@ -101,10 +98,8 @@ void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Proper
 	float x, y;
 	for (int i = buf.startIndex; i < buf.endIndex; i++)
 	{
-		Math::vec4 pos(0.0f, 2.0f, 0.0f, 1.0f);
-		Math::RandomPointInCircle(1.0f, x, y);
-		pos.set_x(x);
-		pos.set_z(y);
+		Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+		RandomPointInSphere(1.0f, pos);
 		particleArray[i].accLife[3] = Math::randFloat(0.0f, 2.5f);
 		particleArray[i].accLife[2] = Math::randFloat(-0.5f, 1.0f);
 		particleArray[i].accLife[1] = Math::randFloat(-9.82f, -7.82f);

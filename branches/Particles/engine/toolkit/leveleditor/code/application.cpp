@@ -88,7 +88,7 @@ Application::Open()
 		billboard->GetEmitter()->CreateEmitter(10000, "resources/textures/particles/fireparticle2.tga");
 
 		billboard2 = std::make_shared<Game::ParticleEntity>();
-		billboard2->SetTransform(Math::mat4::translation(0.0f, 5.5f, 0.0f));
+		billboard2->SetTransform(Math::mat4::multiply(Math::mat4::rotationyawpitchroll(0.0f, 45.0f, 0.0f),Math::mat4::translation(0.0f, 5.5f, 0.0f)));
 		billboard2->Activate();
 		billboard2->GetEmitter()->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");
 		
