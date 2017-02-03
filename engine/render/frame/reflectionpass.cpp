@@ -56,7 +56,7 @@ void ReflectionPass::Execute()
 	this->uniformBlock.workGroups[0] = (RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % 16)) / 16;
 	this->uniformBlock.workGroups[1] = (RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % 16)) / 16;
 	
-	double time = glfwGetTime();
+	//double time = glfwGetTime();
 
 	//glFinish();
 
@@ -111,11 +111,11 @@ void ReflectionPass::Execute()
 
 	//glFinish();
 
-	double time1 = glfwGetTime();
+	//double time1 = glfwGetTime();
 
-	double elapsedTime = time1 - time;
+	//double elapsedTime = time1 - time;
 
-	printf("Elapsed time for sausage to splash the water: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
+	//printf("Elapsed time for sausage to splash the water: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
 
 	FramePass::Execute();
 }

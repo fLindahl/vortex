@@ -23,7 +23,7 @@ Accepts values `cw` for clockwise order and `ccw` counter-clockwise order.
 
 *Specifies which face of a polygon to cull*
 
-Accepts values `back`, `front` and `backandfront`
+Accepts values `back`, `front` and `front_and_back`
 
 ---
 **Blend**
