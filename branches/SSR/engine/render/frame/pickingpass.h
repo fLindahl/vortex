@@ -18,10 +18,7 @@ public:
 	void UpdateResolution();
 
 private:
-	std::shared_ptr<ShaderObject> shader;
 	
-	GLuint shaderIDLocation;
-
 };
 
 }

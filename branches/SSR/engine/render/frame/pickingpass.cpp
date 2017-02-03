@@ -26,29 +26,54 @@ PickingPass::~PickingPass()
 void PickingPass::Execute()
 {
 	this->BindFrameBuffer();
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(this->shader->GetProgram());
-	
-	this->shader->EnableRenderState();
+	GLuint currentProgram = 0;
 
 	for (Material* material : this->materials)
 	{
-		for (auto surface : material->SurfaceList())
+		if (!material->SurfaceList().IsEmpty())
 		{
-			for (auto modelNode : surface->GetModelNodes())
-			{
-				//Bind mesh
-				modelNode->modelInstance->GetMesh()->Bind();
+			auto shader = material->GetShader(this->name);
 
-				for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())
+			if (shader->GetProgram() != currentProgram)
+			{
+				currentProgram = shader->GetProgram();
+				glUseProgram(currentProgram);
+			}
+
+			shader->EnableRenderState();
+
+			for (auto surface : material->SurfaceList())
+			{
+				for (uint i = 0; i < surface->TextureList().Size(); i++)
 				{
-					glUniform1ui(shaderIDLocation, (GLuint)graphicsProperty->GetOwner()->getID());
-					shader->setModelMatrix(graphicsProperty->getModelMatrix());
-					modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
+					surface->TextureList()[i]->BindTexture(i);
+					//TODO: This is kinda bad
+					if (i == 0)
+						glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_ALBEDOMAP), i);
+					else if (i == 1)
+						glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_NORMALMAP), i);
+					else if (i == 2)
+						glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_SPECULARMAP), i);
+					else if (i == 3)
+						glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_ROUGHNESSMAP), i);
 				}
 
-				modelNode->modelInstance->GetMesh()->Unbind();
+				for (auto modelNode : surface->GetModelNodes())
+				{
+					//Bind mesh
+					modelNode->modelInstance->GetMesh()->Bind();
+
+					for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())
+					{
+						glUniform1ui(glGetUniformLocation(shader->GetProgram(), "ID"), (GLuint)graphicsProperty->GetOwner()->getID());
+						shader->setModelMatrix(graphicsProperty->getModelMatrix());
+						modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
+					}
+
+					modelNode->modelInstance->GetMesh()->Unbind();
+				}
 			}
 		}
 	}
@@ -61,12 +86,6 @@ void PickingPass::Execute()
 
 void PickingPass::Setup()
 {
-	this->shader = ShaderServer::Instance()->LoadShader("picking");
-
-	glUseProgram(this->shader->GetProgram());
-	shaderIDLocation = glGetUniformLocation(this->shader->GetProgram(), "ID");
-	glUseProgram(0);
-
     glGenFramebuffers(1, &this->frameBufferObject);    
     GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 

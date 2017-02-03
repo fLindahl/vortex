@@ -155,6 +155,10 @@ void RenderDevice::Render(bool drawToScreen)
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
+
+	//change some render states so that Imgui works correctly
+	glAlphaFunc(GL_ALWAYS, 0.0f);
+	glDepthFunc(GL_LESS);
 }
 
 

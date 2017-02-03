@@ -88,6 +88,8 @@ namespace Render
 	void ShaderObject::EnableRenderState()
 	{
 
+		glDepthMask(this->renderState.depthwrite);
+
 		if (this->renderState.cullface == GL_TRUE)
 		{
 			glEnable(GL_CULL_FACE);
@@ -128,8 +130,6 @@ namespace Render
 		{
 			glDisable(GL_DEPTH_TEST);
 		}
-
-		glDepthMask(this->renderState.depthwrite);
 
 	}
 }
