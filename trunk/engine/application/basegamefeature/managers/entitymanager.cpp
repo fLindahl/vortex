@@ -72,4 +72,10 @@ double EntityManager::TimeSinceLastUpdate()
 	return (((float)clock() - lastUpdateTime) / CLOCKS_PER_SEC);
 }
 
+std::shared_ptr<Game::Entity> EntityManager::GetEntityByID(const uint& id)
+{
+	_assert(this->EntityList.count(id) > 0, "ERROR: No Entity with this ID exists!");
+	return this->EntityList[id];
+}
+
 }

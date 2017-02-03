@@ -23,7 +23,8 @@ namespace Render
 
 		//GL_DEPTH_TEST
 		GLboolean depthtest = GL_FALSE;
-		GLenum depthfunc = GL_LESS;
+		GLenum depthfunc = GL_LEQUAL;
+		GLboolean depthwrite = GL_TRUE;
 	};
 
     /*
@@ -31,15 +32,16 @@ namespace Render
      */
 	const char ShaderHeader[] =
 		"#version 430\n"
+		"#define TILE_SIZE 16\n"
 		"layout (std140, binding = 0) uniform GlobalBlock\n"
 		"{\n"
-		"#define TILE_SIZE 16\n"
 		"mat4 " VORTEX_SEMANTIC_VIEW ";\n"
 		"mat4 " VORTEX_SEMANTIC_PROJECTION ";\n"
 		"mat4 " VORTEX_SEMANTIC_VIEWPROJECTION ";\n"
 		"mat4 " VORTEX_SEMANTIC_INVVIEW ";\n"
 		"mat4 " VORTEX_SEMANTIC_INVPROJECTION ";\n"
 		"mat4 " VORTEX_SEMANTIC_INVVIEWPROJECTION ";\n"
+		"mat4 " VORTEX_SEMANTIC_VIEWTOTEXTURESPACE ";\n"
 		"vec4 " VORTEX_SEMANTIC_CAMERAPOSITION ";\n"
 		"ivec2 " VORTEX_SEMANTIC_SCREENSIZE ";\n"
 		"vec2 " VORTEX_SEMANTIC_TIMEANDRANDOM ";\n"

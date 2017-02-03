@@ -27,16 +27,11 @@ void FlatGeometryLitPass::Execute()
 	//Just use the regular draw pass at the moment
 	this->BindFrameBuffer();
 
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	//Because we're using the old depthbuffer from the depth prepass, we need to allow equal depth values, or clear the depth buffer. clearing would mean redundant work however.
-	glDepthFunc(GL_LEQUAL);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	DrawPass::Execute();
 
     FramePass::Execute();
-
-	glDepthFunc(GL_LESS);
 }
 
 void FlatGeometryLitPass::Setup()
@@ -45,7 +40,7 @@ void FlatGeometryLitPass::Setup()
 
 	glGenTextures(1, &this->buffer);
 	glBindTexture(GL_TEXTURE_2D, this->buffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -55,7 +50,7 @@ void FlatGeometryLitPass::Setup()
 
 	glGenTextures(1, &this->normalBuffer);
 	glBindTexture(GL_TEXTURE_2D, this->normalBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -98,10 +93,10 @@ void FlatGeometryLitPass::UpdateResolution()
 	const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
 
 	glBindTexture(GL_TEXTURE_2D, this->buffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newRes.x, newRes.y, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newRes.x, newRes.y, 0, GL_RGBA, GL_FLOAT, NULL);
 	
 	glBindTexture(GL_TEXTURE_2D, this->normalBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, newRes.x, newRes.y, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, newRes.x, newRes.y, 0, GL_RGB, GL_FLOAT, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, this->specularBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, newRes.x, newRes.y, 0, GL_RGBA, GL_FLOAT, NULL);

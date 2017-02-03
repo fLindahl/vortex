@@ -11,6 +11,7 @@ SET(files_application_basegamefeature
 	basegamefeature/managers/envmanager.cpp	
 	basegamefeature/keyhandler.h
 	basegamefeature/keyhandler.cpp
+	basegamefeature/iniparser.h
 	)
 
 SET(files_application_game

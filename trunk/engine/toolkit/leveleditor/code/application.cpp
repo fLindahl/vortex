@@ -35,7 +35,11 @@ Application::Application()
 
 	this->rayStart = Math::vec4::zerovector();
 	this->rayEnd = Math::vec4::zerovector();
+	this->reflectStart = Math::vec4::zerovector();
+	this->reflectEnd = Math::vec4::zerovector();
 	hit.object = nullptr;
+
+	this->pickingPixels = new GLuint[1920 * 1020];
 }
 
 //------------------------------------------------------------------------------
@@ -54,7 +58,9 @@ Application::Open()
 {
 	this->window = new Display::Window;
 	// Initiate everything we need
-	//Always call app::open after initializing a glfwwindow
+	RenderDevice::Instance()->SetPickingEnabled(true);
+
+	//Always call app::open _AFTER_ initializing a glfwwindow
 	if (this->window->Open() && App::Open())
 	{
 		keyhandler = BaseGameFeature::KeyHandler::Instance();
@@ -77,8 +83,33 @@ Application::Open()
 		this->sponza->Activate();
 		Math::mat4 sTransform = Math::mat4::scaling(0.01f, 0.01f, 0.01f);
 		sTransform.translate(Math::vector(0.0f, -2.0f, 0.0f));
-
 		this->sponza->SetTransform(sTransform);
+
+		//this->wall1 = std::make_shared<Game::StaticEntity>();
+		//this->wall2 = std::make_shared<Game::StaticEntity>();
+		//this->wall3 = std::make_shared<Game::StaticEntity>();
+		//this->wall4 = std::make_shared<Game::StaticEntity>();
+		//this->floor = std::make_shared<Game::StaticEntity>();
+		//this->ceiling = std::make_shared<Game::StaticEntity>();
+		//this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->wall2->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->wall3->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->wall4->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->floor->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->ceiling->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->wall1->Activate();
+		//this->wall2->Activate();
+		//this->wall3->Activate();
+		//this->wall4->Activate();
+		//this->floor->Activate();
+		//this->ceiling->Activate();
+		//wall1->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
+		//wall2->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(10.0f, 8.0f, 0.0f)));
+		//wall3->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(-10.0f, 8.0f, 0.0f)));
+		//wall4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
+		//floor->SetTransform(Math::mat4::translation(0.0f, -2.0f, 0.0f));
+		//ceiling->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
+
 
 		PointLight pLight;
 		pLight.position = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -150,7 +181,8 @@ Application::Run()
 			CameraMovement();
 		}
 
-		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		Debug::DebugRenderer::Instance()->DrawLine(this->reflectStart, this->reflectEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		
 		if (this->hit.object != nullptr)
 		{

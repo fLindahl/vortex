@@ -1,11 +1,16 @@
 <Vortex>
     <Shaders>
 		
-		<!-- SHADER OBJECTS -->
-		
+		<!-- STATIC GEOMETRY -->
 		<Shader name="depthStatic" desc="Default shader for writing to the depth buffer">
 			<VertexShader name="resources/shaders/vertex/depthstatic.vert"/>
 			<FragmentShader name="resources/shaders/fragment/depth.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
+		<Shader name="picking" desc="Default shader for writing ID to a render buffer">
+			<VertexShader name="resources/shaders/vertex/picking.vert"/>
+			<FragmentShader name="resources/shaders/fragment/picking.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		
@@ -14,13 +19,29 @@
 			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
+		<!-- END STATIC GEOMETRY -->
 		
-		<Shader name="toonShader" desc="Shader for rendering cartoon-like lit geometry">    
-			<VertexShader name="resources/shaders/vertex/static.vert"/>
-			<FragmentShader name="resources/shaders/fragment/toonshader.frag"/>
-			<RenderState name="resources/shaders/states/opaque.state"/>
+		<!-- BILLBOARDS -->
+		<Shader name="icon" desc="Renders an unlit icon that always faces the camera">
+			<VertexShader name="resources/shaders/vertex/billboard.vert"/>
+			<FragmentShader name="resources/shaders/fragment/unlit.frag"/>
+			<RenderState name="resources/shaders/states/alphacutout.state"/>
 		</Shader>
 		
+		<Shader name="pickingBillboard" desc="Billboard shader for writing ID to a render buffer">
+			<VertexShader name="resources/shaders/vertex/billboard.vert"/>
+			<FragmentShader name="resources/shaders/fragment/picking.frag"/>
+			<RenderState name="resources/shaders/states/alphacutout.state"/>
+		</Shader>
+		
+		<Shader name="depthBillboard" desc="Renders a billboard to the depth buffer">
+			<VertexShader name="resources/shaders/vertex/billboard.vert"/>
+			<FragmentShader name="resources/shaders/fragment/depthBillboard.frag"/>
+			<RenderState name="resources/shaders/states/alphacutout.state"/>
+		</Shader>
+		<!-- END BILLBOARDS -->
+		
+		<!-- DEBUG -->
 		<Shader name="outline" desc="Shader for rendering outlines">    
 			<VertexShader name="resources/shaders/vertex/depthstatic.vert"/>
 			<FragmentShader name="resources/shaders/fragment/outline.frag"/>
@@ -44,7 +65,7 @@
 			<FragmentShader name="resources/shaders/fragment/light_debug.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
-		
+		<!-- END DEBUG -->
 		
 		<!-- --------------- -->
 		<!-- COMPUTE SHADERS -->
