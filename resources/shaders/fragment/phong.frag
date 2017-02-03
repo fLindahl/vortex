@@ -22,22 +22,42 @@ struct PointLight
 	vec4 radiusAndPadding;
 };
 
+struct SpotLight 
+{
+    vec4 color;
+	vec4 position;
+	vec4 coneDirection;
+	float length;
+	float attenuation;
+	float radius;
+	float padding;
+};
+
 struct VisibleIndex 
 {
 	int index;
 };
 
 // Shader storage buffer objects
-layout(std430, binding = 1) readonly buffer LightBuffer 
+layout(std430, binding = 1) readonly buffer PointLightBuffer 
 {
 	PointLight data[];
-} lightBuffer;
+} pointLightBuffer;
 
-layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer 
+layout(std430, binding = 2) readonly buffer SpotLightBuffer 
+{
+	SpotLight data[];
+} spotLightBuffer;
+
+layout(std430, binding = 3) readonly buffer VisiblePointLightIndicesBuffer 
 {
 	VisibleIndex data[];
-} visibleLightIndicesBuffer;
+} visiblePointLightIndicesBuffer;
 
+layout(std430, binding = 4) readonly buffer VisibleSpotLightIndicesBuffer 
+{
+	VisibleIndex data[];
+} visibleSpotLightIndicesBuffer;
 
 // parameters of the light and possible values
 const vec3 u_lightAmbientIntensity = vec3(0.1f, 0.1f, 0.1f);
@@ -76,19 +96,65 @@ void main()
 	
 	vec3 V = normalize(CameraPosition.xyz - FragmentPos.xyz);
 	
-	uint offset = index * 1024;
-	for (uint i = 0; i < 1024 && visibleLightIndicesBuffer.data[offset + i].index != -1; i++) 
+	/// Loop for Point Lights
+	uint offset = index * 512;
+	for (uint i = 0; i < 512 && visiblePointLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
-		uint lightIndex = visibleLightIndicesBuffer.data[offset + i].index;
-		PointLight light = lightBuffer.data[lightIndex];
-
-		vec3 L = light.position.xyz - FragmentPos.xyz;
+		uint lightIndex = visiblePointLightIndicesBuffer.data[offset + i].index;
+		PointLight light = pointLightBuffer.data[lightIndex];
 		
+		vec3 L = light.position.xyz - FragmentPos.xyz;
+
 		float attenuation = attenuate(L, light.radiusAndPadding.x);
 
 		L = normalize(L);
 		float diffuse = max(dot(L, N), 0.0);
 		float specular = 0.0f;
+
+		//Hope this looks better with shadows...
+		//if(diffuse > 0.0f)
+		//{
+			vec3 H = normalize(L + V);
+			specular = pow(max(dot(H, N), 0.0), shininess);		
+		//}
+
+		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
+		
+		color.rgb += irradiance;
+	}
+	
+	/// Loop for SpotLights
+	for (uint i = 0; i < 512 && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
+	{
+		uint lightIndex = visibleSpotLightIndicesBuffer.data[offset + i].index;
+		SpotLight light = spotLightBuffer.data[lightIndex];
+		/// Light Direction
+		vec3 L = light.position.xyz - FragmentPos.xyz;
+
+		float attenuation = attenuate(L, light.radius);
+		
+		L = normalize(L);
+		float diffuse = max(dot(L, N), 0.0);
+		float specular = 0.0f;
+		
+		//attenuation = attenuate(L, light.radius);
+		/// Calculate the Attenuation of the Spotlight
+        //float distance = length(light.position.xyz - FragmentPos.xyz);
+        //float attenuation = 1.0 / (1.0 + light.attenuation * (distance * distance));
+
+		/// If the light is outside of the cirlce. Do not draw it.
+		float lightToSurfaceAngle = degrees(acos(dot(-L, normalize(light.coneDirection.xyz))));
+		if(lightToSurfaceAngle > light.radius)
+		{
+			attenuation = 0.0;
+		}
+		
+		/// If the light is outside of the length of the light. Do not draw it.
+		/*float lightToSurface = dot(light.position.xyz, L);
+		if(lightToSurface > light.length)
+		{
+			attenuation = 0.0;
+		}*/
 		
 		//Hope this looks better with shadows...
 		//if(diffuse > 0.0f)
@@ -96,7 +162,7 @@ void main()
 			vec3 H = normalize(L + V);
 			specular = pow(max(dot(H, N), 0.0), shininess);		
 		//}
-		
+
 		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
 		color.rgb += irradiance;
 	}

@@ -68,6 +68,13 @@ private:
 	
 	std::shared_ptr<Game::ModelEntity> sponza;
 
+	std::shared_ptr<Game::ModelEntity> wall1;
+	std::shared_ptr<Game::ModelEntity> wall2;
+	std::shared_ptr<Game::ModelEntity> wall3;
+	std::shared_ptr<Game::ModelEntity> wall4;
+	std::shared_ptr<Game::ModelEntity> floor;
+	std::shared_ptr<Game::ModelEntity> ceiling;
+
 	BaseGameFeature::KeyHandler* keyhandler;
 	
 	Edit::CommandManager* commandManager;

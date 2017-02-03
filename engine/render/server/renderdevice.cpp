@@ -44,7 +44,8 @@ void RenderDevice::SetRenderResolution(const Resolution& res)
 	Graphics::MainCamera::Instance()->UpdateProjectionMatrix();
 	FrameServer::Instance()->UpdateResolutions();
 	LightServer::Instance()->UpdateWorkGroups();
-	LightServer::Instance()->UpdateLightBuffer();
+	LightServer::Instance()->UpdatePointLightBuffer();
+	LightServer::Instance()->UpdateSpotLightBuffer();
 }
 
 void RenderDevice::SetRenderResolution(const int& x, const int& y)
@@ -127,9 +128,7 @@ void RenderDevice::Render(bool drawToScreen)
 	//Reflections
 	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->reflectionPass;
 	auto reflectionPass = ref.lock();
-	reflectionPass->Execute();
-
-
+	//reflectionPass->Execute();
 
 	//-------------------
 	// Render Debug Shapes!
