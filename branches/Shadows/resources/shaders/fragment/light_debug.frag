@@ -15,7 +15,7 @@ layout(std430, binding = 1) readonly buffer LightBuffer{
 
 layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer{
 	VisibleIndex data[];
-} visibleLightIndicesBuffer;
+} visiblePointLightIndicesBuffer;
 
 uniform int totalLightCount;
 
@@ -29,7 +29,7 @@ void main() {
 
 	uint offset = index * 1024;
 	uint i;
-	for (i = 0; i < 1024 && visibleLightIndicesBuffer.data[offset + i].index != -1; i++);
+	for (i = 0; i < 1024 && visiblePointLightIndicesBuffer.data[offset + i].index != -1; i++);
 
 	float ratio = float(i) / float(totalLightCount);
 	fragColor = vec4(vec3(ratio, ratio, ratio), 1.0);

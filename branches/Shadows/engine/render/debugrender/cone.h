@@ -37,7 +37,6 @@ inline RenderCone::~RenderCone()
 
 inline void RenderCone::SetupBuffers()
 {
-
 	const int meshSize = 63;
 
 	const GLfloat mesh[meshSize] =
