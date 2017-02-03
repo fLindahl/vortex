@@ -28,11 +28,10 @@ void PickingPass::Execute()
 	this->BindFrameBuffer();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	//Because we're using the old depthbuffer from the depth prepass, we need to allow equal depth values, or clear the depth buffer. clearing would mean redundant work however.
-	glDepthFunc(GL_LEQUAL);
-
 	glUseProgram(this->shader->GetProgram());
 	
+	this->shader->EnableRenderState();
+
 	for (Material* material : this->materials)
 	{
 		for (auto surface : material->SurfaceList())
@@ -53,8 +52,6 @@ void PickingPass::Execute()
 			}
 		}
 	}
-
-	glDepthFunc(GL_LESS);
 
 	//Unbind Depth FrameBufferObject
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

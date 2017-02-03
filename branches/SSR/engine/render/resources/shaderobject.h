@@ -38,6 +38,8 @@ public:
 	void setUni1f(const float& f, const char* uniformName);
 
 	GLuint GetProgram();
+
+	void EnableRenderState();
 	
 private:
 	ShaderObjectType type;

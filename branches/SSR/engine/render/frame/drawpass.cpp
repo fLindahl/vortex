@@ -38,14 +38,14 @@ void DrawPass::Execute()
             glUseProgram(currentProgram);
         }
 
-        //TODO: Renderstates?
+		shader->EnableRenderState();
 
-        //TODO: Per surface
         for (auto surface : material->SurfaceList())
         {
             for (uint i = 0; i < surface->TextureList().Size(); i++)
             {
 				surface->TextureList()[i]->BindTexture(i);
+				//TODO: This is kinda bad
 				if (i == 0)
 					glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_ALBEDOMAP), i);
 				else if (i == 1)

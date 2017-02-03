@@ -135,33 +135,184 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 			return RenderState();
 		}
 
-		std::string content = ReadFromFile(file);
-		if (content.empty())
-		{
-			_assert(false, "ERROR: .state file is empty!");
-			return RenderState();
-		}
-
 		RenderState state;
 
-		std::ifstream fin(content);
+		std::ifstream fin(file);
 		std::string line;
 		std::istringstream sin;
 		
+		std::string sVal;
+		float fVal;
+
 		while (std::getline(fin, line))
 		{
 			sin.str(line.substr(line.find("=") + 1));
-			if (line.find("cullface") != std::string::npos) { sin >> state.cullface; }
-			else if (line.find("frontface") != std::string::npos) { sin >> state.frontface; }
-			else if (line.find("cullmode") != std::string::npos) { sin >> state.cullmode; }
-			else if (line.find("blend") != std::string::npos) { sin >> state.blend; }
-			else if (line.find("blendsourcefunc") != std::string::npos) { sin >> state.blendsourcefunc; }
-			else if (line.find("blenddestinationfunc") != std::string::npos) { sin >> state.blenddestinationfunc; }
-			else if (line.find("alphatest") != std::string::npos) { sin >> state.alphatest; }
-			else if (line.find("alphafunc") != std::string::npos) { sin >> state.alphafunc; }
-			else if (line.find("alphaclamp") != std::string::npos) { sin >> state.alphaclamp; }
-			else if (line.find("depthtest") != std::string::npos) { sin >> state.depthtest; }
-			else if (line.find("depthfunc") != std::string::npos) { sin >> state.depthfunc; }
+			if (line.find("CullFace ") != std::string::npos) 
+			{
+				sin >> sVal;
+				GLboolean glVal;
+
+				if (sVal == "true") { glVal = GL_TRUE; }
+				else if (sVal == "false") { glVal = GL_FALSE; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in CullFace value!\n"); }
+
+				state.cullface = glVal;
+			}
+			else if (line.find("FrontFace ") != std::string::npos)
+			{
+				sin >> sVal;
+				GLenum glVal;
+
+				if (sVal == "cw") { glVal = GL_CW; }
+				else if (sVal == "ccw") { glVal = GL_CCW; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in FrontFace value!\n"); }
+
+				state.frontface = glVal;
+			}
+			else if (line.find("CullMode ") != std::string::npos) 
+			{
+				sin >> sVal; 
+				GLenum glVal;
+
+				if (sVal == "back") { glVal = GL_BACK; }
+				else if (sVal == "front") { glVal = GL_FRONT; }
+				else if (sVal == "front_and_back") { glVal = GL_FRONT_AND_BACK; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in CullMode value!\n"); }
+
+				state.cullmode = glVal;
+			}
+			else if (line.find("Blend ") != std::string::npos) 
+			{
+				sin >> sVal;
+				GLboolean glVal;
+
+				if (sVal == "true") { glVal = GL_TRUE; }
+				else if (sVal == "false") { glVal = GL_FALSE; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in Blend value!\n"); }
+
+				state.blend = glVal;
+			}
+			else if (line.find("BlendSourceFunc ") != std::string::npos) 
+			{
+				sin >> sVal;
+				GLenum glVal;
+
+				if (sVal == "zero") { glVal = GL_ZERO; }
+				else if (sVal == "one") { glVal = GL_ONE; }
+				else if (sVal == "src_color") { glVal = GL_SRC_COLOR; }
+				else if (sVal == "one_minus_src_color") { glVal = GL_ONE_MINUS_SRC_COLOR; }
+				else if (sVal == "dst_color") { glVal = GL_DST_COLOR; }
+				else if (sVal == "one_minus_dst_color") { glVal = GL_ONE_MINUS_DST_COLOR; }
+				else if (sVal == "src_alpha") { glVal = GL_SRC_ALPHA; }
+				else if (sVal == "one_minus_src_alpha") { glVal = GL_ONE_MINUS_SRC_ALPHA; }
+				else if (sVal == "dst_alpha") { glVal = GL_DST_ALPHA; }
+				else if (sVal == "one_minus_dst_alpha") { glVal = GL_ONE_MINUS_DST_ALPHA; }
+				else if (sVal == "constant_color") { glVal = GL_CONSTANT_COLOR; }
+				else if (sVal == "one_minus_constant_color") { glVal = GL_ONE_MINUS_CONSTANT_COLOR; }
+				else if (sVal == "constant_alpha") { glVal = GL_CONSTANT_ALPHA; }
+				else if (sVal == "one_minus_constant_alpha") { glVal = GL_ONE_MINUS_CONSTANT_ALPHA; }
+				else if (sVal == "src_alpha_saturate") { glVal = GL_SRC_ALPHA_SATURATE; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in BlendSourceFunc value!\n"); }
+
+				state.blendsourcefunc = glVal;
+			}
+			else if (line.find("BlendDestinationFunc ") != std::string::npos)
+			{
+				sin >> sVal;
+				GLenum glVal;
+
+				if (sVal == "zero") { glVal = GL_ZERO; }
+				else if (sVal == "one") { glVal = GL_ONE; }
+				else if (sVal == "src_color") { glVal = GL_SRC_COLOR; }
+				else if (sVal == "one_minus_src_color") { glVal = GL_ONE_MINUS_SRC_COLOR; }
+				else if (sVal == "dst_color") { glVal = GL_DST_COLOR; }
+				else if (sVal == "one_minus_dst_color") { glVal = GL_ONE_MINUS_DST_COLOR; }
+				else if (sVal == "src_alpha") { glVal = GL_SRC_ALPHA; }
+				else if (sVal == "one_minus_src_alpha") { glVal = GL_ONE_MINUS_SRC_ALPHA; }
+				else if (sVal == "dst_alpha") { glVal = GL_DST_ALPHA; }
+				else if (sVal == "one_minus_dst_alpha") { glVal = GL_ONE_MINUS_DST_ALPHA; }
+				else if (sVal == "constant_color") { glVal = GL_CONSTANT_COLOR; }
+				else if (sVal == "one_minus_constant_color") { glVal = GL_ONE_MINUS_CONSTANT_COLOR; }
+				else if (sVal == "constant_alpha") { glVal = GL_CONSTANT_ALPHA; }
+				else if (sVal == "one_minus_constant_alpha") { glVal = GL_ONE_MINUS_CONSTANT_ALPHA; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in BlendSourceFunc value!\n"); }
+
+				state.blenddestinationfunc = glVal;
+			}
+			else if (line.find("AlphaTest ") != std::string::npos) 
+			{
+				sin >> sVal;
+				GLboolean glVal;
+
+				if (sVal == "true") { glVal = GL_TRUE; }
+				else if (sVal == "false") { glVal = GL_FALSE; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in AlphaTest value!\n"); }
+
+				state.alphatest = glVal;
+			}
+			else if (line.find("AlphaFunc ") != std::string::npos)
+			{
+				sin >> sVal;
+				GLenum glVal;
+
+				if (sVal == "never") { glVal = GL_NEVER; }
+				else if (sVal == "less") { glVal = GL_LESS; }
+				else if (sVal == "equal") { glVal = GL_EQUAL; }
+				else if (sVal == "lequal") { glVal = GL_LEQUAL; }
+				else if (sVal == "greater") { glVal = GL_GREATER; }
+				else if (sVal == "notequal") { glVal = GL_NOTEQUAL; }
+				else if (sVal == "gequal") { glVal = GL_GEQUAL; }
+				else if (sVal == "always") { glVal = GL_ALWAYS; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in AlphaFunc value!\n"); }
+
+				state.alphafunc = glVal; 
+			}
+			else if (line.find("AlphaClamp ") != std::string::npos) 
+			{
+				sin >> fVal;
+				_assert((fVal > 0.0f || fVal < 1.0f), "[SHADER LOAD ERROR]: [STATE LOAD]: AlphaClamp value can not be less than 0.0 or greater than 1.0!\n");
+				state.alphaclamp = fVal;
+			}
+			else if (line.find("DepthTest ") != std::string::npos)
+			{
+				sin >> sVal;
+				GLboolean glVal;
+
+				if (sVal == "true") { glVal = GL_TRUE; }
+				else if (sVal == "false") { glVal = GL_FALSE; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthTest value!\n"); }
+
+				state.depthtest = glVal; 
+			}
+			else if (line.find("DepthFunc ") != std::string::npos) 
+			{
+				sin >> sVal;
+				GLenum glVal;
+
+				if (sVal == "never") { glVal = GL_NEVER; }
+				else if (sVal == "less") { glVal = GL_LESS; }
+				else if (sVal == "equal") { glVal = GL_EQUAL; }
+				else if (sVal == "lequal") { glVal = GL_LEQUAL; }
+				else if (sVal == "greater") { glVal = GL_GREATER; }
+				else if (sVal == "notequal") { glVal = GL_NOTEQUAL; }
+				else if (sVal == "gequal") { glVal = GL_GEQUAL; }
+				else if (sVal == "always") { glVal = GL_ALWAYS; }
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthFunc value!\n"); }
+
+				state.depthfunc = glVal; 
+			}
+			else if (line.find("DepthWrite ") != std::string::npos)
+			{
+				sin >> sVal;
+				GLboolean glVal;
+
+				if (sVal == "true") { glVal = GL_TRUE; }
+				else if (sVal == "false") { glVal = GL_FALSE; }				
+				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthWrite value!\n"); }
+
+				state.depthwrite = glVal;
+			}
+
 			sin.clear();
 		}
 

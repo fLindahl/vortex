@@ -23,7 +23,8 @@ namespace Render
 
 		//GL_DEPTH_TEST
 		GLboolean depthtest = GL_FALSE;
-		GLenum depthfunc = GL_LESS;
+		GLenum depthfunc = GL_LEQUAL;
+		GLboolean depthwrite = GL_TRUE;
 	};
 
     /*

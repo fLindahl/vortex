@@ -39,7 +39,8 @@ void DepthPass::Execute()
             glUseProgram(currentProgram);
         }
 
-        //TODO: Renderstates?
+		shader->EnableRenderState();
+
         for (auto surface : material->SurfaceList())
         {
             for (auto modelNode : surface->GetModelNodes())
@@ -61,39 +62,6 @@ void DepthPass::Execute()
 
 	//Unbind Depth FrameBufferObject
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	//glBindTexture(GL_TEXTURE_2D, this->linearDepthBuffer);
-	//glGenerateMipmap(GL_TEXTURE_2D);
-	//glBindTexture(GL_TEXTURE_2D, 0);
-
-	/*
-
-	// generate cone map depth buffer compute shader
-	glUseProgram(this->genDepthConeMapComputeProgram);
-
-	// Bind depth map texture to texture location 4 (which will not be used by any model texture)
-	glActiveTexture(GL_TEXTURE4);
-	glUniform1i(glGetUniformLocation(genDepthConeMapComputeProgram, "depthMap"), 4);
-
-	glBindTexture(GL_TEXTURE_2D, this->buffer);
-
-	const GLint location = glGetUniformLocation(genDepthConeMapComputeProgram, "coneMap");
-	if (location == -1){
-		printf("Could not locate uniform location for texture in genDepthConeMapComputeProgram");
-	}
-
-	glUniform1i(location, 0);
-	glBindImageTexture(0, this->depthConeMap, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-	 
-	// Dispatch the compute shader, using the workgroup values calculated earlier
-	// TODO: This shouldnt be lightserver work groups.
-	glDispatchCompute(LightServer::Instance()->GetWorkGroupsX(), LightServer::Instance()->GetWorkGroupsY(), 1);
-
-	// Unbind the depth map
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	*/
 
     FramePass::Execute();
 }
