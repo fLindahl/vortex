@@ -11,6 +11,13 @@ namespace Render{ class ShaderObject; }
 namespace Particles
 {
 
+enum EmitterShapes
+{
+	CONE,
+	SPHERE,
+	HEMISPHERE
+};
+
 struct ParticleState
 {
 	Math::vec4 pos = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -48,6 +55,8 @@ struct ParticleUISettings
 
 	float startSize = 0.05f;
 	float endSize = 0.05f;
+
+	EmitterShapes shapes = CONE;
 
 };
 
