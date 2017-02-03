@@ -14,7 +14,7 @@ class FramePass;
 class DepthPass;
 class DrawPass;
 class FlatGeometryLitPass;
-class LightDebugPass;
+class PickingPass;
 class ReflectionPass;
 
 class FrameServer
@@ -45,6 +45,8 @@ public:
 	std::shared_ptr<FramePass> GetLightCullingPass();
 	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
 	std::shared_ptr<ReflectionPass> GetReflectionPass();
+	std::shared_ptr<PickingPass> GetPickingPass();
+
 
 private:
 	friend class RenderDevice;
@@ -65,7 +67,7 @@ private:
 	std::shared_ptr<FramePass> lightCullingPass;
 	//GLuint lightCullingProgram;
 
-	std::shared_ptr<LightDebugPass> lightdebugpass;
+	std::shared_ptr<PickingPass> pickingPass;
 
 	/// For lit objects
 	std::shared_ptr<FlatGeometryLitPass> FlatGeometryLit;

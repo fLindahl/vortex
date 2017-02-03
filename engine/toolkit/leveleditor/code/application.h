@@ -58,6 +58,8 @@ private:
 	
 	Math::point rayStart;
 	Math::point rayEnd;
+	Math::point reflectStart;
+	Math::point reflectEnd;
 	Physics::PhysicsHit hit;
 	
 	/// ImGui functions
@@ -68,10 +70,19 @@ private:
 	
 	std::shared_ptr<Game::ModelEntity> sponza;
 
+	std::shared_ptr<Game::StaticEntity> wall1;
+	std::shared_ptr<Game::StaticEntity> wall2;
+	std::shared_ptr<Game::StaticEntity> wall3;
+	std::shared_ptr<Game::StaticEntity> wall4;
+	std::shared_ptr<Game::StaticEntity> floor;
+	std::shared_ptr<Game::StaticEntity> ceiling;
+	
 	BaseGameFeature::KeyHandler* keyhandler;
 	
 	Edit::CommandManager* commandManager;
 
 	Display::Window* window;
+
+	GLuint* pickingPixels;
 };
 } // namespace LevelEditor
