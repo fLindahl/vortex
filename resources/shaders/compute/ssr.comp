@@ -35,126 +35,6 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 						 out vec3 hitPoint
 						 )
 {
-	/*
-	float nearPlaneZ = -0.05f;
-
-	// Clip with near plane
-	float rayLength = ((rayOrigin.z + rayDirection.z * maxDistance) > nearPlaneZ) ? (nearPlaneZ - rayOrigin.z) / rayDirection.z : maxDistance;
-
-
-    vec3 viewSpaceEndPoint = rayOrigin + rayDirection * rayLength;
-
-	float sx = float(ScreenSize.x) * 0.5f;
-	float sy = float(ScreenSize.y) * 0.5f;
-
-	mat4 scrScale = mat4(sx, 0.0f, 0.0f, 0.0f,
-						 0.0f, sy, 0.0f, 0.0f,
-						 0.0f, 0.0f, 1.0f, 0.0f,
-						 sx, sy, 0.0f, 1.0f);
-
-	mat4 proj = (scrScale * Projection);
-
-	// Project into homogeneous clip space
-    vec4 H0 = proj * vec4(rayOrigin, 1.0);
-	vec4 H1 = proj * vec4(viewSpaceEndPoint, 1.0);
-
-    float k0 = 1.0 / H0.w;
-	float k1 = 1.0 / H1.w;
-
-    // The interpolated homogeneous version of the camera-space points
-    vec3 Q0 = rayOrigin * k0;
-	vec3 Q1 = viewSpaceEndPoint * k1;
-
-    // Screen-space endpoints
-    vec2 P0 = H0.xy * k0;
-	vec2 P1 = H1.xy * k1;
-
-    // If the line is degenerate, make it cover at least one pixel
-    // to avoid handling zero-pixel extent as a special case later
-    P1 += vec2((distanceSquared(P0, P1) < 0.0001) ? 0.01 : 0.0);
-    vec2 delta = P1 - P0;
-
-    // Permute so that the primary iteration is in x to collapse
-    // all quadrant-specific DDA cases later
-    bool permute = false;
-    if (abs(delta.x) < abs(delta.y))
-	{
-        // This is a more-vertical line
-        permute = true;
-		delta = delta.yx;
-		P0 = P0.yx;
-		P1 = P1.yx;
-    }
-
-    float stepDir = sign(delta.x);
-    float invdx = stepDir / delta.x;
-    vec2  dP = vec2(stepDir, delta.y * invdx);
-
-    // Track the derivatives of Q and k
-    vec3  dQ = (Q1 - Q0) * invdx;
-    float dk = (k1 - k0) * invdx;
-
-	float jitterF = 1 + jitter;
-
-    // Scale derivatives by the desired pixel stride and then
-    // offset the starting values by the jitter fraction
-    dP *= stride;
-	dQ *= stride;
-	dk *= stride;
-    P0 += dP * jitterF;
-	Q0 += dQ * jitterF;
-	k0 += dk * jitterF;
-
-    // Slide P from P0 to P1, (now-homogeneous) Q from Q0 to Q1, k from k0 to k1
-    vec3 Q = Q0;
-    float k = k0;
-
-    // Adjust end condition for iteration direction
-    float  end = P1.x * stepDir;
-
-    float stepCount = 0.0;
-	float prevZMaxEstimate = -rayOrigin.z;
-
-	//Set to zero
-	hitTexCoord = vec2(0.0,0.0);
-
-    float rayZMin = prevZMaxEstimate;
-	float rayZMax = prevZMaxEstimate;
-    float sceneZMax = rayZMax + 1e4;
-    for (vec2 P = P0; ((P.x * stepDir) <= end) && (stepCount < maxSteps) && ((rayZMax < sceneZMax - zThickness) || (rayZMin > sceneZMax)) && (sceneZMax != 0); P += dP, Q.z += dQ.z, k += dk, stepCount += 1.0f)
-	{
-        rayZMin = prevZMaxEstimate;
-        rayZMax = (dQ.z * 0.5 + Q.z) / (dk * 0.5 + k);
-        prevZMaxEstimate = rayZMax;
-        if (rayZMin > rayZMax)
-		{
-			//Swap
-			float t = rayZMin;
-			rayZMin = rayZMax;
-			rayZMax = t;
-        }
-
-        // You may need hitPixel.y = csZBufferSize.y - hitPixel.y; here if your vertical axis
-        // is different than ours in screen space
-        hitTexCoord = permute ? P.yx : P;
-		//hitTexCoord.y = ScreenSize.y - hitTexCoord.y;
-
-		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0)
-		{
-			break;
-		}
-
-		// TexelFetch wants texel position, not UVs
-        sceneZMax = -texelFetch(depthMap, ivec2(hitTexCoord), 0).r;
-    }
-
-    // Advance Q based on the number of steps
-    Q.xy += dQ.xy * stepCount;
-    hitPoint = Q * (1.0 / k);
-
-    return (rayZMax >= sceneZMax - zThickness) && (rayZMin <= sceneZMax);
-	*/
-
 	float nearPlane = -0.05f;
 
 	// Clip to the near plane
@@ -220,8 +100,12 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 
 	// Scale derivatives by the desired pixel stride and then
 	// offset the starting values by the jitter fraction
-	dP *= stride; dQ *= stride; dk *= stride;
-	P0 += dP * jitter; Q0 += dQ * jitter; k0 += dk * jitter;
+	dP *= stride;
+	dQ *= stride;
+	dk *= stride;
+	P0 += dP * jitter;
+	Q0 += dQ * jitter;
+	k0 += dk * jitter;
 
 	float i, zA = 0.0, zB = 0.0;
 
@@ -305,11 +189,6 @@ layout(local_size_x = THREADS_X, local_size_y = THREADS_Y, local_size_z = 1) in;
 void main()
 {
 	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
-	ivec2 itemID = ivec2(gl_LocalInvocationID.xy);
-	ivec2 tileID = ivec2(gl_WorkGroupID.xy);
-	ivec2 tileNumber = ivec2(gl_NumWorkGroups.xy);
-	uint index = tileID.y * tileNumber.x + tileID.x;
-	uint threadCount = THREADS_X * THREADS_Y;
 
 	//Per pixel on depthbuffer
 
@@ -320,7 +199,7 @@ void main()
 	vec3 worldNormal = (texelFetch(normalMap, location, 0).rgb);
 
 	//We need the normal to be in viewspace coordinates.
-	vec3 viewSpaceNormal = ((View * vec4(worldNormal, 0.0f)).rgb);
+	vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
 
 	float pixelDepth = texelFetch(depthMap, location, 0).r;
 
@@ -334,10 +213,10 @@ void main()
 
 	vec3 rayOrigin = viewSpacePosition * pixelDepth;
 
-	vec3 viewDir = normalize(rayOrigin.xyz);
+	vec3 viewDir = (rayOrigin.xyz);
 
 	//Reflect vector against normal
-	vec3 reflectionDir = normalize(reflect(viewDir, viewSpaceNormal));//normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir);
+	vec3 reflectionDir = (reflect(viewDir, viewSpaceNormal));//normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir);
 
 	vec2 hitTexCoord = vec2(0.0,0.0);
 	vec3 hitPoint = vec3(0.0,0.0,0.0);
@@ -361,17 +240,17 @@ void main()
 
 		vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
 
-		vec4 finalColor = vec4(BGColor, 1-roughness) + vec4(reflectionColor.rgb * specularAndRoughness.rgb * roughness, roughness);
+		//vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
 
-		//vec4 finalColor = vec4(reflectionColor.rgb, 1.0f);
+		vec4 finalColor = vec4(reflectionColor.rgb, 1.0f);
 
 		imageStore(reflectionImage, location, finalColor);
 	}
 	else
 	{
 		//Get fall-back value.
-		vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
-		//vec3 BGColor = vec3(1.0f,1.0f,0.0f);
+		//vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
+		vec3 BGColor = vec3(0.0f,0.0f,0.0f);
 		imageStore(reflectionImage, location, vec4(BGColor,1.0f));
 	}
 

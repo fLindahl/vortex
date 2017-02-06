@@ -176,6 +176,36 @@ namespace Toolkit
 		{
 			commandManager->Undo();
 		}
+		//Tools
+		if (!ImGui::GetIO().KeyCtrl)
+		{
+			bool switched = false;
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Q)))
+			{
+				this->currentTool = selectTool;
+				switched = true;
+			}
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_W)))
+			{
+				this->currentTool = translateTool;
+				switched = true;
+			}
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_E)))
+			{
+				//this->currentTool = rotateTool;
+				switched = true;
+			}
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_R)))
+			{
+				//this->currentTool = scaleTool;
+				switched = true;
+			}
+
+			if (switched && application->hit.object != nullptr)
+			{
+				this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+			}
+		}
 	}
 
 	void UserInterface::RenderDocks()
@@ -196,33 +226,46 @@ namespace Toolkit
 			ImGui::SetWindowSize(ImVec2(toolbarWidth, (float)application->window->GetHeight() - 16.0f), ImGuiSetCond_Once);
 			ImGui::SetWindowPos(ImVec2(0.0f, 16.0f), ImGuiSetCond_Once);
 
+			bool switched = false;
 			if (ImGui::ImageButton((void*)this->selectToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				this->currentTool = selectTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->translateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				this->currentTool = translateTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->rotateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = rotateTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->scaleToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = scaleTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->entityToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = entityTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->brushToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = brushTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->polygonEditTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = polygonEditTool;
+				switched = true;
+			}
+
+			if (switched && application->hit.object != nullptr)
+			{
+				this->currentTool->UpdateTransform(application->hit.object->GetTransform());
 			}
 
 			ImGui::End();
