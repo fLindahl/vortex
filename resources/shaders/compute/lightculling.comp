@@ -10,10 +10,11 @@ struct SpotLight
     vec4 color;
 	vec4 position;
 	vec4 coneDirection;
+	vec4 midPoint;
 	float length;
-	float attenuation;
 	float radius;
-	float padding;
+	float fRadius;
+	float angle;
 };
 
 struct VisibleIndex 
@@ -61,10 +62,11 @@ shared uint visiblePointLightCount;
 shared uint visibleSpotLightCount;
 shared vec4 frustumPlanes[6];
 // Shared local storage for visible indices, will be written out to the global buffer at the end
-shared int visiblePointLightIndices[512];
-shared int visibleSpotLightIndices[512];
+shared int visiblePointLightIndices[1024];
+shared int visibleSpotLightIndices[1024];
 
 layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;
+
 void main() 
 {
 	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
@@ -177,7 +179,7 @@ void main()
 			uint offset = atomicAdd(visiblePointLightCount, 1);
 			visiblePointLightIndices[offset] = int(lightIndex);
 		}
-	}
+	} 
 	
 	/// Spotlight Culling///
 	passCount = (spotLightCount + threadCount - 1) / threadCount;
@@ -189,30 +191,28 @@ void main()
 		{
 			break;
 		}
-
-		vec4 position = spotLightBuffer.data[lightIndex].position;
-		float radius = spotLightBuffer.data[lightIndex].radius;
-
-		// We check if the light exists in our frustum
+		
+		float radius = spotLightBuffer.data[lightIndex].fRadius;
+		vec4 mp = spotLightBuffer.data[lightIndex].midPoint;
+		
 		float distance = 0.0;
 		for (uint j = 0; j < 6; j++) 
 		{
-			distance = dot(position, frustumPlanes[j]) + radius;
-
-			// If one of the tests fails, then there is no intersection
+			distance = dot(mp, frustumPlanes[j]) + radius;
 			if (distance <= 0.0)
 			{
 				break;
 			}
 		}
-
-		// If greater than zero, then it is a visible light
+		
 		if (distance > 0.0) 
 		{
-			// Add index to the shared array of visible indices
 			uint offset = atomicAdd(visibleSpotLightCount, 1);
 			visibleSpotLightIndices[offset] = int(lightIndex);
 		}
+		/// Will be removed later
+		/*uint offset = atomicAdd(visibleSpotLightCount, 1);
+		visibleSpotLightIndices[offset] = int(lightIndex);*/
 	}
 
 	memoryBarrierShared();
@@ -221,13 +221,13 @@ void main()
 	if (gl_LocalInvocationIndex == 0) 
 	{
 		/// Point Lights
-		uint offset = index * 512; // Determine position in global buffer
+		uint offset = index * 1024; // Determine position in global buffer
 		for (uint i = 0; i < visiblePointLightCount; i++) 
 		{
 			visiblePointLightIndicesBuffer.data[offset + i].index = visiblePointLightIndices[i];
 		}
 
-		if (visiblePointLightCount != 512) 
+		if (visiblePointLightCount < 1024) 
 		{
 			// Unless we have totally filled the entire array, mark it's end with -1
 			// Final shader step will use this to determine where to stop (without having to pass the light count)
@@ -240,7 +240,7 @@ void main()
 			visibleSpotLightIndicesBuffer.data[offset + i].index = visibleSpotLightIndices[i];
 		}
 		
-		if (visibleSpotLightCount != 512) 
+		if (visibleSpotLightCount < 1024) 
 		{
 			visibleSpotLightIndicesBuffer.data[offset + visibleSpotLightCount].index = -1;
 		}

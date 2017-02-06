@@ -126,21 +126,22 @@ Application::Open()
 		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);*/
 
-		SpotLight sLight;
-		sLight.position = Math::vec4(3.0f, 2.9f, 0.0f, 0.0f);
+     	SpotLight sLight;
+	    sLight.position = Math::vec4(-8.0f, 2.9f, 0.0f, 0.0f);
 		sLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
-		sLight.length = 3.0f;
-		sLight.attenuation = 0.0001f;
-        sLight.radius = 10.0f;
+		sLight.length = 5.0f;
+        sLight.angle = 15.0f;
 		LightServer::Instance()->AddSpotLight(sLight);
 
-/*		sLight.position = Math::vec4(6.0f, 4.5f, 0.0f, 0.0f);
-		sLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		sLight.length = 100.0f;
+/*	    sLight.position = Math::vec4(-2.0f, 5.0f, 0.0f, 0.0f);
+		sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+		sLight.coneDirection = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		sLight.length = 15.0f;
+		sLight.angle = 25.0f;
 		LightServer::Instance()->AddSpotLight(sLight);
 
-		sLight.position = Math::vec4(1.1f, 4.0f, 0.0f, 0.0f);
+     	sLight.position = Math::vec4(1.1f, 4.0f, 0.0f, 0.0f);
 		sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 		sLight.coneDirection = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		LightServer::Instance()->AddSpotLight(sLight);
