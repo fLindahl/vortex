@@ -19,6 +19,7 @@
 #include "render/frame/depthpass.h"
 #include "render/frame/flatgeometrylitpass.h"
 #include "render/frame/reflectionpass.h"
+#include "render/frame/shadowmap.h"
 
 #ifdef _DEBUG
 	#include "render/frame/lightdebugpass.h"
@@ -126,13 +127,22 @@ void RenderDevice::Render(bool drawToScreen)
 	flatGeometryLitPass->Execute();
 
 	//Reflections
-	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->reflectionPass;
-	auto reflectionPass = ref.lock();
+	//std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->reflectionPass;
+	//auto reflectionPass = ref.lock();
 	//reflectionPass->Execute();
+
+	//SWARLEY
+	std::weak_ptr<ShadowMap> shad = FrameServer::Instance()->shadowmap;
+	auto shadowMap = shad.lock();
+	shadowMap->Execute();
+
+
 
 	//-------------------
 	// Render Debug Shapes!
+	flatGeometryLitPass->BindFrameBuffer();
 	Debug::DebugRenderer::Instance()->DrawCommands();
+
 
 	glViewport(0, 0, windowResolution.x, windowResolution.y);
 

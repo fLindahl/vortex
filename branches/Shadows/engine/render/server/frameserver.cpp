@@ -8,6 +8,7 @@
 #include "render/frame/flatgeometrylitpass.h"
 #include "render/frame/lightdebugpass.h"
 #include "render/frame/reflectionpass.h"
+#include "render/frame/shadowmap.h"
 
 namespace Render
 {
@@ -51,13 +52,21 @@ namespace Render
 		this->framePassByName.insert(std::make_pair(this->FlatGeometryLit->name, this->FlatGeometryLit));
 		this->framePasses.Append(this->FlatGeometryLit);
 
-		// FlatGeometryLit pass
+		// Reflection pass
 		this->reflectionPass = std::make_shared<ReflectionPass>();
 		this->reflectionPass->name = "Reflection";
 		this->reflectionPass->Setup();
 
 		this->framePassByName.insert(std::make_pair(this->reflectionPass->name, this->reflectionPass));
 		this->framePasses.Append(this->reflectionPass);
+
+		// Shadow map pass ///SWARLEY
+		this->shadowmap = std::make_shared<ShadowMap>();
+		this->shadowmap->name = "ShadowMap";
+		this->shadowmap->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->shadowmap->name, this->shadowmap));
+		this->framePasses.Append(this->shadowmap);
 
 		//Set final color buffer for easy access
 		RenderDevice::Instance()->SetFinalColorBuffer(this->FlatGeometryLit->buffer);
@@ -70,6 +79,7 @@ namespace Render
 		this->Depth->UpdateResolution();
 		this->FlatGeometryLit->UpdateResolution();		
 		this->reflectionPass->UpdateResolution();
+		this->shadowmap->UpdateResolution();
 	}
 
 	std::shared_ptr<FramePass> FrameServer::GetFramePass(const std::string& name)
@@ -78,7 +88,7 @@ namespace Render
 			return this->framePassByName[name];
 		else
 		{
-			printf("ERROR: No framepass named %s!\n", name);
+			printf("ERROR: No framepass named %s!\n", name.c_str());
 			assert(false);
 			return nullptr;
 		}
@@ -108,4 +118,10 @@ namespace Render
 	{
 		return this->reflectionPass;
 	}
+
+	std::shared_ptr<Render::ShadowMap> FrameServer::GetShadowMap()
+	{
+		return this->shadowmap;
+	}
+
 }
