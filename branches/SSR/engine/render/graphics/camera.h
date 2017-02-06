@@ -46,8 +46,8 @@ public:
 
 	Math::mat4 getViewToTextureSpace() const { return viewToTextureSpaceMatrix; }
 
-	Math::vec4 GetPosition() { return this->cameraPos; }
-	void SetPosition(const Math::vec4& pos) { this->cameraPos = pos; }
+	Math::vec4 GetPosition() const;
+	void SetPosition(const Math::point& pos);
 
 private:
 
@@ -65,8 +65,6 @@ private:
 
 	//For converting viewspace coordinates to screen pixel coordinates.
 	Math::mat4 viewToTextureSpaceMatrix;
-
-	Math::vec4 cameraPos;
 };
 
 }

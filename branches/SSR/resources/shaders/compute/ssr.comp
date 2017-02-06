@@ -9,8 +9,8 @@ layout(std140, binding = 1) uniform UniformBlock
 	float padding; // Just padding. Might not be needed because std140
 };
 
-#define THREADS_X 16
-#define THREADS_Y 16
+#define THREADS_X 32
+#define THREADS_Y 32
 
 // All the samplers we need!
 uniform sampler2D depthMap;
@@ -42,27 +42,20 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 
 	vec3 rayEnd = rayOrigin + rayDirection * rayLength;
 
-	float sx = float(ScreenSize.x) * 0.5f;
-	float sy = float(ScreenSize.y) * 0.5f;
-
-	mat4 scrScale = mat4(sx, 0.0f, 0.0f, 0.0f,
-						 0.0f, sy, 0.0f, 0.0f,
-						 0.0f, 0.0f, 1.0f, 0.0f,
-						 sx, sy, 0.0f, 1.0f);
-
-	mat4 proj = (scrScale * Projection);
-
 	// Project into homogeneous clip space
-	vec4 H0 = proj * vec4( rayOrigin, 1.0f);
-	vec4 H1 = proj * vec4( rayEnd, 1.0f);
+	vec4 H0 = ViewToTextureSpace * vec4( rayOrigin, 1.0f);
+	vec4 H1 = ViewToTextureSpace * vec4( rayEnd, 1.0f);
 
-	float k0 = 1.0 / H0.w, k1 = 1.0 / H1.w;
+	float k0 = 1.0 / H0.w;
+	float k1 = 1.0 / H1.w;
 
 	// The interpolated homogeneous version of the camera-space points
-	vec3 Q0 = rayOrigin * k0, Q1 = rayEnd * k1;
+	vec3 Q0 = rayOrigin * k0;
+	vec3 Q1 = rayEnd * k1;
 
 	// Screen-space endpoints
-	vec2 P0 = H0.xy * k0, P1 = H1.xy * k1;
+	vec2 P0 = H0.xy * k0;
+	vec2 P1 = H1.xy * k1;
 
 	// If the line is degenerate, make it cover at least one pixel
 	// to avoid handling zero-pixel extent as a special case later
@@ -77,7 +70,10 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	if (abs(delta.x) < abs(delta.y))
 	{
 		// This is a more-vertical line
-		permute = true; delta = delta.yx; P0 = P0.yx; P1 = P1.yx;
+		permute = true;
+		delta = delta.yx;
+		P0 = P0.yx;
+		P1 = P1.yx;
 	}
 
 	float stepDir = sign(delta.x);
@@ -88,15 +84,8 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	float dk = (k1 - k0) * invdx;
 	vec2  dP = vec2(stepDir, delta.y * invdx);
 
-	// Calculate pixel stride based on distance of ray origin from camera.
-	// Since perspective means distant objects will be smaller in screen space
-	// we can use this to have higher quality reflections for far away objects
-	// while still using a large pixel stride for near objects (and increase performance)
-	// this also helps mitigate artifacts on distant reflections when we use a large
-	// pixel stride.
 	//float strideScaler = 1.0 + min( 1.0, -rayOrigin.z / 100.0f);
 	//float pixelStride = 1.0 + strideScaler * stride;
-
 
 	// Scale derivatives by the desired pixel stride and then
 	// offset the starting values by the jitter fraction
@@ -107,7 +96,9 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	Q0 += dQ * jitter;
 	k0 += dk * jitter;
 
-	float i, zA = 0.0, zB = 0.0;
+	float i;
+	float zA = 0.0;
+	float zB = 0.0;
 
 	// Track ray step and derivatives in a float4 to parallelize
 	vec4 pqk = vec4( P0, Q0.z, k0);
@@ -116,7 +107,7 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 
 	float end = P1.x * stepDir;
 
-	for(i=0; i < maxSteps && intersect == false; i++)
+	for(i = 0; i < maxSteps && intersect == false; i++)
 	{
 		pqk += dPQK;
 
@@ -216,14 +207,11 @@ void main()
 	vec3 viewDir = (rayOrigin.xyz);
 
 	//Reflect vector against normal
-	vec3 reflectionDir = (reflect(viewDir, viewSpaceNormal));//normalize(-2 * dot(viewDir, viewSpaceNormal) * viewSpaceNormal + viewDir);
+	vec3 reflectionDir = (reflect(viewDir, viewSpaceNormal));
 
 	vec2 hitTexCoord = vec2(0.0,0.0);
 	vec3 hitPoint = vec3(0.0,0.0,0.0);
 
-	//vec2 uv2 = vec2(location);
-	//float c = (uv2.x + uv2.y) * jitter;//0.25;
-	//float jitterFraction = c - 1.0f * floor(c/1.0f);
 
 	if (TraceScreenSpaceRay(rayOrigin.xyz, reflectionDir, hitTexCoord, hitPoint))
 	{
@@ -240,17 +228,17 @@ void main()
 
 		vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
 
-		//vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
+		vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
 
-		vec4 finalColor = vec4(reflectionColor.rgb, 1.0f);
+		//vec4 finalColor = vec4(reflectionColor.rgb, 1.0f);
 
 		imageStore(reflectionImage, location, finalColor);
 	}
 	else
 	{
 		//Get fall-back value.
-		//vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
-		vec3 BGColor = vec3(0.0f,0.0f,0.0f);
+		vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
+		//vec3 BGColor = vec3(0.0f,0.0f,0.0f);
 		imageStore(reflectionImage, location, vec4(BGColor,1.0f));
 	}
 

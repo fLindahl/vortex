@@ -79,7 +79,7 @@ namespace Toolkit
 				if (ImGui::BeginMenu("Show"))
 				{
 					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
-					if (ImGui::MenuItem("Shader Debugger", NULL, &showStatistics)) {}
+					if (ImGui::MenuItem("Shader Debugger", NULL, &showShaderDebugger)) {}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
