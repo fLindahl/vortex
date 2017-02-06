@@ -59,12 +59,12 @@ namespace Render
 		this->framePasses.Append(this->FlatGeometryLit);
 
 		// FlatGeometryLit pass
-		this->ReflectionPass = std::make_shared<Render::ReflectionPass>();
-		this->ReflectionPass->name = "Reflection";
-		this->ReflectionPass->Setup();
+		this->reflectionPass = std::make_shared<ReflectionPass>();
+		this->reflectionPass->name = "Reflection";
+		this->reflectionPass->Setup();
 
-		this->framePassByName.insert(std::make_pair(this->ReflectionPass->name, this->ReflectionPass));
-		this->framePasses.Append(this->ReflectionPass);
+		this->framePassByName.insert(std::make_pair(this->reflectionPass->name, this->reflectionPass));
+		this->framePasses.Append(this->reflectionPass);
 
 		//Set final color buffer for easy access
 		RenderDevice::Instance()->SetFinalColorBuffer(this->FlatGeometryLit->buffer);
@@ -76,7 +76,7 @@ namespace Render
 		//TODO: Loop through all framepasses and update each one of their resolutions if needed.
 		this->Depth->UpdateResolution();
 		this->FlatGeometryLit->UpdateResolution();		
-		this->ReflectionPass->UpdateResolution();
+		this->reflectionPass->UpdateResolution();
 		this->pickingPass->UpdateResolution();
 	}
 
@@ -114,7 +114,7 @@ namespace Render
 
 	std::shared_ptr<ReflectionPass> FrameServer::GetReflectionPass()
 	{
-		return this->ReflectionPass;
+		return this->reflectionPass;
 	}
 
 	std::shared_ptr<PickingPass> FrameServer::GetPickingPass()

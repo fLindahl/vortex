@@ -19,7 +19,7 @@ MainCamera::MainCamera() :
 
 void MainCamera::LookAt(const Math::vec4& target, const Math::vec4& up)
 {
-	this->setViewMatrix(Math::mat4::lookatrh(cameraPos, target, up));
+	this->setViewMatrix(Math::mat4::lookatrh(view.get_position(), target, up));
 }
 
 void MainCamera::setViewMatrix(const Math::mat4& mat)
@@ -42,16 +42,23 @@ void MainCamera::UpdateProjectionMatrix()
 
 	float sx = (float)res.x / 2.0f;
 	float sy = (float)res.y / 2.0f;
-
-	float xOffset = (float)res.x * 0.5f;
-	float yOffset = (float)res.y * 0.5f;
-
+	
 	Math::mat4  scrScale = Math::mat4(sx, 0.0f, 0.0f, 0.0f,
 									  0.0f, sy, 0.0f, 0.0f,
 									  0.0f, 0.0f, 1.0f, 0.0f,
 									  sx, sy, 0.0f, 1.0f);
 
-	this->viewToTextureSpaceMatrix = scrScale;
+	this->viewToTextureSpaceMatrix = Math::mat4::multiply(this->projection, scrScale);
+}
+
+Math::vec4 MainCamera::GetPosition() const 
+{
+	return this->view.get_position();
+}
+
+void MainCamera::SetPosition(const Math::point& p)
+{
+	this->view.set_position(p);
 }
 
 }

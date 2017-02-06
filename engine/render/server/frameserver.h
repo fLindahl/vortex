@@ -3,6 +3,7 @@
 #include <map>
 #include "GL/glew.h"
 #include "foundation/util/array.h"
+//#include "render/frame/reflectionpass.h"
 
 namespace Debug { class DebugServer; }
 
@@ -72,7 +73,7 @@ private:
 	std::shared_ptr<FlatGeometryLitPass> FlatGeometryLit;
 
 	/// For computing reflections
-	std::shared_ptr<ReflectionPass> ReflectionPass;
+	std::shared_ptr<ReflectionPass> reflectionPass;
 
 
 

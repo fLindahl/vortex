@@ -1,3 +1,4 @@
+#include <cstring>
 #include "config.h"
 #include "meshbuilder.h"
 #include "meshfileformatstructs.h"
@@ -21,7 +22,7 @@ bool MeshBuilder::ExportMesh(std::shared_ptr<MeshResource> mesh, const char* fil
 	{
 		//First a header!
 		MeshFileHeader* header = new MeshFileHeader;
-		header->magic = (uint)"MESH";
+		header->magic = (uint)1337;//"MESH";
 		header->numGroups = mesh->getNumPrimitiveGroups();
 		header->numVertices = mesh->getNumVertices();
 		header->vertexWidth = mesh->getVertexWidth();
@@ -37,7 +38,8 @@ bool MeshBuilder::ExportMesh(std::shared_ptr<MeshResource> mesh, const char* fil
 		{
 			//Max limit of primitive group name is 256 letters
 			_assert(mesh->getPrimitiveGroup(i).name.length() <= 256, "ERROR: A primitive groups name is longer than 256 letters! WHY WOULD YOU WANT THAT? :(");
-			strcpy_s(g->name, 256, mesh->getPrimitiveGroup(i).name.c_str());
+			//TODO: Check if name is actually 256 letter long after this
+			strcpy(g->name, mesh->getPrimitiveGroup(i).name.c_str());
 			g->indexpointer = mesh->getPrimitiveGroup(i).indexOffset;
 			g->numindices = mesh->getPrimitiveGroup(i).numIndices;
 			fwrite(g, sizeof(MeshFilePrimitiveGroup), 1, file);

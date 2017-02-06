@@ -4,9 +4,12 @@
 namespace Render
 {
 
-CubeMapNode::CubeMapNode()
+CubeMapNode::CubeMapNode() :
+		IsLoaded(false),
+		resolution({ 128, 128 }),
+		mipLevels(6)		
 {
-
+	
 }
 
 CubeMapNode::~CubeMapNode()
@@ -14,39 +17,21 @@ CubeMapNode::~CubeMapNode()
 
 }
 
-void CubeMapNode::setLightPosition(GLfloat x, GLfloat y, GLfloat z)
+void CubeMapNode::GenerateCubeMap(const Math::point& wPos)
 {
-	//lightPosition.set(x, y, z);
+	//Keep the old render resolution so that we can switch back to it later.
+	Render::Resolution defaultRenderResolution = Render::RenderDevice::Instance()->GetRenderResolution();
+	//Update render resolution
+	Render::RenderDevice::Instance()->SetRenderResolution(this->resolution);
+
+
+
+	this->IsLoaded = true;
 }
 
-void CubeMapNode::setCameraPosition(GLfloat x, GLfloat y, GLfloat z)
+GLuint CubeMapNode::GetCubeMap()
 {
-	//cameraPosition.set(x, y, z);
-}
-
-void CubeMapNode::setAmbientIntensity(GLfloat r, GLfloat g, GLfloat b)
-{
-	//lightAmbientIntensity.set(r,g,b);
-}
-
-void CubeMapNode::setDiffuseIntensity(GLfloat r, GLfloat g, GLfloat b)
-{
-	//lightDiffuseIntensity.set(r, g, b);
-}
-
-void CubeMapNode::setSpecularIntensity(GLfloat r, GLfloat g, GLfloat b)
-{
-	//lightSpecularIntensity.set(r, g, b);
-}
-
-void CubeMapNode::applyToShader(std::shared_ptr<ShaderObject> shader)
-{
-	//shader->setUniVector3fv(this->lightPosition, "lightPosition");
-	//shader->setUniVector3fv(this->cameraPosition, "cameraPosition");
-
-	//shader->setUniVector3fv(this->lightAmbientIntensity, "u_lightAmbientIntensity");
-	//shader->setUniVector3fv(this->lightDiffuseIntensity, "u_lightDiffuseIntensity");
-	//shader->setUniVector3fv(this->lightSpecularIntensity, "u_lightSpecularIntensity");
+	return this->cubeSampler;
 }
 
 }
