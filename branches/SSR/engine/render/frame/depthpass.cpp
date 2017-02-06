@@ -71,14 +71,10 @@ void DepthPass::Setup()
     glGenFramebuffers(1, &this->frameBufferObject);
     GLfloat borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    glGenTextures(1, &this->buffer);
-    glBindTexture(GL_TEXTURE_2D, this->buffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    glGenRenderbuffers(1, &this->buffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, this->buffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	glGenTextures(1, &this->linearDepthBuffer);
 	glBindTexture(GL_TEXTURE_2D, this->linearDepthBuffer);
@@ -92,7 +88,7 @@ void DepthPass::Setup()
 	//glGenerateMipmap(GL_TEXTURE_2D);
 
     glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->buffer, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->buffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->linearDepthBuffer, 0);
     
 	const GLenum drawbuffers[1] = { GL_COLOR_ATTACHMENT0 };
@@ -110,8 +106,9 @@ void DepthPass::UpdateResolution()
 {
 	const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
 
-	glBindTexture(GL_TEXTURE_2D, this->buffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newRes.x, newRes.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glBindRenderbuffer(GL_RENDERBUFFER, this->buffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	glBindTexture(GL_TEXTURE_2D, this->linearDepthBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, newRes.x, newRes.y, 0, GL_RED, GL_FLOAT, NULL);

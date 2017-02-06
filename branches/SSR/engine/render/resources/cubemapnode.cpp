@@ -1,45 +1,45 @@
 #include "config.h"
-#include "lightnode.h"
+#include "cubemapnode.h"
 
 namespace Render
 {
 
-LightNode::LightNode()
+CubeMapNode::CubeMapNode()
 {
 
 }
 
-LightNode::~LightNode()
+CubeMapNode::~CubeMapNode()
 {
 
 }
 
-void LightNode::setLightPosition(GLfloat x, GLfloat y, GLfloat z)
+void CubeMapNode::setLightPosition(GLfloat x, GLfloat y, GLfloat z)
 {
 	//lightPosition.set(x, y, z);
 }
 
-void LightNode::setCameraPosition(GLfloat x, GLfloat y, GLfloat z)
+void CubeMapNode::setCameraPosition(GLfloat x, GLfloat y, GLfloat z)
 {
 	//cameraPosition.set(x, y, z);
 }
 
-void LightNode::setAmbientIntensity(GLfloat r, GLfloat g, GLfloat b)
+void CubeMapNode::setAmbientIntensity(GLfloat r, GLfloat g, GLfloat b)
 {
 	//lightAmbientIntensity.set(r,g,b);
 }
 
-void LightNode::setDiffuseIntensity(GLfloat r, GLfloat g, GLfloat b)
+void CubeMapNode::setDiffuseIntensity(GLfloat r, GLfloat g, GLfloat b)
 {
 	//lightDiffuseIntensity.set(r, g, b);
 }
 
-void LightNode::setSpecularIntensity(GLfloat r, GLfloat g, GLfloat b)
+void CubeMapNode::setSpecularIntensity(GLfloat r, GLfloat g, GLfloat b)
 {
 	//lightSpecularIntensity.set(r, g, b);
 }
 
-void LightNode::applyToShader(std::shared_ptr<ShaderObject> shader)
+void CubeMapNode::applyToShader(std::shared_ptr<ShaderObject> shader)
 {
 	//shader->setUniVector3fv(this->lightPosition, "lightPosition");
 	//shader->setUniVector3fv(this->cameraPosition, "cameraPosition");

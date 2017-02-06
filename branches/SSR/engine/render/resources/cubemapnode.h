@@ -6,11 +6,11 @@
 
 namespace Render
 {
-class LightNode
+class CubeMapNode
 {
 public:
-	LightNode();
-	~LightNode();
+	CubeMapNode();
+	~CubeMapNode();
 
 	void setLightPosition(GLfloat x, GLfloat y, GLfloat z);
 	void setCameraPosition(GLfloat x, GLfloat y, GLfloat z);
