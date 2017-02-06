@@ -27,10 +27,11 @@ struct SpotLight
     vec4 color;
 	vec4 position;
 	vec4 coneDirection;
+	vec4 midPoint;
 	float length;
-	float attenuation;
 	float radius;
-	float padding;
+	float fRadius;
+	float angle;
 };
 
 struct VisibleIndex 
@@ -71,6 +72,21 @@ float attenuate(vec3 lightDirection, float radius)
 	return atten;
 }
 
+float DoSpotCone(SpotLight light, vec3 L)
+{
+    float minCos = cos(radians(light.angle));
+
+	/// Lerps between minCos and 1
+    float maxCos = mix(minCos, 1.0, 0.5);
+    float cosAngle = dot(light.coneDirection.xyz, -L);
+    
+    return smoothstep(minCos, maxCos, cosAngle);
+}
+float DoAttenuation(SpotLight light, float direction)
+{
+    return 1.0f - smoothstep(light.length * 0.75f, light.length, direction);
+}
+
 // Assume the monitor is calibrated to the sRGB color space
 const float screenGamma = 2.2;
 
@@ -97,8 +113,8 @@ void main()
 	vec3 V = normalize(CameraPosition.xyz - FragmentPos.xyz);
 	
 	/// Loop for Point Lights
-	uint offset = index * 512;
-	for (uint i = 0; i < 512 && visiblePointLightIndicesBuffer.data[offset + i].index != -1; i++)
+	uint offset = index * 1024;
+	for (uint i = 0; i < 1024 && visiblePointLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
 		uint lightIndex = visiblePointLightIndicesBuffer.data[offset + i].index;
 		PointLight light = pointLightBuffer.data[lightIndex];
@@ -124,37 +140,21 @@ void main()
 	}
 	
 	/// Loop for SpotLights
-	for (uint i = 0; i < 512 && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
+	for (uint i = 0; i < 1024 && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
 		uint lightIndex = visibleSpotLightIndicesBuffer.data[offset + i].index;
 		SpotLight light = spotLightBuffer.data[lightIndex];
 		/// Light Direction
 		vec3 L = light.position.xyz - FragmentPos.xyz;
-
-		float attenuation = attenuate(L, light.radius);
+		float distance = length(L);
+		L = L / distance;
+		
+		float attenuation = DoAttenuation(light, distance);
+		float spotIntensity = DoSpotCone(light, L);
 		
 		L = normalize(L);
 		float diffuse = max(dot(L, N), 0.0);
 		float specular = 0.0f;
-		
-		//attenuation = attenuate(L, light.radius);
-		/// Calculate the Attenuation of the Spotlight
-        //float distance = length(light.position.xyz - FragmentPos.xyz);
-        //float attenuation = 1.0 / (1.0 + light.attenuation * (distance * distance));
-
-		/// If the light is outside of the cirlce. Do not draw it.
-		float lightToSurfaceAngle = degrees(acos(dot(-L, normalize(light.coneDirection.xyz))));
-		if(lightToSurfaceAngle > light.radius)
-		{
-			attenuation = 0.0;
-		}
-		
-		/// If the light is outside of the length of the light. Do not draw it.
-		/*float lightToSurface = dot(light.position.xyz, L);
-		if(lightToSurface > light.length)
-		{
-			attenuation = 0.0;
-		}*/
 		
 		//Hope this looks better with shadows...
 		//if(diffuse > 0.0f)
@@ -163,7 +163,7 @@ void main()
 			specular = pow(max(dot(H, N), 0.0), shininess);		
 		//}
 
-		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
+		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation * spotIntensity;
 		color.rgb += irradiance;
 	}
 	

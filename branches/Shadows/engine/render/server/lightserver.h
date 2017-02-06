@@ -1,7 +1,15 @@
+/*
+ * TODO: The AddSpotLight function, does a very ugly thing at the moment and should be fixed.
+ *			Spotlights can only go in one direction at the moment.
+ *
+ */
+
 #pragma once
 #include "GL/glew.h"
 #include "foundation/math/point.h"
 #include "foundation/util/array.h"
+#include "foundation/math/math.h"
+#include "foundation/math/vector4.h"
 
 
 namespace Render
@@ -19,12 +27,13 @@ namespace Render
 		Math::point color;
 		Math::point position;
 		Math::vec4 coneDirection;
+		Math::vec4 midPoint;
 		float length;
-		/// The smaller this number is the brighter will the Spotlight be
-		float attenuation;
-        /// The cirlces radius
+        /// The bottom cirlces radius of the cone
 		float radius;
-        float padding;
+		/// The Frustum Culling radius
+		float fRadius;
+		float angle;
 	};
 
 	struct VisibleIndex 
