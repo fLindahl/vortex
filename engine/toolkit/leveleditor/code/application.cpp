@@ -127,26 +127,27 @@ Application::Open()
 		LightServer::Instance()->AddPointLight(pLight);*/
 
      	SpotLight sLight;
-	    sLight.position = Math::vec4(-8.0f, 2.9f, 0.0f, 0.0f);
+	    sLight.position = Math::vec4(-9.499f, 2.9f, 0.0f, 0.0f);
 		sLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
 		sLight.length = 5.0f;
         sLight.angle = 15.0f;
 		LightServer::Instance()->AddSpotLight(sLight);
 
-/*	    sLight.position = Math::vec4(-2.0f, 5.0f, 0.0f, 0.0f);
+	    sLight.position = Math::vec4(-2.0f, 1.5f, 0.0f, 0.0f);
 		sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 		sLight.coneDirection = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 		sLight.length = 15.0f;
 		sLight.angle = 25.0f;
 		LightServer::Instance()->AddSpotLight(sLight);
 
-     	sLight.position = Math::vec4(1.1f, 4.0f, 0.0f, 0.0f);
-		sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+     	sLight.position = Math::vec4(1.1f, 4.0f, -9.499f, 0.0f);
+		sLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		sLight.coneDirection = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+        sLight.length = 15.0f;
 		LightServer::Instance()->AddSpotLight(sLight);
 
-  		sLight.position = Math::vec4(13.0f, 8.0f, -2.5f, 1.0f);
+/* 		sLight.position = Math::vec4(13.0f, 8.0f, -2.5f, 1.0f);
 		sLight.color = Math::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
 		sLight.length = 1.0f;
@@ -205,14 +206,14 @@ Application::Run()
 		}
 
 		//Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 2.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		/*if(LightServer::Instance()->GetSpotLightConeDebug())
+		/*if(!LightServer::Instance()->GetSpotLightArray().IsEmpty())
 		{
-			Debug::DebugRenderer::Instance()->DrawCone(LightServer::Instance()->GetSpotLightArray()[0].position,
-													   Math::quaternion(LightServer::Instance()->GetSpotLightArray()[0].coneDirection),
-													   LightServer::Instance()->GetSpotLightArray()[0].radius,
-													   LightServer::Instance()->GetSpotLightArray()[0].length,
-													   Math::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-													   Debug::RenderMode::WireFrame);
+            Debug::DebugRenderer::Instance()->DrawCone(LightServer::Instance()->GetSpotLightArray()[0].position,
+                                                       Math::quaternion::rotationyawpitchroll(0.0,0.0f, 0.0f),
+                                                       LightServer::Instance()->GetSpotLightArray()[0].radius,
+                                                       LightServer::Instance()->GetSpotLightArray()[0].length,
+                                                       Math::vec4(1.0f, 0.0f, 0.0f, 1.0f),
+                                                       Debug::RenderMode::WireFrame);
 		}*/
 		if (this->hit.object != nullptr)
 		{

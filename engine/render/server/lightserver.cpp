@@ -26,37 +26,18 @@ void LightServer::AddSpotLight(SpotLight& sLight)
     sLight.radius = (float)tan(Math::Deg2Rad(sLight.angle)) * sLight.length;
 
 	/// Get perpendicular direction
-	Math::vec4 m = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	Math::vec4 m2 = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	if(sLight.coneDirection.x() != 0.0f)
-	{
-		m.set_x(sLight.coneDirection.y());
-		m2.set_x(-sLight.coneDirection.y());
-	}
-	if(sLight.coneDirection.y() != 0.0f)
-	{
-		m.set_x(sLight.coneDirection.z());
-		m2.set_x(-sLight.coneDirection.z());
-	}
-	if(sLight.coneDirection.z() != 0.0f)
-	{
-		m.set_x(sLight.coneDirection.y());
-		m2.set_x(-sLight.coneDirection.y());
-	}
-
-	//Math::vec4 m = Math::vec4::cross3(Math::vec4::cross3(sLight.coneDirection, sLight.position), sLight.coneDirection);
-	/// Find Q1
+	Math::vec4 m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection, sLight.position));
 	Math::vec4 Q1 = sLight.position + sLight.coneDirection * sLight.length - m * sLight.radius;
-	// Get perpendicular, -direction
-	//m = Math::vec4::cross3(Math::vec4::cross3(sLight.coneDirection * -1.0f, sLight.position), sLight.coneDirection * -1.0f);
-	/// Find Q2
-	Math::vec4 Q2 = sLight.position + sLight.coneDirection * sLight.length - m2 * sLight.radius;
+	/// Get perpendicular, -direction
+	m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection * -1.0f, sLight.position));
+	Math::vec4 Q2 = sLight.position + sLight.coneDirection * sLight.length - m * sLight.radius;
 
-	// midPoint = pos + Q1 + Q2 / 3
+	/// Calculate the Mid Point of the Sphere
 	float oneOverThree = 1.0f/3.0f;
 	sLight.midPoint = (sLight.position + Q1 + Q2) * oneOverThree;
 	sLight.midPoint.set_w(1.0f);
 
+    /// Calculate the radius for the spehere
 	sLight.fRadius = (sLight.midPoint - sLight.position).length();
 
 	this->spotLights.Append(sLight);

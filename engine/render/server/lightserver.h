@@ -1,9 +1,3 @@
-/*
- * TODO: The AddSpotLight function, does a very ugly thing at the moment and should be fixed.
- *			Spotlights can only go in one direction at the moment.
- *
- */
-
 #pragma once
 #include "GL/glew.h"
 #include "foundation/math/point.h"
