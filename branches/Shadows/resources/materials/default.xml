@@ -3,13 +3,13 @@
         <Material name="Static" desc="A lit opaque material">
 			<!-- Examples of future frame passes -->
 			<!--
-			<Pass name="Picking" shader="picking"/>
 			<Pass name="SpotLightShadow" shader="shadow"/>
 			<Pass name="PointLightShadow" shader="shadow"/>
 			<Pass name="GlobalShadow" shader="shadow"/>
 			-->
 			
 			<Pass name="Depth" shader="depthStatic"/>
+			<Pass name="Picking" shader="picking"/>
 			<Pass name="FlatGeometryLit" shader="defaultLit"/>
 			<Pass name="ShadowMap" shader="shadowMap"/>
 			
@@ -21,12 +21,11 @@
 			<Param name="RoughnessMap" type="string" defaultValue="resources/textures/placeholder_roughness.png"/>
 
             <!-- various parameters -->
-			
         </Material>
-		
-        <Material name="Toon" desc="Generic toon-shader material">
-            
-			<Pass name="FlatGeometryLit" shader="toonShader"/>
+				
+        <Material name="Icon" desc="Icon that always faces the camera">
+			<Pass name="Picking" shader="pickingBillboard"/>
+			<Pass name="FlatGeometryLit" shader="icon"/>
 			
 			<!-- material textures -->
             <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>

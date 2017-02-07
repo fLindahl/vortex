@@ -24,6 +24,7 @@ namespace Render
 		struct  shadowUniformBuffer
 		{
 			Math::mat4 DepthBias;
+			Math::mat4 lightSpaceMatrix;
 		}shadUniformBuffer;
 
 	};

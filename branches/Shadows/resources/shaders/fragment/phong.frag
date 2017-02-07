@@ -3,8 +3,6 @@ in vec3 FragmentPos;
 in vec2 TexCoords;
 // For normalmapping
 in mat3 NormalMatrix;
-in vec3 TangentFragmentPos;
-in vec3 TangentViewPos;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 normalColor;
@@ -15,7 +13,7 @@ uniform sampler2D NormalMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D RoughnessMap;
 
-struct PointLight 
+struct PointLight
 {
 	vec4 color;
 	vec4 position;
@@ -64,11 +62,11 @@ layout(std430, binding = 4) readonly buffer VisibleSpotLightIndicesBuffer
 const vec3 u_lightAmbientIntensity = vec3(0.1f, 0.1f, 0.1f);
 
 // Attenuate the point light intensity
-float attenuate(vec3 lightDirection, float radius) 
+float attenuate(vec3 lightDirection, float radius)
 {
 	vec3 l = lightDirection / radius;
     float atten = max(0.0, 1.0 - dot(l,l));
-		
+
 	return atten;
 }
 
@@ -98,20 +96,20 @@ void main()
 	uint index = tileID.y * LightTileWorkGroups.x + tileID.x;
 
 	vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
-	
+
 	//Sample textures
 	vec3 albedoDiffuseColor = texture(AlbedoMap,TexCoords).rgb;
 	vec3 normal = texture(NormalMap, TexCoords).rgb;
 	vec3 spec = texture(SpecularMap, TexCoords).rgb;
 	float roughness = texture(RoughnessMap, TexCoords).r;
-	
+
 	float shininess = (roughness * 128) + 1;
-	
+
 	//Linearize colors
 	vec3 N = NormalMatrix * ((normal*2.0f) - 1.0f);
-	
+
 	vec3 V = normalize(CameraPosition.xyz - FragmentPos.xyz);
-	
+
 	/// Loop for Point Lights
 	uint offset = index * 1024;
 	for (uint i = 0; i < 1024 && visiblePointLightIndicesBuffer.data[offset + i].index != -1; i++)
@@ -131,14 +129,14 @@ void main()
 		//if(diffuse > 0.0f)
 		//{
 			vec3 H = normalize(L + V);
-			specular = pow(max(dot(H, N), 0.0), shininess);		
+			specular = pow(max(dot(H, N), 0.0), shininess);
 		//}
 
 		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
 		
 		color.rgb += irradiance;
 	}
-	
+
 	/// Loop for SpotLights
 	for (uint i = 0; i < 1024 && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
@@ -168,10 +166,10 @@ void main()
 	}
 	
 	color.rgb += albedoDiffuseColor.rgb * u_lightAmbientIntensity;
-	
+
 	fragColor = color;
 	normalColor = N;
 	specularAndRoughness.rgb = spec;
 	specularAndRoughness.a = roughness;
-	
+
 }

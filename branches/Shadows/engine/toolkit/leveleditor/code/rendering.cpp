@@ -3,6 +3,7 @@
 #include "render/server/frameserver.h"
 #include "foundation/math/math.h"
 #include "application/basegamefeature/managers/envmanager.h"
+#include "render/frame/pickingpass.h"
 
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
@@ -49,6 +50,14 @@ void Application::CameraMovement()
 	{
 		translation.x() += speedIncrease * speedMultiplier;
 	}
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow)))
+	{
+		translation.y() += speedIncrease * speedMultiplier;
+	}
+	if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow)))
+	{
+		translation.y() -= speedIncrease * speedMultiplier;
+	}
 
 	Math::mat4 xMat = Math::mat4::rotationx(camRotX);
 	Math::mat4 yMat = Math::mat4::rotationy(camRotY);
@@ -69,6 +78,7 @@ void Application::CameraMovement()
 
 void Application::DoPicking()
 {
+
 	ImVec2 dockPos = ImGui::GetWindowPos();
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -77,7 +87,7 @@ void Application::DoPicking()
 
 	ImVec2 dockSize = ImGui::GetWindowSize();
 	ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
-	if (ImGui::GetIO().MouseDown[0])
+	if (ImGui::GetIO().MouseDown[1])
 	{
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
 		
@@ -91,6 +101,11 @@ void Application::DoPicking()
 			printf("--- Hit object! ---\n");
 
 			hit = newHit;
+
+			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
+
+			if (rbe != nullptr)
+				rbe->GetRigidBody()->applyForceAtPoint(Math::vec4::normalize(rayLine.vec()), .1f, hit.point);
 			
 			this->rayEnd = hit.point;
 		}
@@ -101,7 +116,34 @@ void Application::DoPicking()
 		}
 				
 	}
+	
 
+
+	//---------------------
+	// Get position from depthbuffer
+	
+	if (ImGui::GetIO().MouseDown[0])
+	{		
+		GLuint SelectedID;
+
+		int pixelx = (mouse_pos_in_dock.x / dockSize.x) * 1920;
+		int pixely = (mouse_pos_in_dock.y / dockSize.y) * 1020;
+
+		//glBindTexture(GL_TEXTURE_2D, texture);
+		GLuint frame = Render::FrameServer::Instance()->GetPickingPass()->GetFrameBufferObject();
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, frame);
+		glReadPixels(pixelx, pixely, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, (GLvoid*)&SelectedID);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+		if (SelectedID != 0)
+		{
+			hit.object = BaseGameFeature::EntityManager::Instance()->GetEntityByID(SelectedID).get();
+		}
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	
 }
 
 }

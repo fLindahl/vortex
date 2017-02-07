@@ -6,6 +6,8 @@
 #include "toolkit/tools/style.h"
 #include "render/frame/flatgeometrylitpass.h"
 #include "render/debugrender/debugserver.h"
+#include "render/frame/reflectionpass.h"
+#include "render/server/frameserver.h"
 
 #include "basetool.h"
 #include "selecttool.h"
@@ -114,6 +116,10 @@ namespace Toolkit
 			{
 				Render::ShaderServer::Instance()->ReloadShaders();
 			}
+
+			Math::vec4 cameraZ = Graphics::MainCamera::Instance()->getView().get_zaxis();
+
+			ImGui::Text("Camera Z axis = %f, %f, %f", cameraZ.x(), cameraZ.y(), cameraZ.z());
 
 			ImGui::End();
 		}
@@ -315,14 +321,20 @@ namespace Toolkit
 
 			ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
+				Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->Settings();
 
+				ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
+				ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
+				ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
+				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
+				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);				
 			}
 			ImGui::EndDock();
 			
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
 			if (ImGui::Button("New Entity", { 100, 40 }))
 			{
-				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Math::point(0.0f, -0.5f, -1.5f), Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
 				commandManager->DoCommand(command);
 			}
 			ImGui::EndDock();

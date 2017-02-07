@@ -85,4 +85,51 @@ namespace Render
 		return this->program;
 	}
 	
+	void ShaderObject::EnableRenderState()
+	{
+
+		glDepthMask(this->renderState.depthwrite);
+
+		if (this->renderState.cullface == GL_TRUE)
+		{
+			glEnable(GL_CULL_FACE);
+			glCullFace(this->renderState.cullmode);
+			glFrontFace(this->renderState.frontface);
+		}
+		else
+		{
+			glDisable(GL_CULL_FACE);
+		}
+
+		if (this->renderState.blend == GL_TRUE)
+		{
+			glEnable(GL_BLEND);
+			glBlendFunc(this->renderState.blendsourcefunc, this->renderState.blenddestinationfunc);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+		}
+
+		if (this->renderState.alphatest == GL_TRUE)
+		{
+			glEnable(GL_ALPHA_TEST);
+			glAlphaFunc(this->renderState.alphafunc, this->renderState.alphaclamp);
+		}
+		else
+		{
+			glDisable(GL_ALPHA_TEST);
+		}
+
+		if (this->renderState.depthtest == GL_TRUE)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(this->renderState.depthfunc);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+		}
+
+	}
 }
