@@ -88,7 +88,7 @@ void main()
 		visibleSpotLightCount = 0;
 	}
 
-	memoryBarrierShared();
+	barrier();
 
 	// Step 1: Calculate the minimum and maximum depth values (from the depth buffer) for this group's tile
 	float maxDepth, minDepth;
@@ -141,7 +141,7 @@ void main()
 		frustumPlanes[5] /= length(frustumPlanes[5].xyz);
 	}
 
-	memoryBarrierShared();
+	barrier();
 
 	// Step 3: Cull lights.
 	// Parallelize the threads against the lights now.
@@ -183,6 +183,8 @@ void main()
 		}
 	} 
 	
+	barrier();
+	
 	/// Spotlight Culling///
 	passCount = (spotLightCount + threadCount - 1) / threadCount;
 	for (uint i = 0; i < passCount; i++) 
@@ -214,7 +216,7 @@ void main()
 		}
 	}
 
-	memoryBarrierShared();
+	barrier();
 
 	// One thread should fill the global light buffer
 	if (gl_LocalInvocationIndex == 0) 
@@ -232,6 +234,8 @@ void main()
 			// Final shader step will use this to determine where to stop (without having to pass the light count)
 			visiblePointLightIndicesBuffer.data[offset + visiblePointLightCount].index = -1;
 		}
+		
+		barrier();
 		
 		/// SpotLight
 		for (uint i = 0; i < visibleSpotLightCount; i++) 
