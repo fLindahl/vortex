@@ -1,7 +1,6 @@
 #pragma once
 #include "entity.h"
 
-
 namespace Render
 {
 class GraphicsProperty;

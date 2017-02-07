@@ -21,6 +21,7 @@ private:
 	{
 		GLint pointLightCount;
 		GLint spotLightCount;
+        //GLuint tileLights;
 	} uniformBlock;
 
 	GLuint ubo[1];

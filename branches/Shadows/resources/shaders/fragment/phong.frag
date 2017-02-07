@@ -43,7 +43,7 @@ layout(std430, binding = 1) readonly buffer PointLightBuffer
 	PointLight data[];
 } pointLightBuffer;
 
-layout(std430, binding = 2) readonly buffer SpotLightBuffer 
+layout(std430, binding = 11) readonly buffer SpotLightBuffer 
 {
 	SpotLight data[];
 } spotLightBuffer;
@@ -53,7 +53,7 @@ layout(std430, binding = 3) readonly buffer VisiblePointLightIndicesBuffer
 	VisibleIndex data[];
 } visiblePointLightIndicesBuffer;
 
-layout(std430, binding = 4) readonly buffer VisibleSpotLightIndicesBuffer 
+layout(std430, binding = 12) readonly buffer VisibleSpotLightIndicesBuffer 
 {
 	VisibleIndex data[];
 } visibleSpotLightIndicesBuffer;
@@ -90,6 +90,8 @@ const float screenGamma = 2.2;
 
 void main()
 {
+	uint tileLights = 512;
+	
 	// Determine which tile this pixel belongs to
 	ivec2 location = ivec2(gl_FragCoord.xy);
 	ivec2 tileID = location / ivec2(TILE_SIZE, TILE_SIZE);
@@ -111,8 +113,8 @@ void main()
 	vec3 V = normalize(CameraPosition.xyz - FragmentPos.xyz);
 
 	/// Loop for Point Lights
-	uint offset = index * 1024;
-	for (uint i = 0; i < 1024 && visiblePointLightIndicesBuffer.data[offset + i].index != -1; i++)
+	uint offset = index * tileLights;
+	for (uint i = 0; i < tileLights && visiblePointLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
 		uint lightIndex = visiblePointLightIndicesBuffer.data[offset + i].index;
 		PointLight light = pointLightBuffer.data[lightIndex];
@@ -138,7 +140,7 @@ void main()
 	}
 
 	/// Loop for SpotLights
-	for (uint i = 0; i < 1024 && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
+	for (uint i = 0; i < tileLights && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
 		uint lightIndex = visibleSpotLightIndicesBuffer.data[offset + i].index;
 		SpotLight light = spotLightBuffer.data[lightIndex];

@@ -35,6 +35,7 @@ void LightCullingPass::Execute()
 
 	uniformBlock.pointLightCount = (GLint)LightServer::Instance()->GetNumPointLights();
 	uniformBlock.spotLightCount  = (GLint)LightServer::Instance()->GetNumSpotLights();
+    //uniformBlock.tileLights      = LightServer::Instance()->GetTileLights();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 24, this->ubo[0]);
@@ -46,15 +47,15 @@ void LightCullingPass::Execute()
 
 	// Bind shader storage buffer objects for the light and index buffers
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lightServer->GetPointLightBuffer());
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, lightServer->GetSpotLightBuffer());
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, lightServer->GetSpotLightBuffer());
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, lightServer->GetVisiblePointLightIndicesBuffer());
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, lightServer->GetVisibleSpotLightIndicesBuffer());
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 12, lightServer->GetVisibleSpotLightIndicesBuffer());
 
 	const GLint location = glGetUniformLocation(this->lightCullingProgram, "lightImage");
-	/*if (location == -1)
+	if (location == -1)
 	{
 		printf("Could not locate uniform location for texture in Light Culling");
-	}*/
+	}
 
 	glUniform1i(location, 0);
 	glBindImageTexture(0, this->buffer, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
