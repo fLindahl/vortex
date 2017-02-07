@@ -87,7 +87,11 @@ void Application::DoPicking()
 
 	ImVec2 dockSize = ImGui::GetWindowSize();
 	ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
-	if (ImGui::GetIO().MouseDown[1])
+
+	//-------------------
+	// Physics 
+
+	if (ImGui::GetIO().MouseDown[0])
 	{
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
 		
@@ -120,9 +124,9 @@ void Application::DoPicking()
 
 
 	//---------------------
-	// Get position from depthbuffer
+	// Picking
 	
-	if (ImGui::GetIO().MouseDown[0])
+	if (ImGui::GetIO().MouseDown[1])
 	{		
 		GLuint SelectedID;
 

@@ -7,17 +7,38 @@
 
 namespace Render
 {
+
 class CubeMapNode
 {
 public:
 	CubeMapNode();
 	~CubeMapNode();
 
-	void GenerateCubeMap(const Math::point& wPos);
+	void GenerateCubeMap();
 	GLuint GetCubeMap();
+	
+	void SetPosition(Math::point pos);
+
+	void DeleteCubeMap();
+
+	bool IsLoaded();
 
 private:
-	bool IsLoaded;
+	enum CubeFace
+	{
+		RIGHT = 0,
+		LEFT = 1,
+		TOP = 2,
+		BOTTOM = 3,
+		BACK = 4,
+		FRONT = 5
+	};
+
+	void RenderTexture(const GLuint& framebuffer, CubeFace face, Graphics::Camera& camera);
+
+	bool isLoaded;
+
+	Math::point position;
 
 	Render::Resolution resolution;
 	GLuint mipLevels;
@@ -25,17 +46,7 @@ private:
 	///The cubemap
 	GLuint cubeSampler;
 
-	///Top texture
-	GLuint top;
-	///Bottom texture
-	GLuint bottom;
-	///Left texture
-	GLuint left;
-	///Right texture
-	GLuint right;
-	///Back texture
-	GLuint back;
-	///Front texture
-	GLuint front;
+	//Lists all textures in the cubemap
+	GLuint textures[6];
 };
 }

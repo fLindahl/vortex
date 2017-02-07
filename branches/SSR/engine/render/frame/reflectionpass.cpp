@@ -18,10 +18,10 @@ ReflectionPass::ReflectionPass()
 {
 	this->uniformBlock.zThickness = 3.5f;
 	this->uniformBlock.jitter = 0.45f;
-	this->uniformBlock.stride = 4.0f;
+	this->uniformBlock.stride = 11.0f;
 	this->uniformBlock.workGroups[0] = (RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % TILE_SIZE)) / TILE_SIZE;
 	this->uniformBlock.workGroups[1] = (RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % TILE_SIZE)) / TILE_SIZE;
-	this->uniformBlock.maxSteps = 128.0f;
+	this->uniformBlock.maxSteps = 80.0f;
 	this->uniformBlock.maxDistance = 280.0f;
 }
 

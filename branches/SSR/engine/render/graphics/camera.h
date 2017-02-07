@@ -12,23 +12,12 @@ Holds View and Projection Matrix
 namespace Graphics
 {
 
-class MainCamera
+class Camera
 {
-private:
-	MainCamera();
-
 public:
-	static MainCamera* Instance()
-	{
-		static MainCamera instance;
-		return &instance;
-	}
-
-	// C++ 11
-	// Delete the methods we don't want.
-	MainCamera(MainCamera const&) = delete;
-	void operator=(MainCamera const&) = delete;
-
+	Camera();
+	~Camera() {}
+	
 	Math::mat4 getView() const { return view; }
 	Math::mat4 getInvView() const { return invView; }
 
@@ -49,11 +38,21 @@ public:
 	Math::vec4 GetPosition() const;
 	void SetPosition(const Math::point& pos);
 
-private:
+	void SetFov(const float& newFov) { this->fov = newFov; }
+	float GetFov() { return this->fov; }
 
-	const float fov = 1.5708f;
-	const float nearZ = 0.05f;
-	const float farZ = 1000.0f;
+	void SetNearZ(const float& newNearZ) { this->nearZ = newNearZ; }
+	float GetNearZ() { return this->nearZ; }
+	
+	void setFarZ(const float& newfarZ) { this->farZ = newfarZ; }
+	float GetFarZ() { return this->farZ; }
+
+	float GetAspectRatio() { return this->aspectRatio; }
+
+protected:
+	float fov;
+	float nearZ;
+	float farZ;
 	float aspectRatio;
 
 	Math::mat4 view;
@@ -65,6 +64,25 @@ private:
 
 	//For converting viewspace coordinates to screen pixel coordinates.
 	Math::mat4 viewToTextureSpaceMatrix;
+};
+
+class MainCamera : public Camera
+{
+private:
+	MainCamera() {}
+	
+public:
+	static MainCamera* Instance()
+	{
+		static MainCamera instance;
+		return &instance;
+	}
+
+	// C++ 11
+	// Delete the methods we don't want.
+	MainCamera(MainCamera const&) = delete;
+	void operator=(MainCamera const&) = delete;
+	void operator=(Camera const&) = delete;
 };
 
 }

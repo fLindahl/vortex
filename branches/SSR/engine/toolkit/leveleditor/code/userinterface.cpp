@@ -8,6 +8,7 @@
 #include "render/debugrender/debugserver.h"
 #include "render/frame/reflectionpass.h"
 #include "render/server/frameserver.h"
+#include "application/game/cubemapentity.h"
 
 #include "basetool.h"
 #include "selecttool.h"
@@ -340,22 +341,21 @@ namespace Toolkit
 					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(2).x(), application->hit.object->GetTransform().getrow(2).y(), application->hit.object->GetTransform().getrow(2).z(), application->hit.object->GetTransform().getrow(2).w());
 					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(3).x(), application->hit.object->GetTransform().getrow(3).y(), application->hit.object->GetTransform().getrow(3).z(), application->hit.object->GetTransform().getrow(3).w());
 
-					Game::PhysicsEntity* pe = dynamic_cast<Game::PhysicsEntity*>(application->hit.object);
+					Game::CubeMapEntity* pe = dynamic_cast<Game::CubeMapEntity*>(application->hit.object);
 
 					if (pe != nullptr)
 					{
 						ImGui::Text("Mesh: %s", pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName().c_str());
-						ImGui::Text("Type: %i", pe->GetPhysicsType());
 
-						if (pe->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
+						if (ImGui::Button("Generate CubeMap"))
 						{
-							Game::RigidBodyEntity* rb = dynamic_cast<Game::RigidBodyEntity*>(pe);
+							pe->GenerateCubeMap();
+						}
 
-							ImGui::Text("Orientation: %f, %f, %f, %f\n", rb->GetRigidBody()->getOrientation().x(), rb->GetRigidBody()->getOrientation().y(), rb->GetRigidBody()->getOrientation().z(), rb->GetRigidBody()->getOrientation().w());
-							ImGui::Text("Position: %f, %f, %f, %f\n", rb->GetRigidBody()->getPosition().x(), rb->GetRigidBody()->getPosition().y(), rb->GetRigidBody()->getPosition().z(), rb->GetRigidBody()->getPosition().w());
-							ImGui::Text("LinearVelocity: %f, %f, %f, %f\n", rb->GetRigidBody()->getLinearVelocity().x(), rb->GetRigidBody()->getLinearVelocity().y(), rb->GetRigidBody()->getLinearVelocity().z(), rb->GetRigidBody()->getLinearVelocity().w());
-							ImGui::Text("AngularVelocity: %f, %f, %f, %f\n", rb->GetRigidBody()->getAngularVelocity().x(), rb->GetRigidBody()->getAngularVelocity().y(), rb->GetRigidBody()->getAngularVelocity().z(), rb->GetRigidBody()->getAngularVelocity().w());
-							ImGui::Text("Acceleration: %f, %f, %f, %f\n", rb->GetRigidBody()->getAcceleration().x(), rb->GetRigidBody()->getAcceleration().y(), rb->GetRigidBody()->getAcceleration().z(), rb->GetRigidBody()->getAcceleration().w());
+						if (pe->IsLoaded())
+						{
+							GLuint cubemapSampler = pe->GetCubeMapSampler();
+							//ImGui::Image((void*)cubemapSampler, ImVec2(128,128));
 						}
 					}
 				}

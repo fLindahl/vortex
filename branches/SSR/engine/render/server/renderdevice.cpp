@@ -58,7 +58,7 @@ void RenderDevice::SetWindowResolution(const int& x, const int& y)
 	this->windowResolution.y = y;
 }
 
-void RenderDevice::SetUniformBuffer(const Graphics::MainCamera* camera)
+void RenderDevice::SetUniformBuffer(const Graphics::Camera* camera)
 {
 	//Set global matrix uniform buffer block for this frame
 	uniformBufferBlock.View = camera->getView();
@@ -127,29 +127,24 @@ void RenderDevice::Render(bool drawToScreen)
 	glDepthFunc(GL_LESS);
 }
 
-void RenderDevice::RenderToTexture()
+void RenderDevice::RenderToTexture(const GLuint& outFrameBuffer, const Graphics::Camera& camera)
 {
 	glViewport(0, 0, renderResolution.x, renderResolution.y);
 
 	//----------------
 	// Start rendering
-	SetUniformBuffer(Graphics::MainCamera::Instance());
+	SetUniformBuffer(&camera);
 
 	for (auto pass : FrameServer::Instance()->framePasses)
 	{
 		pass->Execute();
 	}
-
-	// Render Debug Shapes!
-	FrameServer::Instance()->GetFlatGeometryLitPass()->BindFrameBuffer();
-	Debug::DebugRenderer::Instance()->DrawCommands();
-	
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glDrawBuffer(GL_BACK); // Set the back buffer as the draw buffer
+		
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, outFrameBuffer);
 
 	//Copy final colorbuffer to screen if specified
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, FrameServer::Instance()->FlatGeometryLit->frameBufferObject);
-	glBlitFramebuffer(0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->windowResolution.x, this->windowResolution.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->renderResolution.x, this->renderResolution.y, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
