@@ -1,0 +1,7 @@
+<Vortex>
+    <Model name="cubemap_icon">
+        <Mesh name="resources/meshes/quad_tris.obj">
+            <Node primitivegroup="0" surface="resources/surfaces/cubemap_icon.surface"/>
+        </Mesh>
+    </Model>
+</Vortex>

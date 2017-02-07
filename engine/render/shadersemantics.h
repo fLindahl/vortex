@@ -16,6 +16,7 @@
 #define VORTEX_SEMANTIC_CAMERAPOSITION             "CameraPosition"
 #define VORTEX_SEMANTIC_TIMEANDRANDOM			   "TimeAndRandom"
 #define VORTEX_SEMANTIC_LIGHTTILEWORKGROUPS		   "LightTileWorkGroups"
+#define VORTEX_SEMANTIC_VIEWTOTEXTURESPACE		   "ViewToTextureSpace"
 
 #define VORTEX_SEMANTIC_ALBEDOMAP				   "AlbedoMap"
 #define VORTEX_SEMANTIC_NORMALMAP				   "NormalMap"

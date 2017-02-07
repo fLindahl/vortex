@@ -22,8 +22,8 @@ void LightServer::AddPointLight(const PointLight& pLight)
 
 void LightServer::AddSpotLight(SpotLight& sLight)
 {
-    /// calculate the radius of the bottom cirlce
-    sLight.radius = (float)tan(Math::Deg2Rad(sLight.angle)) * sLight.length;
+	/// calculate the radius of the bottom cirlce
+	sLight.radius = (float)tan(Math::Deg2Rad(sLight.angle)) * sLight.length;
 
 	/// Get perpendicular direction
 	Math::vec4 m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection, sLight.position));
@@ -37,7 +37,7 @@ void LightServer::AddSpotLight(SpotLight& sLight)
 	sLight.midPoint = (sLight.position + Q1 + Q2) * oneOverThree;
 	sLight.midPoint.set_w(1.0f);
 
-    /// Calculate the radius for the spehere
+    /// Calculate the radius for the sphere
 	sLight.fRadius = (sLight.midPoint - sLight.position).length();
 
 	this->spotLights.Append(sLight);

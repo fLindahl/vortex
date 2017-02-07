@@ -24,14 +24,19 @@ namespace Render
 	void ShadowMap::Setup()
 	{
 		//Set the depthBias matrix;
-		Math::vec4 row1, row2, row3, row4;
+		Math::vec4 row1, row2, row3, row4, up;
 
 		row1.set(0.5, 0.0, 0.0, 0.0);
 		row2.set(0.0, 0.5, 0.0, 0.0);
 		row3.set(0.0, 0.0, 0.5, 0.0);
 		row4.set(0.5, 0.5, 0.5, 1.0);
+		up.set(0.0, 1.0, 0.0, 1.0);
 
 		shadUniformBuffer.DepthBias.set(row1, row2, row3, row4);
+
+		if(!LightServer::Instance()->GetSpotLightArray().IsEmpty())
+			shadUniformBuffer.lightSpaceMatrix = Math::mat4::lookatrh(LightServer::Instance()->GetSpotLightArray()[0].position, LightServer::Instance()->GetSpotLightArray()[0].coneDirection*LightServer::Instance()->GetSpotLightArray()[0].length, up);
+
 
 		glGenBuffers(1, this->ubo);
 		glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);

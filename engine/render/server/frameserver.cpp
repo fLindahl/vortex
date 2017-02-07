@@ -6,7 +6,7 @@
 #include "render/frame/drawpass.h"
 #include "render/frame/lightcullingpass.h"
 #include "render/frame/flatgeometrylitpass.h"
-#include "render/frame/lightdebugpass.h"
+#include "render/frame/pickingpass.h"
 #include "render/frame/reflectionpass.h"
 #include "render/frame/shadowmap.h"
 
@@ -39,10 +39,17 @@ namespace Render
 		this->framePassByName.insert(std::make_pair(this->lightCullingPass->name, this->lightCullingPass));
 		this->framePasses.Append(this->lightCullingPass);
 
-#ifdef _DEBUG
-		this->lightdebugpass = std::make_shared<LightDebugPass>();
-		this->lightdebugpass->Setup();
-#endif
+		//Picking pass
+		//TODO: we should be able to deactivate this
+		if (RenderDevice::Instance()->GetPickingEnabled())
+		{
+			this->pickingPass = std::make_shared<PickingPass>();
+			this->pickingPass->name = "Picking";
+			this->pickingPass->Setup();
+
+			this->framePassByName.insert(std::make_pair(this->pickingPass->name, this->pickingPass));
+			this->framePasses.Append(this->pickingPass);
+		}
 
 		// FlatGeometryLit pass
 		this->FlatGeometryLit = std::make_shared<FlatGeometryLitPass>();
@@ -79,6 +86,7 @@ namespace Render
 		this->Depth->UpdateResolution();
 		this->FlatGeometryLit->UpdateResolution();		
 		this->reflectionPass->UpdateResolution();
+		this->pickingPass->UpdateResolution();
 		this->shadowmap->UpdateResolution();
 	}
 
@@ -117,6 +125,11 @@ namespace Render
 	std::shared_ptr<ReflectionPass> FrameServer::GetReflectionPass()
 	{
 		return this->reflectionPass;
+	}
+
+	std::shared_ptr<PickingPass> FrameServer::GetPickingPass()
+	{
+		return this->pickingPass;
 	}
 
 	std::shared_ptr<Render::ShadowMap> FrameServer::GetShadowMap()
