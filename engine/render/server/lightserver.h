@@ -1,3 +1,7 @@
+/*
+ * TODO: The lightTiles should be send to the shader for easier changes, on how many lights each tile can contain.
+ */
+
 #pragma once
 #include "GL/glew.h"
 #include "foundation/math/point.h"
@@ -65,6 +69,8 @@ namespace Render
 		GLuint GetVisiblePointLightIndicesBuffer() { return this->visiblePointLightIndicesBuffer; }
 		GLuint GetVisibleSpotLightIndicesBuffer() { return this->visibleSpotLightIndicesBuffer; }
 
+        GLuint GetTileLights() { return this->tileLights; }
+
 	private:
 		friend class RenderDevice;
 
@@ -85,5 +91,8 @@ namespace Render
 		/// Contains all the pointlights in the game
 		Util::Array<PointLight> pointLights;
 		Util::Array<SpotLight> spotLights;
+
+        /// Determines how many light should be registred per tile
+        GLuint tileLights = 512;
 	};
 }
