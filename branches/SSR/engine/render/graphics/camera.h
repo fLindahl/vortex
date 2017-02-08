@@ -9,6 +9,11 @@ Holds View and Projection Matrix
 */
 /************************************************************************/
 
+namespace Render
+{
+	class CubeMapNode;
+}
+
 namespace Graphics
 {
 
@@ -48,7 +53,7 @@ public:
 	float GetFarZ() { return this->farZ; }
 
 	float GetAspectRatio() { return this->aspectRatio; }
-
+	
 protected:
 	float fov;
 	float nearZ;

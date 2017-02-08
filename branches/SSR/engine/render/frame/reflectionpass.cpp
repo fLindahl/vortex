@@ -8,6 +8,8 @@
 #include "render/server/renderdevice.h"
 #include "render/frame/depthpass.h"
 #include "render/frame/flatgeometrylitpass.h"
+#include "render/resources/cubemapnode.h"
+#include "render/server/lightserver.h"
 
 namespace Render
 {
@@ -80,6 +82,15 @@ void ReflectionPass::Execute()
 	glActiveTexture(GL_TEXTURE7);
 	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "colorMap"), 7);
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer());
+
+	auto cubemap = Render::LightServer::Instance()->GetClosestCubemapToPoint(Graphics::MainCamera::Instance()->GetPosition());
+	if (cubemap != nullptr)
+	{
+		//assign cubemap
+		glActiveTexture(GL_TEXTURE8);
+		glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "cubeMap"), 8);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->GetCubeMap());
+	}
 
 	const GLint location = glGetUniformLocation(this->SSRComputeProgram, "reflectionImage");
 	if (location == -1){

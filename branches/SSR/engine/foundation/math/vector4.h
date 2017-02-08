@@ -211,6 +211,9 @@ namespace Math
 		/// returns a vector that points along the z axis
 		static vec4 forwardvec();
 
+		/// return distance squared between two points
+		static float distancesq(Math::vec4 a, Math::vec4 b);
+
 		/// return true if any XYZ component is less-then
 		static bool less3_any(const vec4 &v0, const vec4 &v1);
 		/// return true if all XYZ components are less-then
@@ -1417,6 +1420,16 @@ namespace Math
 	{
 		return vec4(0, 0, 1, 0);
 	}
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	__forceinline float
+		vec4::distancesq(Math::vec4 a, Math::vec4 b)
+	{
+		a -= b;
+		return dot(a, a);
+	}
+
 } // namespace Math
 //------------------------------------------------------------------------------
 

@@ -9,6 +9,7 @@
 #include "render/frame/reflectionpass.h"
 #include "render/server/frameserver.h"
 #include "application/game/cubemapentity.h"
+#include "render/server/lightserver.h"
 
 #include "basetool.h"
 #include "selecttool.h"
@@ -81,6 +82,18 @@ namespace Toolkit
 				{
 					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
 					if (ImGui::MenuItem("Shader Debugger", NULL, &showShaderDebugger)) {}
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Map"))
+			{
+				if (ImGui::BeginMenu("Lighting"))
+				{
+					if (ImGui::MenuItem("Reload Cubemaps", NULL)) 
+					{
+						Render::LightServer::Instance()->RegenerateCubemaps();
+					}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
@@ -340,24 +353,6 @@ namespace Toolkit
 					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(1).x(), application->hit.object->GetTransform().getrow(1).y(), application->hit.object->GetTransform().getrow(1).z(), application->hit.object->GetTransform().getrow(1).w());
 					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(2).x(), application->hit.object->GetTransform().getrow(2).y(), application->hit.object->GetTransform().getrow(2).z(), application->hit.object->GetTransform().getrow(2).w());
 					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(3).x(), application->hit.object->GetTransform().getrow(3).y(), application->hit.object->GetTransform().getrow(3).z(), application->hit.object->GetTransform().getrow(3).w());
-
-					Game::CubeMapEntity* pe = dynamic_cast<Game::CubeMapEntity*>(application->hit.object);
-
-					if (pe != nullptr)
-					{
-						ImGui::Text("Mesh: %s", pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName().c_str());
-
-						if (ImGui::Button("Generate CubeMap"))
-						{
-							pe->GenerateCubeMap();
-						}
-
-						if (pe->IsLoaded())
-						{
-							GLuint cubemapSampler = pe->GetCubeMapSampler();
-							//ImGui::Image((void*)cubemapSampler, ImVec2(128,128));
-						}
-					}
 				}
 			}
 			ImGui::EndDock();

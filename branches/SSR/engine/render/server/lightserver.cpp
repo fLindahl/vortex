@@ -1,6 +1,7 @@
 #include "config.h"
 #include "lightserver.h"
 #include "renderdevice.h"
+#include "render/resources/cubemapnode.h"
 
 namespace Render
 {
@@ -41,6 +42,52 @@ void LightServer::UpdateLightBuffer()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightBuffer);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, numLights * sizeof(PointLight), &this->pointLights[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+void LightServer::AddCubeMap(std::shared_ptr<CubeMapNode> node)
+{
+	if (!this->cubemapNodes.Find(node))
+	{
+		this->cubemapNodes.Append(node);
+	}
+}
+
+void LightServer::RemoveCubeMap(std::shared_ptr<CubeMapNode> node)
+{
+	auto it = this->cubemapNodes.Find(node);
+
+	if (it != nullptr)
+	{
+		this->cubemapNodes.RemoveSwap(it);
+	}
+}
+
+std::shared_ptr<CubeMapNode> LightServer::GetClosestCubemapToPoint(const Math::point& point)
+{
+	float closestDistance = FLT_MAX;
+	std::shared_ptr<CubeMapNode> closestCubemap = nullptr;
+
+	float distanceSq;
+
+	for (auto cubemap : this->cubemapNodes)
+	{
+		distanceSq = Math::point::distancesq(point, cubemap->GetPosition());
+		if (distanceSq < closestDistance)
+		{
+			closestDistance = distanceSq;
+			closestCubemap = cubemap;
+		}
+	}
+
+	return closestCubemap;
+}
+
+void LightServer::RegenerateCubemaps()
+{
+	for (auto cubemap : this->cubemapNodes)
+	{
+		cubemap->GenerateCubeMap();
+	}
 }
 
 }
