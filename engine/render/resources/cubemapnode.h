@@ -8,7 +8,7 @@
 namespace Render
 {
 
-class CubeMapNode
+class CubeMapNode : public std::enable_shared_from_this<CubeMapNode>
 {
 public:
 	CubeMapNode();
@@ -18,6 +18,10 @@ public:
 	GLuint GetCubeMap();
 	
 	void SetPosition(Math::point pos);
+	const Math::point& GetPosition() const;
+
+	void Activate();
+	void Deactivate();
 
 	void DeleteCubeMap();
 
@@ -37,6 +41,7 @@ private:
 	void RenderTexture(const GLuint& framebuffer, CubeFace face, Graphics::Camera& camera);
 
 	bool isLoaded;
+	bool isActive;
 
 	Math::point position;
 

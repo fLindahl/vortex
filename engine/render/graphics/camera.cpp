@@ -1,6 +1,7 @@
 #include "config.h"
 #include "camera.h"
 #include "render/server/renderdevice.h"
+#include "render/server/lightserver.h"
 
 namespace Graphics
 {

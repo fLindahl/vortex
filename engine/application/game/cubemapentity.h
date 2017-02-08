@@ -29,6 +29,6 @@ public:
 	bool IsLoaded();
 
 protected:
-	Render::CubeMapNode cubemap;
+	std::shared_ptr<Render::CubeMapNode> cubemap;
 };
 }

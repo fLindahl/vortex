@@ -91,7 +91,7 @@ void Application::DoPicking()
 	//-------------------
 	// Physics 
 
-	if (ImGui::GetIO().MouseDown[0])
+	if (ImGui::GetIO().MouseDown[1])
 	{
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
 		
@@ -126,12 +126,12 @@ void Application::DoPicking()
 	//---------------------
 	// Picking
 	
-	if (ImGui::GetIO().MouseDown[1])
+	if (ImGui::GetIO().MouseDown[0])
 	{		
 		GLuint SelectedID;
 
-		int pixelx = (mouse_pos_in_dock.x / dockSize.x) * 1920;
-		int pixely = (mouse_pos_in_dock.y / dockSize.y) * 1020;
+		int pixelx = (mouse_pos_in_dock.x / dockSize.x) * Render::RenderDevice::Instance()->GetRenderResolution().x;
+		int pixely = (mouse_pos_in_dock.y / dockSize.y) * Render::RenderDevice::Instance()->GetRenderResolution().y;
 
 		//glBindTexture(GL_TEXTURE_2D, texture);
 		GLuint frame = Render::FrameServer::Instance()->GetPickingPass()->GetFrameBufferObject();
