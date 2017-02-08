@@ -34,8 +34,8 @@ namespace Render
 
 		shadUniformBuffer.DepthBias.set(row1, row2, row3, row4);
 
-		if(!LightServer::Instance()->GetSpotLightArray().IsEmpty())
-			shadUniformBuffer.lightSpaceMatrix = Math::mat4::lookatrh(LightServer::Instance()->GetSpotLightArray()[0].position, LightServer::Instance()->GetSpotLightArray()[0].coneDirection*LightServer::Instance()->GetSpotLightArray()[0].length, up);
+		//if(!LightServer::Instance()->GetSpotLightArray().IsEmpty())
+			//shadUniformBuffer.lightSpaceMatrix = Math::mat4::lookatrh(LightServer::Instance()->GetSpotLightArray()[0].position, LightServer::Instance()->GetSpotLightArray()[0].coneDirection*LightServer::Instance()->GetSpotLightArray()[0].length, up);
 
 
 		glGenBuffers(1, this->ubo);
