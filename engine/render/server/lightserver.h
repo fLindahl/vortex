@@ -1,5 +1,6 @@
 /*
  * TODO: The lightTiles should be send to the shader for easier changes, on how many lights each tile can contain.
+ *          The Update method should only calculate the lights that are moving or the ones that have been moved
  */
 
 #pragma once
@@ -22,6 +23,8 @@ namespace Render
 
 	struct SpotLight
 	{
+		SpotLight() {};
+
 		Math::point color;
 		Math::point position;
 		Math::vec4 coneDirection;
@@ -59,7 +62,8 @@ namespace Render
 
 		void AddSpotLight(SpotLight& pLight);
 		size_t GetNumSpotLights() { return this->spotLights.Size(); }
-		SpotLight GetSpotLightAtIndex(const int& index);
+        void UpdateSpotLight(SpotLight& sLight);
+		SpotLight& GetSpotLightAtIndex(const int& index);
 
 		GLuint GetWorkGroupsX() { return this->workGroupsX; }
 		GLuint GetWorkGroupsY() { return this->workGroupsY; }
@@ -96,5 +100,7 @@ namespace Render
 
         /// Determines how many light should be registred per tile
         GLuint tileLights = 512;
+
+        float oneOverThree;
 	};
 }

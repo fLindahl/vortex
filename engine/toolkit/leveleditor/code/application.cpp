@@ -199,9 +199,7 @@ void
 Application::Run()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	float a = 0.0f;
-    Math::vec4 b = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    float c = 0.0f;
+    float a = 0.0f;
 	while (this->window->IsOpen() && !this->shutdown)
 	{
 		double time = glfwGetTime();
@@ -219,23 +217,9 @@ Application::Run()
 		//Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		//Debug::DebugRenderer::Instance()->DrawLine(this->reflectStart, this->reflectEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
-		if(LightServer::Instance()->GetNumSpotLights() != 0)
-		{
-            /*Debug::DebugRenderer::Instance()->DrawCone(LightServer::Instance()->GetSpotLightArray()[0].position,
-                                                       Math::quaternion::rotationyawpitchroll(0.0,0.0f, 0.0f),
-                                                       LightServer::Instance()->GetSpotLightArray()[0].radius,
-                                                       LightServer::Instance()->GetSpotLightArray()[0].length,
-                                                       Math::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-                                                       Debug::RenderMode::WireFrame);*/
-			a += 1.0f;
-			LightServer::Instance()->GetSpotLightAtIndex(0).position = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-            //LightServer::Instance()->GetSpotLightArray()[0].length = 0.0f;
-			LightServer::Instance()->Update();
-            b = LightServer::Instance()->GetSpotLightAtIndex(0).position;
-
-            LightServer::Instance()->GetSpotLightAtIndex(0).length = 0.0f;
-            c = LightServer::Instance()->GetSpotLightAtIndex(0).length;
-		}
+        //a += 0.0001f;
+        //Render::LightServer::Instance()->GetSpotLightAtIndex(0).position = Math::vec4(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position.x() + a, 2.3f, 3.0f, 1.0f);
+        //Render::LightServer::Instance()->Update();
 
 		if (this->hit.object != nullptr)
 		{

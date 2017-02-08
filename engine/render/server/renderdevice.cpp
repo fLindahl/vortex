@@ -132,9 +132,9 @@ void RenderDevice::Render(bool drawToScreen)
 	flatGeometryLitPass->Execute();
 
 	//Reflections
-	//std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->reflectionPass;
-	//auto reflectionPass = ref.lock();
-	//reflectionPass->Execute();
+	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->reflectionPass;
+	auto reflectionPass = ref.lock();
+	reflectionPass->Execute();
 
 	//SWARLEY
 	std::weak_ptr<ShadowMap> shad = FrameServer::Instance()->shadowmap;
