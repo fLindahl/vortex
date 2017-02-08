@@ -64,7 +64,7 @@ void LightServer::UpdateWorkGroups()
 
 void LightServer::UpdatePointLightBuffer()
 {
-	size_t numberOfTiles = workGroupsX * workGroupsY;
+	//size_t numberOfTiles = workGroupsX * workGroupsY;
 	size_t numPointLights = this->pointLights.Size();
 
 	// Bind light buffer
@@ -75,13 +75,27 @@ void LightServer::UpdatePointLightBuffer()
 
 void LightServer::UpdateSpotLightBuffer()
 {
-	size_t numberOfTiles = workGroupsX * workGroupsY;
+	//size_t numberOfTiles = workGroupsX * workGroupsY;
 	size_t numSpotLights = this->spotLights.Size();
 
 	// Bind light buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBuffer);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, numSpotLights * sizeof(SpotLight), &this->spotLights[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+void LightServer::Update()
+{
+    this->UpdateWorkGroups();
+    this->UpdateSpotLightBuffer();
+}
+
+SpotLight LightServer::GetSpotLightAtIndex(const int &index)
+{
+    if(index > this->GetNumSpotLights())
+         return this->spotLights[index];
+    else
+        printf("Index was out side the Array! ");
 }
 
 }

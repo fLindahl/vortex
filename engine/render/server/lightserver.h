@@ -59,7 +59,7 @@ namespace Render
 
 		void AddSpotLight(SpotLight& pLight);
 		size_t GetNumSpotLights() { return this->spotLights.Size(); }
-		Util::Array<SpotLight> GetSpotLightArray() { return this->spotLights; }
+		SpotLight GetSpotLightAtIndex(const int& index);
 
 		GLuint GetWorkGroupsX() { return this->workGroupsX; }
 		GLuint GetWorkGroupsY() { return this->workGroupsY; }
@@ -71,12 +71,14 @@ namespace Render
 
         GLuint GetTileLights() { return this->tileLights; }
 
+        void Update();
 	private:
 		friend class RenderDevice;
 
+        void UpdateSpotLightBuffer();
 		void UpdateWorkGroups();
 		void UpdatePointLightBuffer();
-		void UpdateSpotLightBuffer();
+
 
 		// Used for storage buffer objects to hold light data and visible light indicies data
 		GLuint pointLightBuffer;
