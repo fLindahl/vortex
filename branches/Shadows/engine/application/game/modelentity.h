@@ -28,6 +28,5 @@ public:
 
 protected:
 	Render::GraphicsProperty* gProperty;
-
 };
 }
