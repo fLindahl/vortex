@@ -56,7 +56,7 @@ namespace Toolkit
 		GLuint brushToolTextureHandle;
 		GLuint polygonEditTextureHandle;
 
-
+		uint light;
 	};
 
 }

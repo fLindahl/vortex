@@ -39,6 +39,8 @@ namespace Toolkit
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
 		ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout");
+
+		this->light = -1;
 	}
 
 	UserInterface::~UserInterface()
@@ -242,6 +244,9 @@ namespace Toolkit
 				{
 					if (application->hit.object != nullptr)
 					{
+						/// I dunno
+						//this->light = -1;
+
 						if (ImGui::GetIO().MouseClicked[0])
 						{
 							this->currentTool->LeftDown();
@@ -264,6 +269,12 @@ namespace Toolkit
 							
 							this->application->hit.object->SetTransform(Math::mat4::multiply(objTransform, delta));
 							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+
+							/// Gets the index of the Light
+							if(this->application->hit.object->GetLightIndex() != -1)
+								this->light = this->application->hit.object->GetLightIndex();
+							else
+								this->light = -1;
 						}
 					}
 					else
@@ -321,13 +332,32 @@ namespace Toolkit
 
 			ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
-				Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->Settings();
+				if(this->light == -1)
+				{
+					Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->Settings();
 
-				ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
-				ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
-				ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
-				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
-				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
+					ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
+					ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
+					ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
+					ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
+				}
+
+				if(this->light != -1)
+				{
+					char i[50];
+					Render::LightServer::SpotLight& settings = Render::LightServer::Instance()->GetSpotLightAtIndex(this->light);
+					sprintf(i, "Light Index: %u", this->light);
+					ImGui::Text(i);
+					ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 100.0f, "%.1f");
+					ImGui::SliderFloat("Length", &settings.length,    1.0f, 100.0f, "%.1f");
+					ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,   "%.01f");
+					ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,   "%.01f");
+					ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,   "%.01f");
+					ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.01f");
+					ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.01f");
+					ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.01f");
+				}
 			}
 			ImGui::EndDock();
 			

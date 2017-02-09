@@ -134,7 +134,7 @@ Application::Open()
 		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);*/
 
-     	SpotLight sLight;
+     	Render::LightServer::SpotLight sLight;
 	    sLight.position = Math::vec4(-14.0f, 2.3f, 3.0f, 1.0f);
 		sLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);

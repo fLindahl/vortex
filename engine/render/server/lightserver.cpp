@@ -81,7 +81,7 @@ void LightServer::Update()
     this->UpdateSpotLightBuffer();
 }
 
-SpotLight& LightServer::GetSpotLightAtIndex(const int& index)
+LightServer::SpotLight& LightServer::GetSpotLightAtIndex(const int& index)
 {
     return this->spotLights[index];
 }

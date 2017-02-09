@@ -43,17 +43,14 @@ public:
 
     Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty; }
 
-    Render::SpotLight* GetSpotLightEnity(){ return this->spotlightEnt; } const
-    Render::SpotLight* SetSpotLightEnity(Render::SpotLight* sLight){ this->spotlightEnt = sLight; }
+    Render::LightServer::SpotLight* GetSpotLightEnity(){ return this->spotlightEnt; } const
+    Render::LightServer::SpotLight* SetSpotLightEnity(Render::LightServer::SpotLight* sLight){ this->spotlightEnt = sLight; }
 
-    void SetIndex(const uint& index){ this->index = index; }
-    uint GetIndex(){ return this->index; }
+    /*void SetLightIndex(const uint& index){ this->lightIndex = index; }
+    uint GetLightIndex(){ return this->lightIndex; }*/
 
 protected:
-    Render::SpotLight* spotlightEnt;
+    Render::LightServer::SpotLight* spotlightEnt;
     Render::GraphicsProperty* gProperty;
-
-    /// Index of the Light in the SpotLight Array
-    uint index;
 };
 }

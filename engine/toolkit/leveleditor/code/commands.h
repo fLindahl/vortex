@@ -49,7 +49,7 @@ namespace Edit
             this->entity->SetTransform(Math::mat4::translation(position));
 
             /// Default values
-            Render::SpotLight spotlight;
+            Render::LightServer::SpotLight spotlight;
             spotlight.position = this->entity->GetTransform().get_position();
             spotlight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
             spotlight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
@@ -58,7 +58,7 @@ namespace Edit
             Render::LightServer::Instance()->AddSpotLight(spotlight);
 
             this->entity->SetSpotLightEnity(&Render::LightServer::Instance()->GetSpotLightAtIndex(Render::LightServer::Instance()->GetNumSpotLights() - 1));
-            this->entity->SetIndex(Render::LightServer::Instance()->GetNumSpotLights() - 1);
+            this->entity->SetLightIndex(Render::LightServer::Instance()->GetNumSpotLights() - 1);
 
         }
         ~AddSpotlightEntity()
