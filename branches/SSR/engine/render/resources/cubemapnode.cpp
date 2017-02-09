@@ -9,7 +9,10 @@ CubeMapNode::CubeMapNode() :
 		isLoaded(false),
 		isActive(false),
 		resolution({ 128, 128 }),
-		mipLevels(6)		
+		mipLevels(6),
+		shape(SPHERE),
+		innerScale(0.5f,0.5f,0.5f),
+		outerScale(1.0f,1.0f,1.0f)
 {
 	glGenTextures(1, &this->cubeSampler);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeSampler);

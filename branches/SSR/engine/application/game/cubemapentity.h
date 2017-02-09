@@ -10,7 +10,6 @@ class ModelInstance;
 
 namespace Game
 {
-
 class CubeMapEntity : public ModelEntity
 {
 public:
