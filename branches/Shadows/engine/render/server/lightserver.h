@@ -13,6 +13,16 @@
 
 namespace Render
 {
+
+
+	struct VisibleIndex 
+	{
+		int index;
+	};
+
+	class LightServer
+	{
+	public:
 	/// 16 Byte Alignment sensitive
 	struct PointLight
 	{
@@ -30,20 +40,13 @@ namespace Render
 		Math::vec4 coneDirection;
 		Math::vec4 midPoint;
 		float length;
-        /// The bottom cirlces radius of the cone
+		/// The bottom cirlces radius of the cone
 		float radius;
 		/// The Frustum Culling radius
 		float fRadius;
 		float angle;
 	};
 
-	struct VisibleIndex 
-	{
-		int index;
-	};
-
-	class LightServer
-	{
 	private:
 		LightServer();
 		
@@ -63,7 +66,7 @@ namespace Render
 		void AddSpotLight(SpotLight& pLight);
 		size_t GetNumSpotLights() { return this->spotLights.Size(); }
         void UpdateSpotLight(SpotLight& sLight);
-		SpotLight& GetSpotLightAtIndex(const int& index);
+		LightServer::SpotLight& GetSpotLightAtIndex(const int& index);
 
 		GLuint GetWorkGroupsX() { return this->workGroupsX; }
 		GLuint GetWorkGroupsY() { return this->workGroupsY; }

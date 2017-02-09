@@ -35,12 +35,18 @@ public:
 	virtual Math::mat4 GetTransform();
 	virtual void SetTransform(const Math::mat4& nTransform);
 
+	virtual uint GetLightIndex();
+	virtual void SetLightIndex(const uint& index);
+
 protected:
     //friend class BaseGameFeature::EntityManager;
 
 	bool active = false;
 
     Math::mat4 transform;
+
+	/// Index of the Light in the Light Array
+	uint lightIndex;
 
 	uint ID;
 

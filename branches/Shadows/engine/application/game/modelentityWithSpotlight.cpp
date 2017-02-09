@@ -11,7 +11,7 @@ ModelEntitySpotLight::ModelEntitySpotLight()//: spotlightEnt(Render::SpotLight()
 	//Call baseclass first!
 	Entity();
 	this->gProperty = new Render::GraphicsProperty();
-    this->spotlightEnt = new Render::SpotLight();
+    this->spotlightEnt = new Render::LightServer::SpotLight();
 /*
     Render::SpotLight spotlight;
     spotlight.position = Math::vec4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -67,12 +67,12 @@ void ModelEntitySpotLight::SetSpotLightPosition(const Math::mat4& t)
 	this->spotlightEnt->position = t.get_position();
 }
 
-void ModelEntitySpotLight::SetSpotLightLength(const uint& length)
+void ModelEntitySpotLight::SetSpotLightLength(const float& length)
 {
     this->spotlightEnt->length = length;
 }
 
-void ModelEntitySpotLight::SetSpotLightAngle(const uint& angle)
+void ModelEntitySpotLight::SetSpotLightAngle(const float& angle)
 {
     this->spotlightEnt->angle = angle;
 }
