@@ -57,7 +57,9 @@ void ReflectionPass::Setup()
 void ReflectionPass::Execute()
 {
 	//double time = glfwGetTime();
-	//glFinish();
+	
+	//This needs to be done before rendering reflections on AMD cards as the compute shader dispatches before the renderpasses are done otherwise
+	glFinish();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, this->ubo[0]);
