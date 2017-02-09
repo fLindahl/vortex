@@ -19,13 +19,17 @@ public:
 	void Activate();
 	void Deactivate();
 
-	void SetTransform(const Math::mat4 &t);
+	void Update();
 
+	void SetTransform(const Math::mat4 &t);
+	
 	void GenerateCubeMap();
 
 	GLuint GetCubeMapSampler();
 
 	bool IsLoaded();
+
+	std::shared_ptr<Render::CubeMapNode> GetCubeMapNode() { return this->cubemap; }
 
 protected:
 	std::shared_ptr<Render::CubeMapNode> cubemap;

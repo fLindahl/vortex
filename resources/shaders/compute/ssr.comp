@@ -239,9 +239,9 @@ void main()
 		//Get fall-back value.
 		vec3 reflectionColor = texture(cubeMap, (mat3(InvView) * reflectionDir)).rgb;
 		vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
-		vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
+		//vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
 		
-		//vec4 finalColor = vec4(reflectionColor.rgb, 1.0f);
+		vec4 finalColor = vec4(reflectionColor.rgb, 1.0f);
 		
 		//vec3 BGColor = vec3(0.0f,0.0f,0.0f);
 		imageStore(reflectionImage, location, finalColor);
