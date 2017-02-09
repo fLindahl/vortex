@@ -44,7 +44,7 @@ public:
     Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty; }
 
     Render::LightServer::SpotLight* GetSpotLightEnity(){ return this->spotlightEnt; } const
-    Render::LightServer::SpotLight* SetSpotLightEnity(Render::LightServer::SpotLight* sLight){ this->spotlightEnt = sLight; }
+    void SetSpotLightEnity(Render::LightServer::SpotLight* sLight){ this->spotlightEnt = sLight; }
 
     /*void SetLightIndex(const uint& index){ this->lightIndex = index; }
     uint GetLightIndex(){ return this->lightIndex; }*/
