@@ -33,13 +33,19 @@ public:
 
 	bool IsLoaded();
 
+	void CalculateInfluenceWeights(const Math::point& pos);
+
 	Math::vector& InnerScale() { return this->innerScale; }
 	Math::vector& OuterScale() { return this->outerScale; }
 
 	void SetShape(CubemapShape s) { this->shape = s; }
 	CubemapShape GetShape() const { return this->shape; }
 
+	float GetBlendFactor() { return this->blendFactor; }
+
 private:
+	friend class LightServer;
+
 	enum CubeFace
 	{
 		RIGHT = 0,
@@ -70,6 +76,11 @@ private:
 
 	///The cubemap
 	GLuint cubeSampler;
+
+	// normalized distance function which is 0 at center and 1 at boundary
+	float NDF;
+	// how much to blend this cubemap into the final color
+	float blendFactor;
 
 #ifdef _LEVELEDITOR
 	//Lists all textures in the cubemap so that we can inspect them within applications

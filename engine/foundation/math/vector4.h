@@ -1426,8 +1426,7 @@ namespace Math
 	__forceinline float
 		vec4::distancesq(Math::vec4 a, Math::vec4 b)
 	{
-		a -= b;
-		return dot(a, a);
+		return _mm_cvtss_f32(_mm_dp_ps(a.vec, b.vec, 0xF1));
 	}
 
 } // namespace Math

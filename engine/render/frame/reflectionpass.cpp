@@ -10,6 +10,7 @@
 #include "render/frame/flatgeometrylitpass.h"
 #include "render/resources/cubemapnode.h"
 #include "render/server/lightserver.h"
+#include "foundation/math/math.h"
 
 namespace Render
 {
@@ -56,7 +57,7 @@ void ReflectionPass::Setup()
 
 void ReflectionPass::Execute()
 {
-	//double time = glfwGetTime();
+	double time = glfwGetTime();
 	
 	//This needs to be done before rendering reflections on AMD cards as the compute shader dispatches before the renderpasses are done otherwise
 	glFinish();
@@ -85,13 +86,38 @@ void ReflectionPass::Execute()
 	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "colorMap"), 7);
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer());
 
-	auto cubemap = Render::LightServer::Instance()->GetClosestCubemapToPoint(Graphics::MainCamera::Instance()->GetPosition());
-	if (cubemap != nullptr)
+	auto cubemaps = Render::LightServer::Instance()->GetClosestCubemapToPoint(Graphics::MainCamera::Instance()->GetPosition());
+	if (cubemaps.Size() > 0)
 	{
-		//assign cubemap
-		glActiveTexture(GL_TEXTURE8);
-		glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "cubeMap"), 8);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->GetCubeMap());
+		int numCubeMaps = Math::min(cubemaps.Size(), size_t(4));
+
+		glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "NumCubemaps"), numCubeMaps);
+
+		float blendFactor;
+
+		for (int i = 0; i < 4; ++i)
+		{
+			std::string samplerUniformName;
+			std::string blendFactorUniformName;
+			if (i == 0) { samplerUniformName = VORTEX_SEMANTIC_CUBEMAP1; blendFactorUniformName = VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR1; }
+			else if (i == 1) { samplerUniformName = VORTEX_SEMANTIC_CUBEMAP2; blendFactorUniformName = VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR2; }
+			else if (i == 2) { samplerUniformName = VORTEX_SEMANTIC_CUBEMAP3; blendFactorUniformName = VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR3; }
+			else if (i == 3) { samplerUniformName = VORTEX_SEMANTIC_CUBEMAP4; blendFactorUniformName = VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR4; }
+
+			if (i < numCubeMaps)
+			{
+				glActiveTexture(GL_TEXTURE8 + i);
+				glUniform1i(glGetUniformLocation(this->SSRComputeProgram, samplerUniformName.c_str()), 8 + i);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, cubemaps[i]->GetCubeMap());
+				blendFactor = cubemaps[i]->GetBlendFactor();
+			}
+			else
+			{
+				blendFactor = 0.0f;
+			}
+
+			glUniform1f(glGetUniformLocation(this->SSRComputeProgram, blendFactorUniformName.c_str()), blendFactor);
+		}
 	}
 
 	const GLint location = glGetUniformLocation(this->SSRComputeProgram, "reflectionImage");
@@ -119,13 +145,13 @@ void ReflectionPass::Execute()
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//glFinish();
-	//
-	//double time1 = glfwGetTime();
-	//
-	//double elapsedTime = time1 - time;
-	//
-	//printf("Elapsed time for sausage to splash the water: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
+	glFinish();
+	
+	double time1 = glfwGetTime();
+	
+	double elapsedTime = time1 - time;
+	
+	printf("Elapsed time for reflections: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
 
 	FramePass::Execute();
 }
