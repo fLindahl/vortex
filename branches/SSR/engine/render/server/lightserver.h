@@ -51,15 +51,17 @@ namespace Render
 		void AddCubeMap(std::shared_ptr<CubeMapNode> node);
 		void RemoveCubeMap(std::shared_ptr<CubeMapNode> node);
 
-		std::shared_ptr<CubeMapNode> GetClosestCubemapToPoint(const Math::point& point);
+		Util::Array<std::shared_ptr<CubeMapNode>>& GetClosestCubemapToPoint(const Math::point& point);
 		void RegenerateCubemaps();
-
 
 	private:
 		friend class RenderDevice;
 
 		void UpdateWorkGroups();
 		void UpdateLightBuffer();
+
+		//Sets the blendfactors for each influencing cubemap
+		void CalculateBlendMapFactors();
 
 		// Used for storage buffer objects to hold light data and visible light indicies data
 		GLuint lightBuffer;
@@ -75,5 +77,7 @@ namespace Render
 		/// Contains all active cubemaps in the scene
 		Util::Array<std::shared_ptr<CubeMapNode>> cubemapNodes;
 
+		// Contains all currently influencing cubemaps 
+		Util::Array<std::shared_ptr<CubeMapNode>> selectedInfluenceVolumes;
 	};
 }

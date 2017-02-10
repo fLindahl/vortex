@@ -62,24 +62,42 @@ void LightServer::RemoveCubeMap(std::shared_ptr<CubeMapNode> node)
 	}
 }
 
-std::shared_ptr<CubeMapNode> LightServer::GetClosestCubemapToPoint(const Math::point& point)
+Util::Array<std::shared_ptr<CubeMapNode>>& LightServer::GetClosestCubemapToPoint(const Math::point& point)
 {
 	float closestDistance = FLT_MAX;
 	std::shared_ptr<CubeMapNode> closestCubemap = nullptr;
 
-	float distanceSq;
+	float distance;
+
+	//Clear Array first!
+	selectedInfluenceVolumes.Reset();
 
 	for (auto cubemap : this->cubemapNodes)
 	{
-		distanceSq = Math::point::distancesq(point, cubemap->GetPosition());
-		if (distanceSq < closestDistance)
+		
+		distance = (point - cubemap->GetPosition()).length();
+		
+		const float& outerRange = cubemap->OuterScale().x();
+		const float& innerRange = cubemap->InnerScale().x();
+
+		if (distance < innerRange)
 		{
-			closestDistance = distanceSq;
-			closestCubemap = cubemap;
+			//Early out
 		}
+		
+		if (distance < outerRange)
+		{
+			cubemap->CalculateInfluenceWeights(point);
+			selectedInfluenceVolumes.Append(cubemap);
+		}
+		
 	}
 
-	return closestCubemap;
+	//TODO: Maybe sort by NDF?
+	//selectedInfluenceVolumes.Sort();
+	CalculateBlendMapFactors();
+
+	return this->selectedInfluenceVolumes;
 }
 
 void LightServer::RegenerateCubemaps()
@@ -87,6 +105,48 @@ void LightServer::RegenerateCubemaps()
 	for (auto cubemap : this->cubemapNodes)
 	{
 		cubemap->GenerateCubeMap();
+	}
+}
+
+void LightServer::CalculateBlendMapFactors()
+{
+	// First calc sum of NDF and InvDNF to normalize value
+	float sumNDF = 0.0f;
+	float invSumNDF = 0.0f;
+	float sumBlendFactor = 0.0f;
+	
+	const size_t num = this->selectedInfluenceVolumes.Size();
+	
+	if (num > 1)
+	{
+		for (auto cubemap : this->selectedInfluenceVolumes)
+		{
+			sumNDF += cubemap->NDF;
+			invSumNDF += (1.0f - cubemap->NDF);
+		}
+
+		for (auto cubemap : this->selectedInfluenceVolumes)
+		{
+			cubemap->blendFactor = (1.0f - (cubemap->NDF / sumNDF)) / (num - 1);
+			cubemap->blendFactor *= ((1.0f - cubemap->NDF) / invSumNDF);
+			sumBlendFactor += cubemap->blendFactor;
+		}
+
+		// Normalize BlendFactor
+		if (sumBlendFactor == 0.0f) // Possible with custom weight
+		{
+			sumBlendFactor = 1.0f;
+		}
+
+		float constVal = 1.0f / sumBlendFactor;
+		for (auto cubemap : this->selectedInfluenceVolumes)
+		{
+			cubemap->blendFactor *= constVal;
+		}
+	}
+	else if (num > 0)
+	{
+		this->selectedInfluenceVolumes[0]->blendFactor = 1.0f;
 	}
 }
 

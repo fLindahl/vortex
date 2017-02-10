@@ -181,4 +181,10 @@ bool CubeMapNode::IsLoaded()
 	return this->isLoaded;
 }
 
+void CubeMapNode::CalculateInfluenceWeights(const Math::point& pos)
+{
+	Math::vector dir = pos - this->position;
+	this->NDF = (dir.length() - this->innerScale.x()) / (this->outerScale.x() - this->innerScale.x());
+}
+
 }
