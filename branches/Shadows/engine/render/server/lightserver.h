@@ -11,10 +11,9 @@
 #include "foundation/math/vector4.h"
 
 
+
 namespace Render
 {
-
-
 	struct VisibleIndex 
 	{
 		int index;
@@ -22,10 +21,20 @@ namespace Render
 
 	class LightServer
 	{
+
 	public:
+	enum LightType
+	{
+		NaN = 1,
+		Point = 2,
+		Spot = 4
+	};
+
 	/// 16 Byte Alignment sensitive
 	struct PointLight
 	{
+		LightType lightType = LightType::Point;
+
 		Math::point color;
 		Math::point position;
 		Math::vec4 radiusAndPadding;
@@ -33,7 +42,7 @@ namespace Render
 
 	struct SpotLight
 	{
-		SpotLight() {};
+		LightType lightType = LightType::Spot;
 
 		Math::point color;
 		Math::point position;
@@ -41,7 +50,7 @@ namespace Render
 		Math::vec4 midPoint;
 		float length;
 		/// The bottom cirlces radius of the cone
-		float radius;
+		//float radius;
 		/// The Frustum Culling radius
 		float fRadius;
 		float angle;
@@ -62,10 +71,11 @@ namespace Render
 		
 		void AddPointLight(const PointLight& pLight);
 		size_t GetNumPointLights() { return this->pointLights.Size(); }
+		LightServer::PointLight& GetPointLightAtIndex(const int& index);
 
 		void AddSpotLight(SpotLight& pLight);
 		size_t GetNumSpotLights() { return this->spotLights.Size(); }
-        void UpdateSpotLight(SpotLight& sLight);
+        void CalculateSpotlight(SpotLight& sLight);
 		LightServer::SpotLight& GetSpotLightAtIndex(const int& index);
 
 		GLuint GetWorkGroupsX() { return this->workGroupsX; }
@@ -79,12 +89,15 @@ namespace Render
         GLuint GetTileLights() { return this->tileLights; }
 
         void Update();
+
+		void UpdateSpotLightBuffer();
+		void UpdatePointLightBuffer();
+
 	private:
 		friend class RenderDevice;
 
-        void UpdateSpotLightBuffer();
+
 		void UpdateWorkGroups();
-		void UpdatePointLightBuffer();
 
 
 		// Used for storage buffer objects to hold light data and visible light indicies data

@@ -41,6 +41,7 @@ namespace Toolkit
 		ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout");
 
 		this->light = -1;
+        this->lT = Render::LightServer::LightType::NaN;
 	}
 
 	UserInterface::~UserInterface()
@@ -244,9 +245,6 @@ namespace Toolkit
 				{
 					if (application->hit.object != nullptr)
 					{
-						/// I dunno
-						//this->light = -1;
-
 						if (ImGui::GetIO().MouseClicked[0])
 						{
 							this->currentTool->LeftDown();
@@ -271,10 +269,22 @@ namespace Toolkit
 							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
 
 							/// Gets the index of the Light
-							if(this->application->hit.object->GetLightIndex() != -1)
+
+							if(this->application->hit.object->GetLightType() == Render::LightServer::LightType::Spot)
+                            {
 								this->light = this->application->hit.object->GetLightIndex();
+                                this->lT = this->application->hit.object->GetLightType();
+                            }
+                            else if(this->application->hit.object->GetLightType() == Render::LightServer::LightType::Point)
+                            {
+                                this->light = this->application->hit.object->GetLightIndex();
+                                this->lT = this->application->hit.object->GetLightType();
+                            }
 							else
-								this->light = -1;
+                            {
+                                this->lT = Render::LightServer::Instance()->LightType::NaN;
+                                this->light = -1;
+                            }
 						}
 					}
 					else
@@ -343,36 +353,54 @@ namespace Toolkit
 					ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
 				}
 
-				if(this->light != -1)
+				if(this->light != -1 && this->lT == Render::LightServer::LightType::Spot)
 				{
 					char i[50];
 					Render::LightServer::SpotLight& settings = Render::LightServer::Instance()->GetSpotLightAtIndex(this->light);
-					sprintf(i, "Light Index: %u", this->light);
+					sprintf(i, "Spotlight: %i", this->light);
 					ImGui::Text(i);
-					ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 100.0f, "%.1f");
-					ImGui::SliderFloat("Length", &settings.length,    1.0f, 100.0f, "%.1f");
-					ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,   "%.01f");
-					ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,   "%.01f");
-					ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,   "%.01f");
+					ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 50.0f, "%.1f");
+					ImGui::SliderFloat("Length", &settings.length,    1.0f, 50.0f, "%.1f");
+					ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
+					ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
+					ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
 					ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.01f");
 					ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.01f");
 					ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.01f");
 				}
+
+                if(this->light != -1 && this->lT == Render::LightServer::LightType::Point)
+                {
+                    char i[50];
+                    Render::LightServer::PointLight& settings = Render::LightServer::Instance()->GetPointLightAtIndex(this->light);
+                    sprintf(i, "Point Light: %i", this->light);
+                    ImGui::Text(i);
+                    ImGui::SliderFloat("Radius", &settings.radiusAndPadding.x(), 1.0f, 50.0f, "%.1f");
+                    ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
+                    ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
+                    ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
+                }
 			}
 			ImGui::EndDock();
 			
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
-			if (ImGui::Button("New Entity", { 100, 40 }))
+			if (ImGui::Button("Add Box", { 100, 40 }))
 			{
-				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
+				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 				commandManager->DoCommand(command);
 			}
 
-			if (ImGui::Button("New Spotlight", { 100, 40 }))
+			if (ImGui::Button("Add Spotlight", { 125, 40 }))
 			{
 				std::shared_ptr<Edit::AddSpotlightEntity> command = std::make_shared<Edit::AddSpotlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
 				commandManager->DoCommand(command);
 			}
+
+            if (ImGui::Button("Add Point Light", { 125, 40 }))
+            {
+                std::shared_ptr<Edit::AddPointlightEntity> command = std::make_shared<Edit::AddPointlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
+                commandManager->DoCommand(command);
+            }
 			ImGui::EndDock();
 		}
 	}

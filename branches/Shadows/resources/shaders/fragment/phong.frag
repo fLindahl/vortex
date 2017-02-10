@@ -15,6 +15,8 @@ uniform sampler2D RoughnessMap;
 
 struct PointLight
 {
+	int lightType;
+	
 	vec4 color;
 	vec4 position;
 	vec4 radiusAndPadding;
@@ -22,12 +24,13 @@ struct PointLight
 
 struct SpotLight 
 {
+	int lightType;
+	
     vec4 color;
 	vec4 position;
 	vec4 coneDirection;
 	vec4 midPoint;
 	float length;
-	float radius;
 	float fRadius;
 	float angle;
 };

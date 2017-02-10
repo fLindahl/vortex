@@ -6,6 +6,7 @@
 #include "foundation/messaging/messagehandler.h"
 #include "foundation/math/vector4.h"
 #include "baseproperty.h"
+#include "../../render/server/lightserver.h"
 
 namespace Game
 {
@@ -35,8 +36,11 @@ public:
 	virtual Math::mat4 GetTransform();
 	virtual void SetTransform(const Math::mat4& nTransform);
 
-	virtual uint GetLightIndex();
+	/// Light Properties ///
+	virtual int GetLightIndex();
 	virtual void SetLightIndex(const uint& index);
+
+	virtual Render::LightServer::LightType& GetLightType();
 
 protected:
     //friend class BaseGameFeature::EntityManager;
@@ -46,7 +50,8 @@ protected:
     Math::mat4 transform;
 
 	/// Index of the Light in the Light Array
-	uint lightIndex;
+	int lightIndex;
+	Render::LightServer::LightType lightType;
 
 	uint ID;
 

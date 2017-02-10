@@ -22,9 +22,14 @@ void LightServer::AddPointLight(const PointLight& pLight)
 	this->UpdatePointLightBuffer();
 }
 
+LightServer::PointLight& LightServer::GetPointLightAtIndex(const int& index)
+{
+	return this->pointLights[index];
+}
+
 void LightServer::AddSpotLight(SpotLight& sLight)
 {
-    this->UpdateSpotLight(sLight);
+    this->CalculateSpotlight(sLight);
 	this->spotLights.Append(sLight);
 	this->UpdateSpotLightBuffer();
 }
@@ -69,34 +74,22 @@ void LightServer::UpdateSpotLightBuffer()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void LightServer::Update()
-{
-    this->UpdateWorkGroups();
-
-    for(int i = 0; i < this->GetNumSpotLights(); i++)
-    {
-        this->UpdateSpotLight(this->GetSpotLightAtIndex(i));
-    }
-
-    this->UpdateSpotLightBuffer();
-}
-
 LightServer::SpotLight& LightServer::GetSpotLightAtIndex(const int& index)
 {
     return this->spotLights[index];
 }
 
-void LightServer::UpdateSpotLight(SpotLight& sLight)
+void LightServer::CalculateSpotlight(SpotLight& sLight)
 {
     /// calculate the radius of the bottom cirlce
-    sLight.radius = (float)tan(Math::Deg2Rad(sLight.angle)) * sLight.length;
+    float radius = (float)tan(Math::Deg2Rad(sLight.angle)) * sLight.length;
 
     /// Get perpendicular direction
     Math::vec4 m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection, sLight.position));
-    Math::vec4 Q1 = sLight.position + sLight.coneDirection * sLight.length - m * sLight.radius;
+    Math::vec4 Q1 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
     /// Get perpendicular, -direction
     m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection * -1.0f, sLight.position));
-    Math::vec4 Q2 = sLight.position + sLight.coneDirection * sLight.length - m * sLight.radius;
+    Math::vec4 Q2 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
 
     /// Calculate the Mid Point of the Sphere
     sLight.midPoint = (sLight.position + Q1 + Q2) * this->oneOverThree;
@@ -105,5 +98,4 @@ void LightServer::UpdateSpotLight(SpotLight& sLight)
     /// Calculate the radius for the sphere
     sLight.fRadius = (sLight.midPoint - sLight.position).length();
 }
-
 }

@@ -1,5 +1,7 @@
 /*
  * The Spotlights are added in commands.h
+ *
+ * TODO: Set functions should be moved to .h
  */
 
 #pragma once
@@ -36,21 +38,23 @@ public:
     void SetSpotLightDirection(const Math::vec4& direction);
     void SetSpotLightColor(const Math::vec4& color);
 
-	float& GetSpotLightLength(){ return this->spotlightEnt->length; }
-	float& GetSpotLightAngle(){ return this->spotlightEnt->angle; }
-	Math::vec4& GetSpotLightDirection(){ return this->spotlightEnt->coneDirection; }
-	Math::vec4& GetSpotLightColor(){ return this->spotlightEnt->color; }
+	float& GetSpotLightLength(){ return this->lightEntity->length; }
+	float& GetSpotLightAngle(){ return this->lightEntity->angle; }
+	Math::vec4& GetSpotLightDirection(){ return this->lightEntity->coneDirection; }
+	Math::vec4& GetSpotLightColor(){ return this->lightEntity->color; }
 
     Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty; }
 
-    Render::LightServer::SpotLight* GetSpotLightEnity(){ return this->spotlightEnt; } const
-    void SetSpotLightEnity(Render::LightServer::SpotLight* sLight){ this->spotlightEnt = sLight; }
+    Render::LightServer::SpotLight* GetSpotLightEnity(){ return this->lightEntity; } const
+    void SetSpotLightEnity(Render::LightServer::SpotLight* sLight){ this->lightEntity = sLight; }
 
-    /*void SetLightIndex(const uint& index){ this->lightIndex = index; }
-    uint GetLightIndex(){ return this->lightIndex; }*/
+    void SetLightIndex(const uint& index){ this->lightIndex = index; }
+    int GetLightIndex(){ return this->lightIndex; }
+
+    Render::LightServer::LightType& GetLightType(){ return this->lightEntity->lightType; }
 
 protected:
-    Render::LightServer::SpotLight* spotlightEnt;
+    Render::LightServer::SpotLight* lightEntity;
     Render::GraphicsProperty* gProperty;
 };
 }
