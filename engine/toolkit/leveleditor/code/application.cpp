@@ -85,6 +85,12 @@ Application::Open()
 		sTransform.translate(Math::vector(0.0f, -2.0f, 0.0f));
 		this->sponza->SetTransform(sTransform);
 
+		//spawn in a cube somewhere
+		this->wall1 = std::make_shared<Game::StaticEntity>();
+		this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+		this->wall1->Activate();
+		this->wall1->SetTransform(Math::mat4::translation(-1.0f, 0.5f, 0.0f));
+
 		/*
 		this->wall1 = std::make_shared<Game::ModelEntity>();
 		this->wall2 = std::make_shared<Game::ModelEntity>();
@@ -134,13 +140,13 @@ Application::Open()
 		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);*/
 
-/*     	Render::LightServer::SpotLight sLight;
-	    sLight.position = Math::vec4(-14.0f, 2.3f, 3.0f, 1.0f);
+     	/*Render::LightServer::SpotLight sLight;
+	    sLight.position = Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f);
 		sLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
-		sLight.length = 5.0f;
-        sLight.angle = 15.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
+		sLight.length = 10.0f;
+        sLight.angle = 30.0f;
+		LightServer::Instance()->AddSpotLight(sLight);*/
 
 	    sLight.position = Math::vec4(4.0f, 3.5f, 0.0f, 1.0f);
 		sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);

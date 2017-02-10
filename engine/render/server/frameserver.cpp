@@ -29,7 +29,6 @@ namespace Render
 
 		this->framePassByName.insert(std::make_pair(this->Depth->name, this->Depth));
 		this->framePasses.Append(this->Depth);
-		
 
 		//Light culling compute shader pass
 		this->lightCullingPass = std::make_shared<LightCullingPass>();
