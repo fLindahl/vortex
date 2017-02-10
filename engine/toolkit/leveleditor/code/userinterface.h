@@ -1,6 +1,11 @@
+/*
+ * TODO: Add Delete buttons for lights
+ */
+
 #pragma once
 #include "GL/glew.h"
 #include <string>
+#include <render/server/lightserver.h>
 #include "foundation/math/point.h"
 #include "undo.h"
 
@@ -56,7 +61,10 @@ namespace Toolkit
 		GLuint brushToolTextureHandle;
 		GLuint polygonEditTextureHandle;
 
-		uint light;
+        /// Light Variables ///
+		int light;
+        Render::LightServer::LightType lT;
+
 	};
 
 }

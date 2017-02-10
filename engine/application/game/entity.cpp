@@ -79,15 +79,19 @@ void Entity::Deactivate()
 	this->active = false;
 }
 
-	uint Entity::GetLightIndex()
-	{
-		return this->lightIndex;
-	}
+int Entity::GetLightIndex()
+{
+	return this->lightIndex;
+}
 
-	void Entity::SetLightIndex(const uint& index)
-	{
-		this->lightIndex = index;
-	}
+void Entity::SetLightIndex(const uint& index)
+{
+	this->lightIndex = index;
+}
 
+Render::LightServer::LightType& Entity::GetLightType()
+{
+	return this->lightType;
+}
 }
 
