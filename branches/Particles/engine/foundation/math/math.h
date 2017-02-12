@@ -70,7 +70,7 @@ namespace Math
 
 	inline void RandomPointInCircle(const float& radius, float& x, float& y)
 	{
-		float angle = randFloat() * PI * 2;
+		float angle = randFloat() * (float) PI * 2;
 		float randRad = sqrtf(randFloat()) * radius;
 		x = randRad * cosf(angle);
 		y = randRad * sinf(angle);

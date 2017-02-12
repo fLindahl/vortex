@@ -48,6 +48,13 @@ void ParticleEmitter::CreateEmitter(GLuint numOfParticles, const char* texturepa
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(Particles::ParticleRenderingBuffer), &renderBuff, GL_STATIC_DRAW);
 }
 
+void ParticleEmitter::UpdateUniformBuffer()
+{
+	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 3, this->ubo[0]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(Particles::ParticleRenderingBuffer), &renderBuff, GL_STATIC_DRAW);
+}
+
 void ParticleEmitter::BindUniformBuffer()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);

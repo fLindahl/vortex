@@ -1,7 +1,7 @@
 #pragma once
 #include "application/game/baseproperty.h"
 #include "render/particlesystem/particlesystem.h"
-
+#include "foundation/util/string.h"
 
 
 namespace Render
@@ -27,6 +27,7 @@ public:
 	void Deactivate();
 
 	void CreateEmitter(GLuint numOfParticles, const char* texturepath);
+	void UpdateUniformBuffer();
 	void BindUniformBuffer();
 
 	GLuint& GetNumberOfParticles(){ return numOfParticles; }
@@ -41,6 +42,7 @@ public:
 	Particles::EmitterBuffer& GetEmitterBuffer(){ return this->buff; }
 	Particles::ParticleRenderingBuffer& GetRenderBuffer(){ return this->renderBuff; }
 	Particles::ParticleUISettings& GetParticleUISettings(){ return this->pSet; }
+	Util::String& GetEmitterName(){ return this->name; }
 
 private:
 	//uniformBuffer
@@ -61,6 +63,9 @@ private:
 
 	//Saved Settings
 	Particles::ParticleUISettings pSet;
+
+	//Name of the emitter
+	Util::String name = "Name";
 
 };
 }

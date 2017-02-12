@@ -83,12 +83,12 @@ Application::Open()
 
 
 		billboard = std::make_shared<Game::ParticleEntity>();
-		billboard->SetTransform(Math::mat4::translation(5.59f, -0.5f, 2.01f));
+		billboard->SetTransform(Math::mat4::translation(11.18f, -1.0f, 4.02f));
 		billboard->Activate();
-		billboard->GetEmitter()->CreateEmitter(10000, "resources/textures/particles/fireparticle2.tga");
+		billboard->GetEmitter()->CreateEmitter(1000, "resources/textures/particles/sprite_rapids2.tga");
 
 		billboard2 = std::make_shared<Game::ParticleEntity>();
-		billboard2->SetTransform(Math::mat4::multiply(Math::mat4::rotationyawpitchroll(0.0f, 45.0f, 0.0f),Math::mat4::translation(0.0f, 5.5f, 0.0f)));
+		billboard2->SetTransform(Math::mat4::translation(0.0f, 5.5f, 0.0f));
 		billboard2->Activate();
 		billboard2->GetEmitter()->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");
 		
@@ -170,7 +170,7 @@ Application::Run()
 		
 		//Debug::DebugRenderer::Instance()->DrawCircle(Math::point(0, 0, 0), Math::quaternion::identity(), 0.5f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
 
-		//Debug::DebugRenderer::Instance()->DrawCone(Math::point(0, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 0.0f), 0.5f, 1.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
+		//Debug::DebugRenderer::Instance()->DrawCone(Math::point(2, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 45.0f), 0.5f, 1.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
 
 		//Debug::DebugRenderer::Instance()->DrawCircle(Math::point(0, 0, 0), Math::quaternion::identity(), 0.5f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
 

@@ -12,6 +12,7 @@
 #include "translatetool.h"
 #include "render/debugrender/debugrenderer.h"
 #include "imgui_internal.h"
+#include "render/particlesystem/particlefile.h"
 
 
 #define CONSOLE_BUFFER_SIZE 8096
@@ -320,6 +321,16 @@ namespace Toolkit
 			ImGui::BeginDock("Particle Settings", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
 				this->particleCount = 0;
+				if (ImGui::Button("Save"))
+				{
+					Particles::ParticleFile::Instance()->SaveParticle("testParticle");
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("Saves the current particles.\nSaves all the currently appended emitters\nthen removes them from the list");
+					ImGui::EndTooltip();
+				}
 				for (int i = 0; i < application->particleList.Size(); ++i)
 				{
 					ParticlesSettings(application->particleList[i]->GetEmitter());
@@ -351,6 +362,28 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 	std::string id = "Particle "+std::to_string(particleCount);
 	if (ImGui::CollapsingHeader(id.c_str()))
 	{
+		
+		id = "Append Emitter##" + std::to_string(particleCount);
+		if (ImGui::Button(id.c_str()))
+		{
+			Particles::ParticleFile::Instance()->AppendEmitter(emitter);
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::Text("Append the emitter into the current particle.\nUsed when saving");
+			ImGui::EndTooltip();
+		}
+		ImGui::SameLine(120);
+		id = "name##" + std::to_string(particleCount);
+		ImGui::InputText(id.c_str(), (char*)emitter->GetEmitterName().c_str(), 32);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::Text("Emitter name");
+			ImGui::EndTooltip();
+		}
+		
 		id = "Base Settings##" + std::to_string(particleCount);
 		if (ImGui::TreeNode(id.c_str()))
 		{
@@ -373,7 +406,7 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 						emitter->GetParticleUISettings().vel = emitter->GetParticleUISettings().vel2;
 						emitter->GetParticleUISettings().vel2 = emitter->GetParticleUISettings().vel;
 					}
-					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().vecRand);
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
 				}
 				if (emitter->GetParticleUISettings().vecRand)
 				{
@@ -387,7 +420,7 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 							emitter->GetParticleUISettings().vel = emitter->GetParticleUISettings().vel2;
 							emitter->GetParticleUISettings().vel2 = emitter->GetParticleUISettings().vel;
 						}
-						Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().vecRand);
+						Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
 					}
 				}
 				ImGui::TreePop();
@@ -521,10 +554,12 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 
 			ImGui::Text("Max particles"); ImGui::SameLine(130);
 			id = "##mp" + std::to_string(particleCount);
+			ImGui::PushItemWidth(150);
 			if (ImGui::SliderInt(id.c_str(), &emitter->GetParticleUISettings().numParticles, 1, 1000000))
 			{
 				Particles::ParticleSystem::Instance()->GetEmitterBuffer(emitter->GetParticleUISettings().numParticles, emitter, emitter->GetEmitterBuffer());
 			}
+			ImGui::PopItemWidth();
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Emitter Shape Settings"))
@@ -543,18 +578,34 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 			{
 				ImGui::Text("Cone Radius"); ImGui::SameLine(130);
 				id = "##cRadius" + std::to_string(particleCount);
+				ImGui::PushItemWidth(150);
 				if (ImGui::SliderFloat(id.c_str(), &emitter->GetParticleUISettings().radius, 0.001, 10, "%.3f", 5))
 				{
-					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().vecRand);
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
 				}
+				ImGui::PopItemWidth();
 			}
 			else if (emitter->GetParticleUISettings().shapes == Particles::SPHERE)
 			{
-				
+				ImGui::Text("Sphere Radius"); ImGui::SameLine(130);
+				id = "##sRadius" + std::to_string(particleCount);
+				ImGui::PushItemWidth(150);
+				if (ImGui::SliderFloat(id.c_str(), &emitter->GetParticleUISettings().radius, 0.001, 10, "%.3f", 5))
+				{
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
+				}
+				ImGui::PopItemWidth();
 			}
 			else if (emitter->GetParticleUISettings().shapes == Particles::HEMISPHERE)
 			{
-				
+				ImGui::Text("Hemisphere Radius"); ImGui::SameLine(160);
+				id = "##hsRadius" + std::to_string(particleCount);
+				ImGui::PushItemWidth(150);
+				if (ImGui::SliderFloat(id.c_str(), &emitter->GetParticleUISettings().radius, 0.001, 10, "%.3f", 5))
+				{
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
+				}
+				ImGui::PopItemWidth();
 			}
 			
 			//Debug::DebugRenderer::Instance()->DrawCone(Math::point(0, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 0.0f), application->emitter->GetParticleUISettings()tings.radius, 1.0f, application->emitter->GetParticleUISettings()tings.color, Debug::RenderMode::WireFrame, 2.0f);
