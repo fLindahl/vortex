@@ -103,6 +103,8 @@ SET(files_render_softwarerender
 SET(files_render_particlesystem
 	particlesystem/particlesystem.h
 	particlesystem/particlesystem.cpp
+	particlesystem/particlefile.h
+	particlesystem/particlefile.cpp
 	)	
 
 SET(files_render_debugrender

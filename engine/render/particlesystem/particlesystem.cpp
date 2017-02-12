@@ -39,21 +39,22 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 	owner.GetNumberOfParticles() = buf.endIndex - buf.startIndex;
 
 	index_t numPart = particleArray.Size();
-	for (int i = buf.startIndex; i < buf.endIndex; i++)
+	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
 	{
 		Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
 		RandomPointInSphere(1.0f, pos);
+		pos = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - owner.GetModelMatrix().get_position());
 		particleArray[i].accLife[3] = Math::randFloat(0.0f, 2.5f);
 		particleArray[i].accLife[2] =  Math::randFloat(-0.5f, 1.0f);
 		particleArray[i].accLife[1] =  Math::randFloat(-9.82f, -7.82f);
 		particleArray[i].accLife[0] =  Math::randFloat(-0.5f, 1.0f);
-		particleArray[i].pos = owner.GetModelMatrix().get_position();
-		particleArray[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - particleArray[i].pos) * Math::randFloat(1.0f, 2.5f);
+		particleArray[i].pos = owner.GetModelMatrix().get_position()+(pos*1.0f);
+		particleArray[i].vel = pos * Math::randFloat(1.0f, 2.5f);
 		particleArray[i].vel[3] = 1.0f;
 	}
 
 	particleStartSettings = particleArray;
-	for (int i = buf.startIndex; i < buf.endIndex; i++)
+	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
 	{
 		particleStartSettings[i].accLife[3] = Math::randFloat(0.5f, 2.5f);
 	}
@@ -74,13 +75,28 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff)
 {
 	Util::Array<ParticleState> arr;
-	arr.Reserve(particleArray.Size() - (eBuff.endIndex - eBuff.startIndex) + bufferSize);
-	for (int i = 0; i < particleArray.Size(); i++)
+	arr.Reserve(this->particleArray.Size() - (eBuff.endIndex - eBuff.startIndex) + bufferSize);
+	for (size_t i = 0; i < particleArray.Size(); i++)
 	{
 		if (i >= eBuff.startIndex && i <= eBuff.endIndex)
 			continue;
 
-		arr.Insert(i, particleArray[i]);
+		arr.Append(this->particleArray[i]);
+	}
+	
+	size_t it = 0;
+	for (size_t i = 0; i < this->emitters.Size(); i++)
+	{
+		if (this->emitters[i] == owner.get())
+			continue;
+		EmitterBuffer& buf = this->emitters[i]->GetEmitterBuffer();
+
+		buf.startIndex = it;
+		it += buf.endIndex - buf.startIndex;
+		buf.endIndex = it;
+		this->emitters[i]->GetRenderBuffer().offset = buf.startIndex;
+		this->emitters[i]->UpdateUniformBuffer();
+
 	}
 
 	//Create a "buffer" for an emitter
@@ -88,34 +104,33 @@ void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Proper
 	buf.startIndex = arr.Size();
 	arr.Fill(buf.startIndex, bufferSize, owner->GetState());
 	buf.endIndex = arr.Size();
-	particleArray = arr;
-	buf.arr = &particleArray;
-	particleStartSettings = particleArray;
-	buf.startArr = &particleStartSettings;
+	this->particleArray = arr;
+	buf.arr = &this->particleArray;
+	this->particleStartSettings = this->particleArray;
+	buf.startArr = &this->particleStartSettings;
 	
 	eBuff = buf;
 	owner->GetNumberOfParticles() = buf.endIndex - buf.startIndex;
-	float x, y;
-	for (int i = buf.startIndex; i < buf.endIndex; i++)
+	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
 	{
 		Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
 		RandomPointInSphere(1.0f, pos);
-		particleArray[i].accLife[3] = Math::randFloat(0.0f, 2.5f);
-		particleArray[i].accLife[2] = Math::randFloat(-0.5f, 1.0f);
-		particleArray[i].accLife[1] = Math::randFloat(-9.82f, -7.82f);
-		particleArray[i].accLife[0] = Math::randFloat(-0.5f, 1.0f);
-		particleArray[i].pos = owner->GetModelMatrix().get_position();
-		particleArray[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - particleArray[i].pos) * Math::randFloat(1.0f, 2.5f);
-		particleArray[i].vel[3] = 1.0f;
+		this->particleArray[i].accLife[3] = Math::randFloat(0.0f, 2.5f);
+		this->particleArray[i].accLife[2] = Math::randFloat(-0.5f, 1.0f);
+		this->particleArray[i].accLife[1] = Math::randFloat(-9.82f, -7.82f);
+		this->particleArray[i].accLife[0] = Math::randFloat(-0.5f, 1.0f);
+		this->particleArray[i].pos = owner->GetModelMatrix().get_position();
+		this->particleArray[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - this->particleArray[i].pos) * Math::randFloat(1.0f, 2.5f);
+		this->particleArray[i].vel[3] = 1.0f;
 	}
 
-	particleStartSettings = particleArray;
-	for (int i = buf.startIndex; i < buf.endIndex; i++)
+	this->particleStartSettings = this->particleArray;
+	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
 	{
-		particleStartSettings[i].accLife[3] = Math::randFloat(0.5f, 2.5f);
+		this->particleStartSettings[i].accLife[3] = Math::randFloat(0.5f, 2.5f);
 	}
 
-	index_t numPart = particleArray.Size();
+	index_t numPart = this->particleArray.Size();
 	
 
 	// Bind particle buffer
@@ -177,7 +192,7 @@ void ParticleSystem::UpdateParticlePosition(std::shared_ptr<Property::ParticleEm
 	
 	if (random)
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			
 			particles[i].pos = Math::vec4(Math::randFloat(min[0], max[0]), Math::randFloat(min[1], max[1]), Math::randFloat(min[2], max[2]), 1.0f);
@@ -185,7 +200,7 @@ void ParticleSystem::UpdateParticlePosition(std::shared_ptr<Property::ParticleEm
 	}
 	else
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].pos = min;
 		}
@@ -196,7 +211,7 @@ void ParticleSystem::UpdateParticlePosition(std::shared_ptr<Property::ParticleEm
 
 }
 
-void ParticleSystem::UpdateParticleVelocity(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max, float radius, bool random)
+void ParticleSystem::UpdateParticleVelocity(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -212,26 +227,73 @@ void ParticleSystem::UpdateParticleVelocity(std::shared_ptr<Property::ParticleEm
 	float x, y;
 	if (random)
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
-			Math::vec4 pos(0.0f, 2.0f, 0.0f, 1.0f);
-			Math::RandomPointInCircle(radius, x, y);
-			pos.set_x(x);
-			pos.set_z(y);
-			particles[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - particles[i].pos)*Math::randFloat(min, max);
-			particles[i].vel[3] = 1.0f;
+			
+			if (shape == CONE)
+			{
+				Math::vec4 pos(0.0f, 2.0f, 0.0f, 1.0f);
+				Math::RandomPointInCircle(radius, x, y);
+				pos.set_x(x);
+				pos.set_z(y);
+				particles[i].pos = owner->GetModelMatrix().get_position();
+				particles[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - particles[i].pos)*Math::randFloat(min, max);
+				particles[i].vel[3] = 1.0f;
+			}
+			else if (shape == SPHERE)
+			{
+				Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+				Math::RandomPointInSphere(radius, pos, (float)PI*2);
+				pos = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - owner->GetModelMatrix().get_position());
+				particles[i].pos = owner->GetModelMatrix().get_position() + (pos*radius);
+				particles[i].vel = pos*Math::randFloat(min, max);
+				particles[i].vel[3] = 1.0f;
+			}
+			else if (shape == HEMISPHERE)
+			{
+				Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+				Math::RandomPointInSphere(radius, pos, (float)PI);
+				pos = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - owner->GetModelMatrix().get_position());
+				particles[i].pos = owner->GetModelMatrix().get_position() + (pos*radius);
+				particles[i].vel = pos*Math::randFloat(min, max);
+				particles[i].vel[3] = 1.0f;
+			}	
+			
+			
 		}
 	}
 	else
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
-			Math::vec4 pos(0.0f, 2.0f, 0.0f, 1.0f);
-			Math::RandomPointInCircle(radius, x, y);
-			pos.set_x(x);
-			pos.set_z(y);
-			particles[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - particles[i].pos)*min;
-			particles[i].vel[3] = 1.0f;
+			if (shape == CONE)
+			{
+				Math::vec4 pos(0.0f, 2.0f, 0.0f, 1.0f);
+				Math::RandomPointInCircle(radius, x, y);
+				pos.set_x(x);
+				pos.set_z(y);
+				particles[i].pos = owner->GetModelMatrix().get_position();
+				particles[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - particles[i].pos)*min;
+				particles[i].vel[3] = 1.0f;
+			}
+			else if (shape == SPHERE)
+			{
+				Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+				Math::RandomPointInSphere(radius, pos, (float)PI * 2);
+				pos = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - owner->GetModelMatrix().get_position());
+				particles[i].pos = owner->GetModelMatrix().get_position() + (pos*radius);
+				particles[i].vel = pos*min;
+				particles[i].vel[3] = 1.0f;
+			}
+			else if (shape == HEMISPHERE)
+			{
+				Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+				Math::RandomPointInSphere(radius, pos, (float)PI);
+				pos = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - owner->GetModelMatrix().get_position());
+				particles[i].pos = owner->GetModelMatrix().get_position() + (pos*radius);
+				particles[i].vel = pos*min;
+				particles[i].vel[3] = 1.0f;
+			}
 		}
 	}
 
@@ -256,14 +318,14 @@ void ParticleSystem::UpdateParticleRotation(std::shared_ptr<Property::ParticleEm
 
 	if (random)
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].rot = Math::vec4(Math::randFloat(min[0], max[0]), Math::randFloat(min[1], max[1]), Math::randFloat(min[2], max[2]), 1.0f);
 		}
 	}
 	else
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].rot = min;
 		}
@@ -290,7 +352,7 @@ void ParticleSystem::UpdateParticleAcceleration(std::shared_ptr<Property::Partic
 
 	if (random)
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].accLife[0] = Math::randFloat(min[0], max[0]);
 			particles[i].accLife[1] = Math::randFloat(min[1], max[1]);
@@ -299,7 +361,7 @@ void ParticleSystem::UpdateParticleAcceleration(std::shared_ptr<Property::Partic
 	}
 	else
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].accLife[0] = min[0];
 			particles[i].accLife[1] = min[1];
@@ -330,14 +392,14 @@ void ParticleSystem::UpdateParticleLifetime(std::shared_ptr<Property::ParticleEm
 
 	if (random)
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].accLife[3] = Math::randFloat(min, max);
 		}
 	}
 	else
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].accLife[3] = min;
 		}
@@ -364,14 +426,14 @@ void ParticleSystem::UpdateParticleColor(std::shared_ptr<Property::ParticleEmitt
 
 	if (random)
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].color = Math::vec4::lerp(min,max,Math::randFloat());
 		}
 	}
 	else
 	{
-		for (int i = 0; i < owner->GetNumberOfParticles(); ++i)
+		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 		{
 			particles[i].color = min;
 		}

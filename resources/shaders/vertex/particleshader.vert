@@ -27,6 +27,17 @@ layout(std430, binding=5) buffer StartSettings
 	ParticleState settings[]; // array of structures
 } startSettings;
 
+mat3 rotateZ(float rad) 
+{
+    float c = cos(rad);
+    float s = sin(rad);
+    return mat3(
+        c, s, 0.0,
+        -s, c, 0.0,
+        0.0, 0.0, 1.0
+    );
+}
+
 //out vec3 FragmentPos;
 //out vec3 Normal;
 out vec2 TexCoords;
@@ -39,11 +50,15 @@ void main()
 {
 	uint index = gl_InstanceID + offset;
 	float lerp = pSettings.settings[index].accLife[3]/startSettings.settings[index].accLife[3];
-	vec3 particlePos = pSettings.settings[index].pos.xyz;
-	vec3 scalepos = pos * mix(endSize,startSize, lerp).xyz;
+	
 	vec3 camRight = vec3(View[0][0],View[1][0], View[2][0]);
 	vec3 camUp = vec3(View[0][1],View[1][1], View[2][1]);
-	vec3 vertexPos = particlePos + camRight*scalepos.x + camUp*scalepos.y;
+	vec3 normVel =  normalize(pSettings.settings[index].vel.xyz);	
+	float signX = sign(dot(camRight, normVel));
+	vec3 p = (mix(endSize,startSize, lerp).xyz *pos) * rotateZ(signX * acos(dot(vec3(0,1,0),normVel)));
+	vec3 particlePos = pSettings.settings[index].pos.xyz;
+	vec3 vertexPos = camRight*p.x + camUp*p.y;
+	
 	vec4 wPos = vec4(particlePos+vertexPos , 1);
 	
 	// position in world space

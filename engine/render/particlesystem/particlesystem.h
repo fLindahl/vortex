@@ -38,9 +38,9 @@ struct ParticleRenderingBuffer
 
 struct ParticleUISettings
 {
-	float vel = 1;
-	Math::vec4 acc;
-	Math::vec4 color;
+	float vel = 1.0f;
+	Math::vec4 acc = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	Math::vec4 color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	float vel2 = 3.0f;
 	Math::vec4 acc2 = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 	Math::vec4 color2 = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -62,8 +62,8 @@ struct ParticleUISettings
 
 struct EmitterBuffer
 {
-	int startIndex;
-	int endIndex;
+	size_t startIndex;
+	size_t endIndex;
 	Util::Array<ParticleState>* arr;
 	Util::Array<ParticleState>* startArr;
 
@@ -85,7 +85,7 @@ public:
 	void DrawParticleSystem();
 
 	void UpdateParticlePosition(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random = false);
-	void UpdateParticleVelocity(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max, float radius, bool random = false);
+	void UpdateParticleVelocity(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random = false);
 	void UpdateParticleRotation(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random = false);
 	void UpdateParticleAcceleration(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max = Math::vec4(), bool random = false);
 	void UpdateParticleLifetime(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max = 0, bool random = false);
@@ -93,10 +93,10 @@ public:
 	void UpdateParticleSize(std::shared_ptr<Property::ParticleEmitter> owner, float start, float end);
 
 	Util::Array<ParticleState>& GetParticleArray(){ return this->particleArray; }
-	GLuint GetParticleBuffer(){ return particleBuffer; }
-	GLuint GetParticleStartBuffer(){ return particleStartBuffer; }
+	GLuint GetParticleBuffer() const { return particleBuffer; }
+	GLuint GetParticleStartBuffer() const { return particleStartBuffer; }
 	Util::Array<Property::ParticleEmitter*>& GetParticleEmitters(){ return this->emitters; }
-	std::shared_ptr<Render::MeshResource> GetMesh(){ return this->mesh; }
+	std::shared_ptr<Render::MeshResource> GetMesh() const { return this->mesh; }
 	std::shared_ptr<Render::ShaderObject> GetParticleShaderObject();
 
 private:
