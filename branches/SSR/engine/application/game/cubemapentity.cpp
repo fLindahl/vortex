@@ -7,10 +7,9 @@
 namespace Game
 {
 
-CubeMapEntity::CubeMapEntity()
+CubeMapEntity::CubeMapEntity() : ModelEntity()
 {
-	//Call baseclass first!
-	ModelEntity::ModelEntity();
+	//Call baseclass first
 	this->cubemap = std::make_shared<Render::CubeMapNode>();
 }
 	

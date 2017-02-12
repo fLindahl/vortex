@@ -1085,7 +1085,7 @@ struct DockContext
 		
 		if (result != 0)
 		{
-			printf("ERROR: Could not load layout file: %s!", filename);
+			printf("ERROR: Could not load layout file: %s!", filename.c_str());
 			assert(false);
 			return;
 		}
