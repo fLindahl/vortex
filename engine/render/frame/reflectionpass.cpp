@@ -17,7 +17,8 @@ namespace Render
 
 #define TILE_SIZE 32
 
-ReflectionPass::ReflectionPass()
+ReflectionPass::ReflectionPass() : 
+	quality(HIGH)
 {
 	this->uniformBlock.zThickness = 3.5f;
 	this->uniformBlock.jitter = 0.45f;
@@ -47,8 +48,10 @@ void ReflectionPass::Setup()
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// Setup SSR compute shader program
+	// Setup compute shader programs
 	this->SSRComputeProgram = ShaderServer::Instance()->LoadShader("SSR")->GetProgram();
+	this->CubemapProgram = ShaderServer::Instance()->LoadShader("CubemapsOnly")->GetProgram();
+	this->PCCubemapProgram = ShaderServer::Instance()->LoadShader("ParallaxCorrectedCubemaps")->GetProgram();
 	
 	glGenBuffers(1, this->ubo);
 
@@ -66,8 +69,23 @@ void ReflectionPass::Execute()
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, this->ubo[0]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(SSRSettings), &uniformBlock, GL_STATIC_DRAW);
 	
-	//Compute shader
-	glUseProgram(this->SSRComputeProgram);
+	//Switch quality settings
+	//TODO: we should probably move this to vertex+fragmentshader to ~maybe~ gain performance but also enable older hardware to run these effects.
+	switch (quality)
+	{
+	case Render::ReflectionPass::HIGH:
+		glUseProgram(this->SSRComputeProgram);
+		break;
+	case Render::ReflectionPass::MEDIUM:
+		glUseProgram(this->PCCubemapProgram);
+		break;
+	case Render::ReflectionPass::LOW:
+		glUseProgram(this->CubemapProgram);
+		break;
+	default:
+		_assert(false, "No valid reflection quality selected!");
+		break;
+	}
 
 	// Bind depth map texture to texture location 4 (which will not be used by any model texture)
 	glActiveTexture(GL_TEXTURE4);
