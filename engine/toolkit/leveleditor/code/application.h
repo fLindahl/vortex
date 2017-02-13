@@ -26,6 +26,7 @@
 #include "commands.h"
 #include "userinterface.h"
 #include "application/game/modelentity.h"
+#include "render/frame/lightcullingpass.h"
 
 namespace LevelEditor
 {
@@ -84,5 +85,7 @@ private:
 	Display::Window* window;
 
 	GLuint* pickingPixels;
+
+    //Render::LightCullingPass ls;
 };
 } // namespace LevelEditor

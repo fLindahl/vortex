@@ -6,6 +6,7 @@
 #include "foundation/messaging/messagehandler.h"
 #include "foundation/math/vector4.h"
 #include "baseproperty.h"
+#include "render/server/lightserver.h"
 
 namespace Game
 {

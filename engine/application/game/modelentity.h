@@ -1,7 +1,6 @@
 #pragma once
 #include "entity.h"
 
-
 namespace Render
 {
 class GraphicsProperty;
@@ -29,6 +28,5 @@ public:
 
 protected:
 	Render::GraphicsProperty* gProperty;
-
 };
 }

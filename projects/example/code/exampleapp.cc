@@ -125,7 +125,7 @@ ExampleApp::Open()
 		rigidBodyEntity4->Activate();
 		rigidBodyEntity5->Activate();
 
-		PointLight pLight;
+		LightServer::PointLight pLight;
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
 		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		pLight.radiusAndPadding.set_x(10.0f);
@@ -436,7 +436,7 @@ ExampleApp::Run()
 
                 if(keyhandler->rightMousePressed)
                 {
-                    PointLight pLight;
+					LightServer::PointLight pLight;
                     pLight.position = hit.point + (hit.surfaceNormal);
                     pLight.color = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
                     pLight.radiusAndPadding.set_x(5.0f);

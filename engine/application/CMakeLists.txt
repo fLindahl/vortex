@@ -24,10 +24,12 @@ SET(files_application_game
 	game/staticentity.h
 	game/rigidbodyentity.cpp
 	game/physicsentity.h
-	game/staticentity.cpp
+	game/staticentity.cpp 
 	game/physicsentity.cpp
 	game/cubemapentity.h
 	game/cubemapentity.cpp
+	game/modelentityWithSpotlight.h
+	game/modelentityWithSpotlight.cpp
 	)
 	
 SET(files_application_properties
@@ -48,7 +50,7 @@ SET(files_application
 	${files_application_properties}
 	)
 
-SET(files_pch ../config.h ../config.cc)
+SET(files_pch ../config.h ../config.cc game/pointlightentity.cpp game/pointlightentity.h)
 SOURCE_GROUP("pch" FILES ${files_pch})
 ADD_LIBRARY(application STATIC ${files_application} ${files_pch})
 TARGET_PCH(application ../)	

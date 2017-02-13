@@ -345,7 +345,6 @@ Array<TYPE>::GrowTo(size_t newCapacity)
 template<class TYPE> void
 Array<TYPE>::Grow()
 {
-
     size_t growToSize;
     if (0 == this->capacity)
     {
@@ -503,7 +502,6 @@ Array<TYPE>::operator[](const size_t& index) const
 {
     return this->elements[index];
 }
-
 //------------------------------------------------------------------------------
 /**
     The equality operator returns true if all elements are identical. The
