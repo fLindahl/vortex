@@ -18,6 +18,7 @@ class FlatGeometryLitPass;
 class PickingPass;
 class ReflectionPass;
 class ShadowMap; ///SWARLEY
+class ParticleComputePass;
 
 class FrameServer
 {
@@ -49,6 +50,7 @@ public:
 	std::shared_ptr<ReflectionPass> GetReflectionPass();
 	std::shared_ptr<PickingPass> GetPickingPass();
 	std::shared_ptr<ShadowMap> GetShadowMap();
+	std::shared_ptr<ParticleComputePass> GetParticleComputePass();
 
 
 private:
@@ -68,6 +70,10 @@ private:
 	
 	/// Used for lightculling as part of tiled forward rendering.
 	std::shared_ptr<FramePass> lightCullingPass;
+
+	//Used for particle computing
+	std::shared_ptr<ParticleComputePass> particleComputePass;
+
 	//GLuint lightCullingProgram;
 
 	std::shared_ptr<PickingPass> pickingPass;
