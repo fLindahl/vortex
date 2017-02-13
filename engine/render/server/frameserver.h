@@ -4,7 +4,7 @@
 #include "GL/glew.h"
 #include "foundation/util/array.h"
 #include "render/frame/shadowmap.h"
-//#include "render/frame/reflectionpass.h"
+#include "render/frame/reflectionpass.h"
 
 namespace Debug { class DebugServer; }
 

@@ -26,6 +26,8 @@ SET(files_application_game
 	game/physicsentity.h
 	game/staticentity.cpp 
 	game/physicsentity.cpp
+	game/cubemapentity.h
+	game/cubemapentity.cpp
 	game/modelentityWithSpotlight.h
 	game/modelentityWithSpotlight.cpp
 	)

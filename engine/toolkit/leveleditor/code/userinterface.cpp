@@ -8,6 +8,8 @@
 #include "render/debugrender/debugserver.h"
 #include "render/frame/reflectionpass.h"
 #include "render/server/frameserver.h"
+#include "application/game/cubemapentity.h"
+#include "render/server/lightserver.h"
 
 #include "basetool.h"
 #include "selecttool.h"
@@ -83,6 +85,18 @@ namespace Toolkit
 				{
 					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
 					if (ImGui::MenuItem("Shader Debugger", NULL, &showShaderDebugger)) {}
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Map"))
+			{
+				if (ImGui::BeginMenu("Lighting"))
+				{
+					if (ImGui::MenuItem("Reload Cubemaps", NULL)) 
+					{
+						Render::LightServer::Instance()->RegenerateCubemaps();
+					}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
@@ -179,6 +193,36 @@ namespace Toolkit
 		{
 			commandManager->Undo();
 		}
+		//Tools
+		if (!ImGui::GetIO().KeyCtrl)
+		{
+			bool switched = false;
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Q)))
+			{
+				this->currentTool = selectTool;
+				switched = true;
+			}
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_W)))
+			{
+				this->currentTool = translateTool;
+				switched = true;
+			}
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_E)))
+			{
+				//this->currentTool = rotateTool;
+				switched = true;
+			}
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_R)))
+			{
+				//this->currentTool = scaleTool;
+				switched = true;
+			}
+
+			if (switched && application->hit.object != nullptr)
+			{
+				this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+			}
+		}
 	}
 
 	void UserInterface::RenderDocks()
@@ -199,33 +243,46 @@ namespace Toolkit
 			ImGui::SetWindowSize(ImVec2(toolbarWidth, (float)application->window->GetHeight() - 16.0f), ImGuiSetCond_Once);
 			ImGui::SetWindowPos(ImVec2(0.0f, 16.0f), ImGuiSetCond_Once);
 
+			bool switched = false;
 			if (ImGui::ImageButton((void*)this->selectToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				this->currentTool = selectTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->translateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				this->currentTool = translateTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->rotateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = rotateTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->scaleToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = scaleTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->entityToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = entityTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->brushToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = brushTool;
+				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->polygonEditTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
 				//this->currentTool = polygonEditTool;
+				switched = true;
+			}
+
+			if (switched && application->hit.object != nullptr)
+			{
+				this->currentTool->UpdateTransform(application->hit.object->GetTransform());
 			}
 
 			ImGui::End();
@@ -318,23 +375,12 @@ namespace Toolkit
 					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(2).x(), application->hit.object->GetTransform().getrow(2).y(), application->hit.object->GetTransform().getrow(2).z(), application->hit.object->GetTransform().getrow(2).w());
 					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(3).x(), application->hit.object->GetTransform().getrow(3).y(), application->hit.object->GetTransform().getrow(3).z(), application->hit.object->GetTransform().getrow(3).w());
 
-					Game::PhysicsEntity* pe = dynamic_cast<Game::PhysicsEntity*>(application->hit.object);
+					Game::CubeMapEntity* cm = dynamic_cast<Game::CubeMapEntity*>(application->hit.object);
 
-					if (pe != nullptr)
+					if (cm != nullptr)
 					{
-						ImGui::Text("Mesh: %s", pe->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetName().c_str());
-						ImGui::Text("Type: %i", pe->GetPhysicsType());
-
-						if (pe->GetPhysicsType() == Physics::PhysicsType::Rigidbody)
-						{
-							Game::RigidBodyEntity* rb = dynamic_cast<Game::RigidBodyEntity*>(pe);
-
-							ImGui::Text("Orientation: %f, %f, %f, %f\n", rb->GetRigidBody()->getOrientation().x(), rb->GetRigidBody()->getOrientation().y(), rb->GetRigidBody()->getOrientation().z(), rb->GetRigidBody()->getOrientation().w());
-							ImGui::Text("Position: %f, %f, %f, %f\n", rb->GetRigidBody()->getPosition().x(), rb->GetRigidBody()->getPosition().y(), rb->GetRigidBody()->getPosition().z(), rb->GetRigidBody()->getPosition().w());
-							ImGui::Text("LinearVelocity: %f, %f, %f, %f\n", rb->GetRigidBody()->getLinearVelocity().x(), rb->GetRigidBody()->getLinearVelocity().y(), rb->GetRigidBody()->getLinearVelocity().z(), rb->GetRigidBody()->getLinearVelocity().w());
-							ImGui::Text("AngularVelocity: %f, %f, %f, %f\n", rb->GetRigidBody()->getAngularVelocity().x(), rb->GetRigidBody()->getAngularVelocity().y(), rb->GetRigidBody()->getAngularVelocity().z(), rb->GetRigidBody()->getAngularVelocity().w());
-							ImGui::Text("Acceleration: %f, %f, %f, %f\n", rb->GetRigidBody()->getAcceleration().x(), rb->GetRigidBody()->getAcceleration().y(), rb->GetRigidBody()->getAcceleration().z(), rb->GetRigidBody()->getAcceleration().w());
-						}
+						ImGui::SliderFloat("InnerRange", &cm->GetCubeMapNode()->InnerScale().x(), 0.00001f, 100.0f, "%.3f", 2.0f);
+						ImGui::SliderFloat("OuterRange", &cm->GetCubeMapNode()->OuterScale().x(), 0.00001f, 100.0f, "%.3f", 2.0f);
 					}
 				}
 			}
@@ -344,13 +390,18 @@ namespace Toolkit
 			{
 				if(this->light == -1)
 				{
-					Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->Settings();
+					Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->GetSSRSettings();
 
 					ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
 					ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
 					ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
 					ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
 					ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
+
+					const char* items[] = { "HIGH", "MEDIUM", "LOW"};
+
+					ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
+
 				}
 
 				if(this->light != -1 && this->lT == Render::LightServer::LightType::Spot)
@@ -386,7 +437,7 @@ namespace Toolkit
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
 			if (ImGui::Button("Add Box", { 100, 40 }))
 			{
-				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
 				commandManager->DoCommand(command);
 			}
 

@@ -67,8 +67,12 @@ namespace Render
 		void SetWindowResolution(const int& x, const int& y);
 
 		void AddMaterial(Material* obj) { this->materials.Append(obj); }
-        //This renders all graphicsproperties.
-        void Render(bool drawToScreen = true);
+        
+		void SetUniformBuffer(const Graphics::Camera* camera);
+		void Render(bool drawToScreen = true);
+
+		//Render to a specified texture. Remember that you might need to set render resolution before doing this!
+		void RenderToTexture(const GLuint& outFrameBuffer, const Graphics::Camera& camera);
 
 		void Initialize();
 

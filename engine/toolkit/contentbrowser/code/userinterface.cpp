@@ -37,9 +37,10 @@ namespace Toolkit
 			//list the files and directories within directory
 			while ((ent = readdir(dir)) != NULL) 
 			{
-				//skip the first two entries as they're not needed.
-				if (i > 1)
-					outArray.Append(ent->d_name);
+				//skip the . and .. directories
+				std::string n = ent->d_name;
+				if (n != "." && n != "..")
+					outArray.Append(n);
 
 				i++;
 			}
@@ -48,7 +49,7 @@ namespace Toolkit
 		else
 		{
 			//could not open directory
-			_assert(false, "Could not open surface directory: \"resources/surfaces/\"");
+			_assert(false, "Could not open directory!");
 			return;
 		}
 
@@ -65,7 +66,6 @@ namespace Toolkit
 			cStrArray.Append(list[i].c_str());
 		}
 
-		//Start list at index 2 because otherwise we list "." and ".." too
 		ImGui::ListBox(label, selectedItem, &cStrArray[0], (int)list.Size());
 	}
 
@@ -309,13 +309,13 @@ namespace Toolkit
 			}
 			else if (result == NFD_CANCEL)
 			{
-				this->openFilePopup = false;
+				this->importFilePopup = false;
 			}
 			else
 			{
 				printf("Error: %s\n", NFD_GetError());
 				assert(false);
-				this->openFilePopup = false;
+				this->importFilePopup = false;
 			}
 
 			ImGui::EndPopup();
