@@ -26,6 +26,10 @@ PickingPass::~PickingPass()
 void PickingPass::Execute()
 {
 	this->BindFrameBuffer();
+
+	GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	_assert(e == GL_FRAMEBUFFER_COMPLETE, "PickingPass Framebuffer Status Error!");
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	GLuint currentProgram = 0;

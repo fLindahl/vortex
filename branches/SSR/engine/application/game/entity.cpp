@@ -49,7 +49,7 @@ void Entity::SendMsg(const int& recipientID, const BaseGameFeature::MsgType& mes
 
 	//MsgHandler::getInstance()->RecvMsg(newMsg);
 }
-void Entity::SetTransform(const Math::mat4 &nTransform)
+void Entity::SetTransform(const Math::mat4& nTransform)
 {
     this->transform = nTransform;
 }
@@ -76,6 +76,5 @@ void Entity::Deactivate()
 	BaseGameFeature::EntityManager::Instance()->UnregisterEntity(this->ID);
 	this->active = false;
 }
-
 }
 

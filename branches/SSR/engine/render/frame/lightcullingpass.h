@@ -14,11 +14,23 @@ public:
 
     void Execute();
 
+	GLuint GetBuffer() {return this->buffer;}
+
 private:
+	struct UniformBlock
+	{
+		GLint pointLightCount;
+		GLint spotLightCount;
+        //GLuint tileLights;
+	} uniformBlock;
+
+	GLuint ubo[1];
+
 	LightServer* lightServer;
 	//std::shared_ptr<ShaderObject> computeShader;
 	GLuint lightCullingProgram;
 
+	GLuint buffer;
 };
 
 }
