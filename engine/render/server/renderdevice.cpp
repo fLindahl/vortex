@@ -58,24 +58,20 @@ void RenderDevice::SetWindowResolution(const int& x, const int& y)
 	this->windowResolution.y = y;
 }
 
-void RenderDevice::Render(bool drawToScreen)
+void RenderDevice::SetUniformBuffer(const Graphics::Camera* camera)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//Set global matrix uniform buffer block for this frame
+	uniformBufferBlock.View = camera->getView();
+	uniformBufferBlock.Projection = camera->getProjection();
+	uniformBufferBlock.ViewProjection = Math::mat4::multiply(camera->getView(), camera->getProjection());
 
-	glViewport(0, 0, renderResolution.x, renderResolution.y);
+	uniformBufferBlock.InvView = camera->getInvView();
+	uniformBufferBlock.InvProjection = camera->getInvProjection();
+	uniformBufferBlock.InvViewProjection = camera->getInvViewProjection();
 
-    //Set global matrix uniform buffer block for this frame
-    uniformBufferBlock.View = Graphics::MainCamera::Instance()->getView();
-    uniformBufferBlock.Projection = Graphics::MainCamera::Instance()->getProjection();
-	uniformBufferBlock.ViewProjection = Math::mat4::multiply(Graphics::MainCamera::Instance()->getView(), Graphics::MainCamera::Instance()->getProjection());
+	uniformBufferBlock.viewToTextureSpace = camera->getViewToTextureSpace();
 
-	uniformBufferBlock.InvView = Graphics::MainCamera::Instance()->getInvView();
-	uniformBufferBlock.InvProjection = Graphics::MainCamera::Instance()->getInvProjection();
-	uniformBufferBlock.InvViewProjection = Graphics::MainCamera::Instance()->getInvViewProjection();
-	
-	uniformBufferBlock.viewToTextureSpace = Graphics::MainCamera::Instance()->getViewToTextureSpace();
-
-	uniformBufferBlock.CameraPos = Graphics::MainCamera::Instance()->GetPosition();
+	uniformBufferBlock.CameraPos = camera->GetPosition();
 
 	uniformBufferBlock.ScreenSize = this->renderResolution;
 	uniformBufferBlock.TimeAndRandom[0] = (GLfloat)glfwGetTime();
@@ -86,56 +82,26 @@ void RenderDevice::Render(bool drawToScreen)
 	uniformBufferBlock.LightTileWorkGroups[0] = LightServer::Instance()->workGroupsX;
 	uniformBufferBlock.LightTileWorkGroups[1] = LightServer::Instance()->workGroupsY;
 
-    glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, this->ubo[0]);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(uniformBufferBlock), &uniformBufferBlock, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, this->ubo[0]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(uniformBufferBlock), &uniformBufferBlock, GL_STATIC_DRAW);
+}
 
-    //HACK: Render states should be done per shaderobject (in some cases)
-	//glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
-
+void RenderDevice::Render(bool drawToScreen)
+{
+	glViewport(0, 0, renderResolution.x, renderResolution.y);
+	
 	//----------------
 	// Start rendering
+	SetUniformBuffer(Graphics::MainCamera::Instance());
 
-	//TODO: We should iterate through every pass instead of doing it this way!
-
-	// Depth pre-pass
-	std::weak_ptr<DepthPass> dPass = FrameServer::Instance()->GetDepthPass();
-	auto depthPass = dPass.lock();
-
-    //Run depth pass
-	depthPass->Execute();
-	
-	std::weak_ptr<FramePass> framePass = FrameServer::Instance()->GetLightCullingPass();
-	auto lightCullingPass = framePass.lock();
-
-	lightCullingPass->Execute();
-
-	if (this->pickingEnabled)
+	for (auto pass : FrameServer::Instance()->framePasses)
 	{
-		framePass = FrameServer::Instance()->GetPickingPass();
-		auto pickingPass = framePass.lock();
-		pickingPass->Execute();
+		pass->Execute();
 	}
 
-	//Bind the final color buffer
-	//glBindFramebuffer(GL_FRAMEBUFFER, FrameServer::Instance()->finalColorFrameBufferObject);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	std::weak_ptr<FlatGeometryLitPass> fglp = FrameServer::Instance()->FlatGeometryLit;
-	auto flatGeometryLitPass = fglp.lock();
-
-	//Run draw pass
-	flatGeometryLitPass->Execute();
-
-	//Reflections
-	std::weak_ptr<ReflectionPass> ref = FrameServer::Instance()->reflectionPass;
-	auto reflectionPass = ref.lock();
-	reflectionPass->Execute();
-	
-	//-------------------
 	// Render Debug Shapes!
+	FrameServer::Instance()->GetFlatGeometryLitPass()->BindFrameBuffer();
 	Debug::DebugRenderer::Instance()->DrawCommands();
 
 	glViewport(0, 0, windowResolution.x, windowResolution.y);
@@ -155,6 +121,35 @@ void RenderDevice::Render(bool drawToScreen)
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
+
+	//change some render states so that Imgui works correctly
+	glAlphaFunc(GL_ALWAYS, 0.0f);
+	glDepthFunc(GL_LESS);
+}
+
+void RenderDevice::RenderToTexture(const GLuint& outFrameBuffer, const Graphics::Camera& camera)
+{
+	glViewport(0, 0, renderResolution.x, renderResolution.y);
+
+	//----------------
+	// Start rendering
+	SetUniformBuffer(&camera);
+
+	for (auto pass : FrameServer::Instance()->framePasses)
+	{
+		pass->Execute();
+	}
+		
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, outFrameBuffer);
+
+	//Copy final colorbuffer to screen if specified
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, FrameServer::Instance()->FlatGeometryLit->frameBufferObject);
+	glBlitFramebuffer(0, 0, this->renderResolution.x, this->renderResolution.y, 0, 0, this->renderResolution.x, this->renderResolution.y, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
+
+	glViewport(0, 0, windowResolution.x, windowResolution.y);
 
 	//change some render states so that Imgui works correctly
 	glAlphaFunc(GL_ALWAYS, 0.0f);

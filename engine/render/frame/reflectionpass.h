@@ -10,6 +10,13 @@ namespace Render
 class ReflectionPass : public FramePass
 {
 public:
+	enum ReflectionQuality
+	{
+		HIGH,
+		MEDIUM,
+		LOW
+	};
+
 	struct SSRSettings
 	{
 		GLfloat zThickness;		// How thick is each depth fragment? higher value yields some wierd smudging at edges of reflection, but thinner z means we might miss some geometry. This should essentially be the average thickness of the geometry. to do dynamically would be a nightmare however...
@@ -32,9 +39,12 @@ public:
 
 	GLuint GetReflectionBuffer() { return this->reflectionBuffer; }
 
-	SSRSettings& Settings() { return this->uniformBlock; }
+	SSRSettings& GetSSRSettings() { return this->uniformBlock; }
+
+	ReflectionQuality& GetReflectionQuality() { return this->quality; }
 
 private:
+	ReflectionQuality quality;
 
 	SSRSettings uniformBlock;
 	
@@ -42,6 +52,8 @@ private:
 	GLuint ubo[1];
 
 	GLuint SSRComputeProgram;
+	GLuint CubemapProgram;
+	GLuint PCCubemapProgram;
 	GLuint reflectionBuffer;
 };
 
