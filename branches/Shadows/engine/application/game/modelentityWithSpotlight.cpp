@@ -9,7 +9,7 @@ namespace Game
 ModelEntitySpotLight::ModelEntitySpotLight()
 {
 	//Call baseclass first!
-	Entity::Entity();
+	Entity();
 	this->gProperty = new Render::GraphicsProperty();
     this->lightEntity = new Render::LightServer::SpotLight();
 }

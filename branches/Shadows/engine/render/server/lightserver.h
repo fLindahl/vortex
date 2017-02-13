@@ -1,6 +1,7 @@
 /*
  * TODO: The lightTiles should be send to the shader for easier changes, on how many lights each tile can contain.
  *          The Update method should only calculate the lights that are moving or the ones that have been moved
+ *          The Directional Light is not yet added, only struct exists.
  */
 
 #pragma once
@@ -27,7 +28,8 @@ namespace Render
 	{
 		NaN = 1,
 		Point = 2,
-		Spot = 4
+		Spot = 4,
+		Directional = 8
 	};
 
 	/// 16 Byte Alignment sensitive
@@ -38,6 +40,14 @@ namespace Render
 		Math::point color;
 		Math::point position;
 		Math::vec4 radiusAndPadding;
+	};
+	/// Is not added to the shader yet
+	struct DirectionalLight
+	{
+		LightType lightType = LightType::Directional;
+
+		Math::point color;
+		Math::point position;
 	};
 
 	struct SpotLight
@@ -88,17 +98,18 @@ namespace Render
 
         GLuint GetTileLights() { return this->tileLights; }
 
-        void Update();
-
 		void UpdateSpotLightBuffer();
 		void UpdatePointLightBuffer();
+
+
+        /// Debug and Easier Access ///
+        void CreateSpotLight(Math::point color, Math::point position, Math::vec4 direction, float length, float angle);
+        void CreatePointLight(Math::point color, Math::point position, float radius);
 
 	private:
 		friend class RenderDevice;
 
-
 		void UpdateWorkGroups();
-
 
 		// Used for storage buffer objects to hold light data and visible light indicies data
 		GLuint pointLightBuffer;
@@ -117,6 +128,7 @@ namespace Render
         /// Determines how many light should be registred per tile
         GLuint tileLights = 512;
 
+        /// Used to calculate the Middle Point of the Spotlight
         float oneOverThree;
 	};
 }

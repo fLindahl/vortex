@@ -50,13 +50,11 @@ namespace Edit
             this->entity->SetTransform(Math::mat4::translation(position));
 
             /// Default values ///
-            Render::LightServer::SpotLight light;
-            light.position = this->entity->GetTransform().get_position();
-            light.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-            light.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
-            light.length = 5.0f;
-            light.angle = 15.0f;
-            Render::LightServer::Instance()->AddSpotLight(light);
+            Render::LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+                                                             this->entity->GetTransform().get_position(),
+                                                             Math::vec4(0.0f, -1.0f, 0.0f, 1.0f),
+                                                             5.0f,
+                                                             15.0f);
 
             this->entity->SetSpotLightEnity(&Render::LightServer::Instance()->GetSpotLightAtIndex((uint)Render::LightServer::Instance()->GetNumSpotLights() - 1));
             this->entity->SetLightIndex((uint)Render::LightServer::Instance()->GetNumSpotLights() - 1);
@@ -92,11 +90,7 @@ namespace Edit
             this->entity->SetTransform(Math::mat4::translation(position));
 
             /// Default values ///
-            Render::LightServer::PointLight light;
-            light.position = this->entity->GetTransform().get_position();
-            light.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-            light.radiusAndPadding.x() = 3.0f;
-            Render::LightServer::Instance()->AddPointLight(light);
+            Render::LightServer::Instance()->CreatePointLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f), this->entity->GetTransform().get_position(), 3.0f);
 
             this->entity->SetPointLightEnity(&Render::LightServer::Instance()->GetPointLightAtIndex((uint)Render::LightServer::Instance()->GetNumPointLights() - 1));
             this->entity->SetLightIndex((uint)Render::LightServer::Instance()->GetNumPointLights() - 1);
