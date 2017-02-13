@@ -78,10 +78,18 @@
 		<!-- COMPUTE SHADERS -->
 		<!-- --------------- -->
 		
-		<Shader name="SSR" desc="Compute shader for calculating reflections">    
+		<Shader name="SSR" desc="Compute shader for calculating realtime reflections using screenspace ray tracing and parallax corrected cubemap fallback">
 			<ComputeShader name="resources/shaders/compute/ssr.comp"/>
 		</Shader>
 		
+		<Shader name="CubemapsOnly" desc="Compute shader for calculating reflections based on blended POI infinite cubemaps only">    
+			<ComputeShader name="resources/shaders/compute/infinitecubemaps.comp"/>
+		</Shader>
+		
+		<Shader name="ParallaxCorrectedCubemaps" desc="Compute shader for calculating reflections based on POI blended parallax corrected cubemaps">    
+			<ComputeShader name="resources/shaders/compute/pccubemaps.comp"/>
+		</Shader>
+			
 		<Shader name="LightCulling" desc="Compute shader for culling Lights">    
 			<ComputeShader name="resources/shaders/compute/lightculling.comp"/>
 		</Shader>
