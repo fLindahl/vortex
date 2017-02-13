@@ -7,9 +7,5 @@ out vec4 diffuseColor;
 
 void main()
 {
-	if(render == 0.0)
-	{
-		discard;
-	}
 	diffuseColor = texture(AlbedoMap, TexCoords)*inColor;
 }

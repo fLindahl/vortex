@@ -38,6 +38,11 @@ mat3 rotateZ(float rad)
     );
 }
 
+vec4 Lerp(vec4 a, vec4 b, float t) 
+{
+    return a + t * (b - a);
+}
+
 //out vec3 FragmentPos;
 //out vec3 Normal;
 out vec2 TexCoords;
@@ -55,7 +60,11 @@ void main()
 	vec3 camUp = vec3(View[0][1],View[1][1], View[2][1]);
 	vec3 normVel =  normalize(pSettings.settings[index].vel.xyz);	
 	float signX = sign(dot(camRight, normVel));
-	vec3 p = (mix(endSize,startSize, lerp).xyz *pos) * rotateZ(signX * acos(dot(vec3(0,1,0),normVel)));
+	vec3 scaleVec = Lerp(endSize,startSize, lerp).xyz;
+	mat3 scale = mat3(scaleVec.x, 0, 0,
+					  0, scaleVec.y, 0,
+					  0, 0, scaleVec.z);
+	vec3 p = pos * rotateZ(signX * acos(dot(vec3(0,1,0),normVel))) * scale;
 	vec3 particlePos = pSettings.settings[index].pos.xyz;
 	vec3 vertexPos = camRight*p.x + camUp*p.y;
 	
@@ -64,16 +73,6 @@ void main()
 	// position in world space
 	//FragmentPos = wPos.xyz;
 	
-	//Check if fragment should be discarded. if it should be rendered send 1.0 else 0.0
-	if(startSettings.settings[index].vel.w == 1.0)
-	{
-		render = 1.0;
-		
-	}
-	else
-	{
-		render = 0.0;
-	}
 		
 	inColor = pSettings.settings[index].color;
 	
