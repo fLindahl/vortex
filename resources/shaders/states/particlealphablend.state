@@ -1,12 +1,12 @@
 CullFace = true
 FrontFace = cw
 CullMode = front
-Blend = false
+Blend = true
 BlendSourceFunc = src_alpha
 BlendDestinationFunc = one_minus_src_alpha
-AlphaTest = true
+AlphaTest = false
 AlphaFunc = greater
-AlphaClamp = 0.5
+AlphaClamp = 0.0
 DepthTest = true
 DepthFunc = lequal
-DepthWrite = true
+DepthWrite = false

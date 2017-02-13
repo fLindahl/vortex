@@ -13,8 +13,9 @@
 #include "render/server/frameserver.h"
 #include "render/server/lightserver.h"
 #include "application/basegamefeature/managers/scenemanager.h"
-
+#include "application/properties/particleemitter.h"
 #include "application/basegamefeature/keyhandler.h"
+
 
 using namespace Display;
 using namespace Render;
@@ -122,7 +123,21 @@ Application::Open()
 		*/
 
 
-/*		PointLight pLight;
+		billboard = std::make_shared<Game::ParticleEntity>();
+		billboard->SetTransform(Math::mat4::translation(11.18f, -1.0f, 4.02f));
+		billboard->Activate();
+		billboard->GetEmitter()->CreateEmitter(1000, "resources/textures/particles/sprite_rapids2.tga");
+
+		billboard2 = std::make_shared<Game::ParticleEntity>();
+		billboard2->SetTransform(Math::mat4::translation(0.0f, 5.5f, 0.0f));
+		billboard2->Activate();
+		billboard2->GetEmitter()->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");
+		
+		particleList.Append(billboard);
+		particleList.Append(billboard2);
+
+
+		LightServer::PointLight pLight;
 		pLight.position = Math::vec4(-3.0f, 0.0f, -2.5f, 1.0f);
 		pLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 		pLight.radiusAndPadding.set_x(5.0f);
@@ -138,7 +153,7 @@ Application::Open()
 
 		pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
 		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);*/
+		LightServer::Instance()->AddPointLight(pLight);
 
      	/*Render::LightServer::SpotLight sLight;
 	    sLight.position = Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f);
@@ -226,6 +241,12 @@ Application::Run()
         //a += 0.0001f;
         //Render::LightServer::Instance()->GetSpotLightAtIndex(0).position = Math::vec4(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position.x() + a, 2.3f, 3.0f, 1.0f);
         //Render::LightServer::Instance()->Update();
+
+		//Debug::DebugRenderer::Instance()->DrawCircle(Math::point(0, 0, 0), Math::quaternion::identity(), 0.5f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
+
+		//Debug::DebugRenderer::Instance()->DrawCone(Math::point(2, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 45.0f), 0.5f, 1.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
+
+		//Debug::DebugRenderer::Instance()->DrawCircle(Math::point(0, 0, 0), Math::quaternion::identity(), 0.5f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
 
 		if (this->hit.object != nullptr)
 		{

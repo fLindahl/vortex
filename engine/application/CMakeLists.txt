@@ -30,11 +30,17 @@ SET(files_application_game
 	game/cubemapentity.cpp
 	game/modelentityWithSpotlight.h
 	game/modelentityWithSpotlight.cpp
+	game/particleentity.h
+	game/particleentity.cpp
+	game/staticentity.cpp 
+	game/physicsentity.cpp
 	)
 	
 SET(files_application_properties
 	properties/freecamera.h
 	properties/freecamera.cpp
+	properties/particleemitter.h
+	properties/particleemitter.cpp
 	)
 	
 	
