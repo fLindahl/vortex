@@ -22,7 +22,7 @@
 
             <!-- various parameters -->
         </Material>
-				
+		
         <Material name="Icon" desc="Icon that always faces the camera">
 			<Pass name="Picking" shader="pickingBillboard"/>
 			<Pass name="FlatGeometryLit" shader="icon"/>

@@ -1,0 +1,91 @@
+#define THREADS_X 32
+#define THREADS_Y 32
+
+// All the samplers we need!
+uniform sampler2D depthMap;
+uniform sampler2D normalMap;
+uniform sampler2D specularMap;
+uniform sampler2D colorMap;
+
+uniform int NumCubemaps;
+
+uniform samplerCube CubeMap1;
+uniform float BlendFactor1;
+uniform samplerCube CubeMap2;
+uniform float BlendFactor2;
+uniform samplerCube CubeMap3;
+uniform float BlendFactor3;
+uniform samplerCube CubeMap4;
+uniform float BlendFactor4;
+
+// Shared values between all the threads in a group
+//shared DepthSamples
+
+layout (rgba32f) uniform writeonly image2D reflectionImage;
+
+void GetBlendedCubeMapColor(in vec3 reflectionDir, out vec3 reflectionColor)
+{
+	vec3 worldDirection = (mat3(InvView) * reflectionDir);
+	vec3 cubeColor;
+	
+	vec3 cubeColor1 = texture(CubeMap1, worldDirection).rgb;
+	cubeColor = cubeColor1 * BlendFactor1;
+
+    vec3 cubeColor2 = texture(CubeMap2, worldDirection).rgb;
+    cubeColor += cubeColor2 * BlendFactor2;
+
+    vec3 cubeColor3 = texture(CubeMap3, worldDirection).rgb;
+    cubeColor += cubeColor3 * BlendFactor3;
+	
+    vec3 cubeColor4 = texture(CubeMap4, worldDirection).rgb;
+    cubeColor += cubeColor4 * BlendFactor4;
+
+	reflectionColor = cubeColor;
+}
+
+layout(local_size_x = THREADS_X, local_size_y = THREADS_Y, local_size_z = 1) in;
+void main()
+{
+	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
+
+	//Per pixel on depthbuffer
+
+	vec2 TexCoord = vec2(location) / ScreenSize;
+	//First of all we need to generate a reflection vector
+
+	//Get normal from normal map. This only needs to be done once per pixel
+	vec3 worldNormal = (texelFetch(normalMap, location, 0).rgb);
+
+	//We need the normal to be in viewspace coordinates.
+	vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
+
+	float pixelDepth = texelFetch(depthMap, location, 0).r;
+
+	//Calculate world pos
+	vec4 clipSpaceLocation;
+	clipSpaceLocation.xy = TexCoord * 2.0f - 1.0f;
+	clipSpaceLocation.z = 1.0f;
+	clipSpaceLocation.w = 1.0f;
+	vec4 homogenousLocation = InvProjection * clipSpaceLocation;
+	vec3 viewSpacePosition = homogenousLocation.xyz;
+
+	vec3 rayOrigin = viewSpacePosition * pixelDepth;
+
+	vec3 viewDir = (rayOrigin.xyz);
+	//Reflect vector against normal
+	vec3 reflectionDir = (reflect(viewDir, viewSpaceNormal));
+
+	vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
+	float roughness = specularAndRoughness.w;
+	vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
+	
+	vec3 reflectionColor;
+	
+	GetBlendedCubeMapColor(reflectionDir, reflectionColor);
+
+	vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
+	//vec4 finalColor = vec4(reflectionColor, 1.0f);
+	imageStore(reflectionImage, location, finalColor);
+	
+	groupMemoryBarrier();
+}
