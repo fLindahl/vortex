@@ -40,13 +40,15 @@ namespace Render
 
 		//Picking pass
 		//TODO: we should be able to deactivate this
+		
+		this->pickingPass = std::make_shared<PickingPass>();
+		this->pickingPass->name = "Picking";
+		this->pickingPass->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->pickingPass->name, this->pickingPass));
+		
 		if (RenderDevice::Instance()->GetPickingEnabled())
 		{
-			this->pickingPass = std::make_shared<PickingPass>();
-			this->pickingPass->name = "Picking";
-			this->pickingPass->Setup();
-
-			this->framePassByName.insert(std::make_pair(this->pickingPass->name, this->pickingPass));
 			this->framePasses.Append(this->pickingPass);
 		}
 

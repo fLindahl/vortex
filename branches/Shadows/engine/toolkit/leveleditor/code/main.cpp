@@ -5,6 +5,8 @@
 #include "config.h"
 #include "application.h"
 
+#define _LEVELEDITOR
+
 int
 main(int argc, const char** argv)
 {

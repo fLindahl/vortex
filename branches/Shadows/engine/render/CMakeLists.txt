@@ -59,8 +59,8 @@ SET(files_render_frame
 	)
 	
 SET(files_render_resources
-	resources/lightnode.h
-	resources/lightnode.cpp
+	resources/cubemapnode.h
+	resources/cubemapnode.cpp
 	resources/meshbuilder.h
 	resources/meshbuilder.cpp
 	resources/meshresource.h

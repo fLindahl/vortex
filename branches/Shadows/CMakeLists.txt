@@ -2,7 +2,7 @@
 # VORTEX ENGINE
 #--------------------------------------------------------------------------
 PROJECT(vortex_engine)
-CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 MACRO(TARGET_PCH target path)
 IF(WIN32)

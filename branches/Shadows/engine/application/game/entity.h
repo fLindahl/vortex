@@ -6,7 +6,7 @@
 #include "foundation/messaging/messagehandler.h"
 #include "foundation/math/vector4.h"
 #include "baseproperty.h"
-#include "../../render/server/lightserver.h"
+#include "render/server/lightserver.h"
 
 namespace Game
 {
@@ -49,11 +49,10 @@ protected:
 
     Math::mat4 transform;
 
+	uint ID;
 	/// Index of the Light in the Light Array
 	int lightIndex;
 	Render::LightServer::LightType lightType;
-
-	uint ID;
 
 	Util::Array<std::shared_ptr<Game::BaseProperty>> properties;
 };

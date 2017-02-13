@@ -15,6 +15,8 @@
 
 namespace Render
 {
+	class CubeMapNode;
+
 	struct VisibleIndex 
 	{
 		int index;
@@ -106,8 +108,17 @@ namespace Render
         void CreateSpotLight(Math::point color, Math::point position, Math::vec4 direction, float length, float angle);
         void CreatePointLight(Math::point color, Math::point position, float radius);
 
+		void AddCubeMap(std::shared_ptr<CubeMapNode> node);
+		void RemoveCubeMap(std::shared_ptr<CubeMapNode> node);
+
+		Util::Array<std::shared_ptr<CubeMapNode>>& GetClosestCubemapToPoint(const Math::point& point);
+		void RegenerateCubemaps();
+
 	private:
 		friend class RenderDevice;
+		
+		//Sets the blendfactors for each influencing cubemap
+		void CalculateBlendMapFactors();
 
 		void UpdateWorkGroups();
 
@@ -130,5 +141,11 @@ namespace Render
 
         /// Used to calculate the Middle Point of the Spotlight
         float oneOverThree;
+
+		/// Contains all active cubemaps in the scene
+		Util::Array<std::shared_ptr<CubeMapNode>> cubemapNodes;
+
+		// Contains all currently influencing cubemaps 
+		Util::Array<std::shared_ptr<CubeMapNode>> selectedInfluenceVolumes;
 	};
 }
