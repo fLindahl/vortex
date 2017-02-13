@@ -7,6 +7,5 @@
 		<Param name="RoughnessMap" type="string" value="resources/textures/sponza/sponza_floor_roughness.tga"/>
 		
 		<!-- Specific Parameters -->
-		<Param name="Shininess" type="float" value="16" desc="Material shininess"/>
 	</Surface>
 </Vortex>

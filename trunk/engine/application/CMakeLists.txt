@@ -24,7 +24,11 @@ SET(files_application_game
 	game/staticentity.h
 	game/rigidbodyentity.cpp
 	game/physicsentity.h
-	game/staticentity.cpp game/physicsentity.cpp)
+	game/staticentity.cpp
+	game/physicsentity.cpp
+	game/cubemapentity.h
+	game/cubemapentity.cpp
+	)
 	
 SET(files_application_properties
 	properties/freecamera.h

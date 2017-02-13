@@ -9,7 +9,6 @@
 #include "render/window.h"
 #include "render/properties/graphicsproperty.h"
 #include "foundation/math/matrix4.h"
-#include "render/resources/lightnode.h"
 #include "render/softwarerender/rasterizer.h"
 #include "render/server/resourceserver.h"
 #include "render/server/shaderserver.h"

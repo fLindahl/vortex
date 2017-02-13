@@ -1,11 +1,17 @@
+/**--------------------
+	LightServer | Singleton
+
+	Handles all the lighting, including cubemap/environmentmap/lightprobe etc.
+*/
 #pragma once
 #include "GL/glew.h"
 #include "foundation/math/point.h"
 #include "foundation/util/array.h"
 
-
 namespace Render
 {
+	class CubeMapNode;
+
 	struct PointLight
 	{
 		Math::point color;
@@ -42,11 +48,20 @@ namespace Render
 		GLuint GetLightBuffer() { return this->lightBuffer; }
 		GLuint GetVisibleLightIndicesBuffer() { return this->visibleLightIndicesBuffer; }
 
+		void AddCubeMap(std::shared_ptr<CubeMapNode> node);
+		void RemoveCubeMap(std::shared_ptr<CubeMapNode> node);
+
+		Util::Array<std::shared_ptr<CubeMapNode>>& GetClosestCubemapToPoint(const Math::point& point);
+		void RegenerateCubemaps();
+
 	private:
 		friend class RenderDevice;
 
 		void UpdateWorkGroups();
 		void UpdateLightBuffer();
+
+		//Sets the blendfactors for each influencing cubemap
+		void CalculateBlendMapFactors();
 
 		// Used for storage buffer objects to hold light data and visible light indicies data
 		GLuint lightBuffer;
@@ -59,6 +74,10 @@ namespace Render
 		/// Contains all the pointlights in the game
 		Util::Array<PointLight> pointLights;
 
+		/// Contains all active cubemaps in the scene
+		Util::Array<std::shared_ptr<CubeMapNode>> cubemapNodes;
 
+		// Contains all currently influencing cubemaps 
+		Util::Array<std::shared_ptr<CubeMapNode>> selectedInfluenceVolumes;
 	};
 }
