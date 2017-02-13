@@ -27,6 +27,8 @@
 #include "userinterface.h"
 #include "application/game/modelentity.h"
 #include "render/frame/lightcullingpass.h"
+#include "application/game/particleentity.h"
+
 
 namespace LevelEditor
 {
@@ -69,7 +71,26 @@ private:
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
 	
+	std::shared_ptr<Render::ModelInstance> modelInstance;
+	std::shared_ptr<Render::ModelInstance> modelInstanceScene;
+	
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity1;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity2;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity3;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity4;
+	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity5;
+
+	std::shared_ptr<Game::StaticEntity> SceneEntity1;
+    std::shared_ptr<Game::StaticEntity> SceneEntity2;
+    std::shared_ptr<Game::StaticEntity> SceneEntity3;
+    std::shared_ptr<Game::StaticEntity> SceneEntity4;
+    std::shared_ptr<Game::StaticEntity> SceneEntity5;
+    std::shared_ptr<Game::StaticEntity> SceneEntity6;
+	std::shared_ptr<Game::StaticEntity> SceneEntity7;
+
 	std::shared_ptr<Game::ModelEntity> sponza;
+	std::shared_ptr<Game::ParticleEntity> billboard;
+	std::shared_ptr<Game::ParticleEntity> billboard2;
 
 	std::shared_ptr<Game::StaticEntity> wall1;
 	std::shared_ptr<Game::StaticEntity> wall2;
@@ -78,6 +99,10 @@ private:
 	std::shared_ptr<Game::StaticEntity> floor;
 	std::shared_ptr<Game::StaticEntity> ceiling;
 	
+	Util::Array<std::shared_ptr<Game::ParticleEntity>> particleList;
+
+	//Particles::ParticleSettings pSettings;
+
 	BaseGameFeature::KeyHandler* keyhandler;
 	
 	Edit::CommandManager* commandManager;

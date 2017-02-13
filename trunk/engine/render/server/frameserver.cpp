@@ -9,6 +9,7 @@
 #include "render/frame/pickingpass.h"
 #include "render/frame/reflectionpass.h"
 #include "render/frame/shadowmap.h"
+#include "render/frame/particlecomputepass.h"
 
 namespace Render
 {
@@ -59,6 +60,14 @@ namespace Render
 
 		this->framePassByName.insert(std::make_pair(this->FlatGeometryLit->name, this->FlatGeometryLit));
 		this->framePasses.Append(this->FlatGeometryLit);
+
+		//Particle compute shader pass
+		this->particleComputePass = std::make_shared<ParticleComputePass>();
+		this->particleComputePass->name = "ParticleCompute";
+		this->particleComputePass->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->particleComputePass->name, this->particleComputePass));
+		this->framePasses.Append(this->particleComputePass);
 
 		// Reflection pass
 		this->reflectionPass = std::make_shared<ReflectionPass>();
@@ -131,6 +140,12 @@ namespace Render
 	std::shared_ptr<PickingPass> FrameServer::GetPickingPass()
 	{
 		return this->pickingPass;
+	}
+
+
+	std::shared_ptr<ParticleComputePass> FrameServer::GetParticleComputePass()
+	{
+		return this->particleComputePass;
 	}
 
 	std::shared_ptr<Render::ShadowMap> FrameServer::GetShadowMap()

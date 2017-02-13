@@ -24,6 +24,19 @@ namespace Math
 	{ 
 		return ((rand()) / (RAND_MAX + 1.0f)); 
 	}
+	//returns a random float between a and b 
+	inline float randFloat(float a, float b)
+	{
+		if (a > b)
+		{
+			float temp = a;
+			a = b;
+			b = temp;
+		}
+		float r = (float)rand() / (float)RAND_MAX;
+		return a + r * (b - a);
+
+	}
 
 	//returns a random float in the range -1 < n < 1 
 	inline float randomClamped()    { return randFloat() - randFloat(); }
@@ -52,6 +65,27 @@ namespace Math
 	static const T& clamp(const T& in, const T& min, const T& max)
 	{
 		return (in < min) ? min : ((in > max) ? max : in);
+	}
+
+
+	inline void RandomPointInCircle(const float& radius, float& x, float& y)
+	{
+		float angle = randFloat() * (float) PI * 2;
+		float randRad = sqrtf(randFloat()) * radius;
+		x = randRad * cosf(angle);
+		y = randRad * sinf(angle);
+	}
+
+	inline void RandomPointInSphere(const float& radius, Math::vec4& vec, float degrees = PI*2)
+	{
+		float phi = randFloat(0, degrees);
+		float costheta = randFloat(-1,1);
+
+		float theta = acosf(costheta);
+		float rs = radius*sinf(theta);
+		vec.x() = rs*cosf(phi);
+		vec.y() = rs*sinf(phi);
+		vec.z() = radius*cosf(theta);
 	}
 
 	static void barycentric(const vec4& p, const vec4& a, const vec4& b, const vec4& c, float& u, float& v, float& w)
