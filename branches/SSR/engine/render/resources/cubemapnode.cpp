@@ -123,27 +123,27 @@ void CubeMapNode::RenderTexture(const GLuint& framebuffer, CubeFace face, Graphi
 
 	switch (face)
 	{
-	case Render::CubeMapNode::RIGHT:
+	case Render::CubeMapNode::LEFT:
 		rotx = -1.57075f;
 		roty = 0;
 		break;
-	case Render::CubeMapNode::LEFT:
+	case Render::CubeMapNode::RIGHT:
 		rotx = 1.57075f;
 		roty = 0;
 		break;
 	case Render::CubeMapNode::BOTTOM:
-		rotx = 3.1415f;
-		roty = -1.57075f;
-		break;
-	case Render::CubeMapNode::TOP:
-		rotx = 3.1415f;
+		rotx = 0;
 		roty = 1.57075f;
 		break;
-	case Render::CubeMapNode::FRONT:
+	case Render::CubeMapNode::TOP:
+		rotx = 0;
+		roty = -1.57075f;
+		break;
+	case Render::CubeMapNode::BACK:
 		rotx = 0;
 		roty = 0;
 		break;
-	case Render::CubeMapNode::BACK:
+	case Render::CubeMapNode::FRONT:
 		rotx = 3.1415f;
 		roty = 0;
 		break;

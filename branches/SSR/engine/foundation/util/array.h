@@ -828,6 +828,7 @@ Array<TYPE>::Fill(size_t first, size_t num, const TYPE& elm)
     for (i = first; i < (first + num); i++)
     {
         this->elements[i] = elm;
+		this->size++;
     }
 }
 

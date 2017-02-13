@@ -78,14 +78,20 @@ void main()
 	vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
 	float roughness = specularAndRoughness.w;
 	vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
-	
+		
 	vec3 reflectionColor;
 	
 	GetBlendedCubeMapColor(reflectionDir, reflectionColor);
-
-	vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
-	//vec4 finalColor = vec4(reflectionColor, 1.0f);
-	imageStore(reflectionImage, location, finalColor);
+	if(roughness == 200.0f)
+	{
+		vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
+		imageStore(reflectionImage, location, finalColor);
+	}
+	else
+	{
+		vec4 finalColor = vec4(reflectionColor, 1.0f);
+		imageStore(reflectionImage, location, finalColor);
+	}
 	
 	groupMemoryBarrier();
 }

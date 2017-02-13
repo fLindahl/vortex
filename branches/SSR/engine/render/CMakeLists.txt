@@ -52,6 +52,8 @@ SET(files_render_frame
 	frame/lightcullingpass.cpp
 	frame/pickingpass.h
 	frame/pickingpass.cpp
+	frame/particlecomputepass.h
+	frame/particlecomputepass.cpp
 	frame/reflectionpass.h
 	frame/reflectionpass.cpp
 	frame/shadowmap.h
@@ -99,6 +101,13 @@ SET(files_render_softwarerender
 	softwarerender/rasterizer.h
 	softwarerender/rasterizer.cpp
 	)	
+	
+SET(files_render_particlesystem
+	particlesystem/particlesystem.h
+	particlesystem/particlesystem.cpp
+	particlesystem/particlefile.h
+	particlesystem/particlefile.cpp
+	)	
 
 SET(files_render_debugrender
 	debugrender/debugrenderer.h
@@ -129,6 +138,8 @@ SOURCE_GROUP("resources" FILES ${files_render_resources})
 
 SOURCE_GROUP("server" FILES ${files_render_server})
 
+SOURCE_GROUP("particlesystem" FILES ${files_render_particlesystem})
+
 SOURCE_GROUP("softwarerender" FILES ${files_render_softwarerender})
 
 SOURCE_GROUP("debugrender" FILES ${files_render_debugrender})
@@ -142,6 +153,7 @@ SET(files_render
 	${files_render_frame}
 	${files_render_resources}
 	${files_render_server}
+	${files_render_particlesystem}
 	${files_render_softwarerender}
 	${files_render_debugrender}
 	)
