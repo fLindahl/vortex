@@ -1,5 +1,5 @@
 CullFace = true
-FrontFace = cw
+FrontFace = ccw
 CullMode = back
 Blend = false
 BlendSourceFunc = one
@@ -8,4 +8,5 @@ AlphaTest = false
 AlphaFunc = always
 AlphaClamp = 0.0
 DepthTest = true
-DepthFunc = less
+DepthFunc = lequal
+DepthWrite = true

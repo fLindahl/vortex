@@ -6,6 +6,7 @@
 #include "foundation/messaging/messagehandler.h"
 #include "foundation/math/vector4.h"
 #include "baseproperty.h"
+#include "render/server/lightserver.h"
 
 namespace Game
 {
@@ -17,7 +18,7 @@ public:
 	Entity();
 	~Entity();
 
-	int getID() { return ID; };
+	uint getID() { return ID; };
 	//void setID(const int id) { ID = id; };
 
 	virtual void Activate();
@@ -42,7 +43,7 @@ protected:
 
     Math::mat4 transform;
 
-	int ID;
+	uint ID;
 
 	Util::Array<std::shared_ptr<Game::BaseProperty>> properties;
 };

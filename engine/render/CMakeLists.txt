@@ -50,17 +50,19 @@ SET(files_render_frame
 	frame/depthpass.cpp
 	frame/lightcullingpass.h
 	frame/lightcullingpass.cpp
+	frame/pickingpass.h
+	frame/pickingpass.cpp
 	frame/particlecomputepass.h
 	frame/particlecomputepass.cpp
-	frame/lightdebugpass.h
-	frame/lightdebugpass.cpp
 	frame/reflectionpass.h
 	frame/reflectionpass.cpp
+	frame/shadowmap.h
+	frame/shadowmap.cpp
 	)
 	
 SET(files_render_resources
-	resources/lightnode.h
-	resources/lightnode.cpp
+	resources/cubemapnode.h
+	resources/cubemapnode.cpp
 	resources/meshbuilder.h
 	resources/meshbuilder.cpp
 	resources/meshresource.h

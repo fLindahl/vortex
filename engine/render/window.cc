@@ -25,7 +25,6 @@ namespace Display
 	static void GLAPIENTRY
 	GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
-		/*
 		std::string msg("[OPENGL DEBUG MESSAGE] ");
 
 		// print error severity
@@ -58,7 +57,6 @@ namespace Display
 		default:		// Portability, Deprecated, Other
 			break;
 		}
-		*/
 	}
 
 	int32 Window::WindowCount = 0;
@@ -214,9 +212,9 @@ namespace Display
 		{
 			GLenum res = glewInit();
 			assert(res == GLEW_OK);
-			if (!(GLEW_VERSION_4_0))
+			if (!(GLEW_VERSION_4_3))
 			{
-				printf("[WARNING]: OpenGL 4.0+ is not supported on this hardware!\n");
+				printf("[WARNING]: OpenGL 4.3+ is not supported on this hardware!\n");
 				glfwDestroyWindow(this->window);
 				this->window = nullptr;
 				return false;
@@ -228,6 +226,8 @@ namespace Display
 			glDebugMessageCallback(GLDebugCallback, NULL);
 			GLuint unusedIds;
 			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
+
+			//glDepthRange(0, -1);
 
 			// setup stuff
 			glEnable(GL_FRAMEBUFFER_SRGB);

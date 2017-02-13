@@ -1,0 +1,5 @@
+<Vortex>
+	<Surface material="Icon">
+		<Param name="AlbedoMap" type="string" value="resources/textures/cubemap_icon.png"/>
+	</Surface>
+</Vortex>

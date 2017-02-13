@@ -3,6 +3,8 @@
 #include <map>
 #include "GL/glew.h"
 #include "foundation/util/array.h"
+#include "render/frame/shadowmap.h"
+#include "render/frame/reflectionpass.h"
 
 namespace Debug { class DebugServer; }
 
@@ -13,9 +15,9 @@ class FramePass;
 class DepthPass;
 class DrawPass;
 class FlatGeometryLitPass;
-
-class LightDebugPass;
+class PickingPass;
 class ReflectionPass;
+class ShadowMap; ///SWARLEY
 class ParticleComputePass;
 
 class FrameServer
@@ -46,7 +48,10 @@ public:
 	std::shared_ptr<FramePass> GetLightCullingPass();
 	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
 	std::shared_ptr<ReflectionPass> GetReflectionPass();
+	std::shared_ptr<PickingPass> GetPickingPass();
+	std::shared_ptr<ShadowMap> GetShadowMap();
 	std::shared_ptr<ParticleComputePass> GetParticleComputePass();
+
 
 private:
 	friend class RenderDevice;
@@ -71,17 +76,16 @@ private:
 
 	//GLuint lightCullingProgram;
 
-	std::shared_ptr<LightDebugPass> lightdebugpass;
+	std::shared_ptr<PickingPass> pickingPass;
 
 	/// For lit objects
 	std::shared_ptr<FlatGeometryLitPass> FlatGeometryLit;
 
 	/// For computing reflections
-	std::shared_ptr<ReflectionPass> ReflectionPass;
+	std::shared_ptr<ReflectionPass> reflectionPass;
 
-
-
-
+	///SWARLEY
+	std::shared_ptr<ShadowMap> shadowmap;
 
 };
 
