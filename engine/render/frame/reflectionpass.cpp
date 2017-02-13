@@ -169,7 +169,7 @@ void ReflectionPass::Execute()
 	
 	double elapsedTime = time1 - time;
 	
-	printf("Elapsed time for reflections: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
+	//printf("Elapsed time for reflections: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
 
 	FramePass::Execute();
 }

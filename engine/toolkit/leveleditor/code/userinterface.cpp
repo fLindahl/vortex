@@ -90,7 +90,7 @@ namespace Toolkit
 			{
 				if (ImGui::BeginMenu("Lighting"))
 				{
-					if (ImGui::MenuItem("Reload Cubemaps", NULL)) 
+					if (ImGui::MenuItem("Reload Cubemaps", NULL))
 					{
 						Render::LightServer::Instance()->RegenerateCubemaps();
 					}
@@ -98,7 +98,7 @@ namespace Toolkit
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			ImGui::EndMainMenuBar();
 		}
 		
@@ -373,20 +373,72 @@ namespace Toolkit
 				ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
 				ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
 				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
-				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);				
-				
+				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
+
 				const char* items[] = { "HIGH", "MEDIUM", "LOW"};
 
 				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
+
+
+				if(this->application->hit.object != nullptr)
+				{
+					Game::ModelEntitySpotLight* aa = dynamic_cast<Game::ModelEntitySpotLight*>(this->application->hit.object);
+					Game::PointLightEntity* bb = dynamic_cast<Game::PointLightEntity*>(this->application->hit.object);
+
+					if(aa != nullptr)
+					{
+						if(aa->GetLightType() == Render::LightServer::LightType::Spot)
+						{
+							char i[50];
+							Render::LightServer::SpotLight& settings = Render::LightServer::Instance()->GetSpotLightAtIndex(aa->GetLightIndex());
+							sprintf(i, "Spotlight: %i", aa->GetLightIndex());
+							ImGui::Text(i);
+							ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 50.0f, "%.1f");
+							ImGui::SliderFloat("Length", &settings.length,    1.0f, 50.0f, "%.1f");
+							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.01f");
+							ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.01f");
+							ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.01f");
+						}
+					}
+					if(bb != nullptr)
+					{
+						if(bb->GetLightType() == Render::LightServer::LightType::Point)
+						{
+							char i[50];
+							Render::LightServer::PointLight& settings = Render::LightServer::Instance()->GetPointLightAtIndex(bb->GetLightIndex());
+							sprintf(i, "Point Light: %i", bb->GetLightIndex());
+							ImGui::Text(i);
+							ImGui::SliderFloat("Radius", &settings.radiusAndPadding.x(), 1.0f, 50.0f, "%.1f");
+							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
+						}
+					}
+				}
 			}
 			ImGui::EndDock();
 			
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
-			if (ImGui::Button("New Entity", { 100, 40 }))
+			if (ImGui::Button("Add CubeMap", { 100, 40 }))
 			{
 				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
 				commandManager->DoCommand(command);
 			}
+
+			if (ImGui::Button("Add Spotlight", { 125, 40 }))
+			{
+				std::shared_ptr<Edit::AddSpotlightEntity> command = std::make_shared<Edit::AddSpotlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
+				commandManager->DoCommand(command);
+			}
+
+            if (ImGui::Button("Add Point Light", { 125, 40 }))
+            {
+                std::shared_ptr<Edit::AddPointlightEntity> command = std::make_shared<Edit::AddPointlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
+                commandManager->DoCommand(command);
+            }
 			ImGui::EndDock();
 		}
 	}

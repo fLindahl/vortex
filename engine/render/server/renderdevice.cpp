@@ -44,7 +44,8 @@ void RenderDevice::SetRenderResolution(const Resolution& res)
 	Graphics::MainCamera::Instance()->UpdateProjectionMatrix();
 	FrameServer::Instance()->UpdateResolutions();
 	LightServer::Instance()->UpdateWorkGroups();
-	LightServer::Instance()->UpdateLightBuffer();
+	LightServer::Instance()->UpdatePointLightBuffer();
+	LightServer::Instance()->UpdateSpotLightBuffer();
 }
 
 void RenderDevice::SetRenderResolution(const int& x, const int& y)

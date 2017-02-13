@@ -132,7 +132,7 @@ void DebugRenderer::DrawBox(const Math::bbox& bbox,
 	this->commandQueue.push(cmd);
 }
 
-void DebugRenderer::DrawCone(const Math::vector& position, 
+void DebugRenderer::DrawCone(const Math::vector& position,
 							 const Math::quaternion& rotation, 
 							 const float& radius, 
 							 const float& length, 
@@ -142,9 +142,11 @@ void DebugRenderer::DrawCone(const Math::vector& position,
 {
 	ConeCommand* cmd = new ConeCommand();
 	cmd->shape = DebugShape::CONE;
-
-	Math::mat4 transform = Math::mat4::multiply(Math::mat4::scaling(Math::point(radius, length, radius)), Math::mat4::rotationquaternion(rotation));
+	Math::mat4 dirTrans = Math::mat4::rotationquaternion(rotation);
+	Math::vector dir = Math::vector::normalize3(dirTrans.get_yaxis());
+	Math::mat4 transform = Math::mat4::multiply(Math::mat4::scaling(Math::point(radius, length/2, radius)), dirTrans);
 	transform.translate(position);
+	transform.translate(-dir * (length/2));
 
 	cmd->transform = transform;
 

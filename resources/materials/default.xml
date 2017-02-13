@@ -11,6 +11,7 @@
 			<Pass name="Depth" shader="depthStatic"/>
 			<Pass name="Picking" shader="picking"/>
 			<Pass name="FlatGeometryLit" shader="defaultLit"/>
+			<Pass name="ShadowMap" shader="shadowMap"/>
 			
 			
             <!-- material textures -->
