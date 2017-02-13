@@ -15,9 +15,11 @@ ParticleFile::~ParticleFile()
 bool ParticleFile::SaveParticle(Util::String name)
 {
 	XMLDocument xmlDoc;
-	XMLNode* pRoot = xmlDoc.NewElement("ParticleSystem");
+	XMLNode* pRoot = xmlDoc.NewElement("Vortex");
 	xmlDoc.InsertFirstChild(pRoot);
-	
+	XMLElement* pSystem = xmlDoc.NewElement("ParticleSystem");
+	pRoot->InsertFirstChild(pSystem);
+
 	XMLElement* pEmitter;
 	XMLElement* pElement;
 	XMLElement* pShapeElements;
@@ -27,7 +29,7 @@ bool ParticleFile::SaveParticle(Util::String name)
 		ParticleUISettings set = this->emitters[i]->GetParticleUISettings();
 		pEmitter = xmlDoc.NewElement("ParticleEmitter");
 		pEmitter->SetAttribute("name", this->emitters[i]->GetEmitterName());
-		pRoot->InsertEndChild(pEmitter);
+		pSystem->InsertEndChild(pEmitter);
 
 		pElement = xmlDoc.NewElement("Velocity");
 		pElement->SetAttribute("vel", set.vel);
