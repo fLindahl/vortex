@@ -3,7 +3,8 @@
 #include <map>
 #include "GL/glew.h"
 #include "foundation/util/array.h"
-//#include "render/frame/reflectionpass.h"
+#include "render/frame/shadowmap.h"
+#include "render/frame/reflectionpass.h"
 
 namespace Debug { class DebugServer; }
 
@@ -16,6 +17,7 @@ class DrawPass;
 class FlatGeometryLitPass;
 class PickingPass;
 class ReflectionPass;
+class ShadowMap; ///SWARLEY
 
 class FrameServer
 {
@@ -46,6 +48,7 @@ public:
 	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
 	std::shared_ptr<ReflectionPass> GetReflectionPass();
 	std::shared_ptr<PickingPass> GetPickingPass();
+	std::shared_ptr<ShadowMap> GetShadowMap();
 
 
 private:
@@ -75,9 +78,8 @@ private:
 	/// For computing reflections
 	std::shared_ptr<ReflectionPass> reflectionPass;
 
-
-
-
+	///SWARLEY
+	std::shared_ptr<ShadowMap> shadowmap;
 
 };
 
