@@ -36,12 +36,6 @@ public:
 	virtual Math::mat4 GetTransform();
 	virtual void SetTransform(const Math::mat4& nTransform);
 
-	/// Light Properties ///
-	virtual int GetLightIndex();
-	virtual void SetLightIndex(const uint& index);
-
-	virtual Render::LightServer::LightType& GetLightType();
-
 protected:
     //friend class BaseGameFeature::EntityManager;
 
@@ -50,9 +44,6 @@ protected:
     Math::mat4 transform;
 
 	uint ID;
-	/// Index of the Light in the Light Array
-	int lightIndex;
-	Render::LightServer::LightType lightType;
 
 	Util::Array<std::shared_ptr<Game::BaseProperty>> properties;
 };

@@ -50,6 +50,8 @@ public:
     Render::LightServer::LightType& GetLightType(){ return this->lightEntity->lightType; }
 
 protected:
+
+    uint lightIndex;
     Render::LightServer::PointLight* lightEntity;
     Render::GraphicsProperty* gProperty;
 };

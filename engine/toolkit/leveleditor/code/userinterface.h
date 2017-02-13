@@ -60,11 +60,6 @@ namespace Toolkit
 		GLuint entityToolTextureHandle;
 		GLuint brushToolTextureHandle;
 		GLuint polygonEditTextureHandle;
-
-        /// Light Variables ///
-		int light;
-        Render::LightServer::LightType lT;
-
 	};
 
 }
