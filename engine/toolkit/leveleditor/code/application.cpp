@@ -146,7 +146,7 @@ Application::Open()
 		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
 		sLight.length = 10.0f;
         sLight.angle = 30.0f;
-		LightServer::Instance()->AddSpotLight(sLight);*/
+		LightServer::Instance()->AddSpotLight(sLight);
 
 	    sLight.position = Math::vec4(4.0f, 3.5f, 0.0f, 1.0f);
 		sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);

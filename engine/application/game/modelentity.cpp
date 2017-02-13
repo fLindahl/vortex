@@ -9,7 +9,7 @@ namespace Game
 ModelEntity::ModelEntity()
 {
 	//Call baseclass first!
-	Entity::Entity();
+	Entity();
 	this->gProperty = new Render::GraphicsProperty();
 }
 	

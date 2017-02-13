@@ -34,6 +34,31 @@ void LightServer::AddSpotLight(SpotLight& sLight)
 	this->UpdateSpotLightBuffer();
 }
 
+void LightServer::CalculateSpotlight(SpotLight& sLight)
+{
+	/// calculate the radius of the bottom cirlce
+	float radius = (float)tan(Math::Deg2Rad(sLight.angle)) * sLight.length;
+
+	/// Get perpendicular direction
+	Math::vec4 m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection, sLight.position));
+	Math::vec4 Q1 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
+	/// Get perpendicular, -direction
+	m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection * -1.0f, sLight.position));
+	Math::vec4 Q2 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
+
+	/// Calculate the Mid Point of the Sphere
+	sLight.midPoint = (sLight.position + Q1 + Q2) * this->oneOverThree;
+	sLight.midPoint.set_w(1.0f);
+
+	/// Calculate the radius for the sphere
+	sLight.fRadius = (sLight.midPoint - sLight.position).length();
+}
+
+LightServer::SpotLight& LightServer::GetSpotLightAtIndex(const int& index)
+{
+	return this->spotLights[index];
+}
+
 void LightServer::UpdateWorkGroups()
 {
 	// Define work group sizes in x and y direction based off screen size and tile size (in pixels)
@@ -74,28 +99,27 @@ void LightServer::UpdateSpotLightBuffer()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-LightServer::SpotLight& LightServer::GetSpotLightAtIndex(const int& index)
+void LightServer::CreateSpotLight(Math::point color,
+								  Math::point position,
+								  Math::vec4 direction,
+								  float length,
+								  float angle)
 {
-    return this->spotLights[index];
+	SpotLight sLight = SpotLight();
+	sLight.color = color;
+	sLight.position = position;
+	sLight.coneDirection = direction;
+	sLight.length = length;
+	sLight.angle = angle;
+	this->AddSpotLight(sLight);
 }
 
-void LightServer::CalculateSpotlight(SpotLight& sLight)
+void LightServer::CreatePointLight(Math::point color, Math::point position, float radius)
 {
-    /// calculate the radius of the bottom cirlce
-    float radius = (float)tan(Math::Deg2Rad(sLight.angle)) * sLight.length;
-
-    /// Get perpendicular direction
-    Math::vec4 m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection, sLight.position));
-    Math::vec4 Q1 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
-    /// Get perpendicular, -direction
-    m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection * -1.0f, sLight.position));
-    Math::vec4 Q2 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
-
-    /// Calculate the Mid Point of the Sphere
-    sLight.midPoint = (sLight.position + Q1 + Q2) * this->oneOverThree;
-    sLight.midPoint.set_w(1.0f);
-
-    /// Calculate the radius for the sphere
-    sLight.fRadius = (sLight.midPoint - sLight.position).length();
+	PointLight pLight;
+	pLight.position = position;
+	pLight.color = color;
+	pLight.radiusAndPadding.set_x(radius);
+	LightServer::Instance()->AddPointLight(pLight);
 }
 }

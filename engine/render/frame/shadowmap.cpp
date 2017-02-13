@@ -24,15 +24,13 @@ namespace Render
 	void ShadowMap::Setup()
 	{
 
-		LightServer::SpotLight sLight;
-		sLight.position = Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f);
-		sLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
-		sLight.length = 10.0f;
-		sLight.angle = 30.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
+		LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+												 Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f),
+												 Math::vec4(0.0f, -1.0f, 0.0f, 1.0f),
+												 10.0f,
+												 30.0f);
 
-		spotLightBuffer.spotLight = sLight;
+		spotLightBuffer.spotLight = LightServer::Instance()->GetSpotLightAtIndex(0);
 
 		glGenBuffers(1, this->ubo2);
 		glBindBuffer(GL_UNIFORM_BUFFER, this->ubo2[0]);
@@ -53,8 +51,10 @@ namespace Render
 		
 		//get spotlight pos of the the first spotlight in the array and make a lightMVP matrix from it for use in the shadowmap shaders
 		LightServer::SpotLight spotlight;
-		if(LightServer::Instance()->GetNumSpotLights() != 0)
+
+        if(LightServer::Instance()->GetNumSpotLights() != 0)
 			spotlight = LightServer::Instance()->GetSpotLightAtIndex(0);
+
 		Math::mat4 lightV, lightM, lightMV, lightP;
 		lookat = spotlight.position + (spotlight.coneDirection * spotlight.length);
 		lightV = Math::mat4::lookatrh(spotlight.position, lookat, up);
@@ -93,7 +93,7 @@ namespace Render
 
 		//failsafe, check if buffer is alright otherwise stop
 		GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		_assert(e == GL_FRAMEBUFFER_COMPLETE, "ShadowMap Framebuffer Status Error!");
+		_assert(e == GL_FRAMEBUFFER_COMPLETE, "Shadow Map Framebuffer Status Error!");
 
 		FramePass::Setup();
 	}
@@ -142,8 +142,6 @@ namespace Render
 		glActiveTexture(GL_TEXTURE9);
 		glUniform1i(glGetUniformLocation(currentProgram, "ShadowMap"), 0);
 		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());
-
-
 
 		//Unbind Depth FrameBufferObject
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
