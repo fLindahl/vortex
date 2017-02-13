@@ -88,8 +88,8 @@ namespace Render
 
 		glDrawBuffer(GL_NONE); //don't need any color buffer because its just supposed to render shadows, ergo black and white
 
-		//const GLenum drawbuffers[1] = { GL_COLOR_ATTACHMENT0 };
-		//glDrawBuffers(1, &drawbuffers[0]);
+		const GLenum drawbuffers[1] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, &drawbuffers[0]);
 
 		//failsafe, check if buffer is alright otherwise stop
 		GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
