@@ -6,8 +6,9 @@
 #include "render/frame/drawpass.h"
 #include "render/frame/lightcullingpass.h"
 #include "render/frame/flatgeometrylitpass.h"
-#include "render/frame/lightdebugpass.h"
+#include "render/frame/pickingpass.h"
 #include "render/frame/reflectionpass.h"
+#include "render/frame/shadowmap.h"
 #include "render/frame/particlecomputepass.h"
 
 namespace Render
@@ -29,7 +30,6 @@ namespace Render
 
 		this->framePassByName.insert(std::make_pair(this->Depth->name, this->Depth));
 		this->framePasses.Append(this->Depth);
-		
 
 		//Light culling compute shader pass
 		this->lightCullingPass = std::make_shared<LightCullingPass>();
@@ -39,10 +39,19 @@ namespace Render
 		this->framePassByName.insert(std::make_pair(this->lightCullingPass->name, this->lightCullingPass));
 		this->framePasses.Append(this->lightCullingPass);
 
-#ifdef _DEBUG
-		this->lightdebugpass = std::make_shared<LightDebugPass>();
-		this->lightdebugpass->Setup();
-#endif
+		//Picking pass
+		//TODO: we should be able to deactivate this
+		
+		this->pickingPass = std::make_shared<PickingPass>();
+		this->pickingPass->name = "Picking";
+		this->pickingPass->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->pickingPass->name, this->pickingPass));
+		
+		if (RenderDevice::Instance()->GetPickingEnabled())
+		{
+			this->framePasses.Append(this->pickingPass);
+		}
 
 		// FlatGeometryLit pass
 		this->FlatGeometryLit = std::make_shared<FlatGeometryLitPass>();
@@ -60,13 +69,21 @@ namespace Render
 		this->framePassByName.insert(std::make_pair(this->particleComputePass->name, this->particleComputePass));
 		this->framePasses.Append(this->particleComputePass);
 
-		// FlatGeometryLit pass
-		this->ReflectionPass = std::make_shared<Render::ReflectionPass>();
-		this->ReflectionPass->name = "Reflection";
-		this->ReflectionPass->Setup();
+		// Reflection pass
+		this->reflectionPass = std::make_shared<ReflectionPass>();
+		this->reflectionPass->name = "Reflection";
+		this->reflectionPass->Setup();
 
-		this->framePassByName.insert(std::make_pair(this->ReflectionPass->name, this->ReflectionPass));
-		this->framePasses.Append(this->ReflectionPass);
+		this->framePassByName.insert(std::make_pair(this->reflectionPass->name, this->reflectionPass));
+		this->framePasses.Append(this->reflectionPass);
+
+		// Shadow map pass ///SWARLEY
+		this->shadowmap = std::make_shared<ShadowMap>();
+		this->shadowmap->name = "ShadowMap";
+		this->shadowmap->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->shadowmap->name, this->shadowmap));
+		this->framePasses.Append(this->shadowmap);
 
 		//Set final color buffer for easy access
 		RenderDevice::Instance()->SetFinalColorBuffer(this->FlatGeometryLit->buffer);
@@ -78,7 +95,9 @@ namespace Render
 		//TODO: Loop through all framepasses and update each one of their resolutions if needed.
 		this->Depth->UpdateResolution();
 		this->FlatGeometryLit->UpdateResolution();		
-		this->ReflectionPass->UpdateResolution();
+		this->reflectionPass->UpdateResolution();
+		this->pickingPass->UpdateResolution();
+		this->shadowmap->UpdateResolution();
 	}
 
 	std::shared_ptr<FramePass> FrameServer::GetFramePass(const std::string& name)
@@ -87,7 +106,7 @@ namespace Render
 			return this->framePassByName[name];
 		else
 		{
-			printf("ERROR: No framepass named %s!\n", name);
+			printf("ERROR: No framepass named %s!\n", name.c_str());
 			assert(false);
 			return nullptr;
 		}
@@ -115,12 +134,23 @@ namespace Render
 
 	std::shared_ptr<ReflectionPass> FrameServer::GetReflectionPass()
 	{
-		return this->ReflectionPass;
+		return this->reflectionPass;
 	}
+
+	std::shared_ptr<PickingPass> FrameServer::GetPickingPass()
+	{
+		return this->pickingPass;
+	}
+
 
 	std::shared_ptr<ParticleComputePass> FrameServer::GetParticleComputePass()
 	{
 		return this->particleComputePass;
 	}
-}
 
+	std::shared_ptr<Render::ShadowMap> FrameServer::GetShadowMap()
+	{
+		return this->shadowmap;
+	}
+
+}

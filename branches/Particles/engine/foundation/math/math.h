@@ -107,4 +107,14 @@ namespace Math
 
 		u = 1.0f - v - w;
 	}
+
+	static float Deg2Rad(const float& deg)
+	{
+		return (float)(deg * (PI / 180.0f));
+	}
+
+	static float Rad2Deg(const float& rad)
+	{
+		return (float)(rad * (180.0f / PI));
+	}
 }

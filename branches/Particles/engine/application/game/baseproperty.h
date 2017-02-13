@@ -21,6 +21,7 @@ public:
 	virtual void Deactivate() { active = false; }
 
 	void SetOwner(std::shared_ptr<Entity> o) { this->owner = o; }
+	std::shared_ptr<Entity> GetOwner() { return this->owner; }
 
 protected:
 	bool active = false;

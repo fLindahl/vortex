@@ -66,7 +66,7 @@ Application::Open()
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Vortex Content Browser");
 
-		PointLight pLight;
+		LightServer::PointLight pLight;
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
 		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		pLight.radiusAndPadding.set_x(10.0f);

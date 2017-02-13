@@ -9,7 +9,7 @@
 #include "render/window.h"
 #include "render/properties/graphicsproperty.h"
 #include "foundation/math/matrix4.h"
-#include "render/resources/lightnode.h"
+#include "render/resources/cubemapnode.h"
 #include "render/softwarerender/rasterizer.h"
 #include "render/server/resourceserver.h"
 #include "render/server/shaderserver.h"
@@ -26,6 +26,7 @@
 #include "commands.h"
 #include "userinterface.h"
 #include "application/game/modelentity.h"
+#include "render/frame/lightcullingpass.h"
 #include "application/game/particleentity.h"
 
 
@@ -60,6 +61,8 @@ private:
 	
 	Math::point rayStart;
 	Math::point rayEnd;
+	Math::point reflectStart;
+	Math::point reflectEnd;
 	Physics::PhysicsHit hit;
 	
 	/// ImGui functions
@@ -89,6 +92,13 @@ private:
 	std::shared_ptr<Game::ParticleEntity> billboard;
 	std::shared_ptr<Game::ParticleEntity> billboard2;
 
+	std::shared_ptr<Game::StaticEntity> wall1;
+	std::shared_ptr<Game::StaticEntity> wall2;
+	std::shared_ptr<Game::StaticEntity> wall3;
+	std::shared_ptr<Game::StaticEntity> wall4;
+	std::shared_ptr<Game::StaticEntity> floor;
+	std::shared_ptr<Game::StaticEntity> ceiling;
+	
 	Util::Array<std::shared_ptr<Game::ParticleEntity>> particleList;
 
 	//Particles::ParticleSettings pSettings;
@@ -98,5 +108,9 @@ private:
 	Edit::CommandManager* commandManager;
 
 	Display::Window* window;
+
+	GLuint* pickingPixels;
+
+    //Render::LightCullingPass ls;
 };
 } // namespace LevelEditor

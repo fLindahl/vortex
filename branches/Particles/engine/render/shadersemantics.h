@@ -16,9 +16,18 @@
 #define VORTEX_SEMANTIC_CAMERAPOSITION             "CameraPosition"
 #define VORTEX_SEMANTIC_TIMEANDRANDOM			   "TimeAndRandom"
 #define VORTEX_SEMANTIC_LIGHTTILEWORKGROUPS		   "LightTileWorkGroups"
+#define VORTEX_SEMANTIC_VIEWTOTEXTURESPACE		   "ViewToTextureSpace"
 
 #define VORTEX_SEMANTIC_ALBEDOMAP				   "AlbedoMap"
 #define VORTEX_SEMANTIC_NORMALMAP				   "NormalMap"
 #define VORTEX_SEMANTIC_SPECULARMAP				   "SpecularMap"
 #define VORTEX_SEMANTIC_ROUGHNESSMAP			   "RoughnessMap"
-    
+
+#define VORTEX_SEMANTIC_CUBEMAP1				   "CubeMap1"
+#define VORTEX_SEMANTIC_CUBEMAP2				   "CubeMap2"
+#define VORTEX_SEMANTIC_CUBEMAP3				   "CubeMap3"
+#define VORTEX_SEMANTIC_CUBEMAP4				   "CubeMap4"
+#define VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR1	   "BlendFactor1"
+#define VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR2	   "BlendFactor2"
+#define VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR3	   "BlendFactor3"
+#define VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR4	   "BlendFactor4"

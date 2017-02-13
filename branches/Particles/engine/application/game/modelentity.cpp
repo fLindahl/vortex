@@ -6,8 +6,9 @@
 namespace Game
 {
 
-ModelEntity::ModelEntity()
+ModelEntity::ModelEntity() : Entity()
 {
+	//Calls baseclass first
 	this->gProperty = new Render::GraphicsProperty();
 }
 	
@@ -24,6 +25,7 @@ void ModelEntity::SetModel(std::shared_ptr<Render::ModelInstance> mdl)
 
 void ModelEntity::Activate()
 {
+	this->gProperty->SetOwner(this->shared_from_this());
 	this->gProperty->Activate();
 	Entity::Activate();
 }

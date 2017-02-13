@@ -153,9 +153,11 @@ void ParticleSystem::DrawParticleSystem()
 	//glDepthFunc(GL_LEQUAL);
 	glUseProgram(sh->GetProgram());
 
-	glDepthMask(GL_FALSE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	sh->EnableRenderState();
+
+	//glDepthMask(GL_FALSE);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	this->mesh->Bind();
 	for (size_t i = 0; i < GetParticleEmitters().Size(); i++)
@@ -167,8 +169,8 @@ void ParticleSystem::DrawParticleSystem()
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	glDisable(GL_BLEND);
-	glDepthMask(GL_TRUE);
+	//glDisable(GL_BLEND);
+	//glDepthMask(GL_TRUE);
 	this->mesh->Unbind();
 	//glActiveTexture(GL_TEXTURE4);
 	//glBindTexture(GL_TEXTURE_2D, 0);

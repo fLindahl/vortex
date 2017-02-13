@@ -36,6 +36,7 @@ namespace Render
 			Math::mat4 InvView;
 			Math::mat4 InvProjection;
 			Math::mat4 InvViewProjection;
+			Math::mat4 viewToTextureSpace;
 			Math::vec4 CameraPos;
 			Resolution ScreenSize;
 			GLfloat TimeAndRandom[2];
@@ -66,16 +67,25 @@ namespace Render
 		void SetWindowResolution(const int& x, const int& y);
 
 		void AddMaterial(Material* obj) { this->materials.Append(obj); }
-        //This renders all graphicsproperties.
-        void Render(bool drawToScreen = true);
+        
+		void SetUniformBuffer(const Graphics::Camera* camera);
+		void Render(bool drawToScreen = true);
+
+		//Render to a specified texture. Remember that you might need to set render resolution before doing this!
+		void RenderToTexture(const GLuint& outFrameBuffer, const Graphics::Camera& camera);
 
 		void Initialize();
 
 		void SetFinalColorBuffer(GLuint cbuffer) { this->finalColorBuffer = cbuffer; }
 		GLuint GetFinalColorBuffer() { return this->finalColorBuffer; }
 
+		void SetPickingEnabled(const bool& val) { this->pickingEnabled = val; }
+		bool GetPickingEnabled() { return this->pickingEnabled; }
+
    private:
 		friend class LightServer;
+
+		bool pickingEnabled;
 
 		Resolution renderResolution;
 		Resolution windowResolution;

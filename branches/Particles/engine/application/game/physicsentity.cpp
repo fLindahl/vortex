@@ -33,6 +33,7 @@ void PhysicsEntity::SetTransform(const Math::mat4& t)
 void PhysicsEntity::Activate()
 {
 	Physics::PhysicsServer::Instance()->addPhysicsEntity(this);
+	this->gProperty->SetOwner(this->shared_from_this());
 	this->gProperty->Activate();
 	Entity::Activate();
 }
