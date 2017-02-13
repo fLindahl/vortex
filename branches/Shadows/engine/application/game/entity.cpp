@@ -12,8 +12,6 @@ Entity::Entity()
 	//GraphicsServer::getInstance()->addGraphicsProperty(this->graphics);
 
 	this->ID = BaseGameFeature::EntityManager::Instance()->GetNewEntityID();
-
-	this->lightIndex = -1;
 }
 
 Entity::~Entity()
@@ -77,21 +75,6 @@ void Entity::Deactivate()
 {
 	BaseGameFeature::EntityManager::Instance()->UnregisterEntity(this->ID);
 	this->active = false;
-}
-
-int Entity::GetLightIndex()
-{
-	return this->lightIndex;
-}
-
-void Entity::SetLightIndex(const uint& index)
-{
-	this->lightIndex = index;
-}
-
-Render::LightServer::LightType& Entity::GetLightType()
-{
-	return this->lightType;
 }
 }
 

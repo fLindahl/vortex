@@ -41,9 +41,6 @@ namespace Toolkit
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
 		ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout");
-
-		this->light = -1;
-        this->lT = Render::LightServer::LightType::NaN;
 	}
 
 	UserInterface::~UserInterface()
@@ -93,7 +90,7 @@ namespace Toolkit
 			{
 				if (ImGui::BeginMenu("Lighting"))
 				{
-					if (ImGui::MenuItem("Reload Cubemaps", NULL)) 
+					if (ImGui::MenuItem("Reload Cubemaps", NULL))
 					{
 						Render::LightServer::Instance()->RegenerateCubemaps();
 					}
@@ -101,7 +98,7 @@ namespace Toolkit
 				}
 				ImGui::EndMenu();
 			}
-			
+
 			ImGui::EndMainMenuBar();
 		}
 		
@@ -324,24 +321,6 @@ namespace Toolkit
 							
 							this->application->hit.object->SetTransform(Math::mat4::multiply(objTransform, delta));
 							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
-
-							/// Gets the index of the Light
-
-							if(this->application->hit.object->GetLightType() == Render::LightServer::LightType::Spot)
-                            {
-								this->light = this->application->hit.object->GetLightIndex();
-                                this->lT = this->application->hit.object->GetLightType();
-                            }
-                            else if(this->application->hit.object->GetLightType() == Render::LightServer::LightType::Point)
-                            {
-                                this->light = this->application->hit.object->GetLightIndex();
-                                this->lT = this->application->hit.object->GetLightType();
-                            }
-							else
-                            {
-                                this->lT = Render::LightServer::Instance()->LightType::NaN;
-                                this->light = -1;
-                            }
 						}
 					}
 					else
@@ -388,54 +367,62 @@ namespace Toolkit
 
 			ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
-				if(this->light == -1)
+				Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->GetSSRSettings();
+
+				ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
+				ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
+				ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
+				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
+				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
+
+				const char* items[] = { "HIGH", "MEDIUM", "LOW"};
+
+				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
+
+
+				if(this->application->hit.object != nullptr)
 				{
-					Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->GetSSRSettings();
+					Game::ModelEntitySpotLight* aa = dynamic_cast<Game::ModelEntitySpotLight*>(this->application->hit.object);
+					Game::PointLightEntity* bb = dynamic_cast<Game::PointLightEntity*>(this->application->hit.object);
 
-					ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
-					ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
-					ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
-					ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
-					ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
-
-					const char* items[] = { "HIGH", "MEDIUM", "LOW"};
-
-					ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
-
+					if(aa != nullptr)
+					{
+						if(aa->GetLightType() == Render::LightServer::LightType::Spot)
+						{
+							char i[50];
+							Render::LightServer::SpotLight& settings = Render::LightServer::Instance()->GetSpotLightAtIndex(aa->GetLightIndex());
+							sprintf(i, "Spotlight: %i", aa->GetLightIndex());
+							ImGui::Text(i);
+							ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 50.0f, "%.1f");
+							ImGui::SliderFloat("Length", &settings.length,    1.0f, 50.0f, "%.1f");
+							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.01f");
+							ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.01f");
+							ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.01f");
+						}
+					}
+					if(bb != nullptr)
+					{
+						if(bb->GetLightType() == Render::LightServer::LightType::Point)
+						{
+							char i[50];
+							Render::LightServer::PointLight& settings = Render::LightServer::Instance()->GetPointLightAtIndex(bb->GetLightIndex());
+							sprintf(i, "Point Light: %i", bb->GetLightIndex());
+							ImGui::Text(i);
+							ImGui::SliderFloat("Radius", &settings.radiusAndPadding.x(), 1.0f, 50.0f, "%.1f");
+							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
+							ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
+						}
+					}
 				}
-
-				if(this->light != -1 && this->lT == Render::LightServer::LightType::Spot)
-				{
-					char i[50];
-					Render::LightServer::SpotLight& settings = Render::LightServer::Instance()->GetSpotLightAtIndex(this->light);
-					sprintf(i, "Spotlight: %i", this->light);
-					ImGui::Text(i);
-					ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 50.0f, "%.1f");
-					ImGui::SliderFloat("Length", &settings.length,    1.0f, 50.0f, "%.1f");
-					ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
-					ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
-					ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
-					ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.01f");
-					ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.01f");
-					ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.01f");
-				}
-
-                if(this->light != -1 && this->lT == Render::LightServer::LightType::Point)
-                {
-                    char i[50];
-                    Render::LightServer::PointLight& settings = Render::LightServer::Instance()->GetPointLightAtIndex(this->light);
-                    sprintf(i, "Point Light: %i", this->light);
-                    ImGui::Text(i);
-                    ImGui::SliderFloat("Radius", &settings.radiusAndPadding.x(), 1.0f, 50.0f, "%.1f");
-                    ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
-                    ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
-                    ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
-                }
 			}
 			ImGui::EndDock();
 			
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
-			if (ImGui::Button("Add Box", { 100, 40 }))
+			if (ImGui::Button("Add CubeMap", { 100, 40 }))
 			{
 				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
 				commandManager->DoCommand(command);
