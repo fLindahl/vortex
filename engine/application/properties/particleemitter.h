@@ -43,6 +43,7 @@ public:
 	Particles::ParticleRenderingBuffer& GetRenderBuffer(){ return this->renderBuff; }
 	Particles::ParticleUISettings& GetParticleUISettings(){ return this->pSet; }
 	Util::String& GetEmitterName(){ return this->name; }
+	Util::String& GetTexturePath(){ return this->texPath; }
 
 private:
 	//uniformBuffer
@@ -66,6 +67,9 @@ private:
 
 	//Name of the emitter
 	Util::String name = "Name";
+
+	//Texture path
+	Util::String texPath;
 
 };
 }

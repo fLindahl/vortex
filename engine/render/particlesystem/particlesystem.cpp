@@ -149,15 +149,10 @@ void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Proper
 void ParticleSystem::DrawParticleSystem()
 {
 	Render::FrameServer::Instance()->GetFlatGeometryLitPass()->BindFrameBuffer();
-	//Because we're using the old depthbuffer from the depth prepass, we need to allow equal depth values, or clear the depth buffer. clearing would mean redundant work however.
-	//glDepthFunc(GL_LEQUAL);
+
 	glUseProgram(sh->GetProgram());
 
 	sh->EnableRenderState();
-
-	//glDepthMask(GL_FALSE);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	this->mesh->Bind();
 	for (size_t i = 0; i < GetParticleEmitters().Size(); i++)
@@ -169,12 +164,10 @@ void ParticleSystem::DrawParticleSystem()
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	//glDisable(GL_BLEND);
-	//glDepthMask(GL_TRUE);
 	this->mesh->Unbind();
 	//glActiveTexture(GL_TEXTURE4);
 	//glBindTexture(GL_TEXTURE_2D, 0);
-	//glDepthFunc(GL_LESS);
+
 	glUseProgram(0);
 }
 
