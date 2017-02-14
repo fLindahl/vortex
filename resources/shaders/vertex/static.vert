@@ -7,10 +7,17 @@ layout(location=4) in vec3 binormal;
 out vec3 FragmentPos;
 out vec2 TexCoords;
 out mat3 NormalMatrix;
+out vec4 LightClipSpacePos;
+
+layout (std140, binding = 8) uniform shadowRUniformBuffer
+{
+	mat4 LightMVP;
+}shadRUniformBuffer;
 
 void main()
 {
 	vec4 wPos = (Model * vec4(pos, 1.0f));
+	LightClipSpacePos = shadRUniformBuffer.LightMVP * vec4(pos, 1.0f);
 	
 	// position in world space
 	FragmentPos = wPos.xyz;	

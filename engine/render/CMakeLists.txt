@@ -56,6 +56,8 @@ SET(files_render_frame
 	frame/reflectionpass.cpp
 	frame/shadowmap.h
 	frame/shadowmap.cpp
+	frame/rendershadowmap.h
+	frame/rendershadowmap.cpp
 	)
 	
 SET(files_render_resources

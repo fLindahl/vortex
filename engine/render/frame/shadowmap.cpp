@@ -24,7 +24,7 @@ namespace Render
 	void ShadowMap::Setup()
 	{
 
-		LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+		/*LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
 												 Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f),
 												 Math::vec4(0.0f, -1.0f, 0.0f, 1.0f),
 												 10.0f,
@@ -52,13 +52,15 @@ namespace Render
 		//get spotlight pos of the the first spotlight in the array and make a lightMVP matrix from it for use in the shadowmap shaders
 		LightServer::SpotLight spotlight;
 
-        if(LightServer::Instance()->GetNumSpotLights() != 0)
+		if (LightServer::Instance()->GetNumSpotLights() != 0)
 			spotlight = LightServer::Instance()->GetSpotLightAtIndex(0);
 
 		Math::mat4 lightV, lightM, lightMV, lightP;
 		lookat = spotlight.position + (spotlight.coneDirection * spotlight.length);
 		lightV = Math::mat4::lookatrh(spotlight.position, lookat, up);
 		lightM.set_position(spotlight.position);
+
+		//Math::mat4::orthorh
 
 		shadUniformBuffer.lightM = lightM;
 		shadUniformBuffer.lightV = lightV;
@@ -67,7 +69,7 @@ namespace Render
 		glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
 		//all shadow buffers are from 9001 and forward
 		glBindBufferBase(GL_UNIFORM_BUFFER, 9, this->ubo[0]);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(shadowUniformBuffer), &shadUniformBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(shadowUniformBuffer), &shadUniformBuffer, GL_STATIC_DRAW);*/
 
 		//setup the shadow map frame buffer
 		//this->shadowmapframebuffer = 0;
