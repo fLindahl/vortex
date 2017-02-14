@@ -17,7 +17,7 @@ namespace Render
 		void UpdateResolution();
 
 
-		GLuint GetShadowMapFrameBuffer() { return this->frameBufferObject; }
+		GLuint& GetShadowMap() { return this->buffer; }
 	private:
 		//Uniform Buffer Object
 		GLuint ubo[1];
@@ -34,6 +34,8 @@ namespace Render
 		{
 			LightServer::SpotLight spotLight;
 		}spotLightBuffer;
+
+	
 
 	};
 

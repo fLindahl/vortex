@@ -3,6 +3,7 @@ in vec3 FragmentPos;
 in vec2 TexCoords;
 // For normalmapping
 in mat3 NormalMatrix;
+in vec4 LightClipSpacePos;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 normalColor;
@@ -12,6 +13,7 @@ uniform sampler2D AlbedoMap;
 uniform sampler2D NormalMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D RoughnessMap;
+uniform sampler2D ShadowMapTest;
 
 struct PointLight
 {
@@ -171,6 +173,27 @@ void main()
 	/// Loop for SpotLights
 	for (uint i = 0; i < tileLights && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
+		
+		
+		
+		
+		float shadowfactor;
+		
+		vec3 projcords = LightClipSpacePos.xyz / LightClipSpacePos.w;
+		vec2 uvcords;
+		
+		uvcords.x = 0.5f * projcords.x +0.5f;                                                  
+		uvcords.y = 0.5f * projcords.y +0.5f;                                                  
+		float z   = 0.5f * projcords.z +0.5f; 
+		
+		float depth = texture(ShadowMapTest, uvcords).x;
+		
+		if (depth < (z + 0.00001))
+			shadowfactor = 0.0f;
+		else
+			shadowfactor = 1.0f;
+	
+		
 		uint lightIndex = visibleSpotLightIndicesBuffer.data[offset + i].index;
 		SpotLight light = spotLightBuffer.data[lightIndex];
 		/// Light Direction
@@ -191,8 +214,10 @@ void main()
 			vec3 H = normalize(L + V);
 			specular = pow(max(dot(H, N), 0.0), shininess);		
 		//}
-
-		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation * spotIntensity;
+		
+		
+			
+		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse * shadowfactor) + (vec3(specular) * spec) * shadowfactor) * attenuation * spotIntensity;
 		color.rgb += irradiance;
 	}
 	

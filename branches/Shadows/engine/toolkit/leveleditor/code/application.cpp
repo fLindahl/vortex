@@ -89,7 +89,12 @@ Application::Open()
 		this->wall1 = std::make_shared<Game::StaticEntity>();
 		this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 		this->wall1->Activate();
-		this->wall1->SetTransform(Math::mat4::translation(-1.0f, 0.5f, 0.0f));
+		this->wall1->SetTransform(Math::mat4::translation(-5.5f, -0.5f, -0.9f));
+
+		this->wall2 = std::make_shared<Game::StaticEntity>();
+		this->wall2->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+		this->wall2->Activate();
+		this->wall2->SetTransform(Math::mat4::translation(-5.5f, 4.5f, -0.9f));
 
 		/*
 		this->wall1 = std::make_shared<Game::ModelEntity>();
@@ -225,6 +230,10 @@ Application::Run()
 
 		//Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		//Debug::DebugRenderer::Instance()->DrawLine(this->reflectStart, this->reflectEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		Debug::DebugRenderer::Instance()->DrawLine(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position, 
+												   Render::LightServer::Instance()->GetSpotLightAtIndex(0).position + Render::LightServer::Instance()->GetSpotLightAtIndex(0).coneDirection * Render::LightServer::Instance()->GetSpotLightAtIndex(0).length,
+												   4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
         //a += 0.0001f;
         //Render::LightServer::Instance()->GetSpotLightAtIndex(0).position = Math::vec4(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position.x() + a, 2.3f, 3.0f, 1.0f);
