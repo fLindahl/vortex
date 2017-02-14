@@ -168,6 +168,9 @@ Application::Open()
 		sLight.angle = 5.0f;
 		LightServer::Instance()->AddSpotLight(sLight);*/
 
+		/// Creates a directional light in the scene
+		Render::LightServer::Instance()->CreateDirectionalLight(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f), Math::vec4(1.0f, 0.8f, 0.6f, 0.0f));
+
 		// set ui rendering function
 		this->window->SetUiRender([this]()
 		  {
