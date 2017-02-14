@@ -48,7 +48,7 @@ struct ParticleUISettings
 
 	float radius = 1.0f;
 
-	bool vecRand = false;
+	bool velRand = false;
 	bool accRand = false;
 	bool colorRand = false;
 	bool lifeTimeRand = false;

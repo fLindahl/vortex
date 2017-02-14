@@ -15,6 +15,12 @@ using namespace tinyxml2;
  ***********************/
 namespace Particles
 {	
+struct FileSettings
+{
+	ParticleUISettings set;
+	Util::String texPath;
+};
+
 class ParticleFile
 {
 public:
@@ -28,7 +34,7 @@ public:
 	~ParticleFile();
 
 	bool SaveParticle(Util::String name);
-	bool LoadParticle(Util::String path);
+	FileSettings LoadParticle(Util::String path);
 	void AppendEmitter(std::shared_ptr<Property::ParticleEmitter> emitter);
 
 private:

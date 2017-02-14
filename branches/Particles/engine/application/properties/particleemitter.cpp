@@ -38,9 +38,10 @@ void ParticleEmitter::Deactivate()
 void ParticleEmitter::CreateEmitter(GLuint numOfParticles, const char* texturepath)
 {
 	this->numOfParticles = numOfParticles;
-	texture = Render::ResourceServer::Instance()->LoadTexture(texturepath);
-	state = Particles::ParticleState();
-	state.pos = owner->GetTransform().get_position();
+	this->texture = Render::ResourceServer::Instance()->LoadTexture(texturepath);
+	this->texPath = texturepath;
+	this->state = Particles::ParticleState();
+	//state.pos = owner->GetTransform().get_position();
 	this->buff = Particles::ParticleSystem::Instance()->GetEmitterBuffer(this->numOfParticles, *this);
 	this->renderBuff.offset = this->buff.startIndex;
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
