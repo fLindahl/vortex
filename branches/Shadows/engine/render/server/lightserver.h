@@ -1,7 +1,7 @@
 /*
- * TODO: The lightTiles should be send to the shader for easier changes, on how many lights each tile can contain.
- *          The Update method should only calculate the lights that are moving or the ones that have been moved
- *          The Directional Light is not yet added, only struct exists.
+ * TODO: The Update method should only calculate the lights that are moving or the ones that have been moved
+ *       The Directional Light should not be an array.
+ *       If you spam spawn lights you get segmentation fault, look in here/modelentityWithSpotLight/pointlightentity
  */
 
 #pragma once
@@ -41,7 +41,7 @@ namespace Render
 
 		Math::point color;
 		Math::point position;
-		Math::vec4 radiusAndPadding;
+        Math::vec4 radiusAndPadding;
 	};
 	/// Is not added to the shader yet
 	struct DirectionalLight
@@ -49,7 +49,8 @@ namespace Render
 		LightType lightType = LightType::Directional;
 
 		Math::point color;
-		Math::point position;
+        /// w in direction should be zero
+		Math::point direction;
 	};
 
 	struct SpotLight
@@ -80,33 +81,43 @@ namespace Render
 
 		LightServer(const LightServer&) = delete;
 		void operator=(const LightServer&) = delete;
-		
+
+        /// Point Lights ///
 		void AddPointLight(const PointLight& pLight);
 		size_t GetNumPointLights() { return this->pointLights.Size(); }
-		LightServer::PointLight& GetPointLightAtIndex(const int& index);
+		PointLight& GetPointLightAtIndex(const int& index);
 
+        /// Spotlights ///
 		void AddSpotLight(SpotLight& pLight);
 		size_t GetNumSpotLights() { return this->spotLights.Size(); }
         void CalculateSpotlight(SpotLight& sLight);
-		LightServer::SpotLight& GetSpotLightAtIndex(const int& index);
+		SpotLight& GetSpotLightAtIndex(const int& index);
+
+        /// Directional Lights ///
+        void AddDirectionalLight(const DirectionalLight& dLight);
+        size_t GetNumDirectionalLights() { return this->directionlLights.Size(); }
+        DirectionalLight& GetDirectionalLightAtIndex(const int& index);
 
 		GLuint GetWorkGroupsX() { return this->workGroupsX; }
 		GLuint GetWorkGroupsY() { return this->workGroupsY; }
 
 		GLuint GetPointLightBuffer() { return this->pointLightBuffer; }
 		GLuint GetSpotLightBuffer() { return this->spotLightBuffer; }
+        GLuint GetDirectionalLightBuffer() { return this->directionalLightBuffer; }
 		GLuint GetVisiblePointLightIndicesBuffer() { return this->visiblePointLightIndicesBuffer; }
 		GLuint GetVisibleSpotLightIndicesBuffer() { return this->visibleSpotLightIndicesBuffer; }
+        GLuint GetVisibleDirectionalLightIndicesBuffer() { return this->visibleDirectionaltLightIndicesBuffer; }
 
         GLuint GetTileLights() { return this->tileLights; }
 
 		void UpdateSpotLightBuffer();
 		void UpdatePointLightBuffer();
-
+        void UpdateDirectionalLightBuffer();
 
         /// Debug and Easier Access ///
         void CreateSpotLight(Math::point color, Math::point position, Math::vec4 direction, float length, float angle);
         void CreatePointLight(Math::point color, Math::point position, float radius);
+        void CreateDirectionalLight(Math::point color, Math::point direction);
 
 		void AddCubeMap(std::shared_ptr<CubeMapNode> node);
 		void RemoveCubeMap(std::shared_ptr<CubeMapNode> node);
@@ -125,8 +136,10 @@ namespace Render
 		// Used for storage buffer objects to hold light data and visible light indicies data
 		GLuint pointLightBuffer;
 		GLuint spotLightBuffer;
+        GLuint directionalLightBuffer;
 		GLuint visiblePointLightIndicesBuffer;
 		GLuint visibleSpotLightIndicesBuffer;
+        GLuint visibleDirectionaltLightIndicesBuffer;
 
 		// X and Y work group dimension variables for compute shader
 		GLuint workGroupsX;
@@ -135,6 +148,7 @@ namespace Render
 		/// Contains all the pointlights in the game
 		Util::Array<PointLight> pointLights;
 		Util::Array<SpotLight> spotLights;
+        Util::Array<DirectionalLight> directionlLights;
 
         /// Determines how many light should be registred per tile
         GLuint tileLights = 512;

@@ -60,6 +60,9 @@ namespace Toolkit
 		GLuint entityToolTextureHandle;
 		GLuint brushToolTextureHandle;
 		GLuint polygonEditTextureHandle;
+
+		/// this will be removed once someone finds a better solution
+		bool toggleLight;
 	};
 
 }

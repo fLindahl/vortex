@@ -41,6 +41,8 @@ namespace Toolkit
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
 		ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout");
+
+        this->toggleLight = false;
 	}
 
 	UserInterface::~UserInterface()
@@ -377,13 +379,27 @@ namespace Toolkit
 
 				const char* items[] = { "HIGH", "MEDIUM", "LOW"};
 
-				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
+				ImGui::Combo("Reflection Quality /n", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
 
+
+                if(Render::LightServer::Instance()->GetNumDirectionalLights() != 0 && !this->toggleLight)
+                {
+                    Render::LightServer::DirectionalLight& dirSettings = Render::LightServer::Instance()->GetDirectionalLightAtIndex(0);
+                    ImGui::Text("Directional Light: 0");
+                    ImGui::SliderFloat("Red"  , &dirSettings.color.x(), 0.0f, 1.0f, "%.01f");
+                    ImGui::SliderFloat("Blue" , &dirSettings.color.y(), 0.0f, 1.0f, "%.01f");
+                    ImGui::SliderFloat("Green", &dirSettings.color.z(), 0.0f, 1.0f, "%.01f");
+                    ImGui::SliderFloat("Position-X", &dirSettings.direction.x(), -1.0f, 1.0f, "%.01f");
+                    ImGui::SliderFloat("Position-Y", &dirSettings.direction.y(), -1.0f, 1.0f, "%.01f");
+                    ImGui::SliderFloat("Position-Z", &dirSettings.direction.z(), -1.0f, 1.0f, "%.01f");
+                    Render::LightServer::Instance()->UpdateDirectionalLightBuffer();
+                }
 
 				if(this->application->hit.object != nullptr)
 				{
 					Game::ModelEntitySpotLight* aa = dynamic_cast<Game::ModelEntitySpotLight*>(this->application->hit.object);
 					Game::PointLightEntity* bb = dynamic_cast<Game::PointLightEntity*>(this->application->hit.object);
+                    this->toggleLight = false;
 
 					if(aa != nullptr)
 					{
@@ -393,7 +409,7 @@ namespace Toolkit
 							Render::LightServer::SpotLight& settings = Render::LightServer::Instance()->GetSpotLightAtIndex(aa->GetLightIndex());
 							sprintf(i, "Spotlight: %i", aa->GetLightIndex());
 							ImGui::Text(i);
-							ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 50.0f, "%.1f");
+							ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 89.9f, "%.1f");
 							ImGui::SliderFloat("Length", &settings.length,    1.0f, 50.0f, "%.1f");
 							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
 							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
@@ -401,6 +417,8 @@ namespace Toolkit
 							ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.01f");
 							ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.01f");
 							ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.01f");
+
+                            this->toggleLight = true;
 						}
 					}
 					if(bb != nullptr)
@@ -415,6 +433,8 @@ namespace Toolkit
 							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
 							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
 							ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
+
+                            this->toggleLight = true;
 						}
 					}
 				}

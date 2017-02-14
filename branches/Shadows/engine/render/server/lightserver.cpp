@@ -6,13 +6,17 @@
 namespace Render
 {
 
-LightServer::LightServer() : pointLightBuffer(0), spotLightBuffer(0), visiblePointLightIndicesBuffer(0), visibleSpotLightIndicesBuffer(0), workGroupsX(0), workGroupsY(0), tileLights(512)
+LightServer::LightServer() : pointLightBuffer(0), spotLightBuffer(0), directionalLightBuffer(0),
+							 visiblePointLightIndicesBuffer(0), visibleSpotLightIndicesBuffer(0), visibleDirectionaltLightIndicesBuffer(0),
+							 workGroupsX(0), workGroupsY(0), tileLights(512)
 {
 	// Generate our shader storage buffers
 	glGenBuffers(1, &pointLightBuffer);
 	glGenBuffers(1, &spotLightBuffer);
+	glGenBuffers(1, &directionalLightBuffer);
 	glGenBuffers(1, &visiblePointLightIndicesBuffer);
 	glGenBuffers(1, &visibleSpotLightIndicesBuffer);
+	glGenBuffers(1, &visibleDirectionaltLightIndicesBuffer);
 
     this->oneOverThree = 1.0f/3.0f;
 }
@@ -52,12 +56,23 @@ void LightServer::CalculateSpotlight(SpotLight& sLight)
 	sLight.midPoint.set_w(1.0f);
 
 	/// Calculate the radius for the sphere
-	sLight.fRadius = (sLight.midPoint - sLight.position).length();
+	sLight.fRadius = (sLight.midPoint - sLight.position).length() + radius;
 }
 
 LightServer::SpotLight& LightServer::GetSpotLightAtIndex(const int& index)
 {
 	return this->spotLights[index];
+}
+
+void LightServer::AddDirectionalLight(const DirectionalLight& dLight)
+{
+	this->directionlLights.Append(dLight);
+	this->UpdateDirectionalLightBuffer();
+}
+
+LightServer::DirectionalLight& LightServer::GetDirectionalLightAtIndex(const int& index)
+{
+	return this->directionlLights[index];
 }
 
 void LightServer::UpdateWorkGroups()
@@ -74,6 +89,10 @@ void LightServer::UpdateWorkGroups()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, visibleSpotLightIndicesBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * tileLights, 0, GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, visibleDirectionaltLightIndicesBuffer);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * tileLights, 0, GL_STATIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
@@ -100,6 +119,17 @@ void LightServer::UpdateSpotLightBuffer()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
+void LightServer::UpdateDirectionalLightBuffer()
+{
+	//size_t numberOfTiles = workGroupsX * workGroupsY;
+	size_t numDirectionalLights = this->directionlLights.Size();
+
+	// Bind light buffer
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, directionalLightBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numDirectionalLights * sizeof(DirectionalLight), &this->directionlLights[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
 void LightServer::CreateSpotLight(Math::point color,
 								  Math::point position,
 								  Math::vec4 direction,
@@ -121,8 +151,18 @@ void LightServer::CreatePointLight(Math::point color, Math::point position, floa
 	pLight.position = position;
 	pLight.color = color;
 	pLight.radiusAndPadding.set_x(radius);
-	LightServer::Instance()->AddPointLight(pLight);
+	this->AddPointLight(pLight);
 }
+
+void LightServer::CreateDirectionalLight(Math::point color, Math::point direction)
+{
+	DirectionalLight dLight;
+	dLight.direction = direction;
+    dLight.direction.w() = 0.0f;
+	dLight.color = color;
+	this->AddDirectionalLight(dLight);
+}
+
 void LightServer::AddCubeMap(std::shared_ptr<CubeMapNode> node)
 {
 	if (!this->cubemapNodes.Find(node))

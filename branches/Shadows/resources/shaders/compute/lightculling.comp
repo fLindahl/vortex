@@ -7,6 +7,14 @@ struct PointLight
 	vec4 radiusAndPadding;
 };
 
+struct DirectionalLight 
+{
+	int lightType;
+	
+	vec4 color;
+	vec4 direction;
+};
+
 struct SpotLight 
 {
 	int lightType;
@@ -32,6 +40,8 @@ layout (std140, binding = 24) uniform uniformBlock
 {
 	int pointLightCount;
 	int spotLightCount;
+	int directionalLightCount;
+	int tileLights;
 };
 
 layout(std430, binding = 1) readonly buffer PointLightBuffer 
@@ -39,20 +49,30 @@ layout(std430, binding = 1) readonly buffer PointLightBuffer
 	PointLight data[];
 } pointLightBuffer;
 
-layout(std430, binding = 11) readonly buffer SpotLightBuffer 
+layout(std430, binding = 2) readonly buffer SpotLightBuffer 
 {
 	SpotLight data[];
 } spotLightBuffer;
 
-layout(std430, binding = 3) writeonly buffer VisiblePointLightIndicesBuffer 
+layout(std430, binding = 3) readonly buffer DirectionalLightBuffer 
+{
+	DirectionalLight data[];
+} directionalLightBuffer;
+
+layout(std430, binding = 4) writeonly buffer VisiblePointLightIndicesBuffer 
 {
 	VisibleIndex data[];
 } visiblePointLightIndicesBuffer;
 
-layout(std430, binding = 12) writeonly buffer VisibleSpotLightIndicesBuffer 
+layout(std430, binding = 5) writeonly buffer VisibleSpotLightIndicesBuffer 
 {
 	VisibleIndex data[];
 } visibleSpotLightIndicesBuffer;
+
+layout(std430, binding = 6) writeonly buffer VisibleDirectionalLightIndicesBuffer 
+{
+	VisibleIndex data[];
+} visibleDirectionalLightIndicesBuffer;
 
 // Uniforms
 uniform sampler2D depthMap;
@@ -63,16 +83,18 @@ shared uint minDepthInt;
 shared uint maxDepthInt;
 shared uint visiblePointLightCount;
 shared uint visibleSpotLightCount;
+shared uint visibleDirectionalLightCount;
 shared vec4 frustumPlanes[6];
 // Shared local storage for visible indices, will be written out to the global buffer at the end
 shared int visiblePointLightIndices[512];
 shared int visibleSpotLightIndices[512];
+shared int visibleDirectionalLightIndices[512];
 
 layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;
 
 void main() 
 {
-	uint tileLights = 512;
+	//uint tileLights = tileLights;
 	
 	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 itemID = ivec2(gl_LocalInvocationID.xy);
@@ -89,6 +111,7 @@ void main()
 		maxDepthInt = 0;
 		visiblePointLightCount = 0;
 		visibleSpotLightCount = 0;
+		visibleDirectionalLightCount = 0;
 	}
 
 	barrier();
@@ -220,6 +243,22 @@ void main()
 	}
 
 	barrier();
+	
+	passCount = (directionalLightCount + threadCount - 1) / threadCount;
+	for (uint i = 0; i < passCount; i++) 
+	{
+		uint lightIndex = i * threadCount + gl_LocalInvocationIndex;
+		
+		if (lightIndex >= directionalLightCount) 
+		{
+			break;
+		}
+
+		uint offset = atomicAdd(visibleDirectionalLightCount, 1);
+		visibleDirectionalLightIndices[offset] = int(lightIndex);
+	}
+
+	barrier();
 
 	// One thread should fill the global light buffer
 	if (gl_LocalInvocationIndex == 0) 
@@ -248,12 +287,24 @@ void main()
 		{
 			visibleSpotLightIndicesBuffer.data[offset + visibleSpotLightCount].index = -1;
 		}
+		
+		/// Directional Light
+		for (uint i = 0; i < visibleDirectionalLightCount; i++) 
+		{
+			visibleDirectionalLightIndicesBuffer.data[offset + i].index = visibleDirectionalLightIndices[i];
+		}
+		
+		if (visibleDirectionalLightCount < tileLights) 
+		{
+			visibleDirectionalLightIndicesBuffer.data[offset + visibleDirectionalLightCount].index = -1;
+		}
 	}
 	
 	/// Debug Light ///
 	barrier();
 	//float c = float(visiblePointLightCount) / float(visiblePointLightCount);
-	float c = float(visibleSpotLightCount) / float(visibleSpotLightCount);
+	//float c = float(visibleSpotLightCount) / float(visibleSpotLightCount);
+	float c = float(visibleDirectionalLightCount) / float(visibleDirectionalLightCount);
 	imageStore(lightImage, location, vec4(c,c,c,1.0f));
 	//imageStore(lightImage, location, vec4(0,0,0,1.0f));
 }

@@ -22,6 +22,14 @@ struct PointLight
 	vec4 radiusAndPadding;
 };
 
+struct DirectionalLight 
+{
+	int lightType;
+	
+	vec4 color;
+	vec4 direction;
+};
+
 struct SpotLight 
 {
 	int lightType;
@@ -40,26 +48,44 @@ struct VisibleIndex
 	int index;
 };
 
+layout (std140, binding = 24) uniform uniformBlock
+{
+	int pointLightCount;
+	int spotLightCount;
+	int directionalLightCount;
+	int tileLights;
+};
+
 // Shader storage buffer objects
 layout(std430, binding = 1) readonly buffer PointLightBuffer 
 {
 	PointLight data[];
 } pointLightBuffer;
 
-layout(std430, binding = 11) readonly buffer SpotLightBuffer 
+layout(std430, binding = 2) readonly buffer SpotLightBuffer 
 {
 	SpotLight data[];
 } spotLightBuffer;
 
-layout(std430, binding = 3) readonly buffer VisiblePointLightIndicesBuffer 
+layout(std430, binding = 3) readonly buffer DirectionalLightBuffer 
+{
+	DirectionalLight data[];
+} directionalLightBuffer;
+
+layout(std430, binding = 4) readonly buffer VisiblePointLightIndicesBuffer 
 {
 	VisibleIndex data[];
 } visiblePointLightIndicesBuffer;
 
-layout(std430, binding = 12) readonly buffer VisibleSpotLightIndicesBuffer 
+layout(std430, binding = 5) readonly buffer VisibleSpotLightIndicesBuffer 
 {
 	VisibleIndex data[];
 } visibleSpotLightIndicesBuffer;
+
+layout(std430, binding = 6) readonly buffer VisibleDirectionalLightIndicesBuffer 
+{
+	VisibleIndex data[];
+} visibleDirectionalLightIndicesBuffer;
 
 // parameters of the light and possible values
 const vec3 u_lightAmbientIntensity = vec3(0.1f, 0.1f, 0.1f);
@@ -167,6 +193,30 @@ void main()
 		//}
 
 		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation * spotIntensity;
+		color.rgb += irradiance;
+	}
+	
+	for (uint i = 0; i < tileLights && visibleDirectionalLightIndicesBuffer.data[offset + i].index != -1; i++)
+	{
+		uint lightIndex = visibleDirectionalLightIndicesBuffer.data[offset + i].index;
+		DirectionalLight light = directionalLightBuffer.data[lightIndex];
+		
+		vec3 L = normalize(light.direction.xyz);
+
+		float attenuation = 1.0f;
+		
+		float diffuse = max(dot(L, N), 0.0);
+		float specular = 0.0f;
+
+		//Hope this looks better with shadows...
+		//if(diffuse > 0.0f)
+		//{
+			vec3 H = normalize(L + V);
+			specular = pow(max(dot(H, N), 0.0), shininess);
+		//}
+
+		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
+		
 		color.rgb += irradiance;
 	}
 	

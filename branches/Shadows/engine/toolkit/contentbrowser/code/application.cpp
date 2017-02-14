@@ -65,7 +65,7 @@ Application::Open()
 		//Never set resolution before initializing rendering and framepasses
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Vortex Content Browser");
-
+        /*
 		LightServer::PointLight pLight;
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
 		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -83,6 +83,8 @@ Application::Open()
 		pLight.position = Math::vec4(10.0f, -1.5f, 10.0f, 1.0f);
 		pLight.color = Math::vec4(0.1f, 1.0f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);
+         */
+
 		
 		// set ui rendering function
 		this->window->SetUiRender([this]()
