@@ -30,6 +30,8 @@ SET(files_application_game
 	game/cubemapentity.cpp
 	game/modelentityWithSpotlight.h
 	game/modelentityWithSpotlight.cpp
+	game/boxentity.cpp
+	game/boxentity.cpp
 	)
 	
 SET(files_application_properties

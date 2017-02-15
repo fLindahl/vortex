@@ -140,10 +140,10 @@ namespace Render
 				}
 			}
 		}
-
+/*
 		glActiveTexture(GL_TEXTURE9);
 		glUniform1i(glGetUniformLocation(currentProgram, "ShadowMap"), 0);
-		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());*/
 
 		//Unbind Depth FrameBufferObject
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

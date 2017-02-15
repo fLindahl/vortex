@@ -3,7 +3,7 @@ in vec3 FragmentPos;
 in vec2 TexCoords;
 // For normalmapping
 in mat3 NormalMatrix;
-in vec4 LightClipSpacePos;
+in vec4 FragPosLightSpace;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 normalColor;
@@ -121,7 +121,7 @@ const float screenGamma = 2.2;
 
 void main()
 {
-	uint tileLights = 512;
+	//uint tileLights = 512;
 	
 	// Determine which tile this pixel belongs to
 	ivec2 location = ivec2(gl_FragCoord.xy);
@@ -172,27 +172,16 @@ void main()
 
 	/// Loop for SpotLights
 	for (uint i = 0; i < tileLights && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
-	{
+	{		
+		vec3 projcords = FragPosLightSpace.xyz / FragPosLightSpace.w;
 		
+		vec3 uvcords = 0.5f * projcords + 0.5f;
 		
-		
-		
-		float shadowfactor;
-		
-		vec3 projcords = LightClipSpacePos.xyz / LightClipSpacePos.w;
-		vec2 uvcords;
-		
-		uvcords.x = 0.5f * projcords.x +0.5f;                                                  
-		uvcords.y = 0.5f * projcords.y +0.5f;                                                  
-		float z   = 0.5f * projcords.z +0.5f; 
-		
-		float depth = texture(ShadowMapTest, uvcords).x;
-		
-		if (depth < (z + 0.00001))
-			shadowfactor = 0.0f;
-		else
-			shadowfactor = 1.0f;
+		float depth = texture(ShadowMapTest, uvcords.xy).r;
+		float z = uvcords.z;
 	
+		float shadowfactor = z > depth ? 1.0 : 0.0;  
+
 		
 		uint lightIndex = visibleSpotLightIndicesBuffer.data[offset + i].index;
 		SpotLight light = spotLightBuffer.data[lightIndex];
@@ -215,9 +204,7 @@ void main()
 			specular = pow(max(dot(H, N), 0.0), shininess);		
 		//}
 		
-		
-			
-		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse * shadowfactor) + (vec3(specular) * spec) * shadowfactor) * attenuation * spotIntensity;
+		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse * (1.0 - shadowfactor)) + (vec3(specular) * spec) * (1.0 - shadowfactor)) * attenuation * spotIntensity;
 		color.rgb += irradiance;
 	}
 	

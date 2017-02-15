@@ -442,21 +442,26 @@ namespace Toolkit
 			ImGui::EndDock();
 			
 			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
-			if (ImGui::Button("Add CubeMap", { 100, 40 }))
+			if (ImGui::Button("Add CubeMap", { 100, 20 }))
 			{
 				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
 				commandManager->DoCommand(command);
 			}
 			
-			if (ImGui::Button("Add Spotlight", { 125, 40 }))
+			if (ImGui::Button("Spawn Spotlight", { 125, 20 }))
 			{
 				std::shared_ptr<Edit::AddSpotlightEntity> command = std::make_shared<Edit::AddSpotlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
 				commandManager->DoCommand(command);
 			}
 
-            if (ImGui::Button("Add Point Light", { 125, 40 }))
+            if (ImGui::Button("Spawn Point Light", { 125, 20 }))
             {
                 std::shared_ptr<Edit::AddPointlightEntity> command = std::make_shared<Edit::AddPointlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
+                commandManager->DoCommand(command);
+            }
+            if (ImGui::Button("Spawn Box", { 125, 20 }))
+            {
+                std::shared_ptr<Edit::AddBox> command = std::make_shared<Edit::AddBox>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
                 commandManager->DoCommand(command);
             }
 			ImGui::EndDock();

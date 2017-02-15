@@ -1,4 +1,6 @@
 #pragma once
+
+#include <application/game/boxentity.h>
 #include "undo.h"
 #include "application/game/cubemapentity.h"
 #include "application/game/modelentityWithSpotlight.h"
@@ -20,7 +22,7 @@ namespace Edit
 		}
 		~AddEntity()
 		{
-
+            //empty
 		}
 
 		virtual bool Execute()
@@ -36,6 +38,37 @@ namespace Edit
 		}
 
 	};
+
+    class AddBox : public Command
+    {
+      public:
+        std::shared_ptr<Game::BoxEntity> entity;
+
+      public:
+        AddBox(const Math::vec4& position, std::shared_ptr<Render::ModelInstance> mdl)
+        {
+            this->entity = std::make_shared<Game::BoxEntity>();
+            this->entity->SetModel(mdl);
+            this->entity->SetTransform(Math::mat4::translation(position));
+        }
+        ~AddBox()
+        {
+            //empty
+        }
+
+        virtual bool Execute()
+        {
+            this->entity->Activate();
+            return true;
+        }
+
+        virtual bool Unexecute()
+        {
+            this->entity->Deactivate();
+            return true;
+        }
+
+    };
 
     class AddSpotlightEntity : public Command
     {
