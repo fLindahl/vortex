@@ -24,6 +24,8 @@ CubeMapNode::CubeMapNode() :
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, this->resolution.x, this->resolution.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 	this->isLoaded = true;
+
+	this->proxy = nullptr;
 }
 
 CubeMapNode::~CubeMapNode()

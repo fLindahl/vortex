@@ -34,6 +34,8 @@ SET(files_application_game
 	game/particleentity.cpp
 	game/staticentity.cpp 
 	game/physicsentity.cpp
+	game/geometryproxyentity.h
+	game/geometryproxyentity.cpp
 	)
 	
 SET(files_application_properties

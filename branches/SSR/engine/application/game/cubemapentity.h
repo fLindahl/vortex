@@ -30,7 +30,7 @@ public:
 	bool IsLoaded();
 
 	std::shared_ptr<Render::CubeMapNode> GetCubeMapNode() { return this->cubemap; }
-
+	void SetGeometryProxy(std::shared_ptr<Render::GeometryProxy> proxy) { this->cubemap->SetGeometryProxy(proxy); }
 protected:
 	std::shared_ptr<Render::CubeMapNode> cubemap;
 };

@@ -7,39 +7,57 @@ uniform sampler2D normalMap;
 uniform sampler2D specularMap;
 uniform sampler2D colorMap;
 
-uniform int NumCubemaps;
+layout (rgba32f) uniform writeonly image2D reflectionImage;
 
-uniform samplerCube CubeMap1;
-uniform float BlendFactor1;
-uniform samplerCube CubeMap2;
-uniform float BlendFactor2;
-uniform samplerCube CubeMap3;
-uniform float BlendFactor3;
-uniform samplerCube CubeMap4;
-uniform float BlendFactor4;
+//We can have a maximum of 8 cubemaps blended simultaneously
+uniform samplerCube Cubemaps[8];
+
+struct CubemapData
+{
+	mat4 geometryproxy;
+	vec4 cubeMapPosition;
+	float blendfactor;
+};
+
+uniform uint numCubemaps;
+
+layout(std140, binding = 10) uniform CubeMapBlock
+{	
+	//how many cubemaps we are currently blending between
+	CubemapData cubemapData[8];
+};
 
 // Shared values between all the threads in a group
 //shared DepthSamples
 
-layout (rgba32f) uniform writeonly image2D reflectionImage;
 
-void GetBlendedCubeMapColor(in vec3 reflectionDir, out vec3 reflectionColor)
+void GetBlendedAndParallaxCorrectedCubeMapColor(in vec3 rayPosition, in vec3 reflectionDir, out vec3 reflectionColor)
 {
-	vec3 worldDirection = (mat3(InvView) * reflectionDir);
-	vec3 cubeColor;
+	vec3 cubeColor = vec3(0.0f,0.0f,0.0f);
 	
-	vec3 cubeColor1 = texture(CubeMap1, worldDirection).rgb;
-	cubeColor = cubeColor1 * BlendFactor1;
+	for(int i = 0; i < numCubemaps; ++i)
+	{
+		// Intersection with OBB
+		// convert to unit box space
+		// Transform in local unit parallax cube space (scaled and rotated)
+		// Why multiply by 2? Magic.
+		vec3 RayLS = (mat3(inverse(cubemapData[i].geometryproxy)) * reflectionDir) * 2.0f;
+		vec3 PositionLS = (inverse(cubemapData[i].geometryproxy) * vec4(rayPosition, 1.0f)).xyz * 2.0f;
+		
+		vec3 Unitary = vec3(1.0f,1.0f,1.0f);
+		vec3 FirstPlaneIntersect = (Unitary - PositionLS) / RayLS;
+		vec3 SecondPlaneIntersect = (-Unitary - PositionLS) / RayLS;
+		vec3 FurthestPlane = max(FirstPlaneIntersect, SecondPlaneIntersect);
+		float Distance = min(FurthestPlane.x, min(FurthestPlane.y, FurthestPlane.z));
 
-    vec3 cubeColor2 = texture(CubeMap2, worldDirection).rgb;
-    cubeColor += cubeColor2 * BlendFactor2;
+		// Use Distance in WS directly to recover intersection
+		vec3 IntersectPositionWS = rayPosition + reflectionDir * Distance;
+		vec3 newWorldDirection = IntersectPositionWS - cubemapData[i].cubeMapPosition.xyz;
 
-    vec3 cubeColor3 = texture(CubeMap3, worldDirection).rgb;
-    cubeColor += cubeColor3 * BlendFactor3;
 	
-    vec3 cubeColor4 = texture(CubeMap4, worldDirection).rgb;
-    cubeColor += cubeColor4 * BlendFactor4;
-
+		cubeColor += texture(Cubemaps[i], newWorldDirection).rgb * cubemapData[i].blendfactor;
+	}
+	
 	reflectionColor = cubeColor;
 }
 
@@ -57,7 +75,7 @@ void main()
 	vec3 worldNormal = (texelFetch(normalMap, location, 0).rgb);
 
 	//We need the normal to be in viewspace coordinates.
-	vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
+	//vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
 
 	float pixelDepth = texelFetch(depthMap, location, 0).r;
 
@@ -70,22 +88,30 @@ void main()
 	vec3 viewSpacePosition = homogenousLocation.xyz;
 
 	vec3 rayOrigin = viewSpacePosition * pixelDepth;
-
-	vec3 viewDir = (rayOrigin.xyz);
+	rayOrigin = (InvView * vec4(rayOrigin, 1.0f)).xyz;
+	
+	vec3 viewDir = normalize(rayOrigin.xyz - CameraPosition.xyz);
 	//Reflect vector against normal
-	vec3 reflectionDir = (reflect(viewDir, viewSpaceNormal));
+	vec3 reflectionDir = normalize(reflect(viewDir, worldNormal));
 
 	vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
 	float roughness = specularAndRoughness.w;
 	vec3 BGColor = texelFetch(colorMap, location, 0).rgb;
-	
+		
 	vec3 reflectionColor;
 	
-	GetBlendedCubeMapColor(reflectionDir, reflectionColor);
-
-	vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
-	//vec4 finalColor = vec4(reflectionColor, 1.0f);
-	imageStore(reflectionImage, location, finalColor);
+	GetBlendedAndParallaxCorrectedCubeMapColor(rayOrigin.xyz, reflectionDir, reflectionColor);
+	
+	//if(roughness == 200.0f)
+	//{
+		vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
+		imageStore(reflectionImage, location, finalColor);
+	//}
+	//else
+	//{
+	//	vec4 finalColor = vec4(reflectionColor, 1.0f);
+	//	imageStore(reflectionImage, location, finalColor);
+	//}
 	
 	groupMemoryBarrier();
 }

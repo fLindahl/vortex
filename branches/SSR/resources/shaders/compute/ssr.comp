@@ -18,21 +18,74 @@ uniform sampler2D normalMap;
 uniform sampler2D specularMap;
 uniform sampler2D colorMap;
 
-uniform int NumCubemaps;
+layout (rgba32f) uniform writeonly image2D reflectionImage;
 
-uniform samplerCube CubeMap1;
-uniform float BlendFactor1;
-uniform samplerCube CubeMap2;
-uniform float BlendFactor2;
-uniform samplerCube CubeMap3;
-uniform float BlendFactor3;
-uniform samplerCube CubeMap4;
-uniform float BlendFactor4;
+//We can have a maximum of 8 cubemaps blended simultaneously
+uniform samplerCube Cubemaps[8];
+
+struct CubemapData
+{
+	mat4 geometryproxy;
+	vec4 cubeMapPosition;
+	float blendfactor;
+};
+
+uniform uint numCubemaps;
+
+layout(std140, binding = 10) uniform CubeMapBlock
+{	
+	//how many cubemaps we are currently blending between
+	CubemapData cubemapData[8];
+};
 
 // Shared values between all the threads in a group
 //shared DepthSamples
 
-layout (rgba32f) uniform writeonly image2D reflectionImage;
+
+void GetBlendedCubeMapColor(in vec3 reflectionDir, out vec3 reflectionColor)
+{
+	vec3 worldDirection = (mat3(InvView) * reflectionDir);
+	vec3 cubeColor = vec3(0.0f,0.0f,0.0f);
+	
+	for(int i = 0; i < numCubemaps; ++i)
+	{
+		cubeColor += texture(Cubemaps[i], worldDirection).rgb * cubemapData[i].blendfactor;
+	}
+	
+	reflectionColor = cubeColor;
+}
+
+
+void GetBlendedAndParallaxCorrectedCubeMapColor(in vec3 rayPosition, in vec3 reflectionDir, out vec3 reflectionColor)
+{
+	vec3 cubeColor = vec3(0.0f,0.0f,0.0f);
+	
+	for(int i = 0; i < numCubemaps; ++i)
+	{
+		// Intersection with OBB
+		// convert to unit box space
+		// Transform in local unit parallax cube space (scaled and rotated)
+		// Why multiply by 2? Magic.
+		vec3 RayLS = (mat3(inverse(cubemapData[i].geometryproxy)) * reflectionDir) * 2.0f;
+		vec3 PositionLS = (inverse(cubemapData[i].geometryproxy) * vec4(rayPosition, 1.0f)).xyz * 2.0f;
+		
+		vec3 Unitary = vec3(1.0f,1.0f,1.0f);
+		vec3 FirstPlaneIntersect = (Unitary - PositionLS) / RayLS;
+		vec3 SecondPlaneIntersect = (-Unitary - PositionLS) / RayLS;
+		vec3 FurthestPlane = max(FirstPlaneIntersect, SecondPlaneIntersect);
+		float Distance = min(FurthestPlane.x, min(FurthestPlane.y, FurthestPlane.z));
+
+		// Use Distance in WS directly to recover intersection
+		vec3 IntersectPositionWS = rayPosition + reflectionDir * Distance;
+		vec3 newWorldDirection = IntersectPositionWS - cubemapData[i].cubeMapPosition.xyz;
+
+	
+		cubeColor += texture(Cubemaps[i], newWorldDirection).rgb * cubemapData[i].blendfactor;
+	}
+	
+	reflectionColor = cubeColor;
+}
+
 
 float distanceSquared(vec2 a, vec2 b)
 {
@@ -186,27 +239,6 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	return intersect;
 }
 
-void GetBlendedCubeMapColor(in vec3 reflectionDir, out vec3 reflectionColor)
-{
-	vec3 worldDirection = (mat3(InvView) * reflectionDir);
-	vec3 cubeColor;
-	
-	
-	vec3 cubeColor1 = texture(CubeMap1, worldDirection).rgb;
-	cubeColor = cubeColor1 * BlendFactor1;
-
-    vec3 cubeColor2 = texture(CubeMap2, worldDirection).rgb;
-    cubeColor += cubeColor2 * BlendFactor2;
-
-    vec3 cubeColor3 = texture(CubeMap3, worldDirection).rgb;
-    cubeColor += cubeColor3 * BlendFactor3;
-	
-    vec3 cubeColor4 = texture(CubeMap4, worldDirection).rgb;
-    cubeColor += cubeColor4 * BlendFactor4;
-
-	reflectionColor = cubeColor;
-}
-
 layout(local_size_x = THREADS_X, local_size_y = THREADS_Y, local_size_z = 1) in;
 void main()
 {
@@ -257,7 +289,11 @@ void main()
 	else
 	{
 		//Get fall-back value.
-		GetBlendedCubeMapColor(reflectionDir, reflectionColor);
+		//GetBlendedCubeMapColor(reflectionDir, reflectionColor);
+		
+		vec3 worldPosition = (InvView * vec4(rayOrigin, 1.0f)).xyz;
+		vec3 worldDirection = normalize(mat3(InvView) * reflectionDir);
+		GetBlendedAndParallaxCorrectedCubeMapColor(worldPosition, worldDirection, reflectionColor);
 	}
 
 	vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
