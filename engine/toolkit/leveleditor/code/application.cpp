@@ -15,7 +15,7 @@
 #include "application/basegamefeature/managers/scenemanager.h"
 #include "application/properties/particleemitter.h"
 #include "application/basegamefeature/keyhandler.h"
-
+#include "application/basegamefeature/managers/envmanager.h"
 
 using namespace Display;
 using namespace Render;
@@ -29,6 +29,8 @@ namespace LevelEditor
 */
 Application::Application()
 {
+	this->renderGeoProxies = false;
+
 	this->commandManager = Edit::CommandManager::Instance();
 	cameraPos = Math::point::zerovector();
 	camRotX = 0;
@@ -235,19 +237,6 @@ Application::Run()
 			CameraMovement();
 		}
 
-		//Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		//Debug::DebugRenderer::Instance()->DrawLine(this->reflectStart, this->reflectEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
-        //a += 0.0001f;
-        //Render::LightServer::Instance()->GetSpotLightAtIndex(0).position = Math::vec4(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position.x() + a, 2.3f, 3.0f, 1.0f);
-        //Render::LightServer::Instance()->Update();
-
-		//Debug::DebugRenderer::Instance()->DrawCircle(Math::point(0, 0, 0), Math::quaternion::identity(), 0.5f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
-
-		//Debug::DebugRenderer::Instance()->DrawCone(Math::point(2, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 45.0f), 0.5f, 1.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
-
-		//Debug::DebugRenderer::Instance()->DrawCircle(Math::point(0, 0, 0), Math::quaternion::identity(), 0.5f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
-
 		if (this->hit.object != nullptr)
 		{
 			Game::PhysicsEntity* e = dynamic_cast<Game::PhysicsEntity*>(hit.object);
@@ -257,7 +246,14 @@ Application::Run()
 			}
 		}
 
+		if (renderGeoProxies)
+		{
+			BaseGameFeature::EnvManager::Instance()->RenderGeometryProxies();
+		}
+
 		RenderDevice::Instance()->Render(false);
+
+		
 
 		this->window->SwapBuffers();
 		UI->frameTime = glfwGetTime() - time;

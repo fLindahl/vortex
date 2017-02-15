@@ -49,6 +49,8 @@ private:
 
 	bool shutdown = false;
 
+	bool renderGeoProxies;
+
 	void CameraMovement();
 	
 	void DoPicking();

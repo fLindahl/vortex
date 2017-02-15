@@ -60,6 +60,8 @@ namespace Math
 		/// stream content to 16-byte-aligned memory circumventing the write-cache
 		void stream(float* ptr) const;
 
+		void to_euler_angles(float& yaw, float& pitch, float& roll);
+
 		/// set content
 		void set(float x, float y, float z, float w);
 		/// set from vec4
@@ -709,6 +711,34 @@ namespace Math
 		outAxis.set_w(0);
 		outAngle = 2.0f * cosf(q.vec.w());
 		outAxis.set_w(0.0f);
+	}
+
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	inline void
+		quaternion::to_euler_angles(float& yaw, float& pitch, float& roll)
+	{
+		// WARNING: UNTESTED
+
+		float ysqr = this->y() * this->y();
+
+
+		// roll (x-axis rotation)
+		float t0 = +2.0 * (this->w() * this->z() + this->x() * this->y());
+		float t1 = +1.0 - 2.0 * (this->z() * this->z() + ysqr);
+		roll = std::atan2(t0, t1);
+
+		// pitch (y-axis rotation)
+		float t2 = +2.0 * (this->w() * this->x() - this->y() * this->z());
+		t2 = t2 > 1.0 ? 1.0 : t2;
+		t2 = t2 < -1.0 ? -1.0 : t2;
+		pitch = std::asin(t2);
+
+		// yaw (z-axis rotation)
+		float t3 = +2.0 * (this->w() * this->y() + this->z() * this->x());
+		float t4 = +1.0 - 2.0 * (ysqr + this->y() * this->y());
+		yaw = std::atan2(t3, t4);
 	}
 
 } // namespace Math
