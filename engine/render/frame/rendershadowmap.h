@@ -25,7 +25,9 @@ namespace Render
 
 		struct  shadowRUniformBuffer
 		{
-			Math::mat4 lightMVP;
+			//Math::mat4 bias;
+			/// Lightspace Matrix
+			Math::mat4 LSM;
 		}shadRUniformBuffer;
 
 	};

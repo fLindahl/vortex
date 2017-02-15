@@ -144,34 +144,34 @@ Application::Open()
 		pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
 		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
 		LightServer::Instance()->AddPointLight(pLight);*/
-
-     	/*Render::LightServer::SpotLight sLight;
-	    sLight.position = Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f);
-		sLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
+/*
+     	Render::LightServer::SpotLight sLight;
+	    sLight.position = Math::vec4(0.0f, -.5f, -1.0f, 1.0f);
+		sLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		sLight.coneDirection = Math::vec4(-1.0f, 0.0f, 0.0f, 1.0f);
 		sLight.length = 10.0f;
         sLight.angle = 30.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
-
-	    sLight.position = Math::vec4(4.0f, 3.5f, 0.0f, 1.0f);
-		sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		sLight.length = 15.0f;
-		sLight.angle = 25.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
-
-     	sLight.position = Math::vec4(-2.1f, 0.0f, 3.0f, 1.0f);
-		sLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-        sLight.length = 15.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
-
-		sLight.position = Math::vec4(-2.1f, 15.0f, -6.0f, 1.0f);
-		sLight.color = Math::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
-		sLight.length = 18.0f;
-		sLight.angle = 5.0f;
 		LightServer::Instance()->AddSpotLight(sLight);*/
+
+		/*sLight.position = Math::vec4(4.0f, 3.5f, 0.0f, 1.0f);
+        sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+        sLight.coneDirection = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        sLight.length = 15.0f;
+        sLight.angle = 25.0f;
+        LightServer::Instance()->AddSpotLight(sLight);
+
+         sLight.position = Math::vec4(-2.1f, 0.0f, 3.0f, 1.0f);
+        sLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        sLight.coneDirection = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+        sLight.length = 15.0f;
+        LightServer::Instance()->AddSpotLight(sLight);
+
+        sLight.position = Math::vec4(-2.1f, 15.0f, -6.0f, 1.0f);
+        sLight.color = Math::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+        sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
+        sLight.length = 18.0f;
+        sLight.angle = 5.0f;
+        LightServer::Instance()->AddSpotLight(sLight);*/
 
 		/// Creates a directional light in the scene
 		Render::LightServer::Instance()->CreateDirectionalLight(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f), Math::vec4(1.0f, 0.8f, 0.6f, 0.0f));

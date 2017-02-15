@@ -69,11 +69,12 @@ namespace Render
 		//Math::vec4 lookat = spotlight.position + (spotlight.coneDirection * spotlight.length);
 		lightV = Math::mat4::lookatrh(spotlight.position, spotlight.coneDirection, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		//lightV = Math::mat4::inverse(lightV);
-		lightM.set_position(spotlight.position);
+		//lightM.set_position(spotlight.position);
 		//lightM = Math::mat4::transpose(lightM);
 		lightP = Math::mat4::perspfovrh(Math::Deg2Rad(spotlight.angle), (RenderDevice::Instance()->GetRenderResolution().x/ RenderDevice::Instance()->GetRenderResolution().y), 0.05f, spotlight.length);
 
-		shadRUniformBuffer.lightMVP = Math::mat4::multiply(Math::mat4::multiply(lightP, lightM), lightV);
+		//shadRUniformBuffer.lightMVP = Math::mat4::multiply(Math::mat4::multiply(lightP, lightV), lightV);
+		shadRUniformBuffer.LSM = Math::mat4::multiply(lightP, lightV);
 		//bind light MVP
 		glGenBuffers(1, this->ubo);
 		glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
