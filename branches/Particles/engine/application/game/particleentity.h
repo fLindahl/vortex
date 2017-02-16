@@ -1,5 +1,6 @@
 #pragma once
 #include "entity.h"
+#include "foundation/util/string.h"
 
 
 namespace Property{ class ParticleEmitter; }
@@ -16,12 +17,15 @@ public:
 	void Activate();
 	void Deactivate();
 
+	void LoadEmitters(Util::String path);
+
 	void SetTransform(const Math::mat4& t);
 	
-	std::shared_ptr<Property::ParticleEmitter>& GetEmitter(){ return this->emitter; }
+	Util::Array<std::shared_ptr<Property::ParticleEmitter>>& GetEmitters(){ return this->emitters; }
 
 protected:
 	
-	std::shared_ptr<Property::ParticleEmitter> emitter;
+	Util::Array<std::shared_ptr<Property::ParticleEmitter>> emitters;
+	
 };
 }

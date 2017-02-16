@@ -18,6 +18,7 @@ namespace Particles
 struct FileSettings
 {
 	ParticleUISettings set;
+	Util::String name;
 	Util::String texPath;
 };
 
@@ -34,7 +35,7 @@ public:
 	~ParticleFile();
 
 	bool SaveParticle(Util::String name);
-	FileSettings LoadParticle(Util::String path);
+	Util::Array<FileSettings> LoadParticle(Util::String path);
 	void AppendEmitter(std::shared_ptr<Property::ParticleEmitter> emitter);
 
 private:

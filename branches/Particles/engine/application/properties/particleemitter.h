@@ -11,6 +11,12 @@ namespace Render
 	class TextureResource;
 }
 
+namespace Particles
+{
+	struct FileSettings;
+	class ParticleFile;
+}
+
 namespace Property
 {
 
@@ -27,6 +33,7 @@ public:
 	void Deactivate();
 
 	void CreateEmitter(GLuint numOfParticles, const char* texturepath);
+	void CreateEmitter(Particles::FileSettings& set);
 	void UpdateUniformBuffer();
 	void BindUniformBuffer();
 
@@ -60,6 +67,7 @@ private:
 	//The uniform render buffer
 	Particles::ParticleRenderingBuffer renderBuff;
 
+	//Texture
 	std::shared_ptr<Render::TextureResource> texture;
 
 	//Saved Settings

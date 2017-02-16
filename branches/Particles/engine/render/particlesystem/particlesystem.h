@@ -80,6 +80,7 @@ public:
 	}
 
 	EmitterBuffer GetEmitterBuffer(index_t bufferSize, Property::ParticleEmitter& owner);
+	EmitterBuffer GetEmitterBuffer(index_t bufferSize, Property::ParticleEmitter& owner, ParticleUISettings& settings);
 	void GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff);
 
 	void DrawParticleSystem();

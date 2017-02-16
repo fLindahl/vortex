@@ -42,6 +42,8 @@ namespace Toolkit
 
 		this->commandManager = Edit::CommandManager::Instance();
 
+		this->saveName = "Name";
+		this->appendedEmitters = "Appended emitters: ";
 
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
@@ -375,7 +377,7 @@ namespace Toolkit
 				this->particleCount = 0;
 				if (ImGui::Button("Save"))
 				{
-					Particles::ParticleFile::Instance()->SaveParticle("testParticle");
+					Particles::ParticleFile::Instance()->SaveParticle(this->saveName.c_str());
 				}
 				if (ImGui::IsItemHovered())
 				{
@@ -383,9 +385,22 @@ namespace Toolkit
 					ImGui::Text("Saves the current particles.\nSaves all the currently appended emitters\nthen removes them from the list");
 					ImGui::EndTooltip();
 				}
-				for (int i = 0; i < application->particleList.Size(); ++i)
+				ImGui::SameLine(70);
+				ImGui::InputText("##saveName", (char*)this->saveName.c_str(), 32);
+				if (ImGui::IsItemHovered())
 				{
-					ParticlesSettings(application->particleList[i]->GetEmitter());
+					ImGui::BeginTooltip();
+					ImGui::Text("Particle save name");
+					ImGui::EndTooltip();
+				}
+				ImGui::Text(this->appendedEmitters.c_str());
+				/*if (ImGui::Button("Load"))
+				{
+					Particles::ParticleFile::Instance()->LoadParticle("resources/particles/testParticle.particle");
+				}
+				*/for (int i = 0; i < application->particleList.Size(); ++i)
+				{
+					ParticlesSettings(application->particleList[i]);
 					this->particleCount++;
 				}
 				
@@ -473,6 +488,7 @@ namespace Toolkit
 
 void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter> emitter)
 {
+
 	std::string id = "Particle "+std::to_string(particleCount);
 	if (ImGui::CollapsingHeader(id.c_str()))
 	{
@@ -480,6 +496,7 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 		id = "Append Emitter##" + std::to_string(particleCount);
 		if (ImGui::Button(id.c_str()))
 		{
+			this->appendedEmitters += emitter->GetEmitterName()+", ";
 			Particles::ParticleFile::Instance()->AppendEmitter(emitter);
 		}
 		if (ImGui::IsItemHovered())
@@ -502,8 +519,6 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 		if (ImGui::TreeNode(id.c_str()))
 		{
 
-			emitter->GetParticleUISettings().acc = emitter->GetState().accLife;
-			emitter->GetParticleUISettings().color = emitter->GetState().color;
 			id = "Velocity##" + std::to_string(particleCount);
 			if (ImGui::TreeNode(id.c_str()))
 			{
@@ -616,7 +631,7 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 				ImGui::Text("Randomize"); ImGui::SameLine(120);
 				id = "##cb" + std::to_string(particleCount);
 				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().colorRand);
-				ImGui::Text("Min"); ImGui::SameLine(100);
+				ImGui::Text("Min"); ImGui::SameLine(90);
 				id = "##c1" + std::to_string(particleCount);
 				if (ImGui::ColorEdit4(id.c_str(), (float*)&emitter->GetParticleUISettings().color, ImGuiColorEditFlags_Alpha))
 				{
@@ -630,7 +645,7 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 				}
 				if (emitter->GetParticleUISettings().colorRand)
 				{
-					ImGui::Text("Max"); ImGui::SameLine(100);
+					ImGui::Text("Max"); ImGui::SameLine(90);
 					id = "##c2" + std::to_string(particleCount);
 					if (ImGui::ColorEdit4(id.c_str(), (float*)&emitter->GetParticleUISettings().color2, ImGuiColorEditFlags_Alpha))
 					{
@@ -676,13 +691,14 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 			ImGui::PopItemWidth();
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Emitter Shape Settings"))
+		id = "Emitter Shape Settings##" + std::to_string(particleCount);
+		if (ImGui::TreeNode(id.c_str()))
 		{
 			const char* items[] = { "Cone", "Sphere", "Hemisphere" };
-			static int item2 = 0;
 			ImGui::Text("Emitter Shape"); ImGui::SameLine(130);
 			id = "##cbs" + std::to_string(particleCount);
 			ImGui::PushItemWidth(170);
+			int item2 = (int)emitter->GetParticleUISettings().shapes;
 			if (ImGui::Combo(id.c_str(), &item2, items, IM_ARRAYSIZE(items)))
 			{
 				emitter->GetParticleUISettings().shapes = (Particles::EmitterShapes)item2;

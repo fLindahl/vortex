@@ -2,6 +2,7 @@
 #include "particleemitter.h"
 #include "render/properties/graphicsproperty.h"
 #include "render/server/resourceserver.h"
+#include "render/particlesystem/particlefile.h"
 
 namespace Property
 {
@@ -43,13 +44,29 @@ void ParticleEmitter::CreateEmitter(GLuint numOfParticles, const char* texturepa
 	this->state = Particles::ParticleState();
 	//state.pos = owner->GetTransform().get_position();
 	this->buff = Particles::ParticleSystem::Instance()->GetEmitterBuffer(this->numOfParticles, *this);
+	this->pSet.numParticles = numOfParticles;
 	this->renderBuff.offset = this->buff.startIndex;
-	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 3, this->ubo[0]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(Particles::ParticleRenderingBuffer), &renderBuff, GL_STATIC_DRAW);
+	UpdateUniformBuffer();
 }
 
-void ParticleEmitter::UpdateUniformBuffer()
+void ParticleEmitter::CreateEmitter(Particles::FileSettings& set)
+{
+	this->numOfParticles = set.set.numParticles;
+	this->texture = Render::ResourceServer::Instance()->LoadTexture(set.texPath);
+	this->texPath = set.texPath;
+	this->state = Particles::ParticleState();
+
+	this->name = set.name;
+	this->buff = Particles::ParticleSystem::Instance()->GetEmitterBuffer(this->numOfParticles, *this, set.set);
+	this->pSet = set.set;
+
+	this->renderBuff.offset = this->buff.startIndex;
+	this->renderBuff.startSize = set.set.startSize;
+	this->renderBuff.endSize = set.set.endSize;
+	UpdateUniformBuffer();
+}
+
+	void ParticleEmitter::UpdateUniformBuffer()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 3, this->ubo[0]);
