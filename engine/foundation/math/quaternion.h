@@ -725,19 +725,19 @@ namespace Math
 
 
 		// roll (x-axis rotation)
-		float t0 = +2.0 * (this->w() * this->z() + this->x() * this->y());
-		float t1 = +1.0 - 2.0 * (this->z() * this->z() + ysqr);
+		float t0 = +2.0f * (this->w() * this->z() + this->x() * this->y());
+		float t1 = +1.0f - 2.0f * (this->z() * this->z() + ysqr);
 		roll = std::atan2(t0, t1);
 
 		// pitch (y-axis rotation)
-		float t2 = +2.0 * (this->w() * this->x() - this->y() * this->z());
-		t2 = t2 > 1.0 ? 1.0 : t2;
-		t2 = t2 < -1.0 ? -1.0 : t2;
+		float t2 = +2.0f * (this->w() * this->x() - this->y() * this->z());
+		t2 = t2 > 1.0f ? 1.0f : t2;
+		t2 = t2 < -1.0f ? -1.0f : t2;
 		pitch = std::asin(t2);
 
 		// yaw (z-axis rotation)
-		float t3 = +2.0 * (this->w() * this->y() + this->z() * this->x());
-		float t4 = +1.0 - 2.0 * (ysqr + this->y() * this->y());
+		float t3 = +2.0f * (this->w() * this->y() + this->z() * this->x());
+		float t4 = +1.0f - 2.0f * (ysqr + this->y() * this->y());
 		yaw = std::atan2(t3, t4);
 	}
 

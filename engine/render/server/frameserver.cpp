@@ -88,7 +88,7 @@ namespace Render
 		// Dynamic unlit pass
 		// Uses the regular flat geometry lit framebuffer object but renders later (after shadows and reflections)
 		this->dynamicUnlitPass = std::make_shared<DynamicUnlitPass>();
-		this->dynamicUnlitPass->name = "DynamicUnlitPass";
+		this->dynamicUnlitPass->name = "DynamicUnlit";
 		this->dynamicUnlitPass->Setup();
 
 		this->framePassByName.insert(std::make_pair(this->dynamicUnlitPass->name, this->dynamicUnlitPass));
