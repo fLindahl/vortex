@@ -2,6 +2,7 @@
 #include "lightserver.h"
 #include "renderdevice.h"
 #include "render/resources/cubemapnode.h"
+#include "foundation/math/math.h"
 
 namespace Render
 {
@@ -13,8 +14,6 @@ LightServer::LightServer() : pointLightBuffer(0), spotLightBuffer(0), visiblePoi
 	glGenBuffers(1, &spotLightBuffer);
 	glGenBuffers(1, &visiblePointLightIndicesBuffer);
 	glGenBuffers(1, &visibleSpotLightIndicesBuffer);
-
-    this->oneOverThree = 1.0f/3.0f;
 }
 
 void LightServer::AddPointLight(const PointLight& pLight)
@@ -30,29 +29,69 @@ LightServer::PointLight& LightServer::GetPointLightAtIndex(const int& index)
 
 void LightServer::AddSpotLight(SpotLight& sLight)
 {
-    this->CalculateSpotlight(sLight);
 	this->spotLights.Append(sLight);
 	this->UpdateSpotLightBuffer();
 }
 
-void LightServer::CalculateSpotlight(SpotLight& sLight)
+LightServer::SpotLight LightServer::CalculateSpotlight(Math::point color,
+									Math::point position,
+									Math::vec4 direction,
+									float length,
+									float angle)
 {
-	/// calculate the radius of the bottom cirlce
-	float radius = (float)tan(Math::Deg2Rad(sLight.angle)) * sLight.length;
+
+	/// calculate the radius of the bottom circle
+	float radians = Math::Deg2Rad(angle);
+	float radius = (float)tan(radians) * length;
+
+	Math::point endPoint = position + Math::vector(direction) * length;
 
 	/// Get perpendicular direction
-	Math::vec4 m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection, sLight.position));
-	Math::vec4 Q1 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
+	Math::vector m = Math::vec4::normalize(Math::vector::orthogonal(direction)) * radius;
+	Math::vec4 Q1 = endPoint - m;
 	/// Get perpendicular, -direction
-	m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection * -1.0f, sLight.position));
-	Math::vec4 Q2 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
+	//m = Math::vec4::normalize(Math::vec4::cross3(direction * -1.0f, position));
+	Math::vec4 Q2 = endPoint + m;
 
 	/// Calculate the Mid Point of the Sphere
-	sLight.midPoint = (sLight.position + Q1 + Q2) * this->oneOverThree;
-	sLight.midPoint.set_w(1.0f);
+	const float oneOverThree = 1.0f / 3.0f;
+	Math::vec4 centerAndRadius = (position + Q1 + Q2) * oneOverThree;
+	centerAndRadius.set_w(1.0f);
+	
+	GLfloat centerOffset = (centerAndRadius - position).length();
+	
+	//TODO: This isn't quite right, but it works for now. the sphere radius is a bit too big of angle is greater than 50
+	//if the angle is greater than 50 degrees we cant use center-position as our radius length
+	if (angle > 50)
+	{
+		centerAndRadius.set_w((centerAndRadius - Q1).length());
+	}
+	else
+	{
+		centerAndRadius.set_w(centerOffset);
+	}
 
-	/// Calculate the radius for the sphere
-	sLight.fRadius = (sLight.midPoint - sLight.position).length();
+	Math::vec4 colorAndCenterOffset = color;
+	colorAndCenterOffset.set_w(centerOffset);
+
+	SpotLight spot;
+	spot.centerAndRadius = centerAndRadius;
+	spot.colorAndCenterOffset = colorAndCenterOffset;
+
+	//spot.colorAndCenterOffset.set_w(centerOffset);
+
+	//Make sure direction is normalized
+	Math::vector normalizedDir = Math::vector::normalize(direction);
+	//XY direction
+	spot.params.x() = normalizedDir.x();
+	spot.params.y() = normalizedDir.y();
+	//Z is cosine of angle and sign of direction Z component
+	spot.params.z() = cos(radians) * Math::sign(normalizedDir.z());
+	//W is falloff radius. TEMPORARY: Set to radius for now
+	spot.params.w() = radius;
+	
+	
+	return spot;
 }
 
 LightServer::SpotLight& LightServer::GetSpotLightAtIndex(const int& index)
@@ -100,29 +139,46 @@ void LightServer::UpdateSpotLightBuffer()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void LightServer::CreateSpotLight(Math::point color,
+LightServer::SpotLight& LightServer::CreateSpotLight(Math::point color,
 								  Math::point position,
 								  Math::vec4 direction,
 								  float length,
 								  float angle)
 {
+	SpotLight sLight = CalculateSpotlight(color, position, direction, length, angle);
+	/*
 	SpotLight sLight = SpotLight();
 	sLight.color = color;
 	sLight.position = position;
 	sLight.coneDirection = direction;
 	sLight.length = length;
 	sLight.angle = angle;
+	*/
 	this->AddSpotLight(sLight);
+
+	return this->spotLights[this->spotLights.Size() - 1];
 }
 
-void LightServer::CreatePointLight(Math::point color, Math::point position, float radius)
+void LightServer::RemoveSpotLight(SpotLight* light)
+{
+	this->spotLights.EraseSwap(light);
+}
+
+LightServer::PointLight& LightServer::CreatePointLight(Math::point color, Math::point position, float radius)
 {
 	PointLight pLight;
 	pLight.position = position;
 	pLight.color = color;
 	pLight.radiusAndPadding.set_x(radius);
 	LightServer::Instance()->AddPointLight(pLight);
+	return this->pointLights[this->pointLights.Size() - 1];
 }
+
+void LightServer::RemovePointLight(PointLight* light)
+{
+	this->pointLights.EraseSwap(light);
+}
+
 void LightServer::AddCubeMap(std::shared_ptr<CubeMapNode> node)
 {
 	if (!this->cubemapNodes.Find(node))

@@ -80,16 +80,6 @@ namespace Edit
             this->entity = std::make_shared<Game::ModelEntitySpotLight>();
             this->entity->SetModel(mdl);
             this->entity->SetTransform(Math::mat4::translation(position));
-
-            /// Default values ///
-            Render::LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
-                                                             this->entity->GetTransform().get_position(),
-                                                             Math::vec4(0.0f, -1.0f, 0.0f, 1.0f),
-                                                             5.0f,
-                                                             15.0f);
-
-            this->entity->SetSpotLightEnity(&Render::LightServer::Instance()->GetSpotLightAtIndex((uint)Render::LightServer::Instance()->GetNumSpotLights() - 1));
-            this->entity->SetLightIndex((uint)Render::LightServer::Instance()->GetNumSpotLights() - 1);
         }
         ~AddSpotlightEntity()
         {
@@ -120,12 +110,6 @@ namespace Edit
             this->entity = std::make_shared<Game::PointLightEntity>();
             this->entity->SetModel(mdl);
             this->entity->SetTransform(Math::mat4::translation(position));
-
-            /// Default values ///
-            Render::LightServer::Instance()->CreatePointLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f), this->entity->GetTransform().get_position(), 3.0f);
-
-            this->entity->SetPointLightEnity(&Render::LightServer::Instance()->GetPointLightAtIndex((uint)Render::LightServer::Instance()->GetNumPointLights() - 1));
-            this->entity->SetLightIndex((uint)Render::LightServer::Instance()->GetNumPointLights() - 1);
         }
         ~AddPointlightEntity()
         {

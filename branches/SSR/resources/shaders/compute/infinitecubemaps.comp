@@ -87,7 +87,7 @@ void main()
 	
 	if(roughness == 200.0f)
 	{
-		vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb * 0.5f) * roughness, 1-roughness);
+		vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb) * roughness, 1-roughness);
 		imageStore(reflectionImage, location, finalColor);
 	}
 	else

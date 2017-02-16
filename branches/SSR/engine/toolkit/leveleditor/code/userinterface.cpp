@@ -390,8 +390,10 @@ namespace Toolkit
 					float pitch = asin(transform.getrow0().y());
 					float roll = atan2(-transform.getrow2().y(), transform.getrow1().y());
 
-					ImGui::Text("%f | %f | %f", pitch, yaw, roll);
+					ImGui::Text("Pitch : %f | Yaw : %f | Roll : %f", pitch, yaw, roll);
+					ImGui::Separator();
 
+					// CUBEMAPS --------------------------------------------
 					Game::CubeMapEntity* cm = dynamic_cast<Game::CubeMapEntity*>(application->hit.object);
 
 					if (cm != nullptr)
@@ -420,20 +422,66 @@ namespace Toolkit
 						}
 					}
 
+					//LIGHTS --------------------------------------------------
 
-					/*
-					ImGui::Text("Tool Initial Transform:");
-					ImGui::Text("%f | %f | %f | %f", this->currentTool->GetInitialTransform().getrow(0).x(), this->currentTool->GetInitialTransform().getrow(0).y(), this->currentTool->GetInitialTransform().getrow(0).z(), this->currentTool->GetInitialTransform().getrow(0).w());
-					ImGui::Text("%f | %f | %f | %f", this->currentTool->GetInitialTransform().getrow(1).x(), this->currentTool->GetInitialTransform().getrow(1).y(), this->currentTool->GetInitialTransform().getrow(1).z(), this->currentTool->GetInitialTransform().getrow(1).w());
-					ImGui::Text("%f | %f | %f | %f", this->currentTool->GetInitialTransform().getrow(2).x(), this->currentTool->GetInitialTransform().getrow(2).y(), this->currentTool->GetInitialTransform().getrow(2).z(), this->currentTool->GetInitialTransform().getrow(2).w());
-					ImGui::Text("%f | %f | %f | %f", this->currentTool->GetInitialTransform().getrow(3).x(), this->currentTool->GetInitialTransform().getrow(3).y(), this->currentTool->GetInitialTransform().getrow(3).z(), this->currentTool->GetInitialTransform().getrow(3).w());
+					Game::ModelEntitySpotLight* aa = dynamic_cast<Game::ModelEntitySpotLight*>(this->application->hit.object);
+					Game::PointLightEntity* bb = dynamic_cast<Game::PointLightEntity*>(this->application->hit.object);
 
-					ImGui::Text("Tool Delta Transform:");
-					ImGui::Text("%f | %f | %f | %f", delta.getrow(0).x(), delta.getrow(0).y(), delta.getrow(0).z(), delta.getrow(0).w());
-					ImGui::Text("%f | %f | %f | %f", delta.getrow(1).x(), delta.getrow(1).y(), delta.getrow(1).z(), delta.getrow(1).w());
-					ImGui::Text("%f | %f | %f | %f", delta.getrow(2).x(), delta.getrow(2).y(), delta.getrow(2).z(), delta.getrow(2).w());
-					ImGui::Text("%f | %f | %f | %f", delta.getrow(3).x(), delta.getrow(3).y(), delta.getrow(3).z(), delta.getrow(3).w());
-					*/
+					if (aa != nullptr)
+					{
+						ImGui::Text("Spot Light");
+
+						float angle = aa->GetSpotLightAngle();
+						if (ImGui::SliderFloat("Angle", &angle, 1.0f, 90.0f, "%.1f"))
+						{
+							aa->SetSpotLightAngle(angle);
+						}
+						float length = aa->GetSpotLightLength();
+						if (ImGui::SliderFloat("Length", &length, 1.0f, 50.0f, "%.1f"))
+						{
+							aa->SetSpotLightLength(length);
+						}
+
+						Math::vec4 color = aa->GetSpotLightColor();
+						if (ImGui::SliderFloat("Red", &color.x(), 0.0f, 1.0f, "%.01f"))
+						{
+							aa->SetSpotLightColor(color);
+						}
+						if (ImGui::SliderFloat("Green", &color.y(), 0.0f, 1.0f, "%.01f"))
+						{
+							aa->SetSpotLightColor(color);
+						}
+						if (ImGui::SliderFloat("Blue", &color.z(), 0.0f, 1.0f, "%.01f"))
+						{
+							aa->SetSpotLightColor(color);
+						}
+
+					}
+					if (bb != nullptr)
+					{
+						ImGui::Text("Point Light");
+
+						float radius = bb->GetPointLightRadius();
+						if (ImGui::SliderFloat("Radius", &radius, 1.0f, 50.0f, "%.1f"))
+						{
+							bb->SetPointLightRadius(radius);
+						}
+
+						Math::vec4 color = bb->GetPointLightColor();
+						if (ImGui::SliderFloat("Red", &color.x(), 0.0f, 1.0f, "%.01f"))
+						{
+							bb->SetPointLightColor(color);
+						}
+						if (ImGui::SliderFloat("Green", &color.y(), 0.0f, 1.0f, "%.01f"))
+						{
+							bb->SetPointLightColor(color);
+						}
+						if (ImGui::SliderFloat("Blue", &color.z(), 0.0f, 1.0f, "%.01f"))
+						{
+							bb->SetPointLightColor(color);
+						}
+					}
+
 				}
 			}
 			ImGui::EndDock();
@@ -473,46 +521,6 @@ namespace Toolkit
 				const char* items[] = { "HIGH", "MEDIUM", "LOW"};
 
 				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
-
-
-				if(this->application->hit.object != nullptr)
-				{
-					Game::ModelEntitySpotLight* aa = dynamic_cast<Game::ModelEntitySpotLight*>(this->application->hit.object);
-					Game::PointLightEntity* bb = dynamic_cast<Game::PointLightEntity*>(this->application->hit.object);
-
-					if(aa != nullptr)
-					{
-						if(aa->GetLightType() == Render::LightServer::LightType::Spot)
-						{
-							char i[50];
-							Render::LightServer::SpotLight& settings = Render::LightServer::Instance()->GetSpotLightAtIndex(aa->GetLightIndex());
-							sprintf(i, "Spotlight: %i", aa->GetLightIndex());
-							ImGui::Text(i);
-							ImGui::SliderFloat("Angle" , &settings.angle,     1.0f, 50.0f, "%.1f");
-							ImGui::SliderFloat("Length", &settings.length,    1.0f, 50.0f, "%.1f");
-							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
-							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
-							ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
-							ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.01f");
-							ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.01f");
-							ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.01f");
-						}
-					}
-					if(bb != nullptr)
-					{
-						if(bb->GetLightType() == Render::LightServer::LightType::Point)
-						{
-							char i[50];
-							Render::LightServer::PointLight& settings = Render::LightServer::Instance()->GetPointLightAtIndex(bb->GetLightIndex());
-							sprintf(i, "Point Light: %i", bb->GetLightIndex());
-							ImGui::Text(i);
-							ImGui::SliderFloat("Radius", &settings.radiusAndPadding.x(), 1.0f, 50.0f, "%.1f");
-							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
-							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
-							ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
-						}
-					}
-				}
 			}
 			ImGui::EndDock();
 			
