@@ -1,12 +1,13 @@
 #include "config.h"
 #include "particleentity.h"
 #include "application/properties/particleemitter.h"
+#include "render/particlesystem/particlefile.h"
 
 namespace Game
 {
 ParticleEntity::ParticleEntity()
 {
-	this->emitter = std::make_shared<Property::ParticleEmitter>();
+	this->emitters.Append(std::make_shared<Property::ParticleEmitter>());
 }
 
 ParticleEntity::~ParticleEntity()
@@ -15,15 +16,37 @@ ParticleEntity::~ParticleEntity()
 
 void ParticleEntity::Activate()
 {
-	this->AddProperty(this->emitter);
-	this->emitter->Activate();
+	for (auto emitter : this->emitters)
+	{
+		this->AddProperty(emitter);
+		emitter->Activate();
+	}
+	
 	Entity::Activate();
 }
 
 void ParticleEntity::Deactivate()
 {
-	this->emitter->Deactivate();
+	for (auto emitter : this->emitters)
+	{
+		emitter->Deactivate();
+	}
 	Entity::Deactivate();
+}
+
+void ParticleEntity::LoadEmitters(Util::String path)
+{
+	Util::Array<Particles::FileSettings> set = Particles::ParticleFile::Instance()->LoadParticle(path);
+
+	for (size_t i = 0; i < set.Size(); i++)
+	{
+		if (i != 0)
+			this->emitters.Append(std::make_shared<Property::ParticleEmitter>());
+
+		Activate();
+		this->emitters[i]->CreateEmitter(set[i]);
+	}
+
 }
 
 void ParticleEntity::SetTransform(const Math::mat4 &t)

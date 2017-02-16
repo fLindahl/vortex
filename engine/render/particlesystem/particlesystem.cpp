@@ -26,7 +26,7 @@ ParticleSystem::~ParticleSystem()
 EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::ParticleEmitter& owner)
 {
 
-	emitters.Insert(emitters.Size(), &owner);
+	emitters.Append(&owner);
 	//Create a "buffer" for an emitter
 	EmitterBuffer buf;
 	buf.startIndex = particleArray.Size();
@@ -35,8 +35,6 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 	buf.endIndex = particleArray.Size();
 	buf.arr = &particleArray;
 	buf.startArr = &particleStartSettings;
-
-	owner.GetNumberOfParticles() = buf.endIndex - buf.startIndex;
 
 	index_t numPart = particleArray.Size();
 	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
@@ -72,7 +70,119 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 	return buf;
 }
 
-void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff)
+EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::ParticleEmitter& owner, ParticleUISettings& settings)
+{
+	this->emitters.Append(&owner);
+	//Create a "buffer" for an emitter
+	EmitterBuffer buf;
+	buf.startIndex = particleArray.Size();
+	this->particleArray.Reserve(bufferSize);
+	this->particleArray.Fill(buf.startIndex, bufferSize, owner.GetState());
+	buf.endIndex = particleArray.Size();
+	buf.arr = &particleArray;
+	buf.startArr = &particleStartSettings;
+
+	index_t numPart = particleArray.Size();
+	float x, y;
+	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
+	{
+		//Velocity
+		if (settings.shapes == CONE)
+		{
+			Math::vec4 pos(0.0f, 2.0f, 0.0f, 1.0f);
+			Math::RandomPointInCircle(settings.radius, x, y);
+			pos.set_x(x);
+			pos.set_z(y);
+			particleArray[i].pos = owner.GetModelMatrix().get_position();
+			if (settings.velRand)
+			{
+				particleArray[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - particleArray[i].pos)*Math::randFloat(settings.vel, settings.vel2);
+			}
+			else
+			{
+				particleArray[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - particleArray[i].pos)*settings.vel;
+			}
+			particleArray[i].vel[3] = 1.0f;
+		}
+		else if (settings.shapes == SPHERE)
+		{
+			Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+			Math::RandomPointInSphere(settings.radius, pos, (float)PI * 2);
+			pos = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - owner.GetModelMatrix().get_position());
+			this->particleArray[i].pos = owner.GetModelMatrix().get_position() + (pos*settings.radius);
+			if (settings.velRand)
+			{
+				this->particleArray[i].vel = pos*Math::randFloat(settings.vel, settings.vel2);
+			}
+			else
+			{
+				this->particleArray[i].vel = pos*settings.vel;
+			}
+			this->particleArray[i].vel[3] = 1.0f;
+		}
+		else if (settings.shapes == HEMISPHERE)
+		{
+			Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+			Math::RandomPointInSphere(settings.radius, pos, (float)PI);
+			pos = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - owner.GetModelMatrix().get_position());
+			this->particleArray[i].pos = owner.GetModelMatrix().get_position() + (pos*settings.radius);
+			if (settings.velRand)
+			{
+				this->particleArray[i].vel = pos*Math::randFloat(settings.vel, settings.vel2);
+			}
+			else
+			{
+				this->particleArray[i].vel = pos*settings.vel;
+			}
+			this->particleArray[i].vel[3] = 1.0f;
+		}
+		//Acceleration
+		if (settings.accRand)
+		{
+			this->particleArray[i].accLife[0] = Math::randFloat(settings.acc[0], settings.acc2[0]);
+			this->particleArray[i].accLife[1] = Math::randFloat(settings.acc[1], settings.acc2[1]);
+			this->particleArray[i].accLife[2] = Math::randFloat(settings.acc[2], settings.acc2[2]);
+		}
+		else
+		{
+			this->particleArray[i].accLife[0] = settings.acc[0];
+			this->particleArray[i].accLife[1] = settings.acc[1];
+			this->particleArray[i].accLife[2] = settings.acc[2];
+		}
+		//Lifetime
+		this->particleArray[i].accLife[3] = Math::randFloat(0.0f, settings.acc2[3]);
+
+		//Color
+		if (settings.colorRand)
+		{
+			this->particleArray[i].color = Math::vec4::lerp(settings.color, settings.color2, Math::randFloat());
+		}
+		else
+		{
+			this->particleArray[i].color = settings.color;
+		}
+
+	}
+
+	this->particleStartSettings = this->particleArray;
+	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
+	{
+		this->particleStartSettings[i].accLife[3] = Math::randFloat(settings.acc[3], settings.acc2[3]);
+	}
+
+	// Bind particle buffer
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleStartBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	return buf;
+}
+
+	void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff)
 {
 	Util::Array<ParticleState> arr;
 	arr.Reserve(this->particleArray.Size() - (eBuff.endIndex - eBuff.startIndex) + bufferSize);

@@ -1,0 +1,16 @@
+<Vortex>
+    <ParticleSystem>
+        <ParticleEmitter name="Fountain">
+            <Texture path="resources/textures/particles/sprite_rapids2.tga"/>
+            <Velocity vel="1.5560001" vel2="1.7040001" random="true"/>
+            <Acceleration acc="0.000000 -1.294000 0.000000" acc2="0.000000 -1.874000 0.000000" random="true"/>
+            <Lifetime life="1.585" life2="1.9900001" random="true"/>
+            <Color color="0.529166 0.790646 0.969432 0.825328" color2="0.272153 0.688878 0.973799 0.825328" random="true"/>
+            <Size startSize="0.171" endSize="0.33600003"/>
+            <ParticleAmount num="1000"/>
+            <EmitterShapes shape="0">
+                <Radius radius="0.29100001"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+    </ParticleSystem>
+</Vortex>

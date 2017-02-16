@@ -526,7 +526,7 @@ inline Util::Array<String> String::Tokenize(Util::String str, Util::String delim
 
 inline float String::ToFloat() const
 {
-	return atof(str);
+	return (float)atof(str);
 }
 
 inline String operator + ( const String & lhs, const String & rhs ) {

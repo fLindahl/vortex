@@ -42,6 +42,12 @@ void main()
 	{
 		vec3 p  = pSettings.settings[gid].pos.xyz;
 		vec3 v  = pSettings.settings[gid].vel.xyz;
+		
+		//if(p.y <= 2.0)
+		//{
+			//v = reflect(v,vec3(0,1,0));
+		//}
+		
 		vec3 pp = p + (v*DT + 0.5*DT*DT*pSettings.settings[gid].accLife.xyz);
 		vec3 vp = v + pSettings.settings[gid].accLife.xyz*DT;
 		pSettings.settings[gid].pos = vec4(pp,1.0);
@@ -49,44 +55,43 @@ void main()
 		pSettings.settings[gid].accLife.w -= DT;
 		if(pSettings.settings[gid].accLife.w <= 0.5)
 		{
-			pSettings.settings[gid].color -= 0.1;
+			pSettings.settings[gid].color.a -= 0.1;
 		}
 	}
+
 	
-	memoryBarrier();
-	barrier();
-	int i;
 	// Bitonic sort
-	for(int nMergeSize=2; nMergeSize <= SORT_SIZE; nMergeSize=nMergeSize*2 ) 
-	{
-		for(int nMergeSubSize=nMergeSize>>1; nMergeSubSize>0; nMergeSubSize=nMergeSubSize>>1 ) 
-		{			
-			for( i = 0; i<ITERATIONS; ++i )		
-			{
-				int tmp_index = int(gl_LocalInvocationIndex) + NUM_THREADS * i;
-				int index_low = tmp_index & (nMergeSubSize-1);
-				int index_high = 2*(tmp_index-index_low);
-				int index = index_high + index_low;
-
-				int nSwapElem = nMergeSubSize==nMergeSize>>1 ? index_high + (2*nMergeSubSize-1) - index_low : index_high + nMergeSubSize + index_low;
-				if( nSwapElem < WORK_GROUP_SIZE )
-				{
-					ParticleState a = pSettings.settings[index];
-					ParticleState b = pSettings.settings[nSwapElem];
-
-					if( a.pos.z > b.pos.z )
-					{ 
-						pSettings.settings[index] = b;
-						pSettings.settings[nSwapElem] = a;
-					}
-				}
-				memoryBarrier();
-				barrier();
-			}
-		}
-	} 
-	memoryBarrier();
-	barrier();
+	//int i;
+	//for(int nMergeSize=2; nMergeSize <= SORT_SIZE; nMergeSize=nMergeSize*2 ) 
+	//{
+	//	for(int nMergeSubSize=nMergeSize>>1; nMergeSubSize>0; nMergeSubSize=nMergeSubSize>>1 ) 
+	//	{			
+	//		for( i = 0; i<ITERATIONS; ++i )		
+	//		{
+	//			int tmp_index = int(gl_LocalInvocationIndex) + NUM_THREADS * i;
+	//			int index_low = tmp_index & (nMergeSubSize-1);
+	//			int index_high = 2*(tmp_index-index_low);
+	//			int index = index_high + index_low;
+    //
+	//			int nSwapElem = nMergeSubSize==nMergeSize>>1 ? index_high + (2*nMergeSubSize-1) - index_low : index_high + nMergeSubSize + index_low;
+	//			if( nSwapElem < WORK_GROUP_SIZE )
+	//			{
+	//				ParticleState a = pSettings.settings[index];
+	//				ParticleState b = pSettings.settings[nSwapElem];
+    //
+	//				if( a.pos.z > b.pos.z )
+	//				{ 
+	//					pSettings.settings[index] = b;
+	//					pSettings.settings[nSwapElem] = a;
+	//				}
+	//			}
+	//			memoryBarrier();
+	//			barrier();
+	//		}
+	//	}
+	//} 
+	//memoryBarrier();
+	//barrier();
 
 }
 

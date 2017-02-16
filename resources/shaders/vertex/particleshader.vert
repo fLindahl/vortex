@@ -38,10 +38,6 @@ mat3 rotateZ(float rad)
     );
 }
 
-vec4 Lerp(vec4 a, vec4 b, float t) 
-{
-    return a + t * (b - a);
-}
 
 //out vec3 FragmentPos;
 //out vec3 Normal;
@@ -54,13 +50,13 @@ const float DT = 0.016;
 void main()
 {
 	uint index = gl_InstanceID + offset;
-	float lerp = pSettings.settings[index].accLife[3]/startSettings.settings[index].accLife[3];
+	float lerp = pSettings.settings[index].accLife.w / startSettings.settings[index].accLife.w;
 	
 	vec3 camRight = vec3(View[0][0],View[1][0], View[2][0]);
 	vec3 camUp = vec3(View[0][1],View[1][1], View[2][1]);
 	vec3 normVel =  normalize(pSettings.settings[index].vel.xyz);	
 	float signX = sign(dot(camRight, normVel));
-	vec3 scaleVec = Lerp(endSize,startSize, lerp).xyz;
+	vec3 scaleVec = mix(endSize,startSize, lerp).xyz;
 	mat3 scale = mat3(scaleVec.x, 0, 0,
 					  0, scaleVec.y, 0,
 					  0, 0, scaleVec.z);
@@ -73,7 +69,6 @@ void main()
 	// position in world space
 	//FragmentPos = wPos.xyz;
 	
-		
 	inColor = pSettings.settings[index].color;
 	
 	// normal in world space

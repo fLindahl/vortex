@@ -89,10 +89,10 @@ bool ParticleFile::SaveParticle(Util::String name)
 	return true;
 }
 
-FileSettings ParticleFile::LoadParticle(Util::String path)
+Util::Array<FileSettings> ParticleFile::LoadParticle(Util::String path)
 {
 
-	FileSettings fileSet;
+	
 
 	XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(path.c_str());
@@ -121,20 +121,25 @@ FileSettings ParticleFile::LoadParticle(Util::String path)
 	}
 	
 	Util::Array<Util::String> arr;
+	Util::Array<FileSettings> settings;
 	while (pElement != nullptr)
 	{
+		FileSettings fileSet;
+		//Particle Name
+		fileSet.name = pElement->Attribute("name");
+
 		//Texture
-		XMLElement* pValues = pElement->FirstChildElement();
+		XMLElement* pValues = pElement->FirstChildElement("Texture");
 		fileSet.texPath = pValues->Attribute("path");
 
 		//Velocity
-		pValues = pElement->NextSiblingElement();
+		pValues = pElement->FirstChildElement("Velocity");
 		fileSet.set.vel = pValues->FloatAttribute("vel");
 		fileSet.set.vel2 = pValues->FloatAttribute("vel2");
 		fileSet.set.velRand = pValues->BoolAttribute("random");
 
 		//Acceleration
-		pValues = pElement->NextSiblingElement();
+		pValues = pElement->FirstChildElement("Acceleration");
 		arr = Util::String::Tokenize(pValues->Attribute("acc"), " ");
 		fileSet.set.acc = Math::vec4(arr[0].ToFloat(), arr[1].ToFloat(),arr[2].ToFloat(), 1.0);
 		arr = Util::String::Tokenize(pValues->Attribute("acc2"), " ");
@@ -142,41 +147,41 @@ FileSettings ParticleFile::LoadParticle(Util::String path)
 		fileSet.set.accRand = pValues->BoolAttribute("random");
 		
 		//Lifetime
-		pValues = pElement->NextSiblingElement();
+		pValues = pElement->FirstChildElement("Lifetime");
 		fileSet.set.acc[3] = pValues->FloatAttribute("life");
 		fileSet.set.acc2[3] = pValues->FloatAttribute("life2");
 		fileSet.set.lifeTimeRand = pValues->BoolAttribute("random");
 
 		//Color
-		pValues = pElement->NextSiblingElement();
+		pValues = pElement->FirstChildElement("Color");
 		arr = Util::String::Tokenize(pValues->Attribute("color"), " ");
 		fileSet.set.color = Math::vec4(arr[0].ToFloat(), arr[1].ToFloat(), arr[2].ToFloat(), arr[3].ToFloat());
 		arr = Util::String::Tokenize(pValues->Attribute("color2"), " ");
 		fileSet.set.color2 = Math::vec4(arr[0].ToFloat(), arr[1].ToFloat(), arr[2].ToFloat(), arr[3].ToFloat());
-		fileSet.set.accRand = pValues->BoolAttribute("random");
+		fileSet.set.colorRand = pValues->BoolAttribute("random");
 
 		//Size
-		pValues = pElement->NextSiblingElement();
+		pValues = pElement->FirstChildElement("Size");
 		fileSet.set.startSize = pValues->FloatAttribute("startSize");
 		fileSet.set.endSize = pValues->FloatAttribute("endSize");
 
 		//ParticleAmount
-		pValues = pElement->NextSiblingElement();
+		pValues = pElement->FirstChildElement("ParticleAmount");
 		fileSet.set.numParticles = pValues->IntAttribute("num");
 
 		//EmitterShapes
-		pValues = pElement->NextSiblingElement();
+		pValues = pElement->FirstChildElement("EmitterShapes");
 		fileSet.set.shapes = (EmitterShapes) pValues->IntAttribute("shape");
 
 		//Radius
-		XMLElement* pShapes = pValues->FirstChildElement();
-		fileSet.set.radius = pValues->FloatAttribute("radius");
+		XMLElement* pShapes = pValues->FirstChildElement("Radius");
+		fileSet.set.radius = pShapes->FloatAttribute("radius");
 
-		pElement = pRoot->NextSiblingElement();
+		settings.Append(fileSet);
+		pElement = pElement->NextSiblingElement();
 	}
 
-	
-	return fileSet;
+	return settings;
 
 }
 

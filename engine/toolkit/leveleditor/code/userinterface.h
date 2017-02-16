@@ -65,6 +65,9 @@ namespace Toolkit
 	
 		GLuint particleCount;
 
+		std::string saveName;
+		std::string appendedEmitters;
+
 	};
 
 }

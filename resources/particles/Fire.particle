@@ -1,0 +1,16 @@
+<Vortex>
+    <ParticleSystem>
+        <ParticleEmitter name="Fire">
+            <Texture path="resources/textures/particles/sprite_fire4.tga"/>
+            <Velocity vel="0.109" vel2="0.13700001" random="true"/>
+            <Acceleration acc="0.000000 0.114000 0.000000" acc2="0.000000 0.348000 0.000000" random="true"/>
+            <Lifetime life="1.6800001" life2="2.345" random="true"/>
+            <Color color="0.803493 0.042104 0.000000 1.000000" color2="0.266376 0.097710 0.000000 1.000000" random="true"/>
+            <Size startSize="0.18200001" endSize="0.067000002"/>
+            <ParticleAmount num="1500"/>
+            <EmitterShapes shape="2">
+                <Radius radius="0.23300001"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+    </ParticleSystem>
+</Vortex>

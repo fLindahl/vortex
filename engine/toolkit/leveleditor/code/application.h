@@ -99,7 +99,7 @@ private:
 	std::shared_ptr<Game::StaticEntity> floor;
 	std::shared_ptr<Game::StaticEntity> ceiling;
 	
-	Util::Array<std::shared_ptr<Game::ParticleEntity>> particleList;
+	Util::Array<std::shared_ptr<Property::ParticleEmitter>> particleList;
 
 	//Particles::ParticleSettings pSettings;
 

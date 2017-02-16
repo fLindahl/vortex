@@ -7,5 +7,10 @@ out vec4 diffuseColor;
 
 void main()
 {
-	diffuseColor = texture(AlbedoMap, TexCoords)*inColor;
+
+	vec4 text = texture(AlbedoMap, TexCoords);
+	vec4 col = text*inColor;
+	if(col.a  < 0.05)
+		discard;
+	diffuseColor = col;
 }
