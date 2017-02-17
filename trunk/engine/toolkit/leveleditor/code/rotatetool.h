@@ -24,7 +24,7 @@ namespace Tools
 
 		TransformHandle GetMouseHandle(const Math::line& worldMouseRay);
 		void UpdateHandlePositions();
-		void UpdateTransform(const Math::mat4& transform) {}
+		void UpdateTransform(const Math::mat4& transform);
 		
 		/// decompose matrix into angles in all axis
 		void GetAnglesFromMat(const Math::mat4& i_m, float& x, float& y, float& z);

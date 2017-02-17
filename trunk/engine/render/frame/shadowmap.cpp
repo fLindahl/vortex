@@ -24,13 +24,13 @@ namespace Render
 	void ShadowMap::Setup()
 	{
 
-		LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
-												 Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f),
-												 Math::vec4(0.0f, -1.0f, 0.0f, 1.0f),
-												 10.0f,
-												 30.0f);
-
-		spotLightBuffer.spotLight = LightServer::Instance()->GetSpotLightAtIndex(0);
+		//LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+		//										 Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f),
+		//										 Math::vec4(0.0f, -1.0f, 0.0f, 1.0f),
+		//										 10.0f,
+		//										 30.0f);
+		//
+		//spotLightBuffer.spotLight = LightServer::Instance()->GetSpotLightAtIndex(0);
 
 		glGenBuffers(1, this->ubo2);
 		glBindBuffer(GL_UNIFORM_BUFFER, this->ubo2[0]);
@@ -56,9 +56,9 @@ namespace Render
 			spotlight = LightServer::Instance()->GetSpotLightAtIndex(0);
 
 		Math::mat4 lightV, lightM, lightMV, lightP;
-		lookat = spotlight.position + (spotlight.coneDirection * spotlight.length);
-		lightV = Math::mat4::lookatrh(spotlight.position, lookat, up);
-		lightM.set_position(spotlight.position);
+		//lookat = spotlight.position + (spotlight.coneDirection * spotlight.length);
+		//lightV = Math::mat4::lookatrh(spotlight.position, lookat, up);
+		//lightM.set_position(spotlight.position);
 
 		shadUniformBuffer.lightM = lightM;
 		shadUniformBuffer.lightV = lightV;

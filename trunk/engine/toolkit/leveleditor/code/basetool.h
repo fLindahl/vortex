@@ -51,6 +51,7 @@ public:
 	virtual void Render() { }
 
 	const Math::mat4& GetDeltaMatrix() const { return this->deltaMatrix; }
+	const Math::mat4& GetInitialTransform() const { return this->initialMatrix; }
 
 	virtual const ToolType& Type() { return this->type; }
 

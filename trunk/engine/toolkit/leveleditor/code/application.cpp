@@ -15,7 +15,7 @@
 #include "application/basegamefeature/managers/scenemanager.h"
 #include "application/properties/particleemitter.h"
 #include "application/basegamefeature/keyhandler.h"
-
+#include "application/basegamefeature/managers/envmanager.h"
 
 using namespace Display;
 using namespace Render;
@@ -29,6 +29,8 @@ namespace LevelEditor
 */
 Application::Application()
 {
+	this->renderGeoProxies = false;
+
 	this->commandManager = Edit::CommandManager::Instance();
 	cameraPos = Math::point::zerovector();
 	camRotX = 0;
@@ -87,73 +89,73 @@ Application::Open()
 		this->sponza->SetTransform(sTransform);
 
 		//spawn in a cube somewhere
-		this->wall1 = std::make_shared<Game::StaticEntity>();
-		this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
-		this->wall1->Activate();
-		this->wall1->SetTransform(Math::mat4::translation(-1.0f, 0.5f, 0.0f));
+		//this->wall1 = std::make_shared<Game::StaticEntity>();
+		//this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+		//this->wall1->Activate();
+		//this->wall1->SetTransform(Math::mat4::translation(-1.0f, 0.5f, 0.0f));
 
-		/*
-		this->wall1 = std::make_shared<Game::ModelEntity>();
-		this->wall2 = std::make_shared<Game::ModelEntity>();
-		this->wall3 = std::make_shared<Game::ModelEntity>();
-		this->wall4 = std::make_shared<Game::ModelEntity>();
-		this->floor = std::make_shared<Game::ModelEntity>();
-		this->ceiling = std::make_shared<Game::ModelEntity>();
-
-		this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		this->wall2->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		this->wall3->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		this->wall4->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		this->floor->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		this->ceiling->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-
-		this->wall1->Activate();
-		this->wall2->Activate();
-		this->wall3->Activate();
-		this->wall4->Activate();
-		this->floor->Activate();
-		this->ceiling->Activate();
-
-		this->floor->SetTransform(Math::mat4::translation(0.0f, -2.0f, 0.0f));
-		this->wall2->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(10.0f, 8.0f, 0.0f)));
-		this->wall3->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(-10.0f, 8.0f, 0.0f)));
-		this->wall4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
-		this->wall1->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
-		this->ceiling->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
-		*/
-
-
-		billboard = std::make_shared<Game::ParticleEntity>();
-		billboard->SetTransform(Math::mat4::translation(11.18f, -1.0f, 4.02f));
-		billboard->Activate();
-		billboard->GetEmitter()->CreateEmitter(1000, "resources/textures/particles/sprite_rapids2.tga");
-
-		billboard2 = std::make_shared<Game::ParticleEntity>();
-		billboard2->SetTransform(Math::mat4::translation(0.0f, 5.5f, 0.0f));
-		billboard2->Activate();
-		billboard2->GetEmitter()->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");
 		
-		particleList.Append(billboard);
-		particleList.Append(billboard2);
+		//this->wall1 = std::make_shared<Game::ModelEntity>();
+		//this->wall2 = std::make_shared<Game::ModelEntity>();
+		//this->wall3 = std::make_shared<Game::ModelEntity>();
+		//this->wall4 = std::make_shared<Game::ModelEntity>();
+		//this->floor = std::make_shared<Game::ModelEntity>();
+		//this->ceiling = std::make_shared<Game::ModelEntity>();
+		//
+		//this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->wall2->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->wall3->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->wall4->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->floor->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//this->ceiling->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
+		//
+		//this->wall1->Activate();
+		//this->wall2->Activate();
+		//this->wall3->Activate();
+		//this->wall4->Activate();
+		//this->floor->Activate();
+		//this->ceiling->Activate();
+		//
+		//this->floor->SetTransform(Math::mat4::translation(0.0f, -2.0f, 0.0f));
+		//this->wall2->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(10.0f, 8.0f, 0.0f)));
+		//this->wall3->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(-10.0f, 8.0f, 0.0f)));
+		//this->wall4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
+		//this->wall1->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
+		//this->ceiling->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
+		
 
 
-/*		PointLight pLight;
-		pLight.position = Math::vec4(-3.0f, 0.0f, -2.5f, 1.0f);
-		pLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		pLight.radiusAndPadding.set_x(5.0f);
-		LightServer::Instance()->AddPointLight(pLight);
+		//billboard = std::make_shared<Game::ParticleEntity>();
+		//billboard->SetTransform(Math::mat4::translation(11.18f, -1.0f, 4.02f));
+		//billboard->Activate();
+		//billboard->GetEmitter()->CreateEmitter(1000, "resources/textures/particles/sprite_rapids2.tga");
+		//
+		//billboard2 = std::make_shared<Game::ParticleEntity>();
+		//billboard2->SetTransform(Math::mat4::translation(0.0f, 5.5f, 0.0f));
+		//billboard2->Activate();
+		//billboard2->GetEmitter()->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");
+		//
+		//particleList.Append(billboard);
+		//particleList.Append(billboard2);
 
-		pLight.position = Math::vec4(-6.0f, 0.0f, 2.5f, 1.0f);
-		pLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
 
-		pLight.position = Math::vec4(2.0f, -1.0f, -0.0f, 1.0f);
-		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-
-		pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
-		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);*/
+		//LightServer::PointLight pLight;
+		//pLight.position = Math::vec4(-3.0f, 0.0f, -2.5f, 1.0f);
+		//pLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		//pLight.radiusAndPadding.set_x(5.0f);
+		//LightServer::Instance()->AddPointLight(pLight);
+		//
+		//pLight.position = Math::vec4(-6.0f, 0.0f, 2.5f, 1.0f);
+		//pLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		//LightServer::Instance()->AddPointLight(pLight);
+		//
+		//pLight.position = Math::vec4(2.0f, -1.0f, -0.0f, 1.0f);
+		//pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
+		//LightServer::Instance()->AddPointLight(pLight);
+		//
+		//pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
+		//pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
+		//LightServer::Instance()->AddPointLight(pLight);
 
      	/*Render::LightServer::SpotLight sLight;
 	    sLight.position = Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f);
@@ -235,19 +237,6 @@ Application::Run()
 			CameraMovement();
 		}
 
-		//Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		//Debug::DebugRenderer::Instance()->DrawLine(this->reflectStart, this->reflectEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
-        //a += 0.0001f;
-        //Render::LightServer::Instance()->GetSpotLightAtIndex(0).position = Math::vec4(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position.x() + a, 2.3f, 3.0f, 1.0f);
-        //Render::LightServer::Instance()->Update();
-
-		//Debug::DebugRenderer::Instance()->DrawCircle(Math::point(0, 0, 0), Math::quaternion::identity(), 0.5f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
-
-		//Debug::DebugRenderer::Instance()->DrawCone(Math::point(2, 0, 0), Math::quaternion::rotationyawpitchroll(0.0f, 3.14f, 45.0f), 0.5f, 1.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
-
-		//Debug::DebugRenderer::Instance()->DrawCircle(Math::point(0, 0, 0), Math::quaternion::identity(), 0.5f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::Normal, 2.0f);
-
 		if (this->hit.object != nullptr)
 		{
 			Game::PhysicsEntity* e = dynamic_cast<Game::PhysicsEntity*>(hit.object);
@@ -257,7 +246,14 @@ Application::Run()
 			}
 		}
 
+		if (renderGeoProxies)
+		{
+			BaseGameFeature::EnvManager::Instance()->RenderGeometryProxies();
+		}
+
 		RenderDevice::Instance()->Render(false);
+
+		
 
 		this->window->SwapBuffers();
 		UI->frameTime = glfwGetTime() - time;

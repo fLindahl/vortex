@@ -5,6 +5,7 @@
 #include "foundation/util/array.h"
 #include "render/frame/shadowmap.h"
 #include "render/frame/reflectionpass.h"
+#include "render/frame/dynamicunlitpass.h"
 
 namespace Debug { class DebugServer; }
 
@@ -86,6 +87,10 @@ private:
 
 	///SWARLEY
 	std::shared_ptr<ShadowMap> shadowmap;
+	
+	/// For icons etc.
+	/// Objects rendered in this pass are not shown in reflections
+	std::shared_ptr<DynamicUnlitPass> dynamicUnlitPass;
 
 };
 

@@ -37,8 +37,6 @@ namespace Render
 	/// 16 Byte Alignment sensitive
 	struct PointLight
 	{
-		LightType lightType = LightType::Point;
-
 		Math::point color;
 		Math::point position;
 		Math::vec4 radiusAndPadding;
@@ -46,26 +44,31 @@ namespace Render
 	/// Is not added to the shader yet
 	struct DirectionalLight
 	{
-		LightType lightType = LightType::Directional;
-
 		Math::point color;
 		Math::point position;
 	};
 
 	struct SpotLight
 	{
-		LightType lightType = LightType::Spot;
+		//centerAndRadius:
+		//Contains the center of the cone bounding sphere and the radius of it's sphere.
+		Math::vec4 centerAndRadius;
 
-		Math::point color;
-		Math::point position;
-		Math::vec4 coneDirection;
-		Math::vec4 midPoint;
-		float length;
-		/// The bottom cirlces radius of the cone
-		//float radius;
-		/// The Frustum Culling radius
-		float fRadius;
-		float angle;
+		//colorAndCenterOffset:
+		//Color of the light and center offset
+		//if angle is greater than 50 (tan(50) = 1) the distance from the cornerpoints to the center is greater than the distance to the spotlight position.
+		//In this special case we need to apply a center offset for the position of the spotlight
+		Math::vec4 colorAndCenterOffset;
+
+		//params:
+		//Contains direction, angle and the falloff radius of the cone
+		//XY is direction (we can reconstruct Z because we know the direction is normalized and we know the sign of Z dir)
+		//Z is cosine of cone angle and lightdir Z sign (Sign bit is used to store sign for the z component of the light direction)
+		//W is falloff radius
+		Math::vec4 params;
+
+		//We can reconstruct position of spotlight by knowing that the top of the cone will be the 
+		//bounding spheres radius away from it's center in the direction of the spotlight 
 	};
 
 	private:
@@ -82,12 +85,14 @@ namespace Render
 		void operator=(const LightServer&) = delete;
 		
 		void AddPointLight(const PointLight& pLight);
+		void RemovePointLight(PointLight* light);
 		size_t GetNumPointLights() { return this->pointLights.Size(); }
 		LightServer::PointLight& GetPointLightAtIndex(const int& index);
 
 		void AddSpotLight(SpotLight& pLight);
+		void RemoveSpotLight(SpotLight* light);
 		size_t GetNumSpotLights() { return this->spotLights.Size(); }
-        void CalculateSpotlight(SpotLight& sLight);
+		SpotLight CalculateSpotlight(Math::point color, Math::point position, Math::vec4 direction, float length, float angle);
 		LightServer::SpotLight& GetSpotLightAtIndex(const int& index);
 
 		GLuint GetWorkGroupsX() { return this->workGroupsX; }
@@ -105,8 +110,8 @@ namespace Render
 
 
         /// Debug and Easier Access ///
-        void CreateSpotLight(Math::point color, Math::point position, Math::vec4 direction, float length, float angle);
-        void CreatePointLight(Math::point color, Math::point position, float radius);
+		LightServer::SpotLight& CreateSpotLight(Math::point color, Math::point position, Math::vec4 direction, float length, float angle);
+		LightServer::PointLight& CreatePointLight(Math::point color, Math::point position, float radius);
 
 		void AddCubeMap(std::shared_ptr<CubeMapNode> node);
 		void RemoveCubeMap(std::shared_ptr<CubeMapNode> node);
@@ -138,9 +143,6 @@ namespace Render
 
         /// Determines how many light should be registred per tile
         GLuint tileLights = 512;
-
-        /// Used to calculate the Middle Point of the Spotlight
-        float oneOverThree;
 
 		/// Contains all active cubemaps in the scene
 		Util::Array<std::shared_ptr<CubeMapNode>> cubemapNodes;

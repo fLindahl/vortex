@@ -44,7 +44,7 @@
 		
         <Material name="Icon" desc="Icon that always faces the camera">
 			<Pass name="Picking" shader="pickingBillboard"/>
-			<Pass name="FlatGeometryLit" shader="icon"/>
+			<Pass name="DynamicUnlit" shader="icon"/>
 			
 			<!-- material textures -->
             <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>

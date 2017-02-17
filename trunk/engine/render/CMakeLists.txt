@@ -58,9 +58,13 @@ SET(files_render_frame
 	frame/reflectionpass.cpp
 	frame/shadowmap.h
 	frame/shadowmap.cpp
+	frame/dynamicunlitpass.h
+	frame/dynamicunlitpass.cpp
 	)
 	
 SET(files_render_resources
+	resources/geometryproxy.h
+	resources/geometryproxy.cpp
 	resources/cubemapnode.h
 	resources/cubemapnode.cpp
 	resources/meshbuilder.h
