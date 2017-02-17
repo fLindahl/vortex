@@ -96,12 +96,12 @@ void main()
 	vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
 	//Sample textures
-	vec3 albedoDiffuseColor = texture(AlbedoMap,TexCoords).rgb;
+	vec4 albedoDiffuseColor = texture(AlbedoMap,TexCoords).rgba;
 	vec3 normal = texture(NormalMap, TexCoords).rgb;
 	vec3 spec = texture(SpecularMap, TexCoords).rgb;
 	float roughness = texture(RoughnessMap, TexCoords).r;
 
-	float shininess = (roughness * 128) + 1;
+	float shininess = ((1-roughness) * 128) + 1;
 
 	//Linearize colors
 	vec3 N = NormalMatrix * ((normal*2.0f) - 1.0f);
@@ -197,6 +197,7 @@ void main()
 	color.rgb += albedoDiffuseColor.rgb * u_lightAmbientIntensity;
 
 	fragColor = color;
+	fragColor.a = albedoDiffuseColor.a;
 	normalColor = N;
 	specularAndRoughness.rgb = spec;
 	specularAndRoughness.a = roughness;

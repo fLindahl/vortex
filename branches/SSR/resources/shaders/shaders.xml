@@ -19,6 +19,13 @@
 			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
+		
+		<Shader name="defaultLitAlphaCutout" desc="Default shader for rendering Cutout lit geometry">            
+			<VertexShader name="resources/shaders/vertex/static.vert"/>
+			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
+			<RenderState name="resources/shaders/states/alphacutout.state"/>
+		</Shader>
+		
 		<!-- END STATIC GEOMETRY -->
 		
 		<!-- BILLBOARDS -->

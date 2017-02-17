@@ -1,7 +1,7 @@
 <Vortex>
-	<Surface material="Static">
+	<Surface material="StaticAlphaCutout">
 		<!-- Textures -->
-		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/chain_texture.tga"/>
+		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/chain_texture.png"/>
 		<Param name="NormalMap" type="string" value="resources/textures/sponza/chain_texture_ddn.tga"/>
 		<Param name="SpecularMap" type="string" value="resources/textures/sponza/chain_texture_spec.tga"/>
 		<Param name="RoughnessMap" type="string" value="resources/textures/sponza/chaintexture_roughness.tga"/>

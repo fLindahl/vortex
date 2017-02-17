@@ -98,7 +98,7 @@ inline void RenderLine::Draw(RenderCommand* command)
 
 	if ((lineCommand->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
 	{
-		glDepthFunc(GL_LESS);
+		glDepthFunc(GL_LEQUAL);
 		glDepthRange(0.0f, 1.0f);
 	}
 
