@@ -9,15 +9,12 @@ out vec2 TexCoords;
 out mat3 NormalMatrix;
 out vec4 FragPosLightSpace;
 
-layout (std140, binding = 8) uniform shadowRUniformBuffer
-{
-	mat4 LSM;
-}shadRUniformBuffer;
+uniform mat4 LSM;
 
 void main()
 {
 	vec4 wPos = Model * vec4(pos, 1.0f);
-	FragPosLightSpace = shadRUniformBuffer.LSM * wPos;
+	FragPosLightSpace = LSM * wPos;
 	
 	// position in world space
 	FragmentPos = wPos.xyz;	

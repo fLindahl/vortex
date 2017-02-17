@@ -12,7 +12,6 @@
 			<Pass name="Picking" shader="picking"/>
 			<Pass name="FlatGeometryLit" shader="defaultLit"/>
 			<Pass name="ShadowMap" shader="shadowMap"/>
-			<Pass name="RenderShadowMap" shader="renderShadowMap"/>
 			
 			
             <!-- material textures -->

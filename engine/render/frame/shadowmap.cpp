@@ -6,6 +6,7 @@
 #include "render/resources/meshresource.h"
 #include "render/properties/graphicsproperty.h"
 #include "render/server/renderdevice.h"
+#include "render/frame/flatgeometrylitpass.h"
 
 
 namespace Render
@@ -14,6 +15,8 @@ namespace Render
 	{
 		this->frameBufferObject = 0;
 		this->buffer = 0;
+		this->shadowmap = 0;
+		this->shadowmapFBO = 0;
 	}
 
 	ShadowMap::~ShadowMap()
@@ -23,79 +26,68 @@ namespace Render
 
 	void ShadowMap::Setup()
 	{
+		///GENERATE A SHADOWMAP TEXTURE
+		glGenFramebuffers(1, &this->frameBufferObject);
 
-		/*LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
-												 Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f),
-												 Math::vec4(0.0f, -1.0f, 0.0f, 1.0f),
-												 10.0f,
-												 30.0f);
+		glGenTextures(1, &this->buffer);
+		glBindTexture(GL_TEXTURE_2D, this->buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+			1024,
+			1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
-		spotLightBuffer.spotLight = LightServer::Instance()->GetSpotLightAtIndex(0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glGenBuffers(1, this->ubo2);
-		glBindBuffer(GL_UNIFORM_BUFFER, this->ubo2[0]);
-		//all shadow buffers are from 9001 and forward
-		glBindBufferBase(GL_UNIFORM_BUFFER, 8, this->ubo2[0]);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(SpotLightBuffer), &spotLightBuffer, GL_STATIC_DRAW);
+		///PUT THE SHADOW MAP INTO A FRAMEBUFFER
+		glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->buffer, 0);
+		///DONT NEED COLOR BUFFER
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		///FRAMEBUFFER CHECK
+		GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		_assert(e == GL_FRAMEBUFFER_COMPLETE, "Render ShadowMap Framebuffer Status Error!");
+		///UNBIND BUFFER
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		//Set the depthBias matrix;
-		Math::vec4 row1, row2, row3, row4, up, light, lookat;
 
-		row1.set(0.5, 0.0, 0.0, 0.0);
-		row2.set(0.0, 0.5, 0.0, 0.0);
-		row3.set(0.0, 0.0, 0.5, 0.0);
-		row4.set(0.5, 0.5, 0.5, 1.0);
-		up.set(0.0, 1.0, 0.0, 1.0);
-
-		shadUniformBuffer.DepthBias.set(row1, row2, row3, row4);
+		///SETUP LIGHTSPACE MATRIX FOR THE SHADER
+		/*Render::LightServer::SpotLight sLight;
+		sLight.position = Math::vec4(-5.5f, 3.5f, -0.9f, 1.0f);
+		sLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
+		sLight.length = 10.0f;
+		sLight.angle = 15.0f;
+		LightServer::Instance()->AddSpotLight(sLight);
 		
-		//get spotlight pos of the the first spotlight in the array and make a lightMVP matrix from it for use in the shadowmap shaders
+		///calculate light MVP from a single spotlight
 		LightServer::SpotLight spotlight;
 
 		if (LightServer::Instance()->GetNumSpotLights() != 0)
 			spotlight = LightServer::Instance()->GetSpotLightAtIndex(0);
 
-		Math::mat4 lightV, lightM, lightMV, lightP;
-		lookat = spotlight.position + (spotlight.coneDirection * spotlight.length);
-		lightV = Math::mat4::lookatrh(spotlight.position, lookat, up);
-		lightM.set_position(spotlight.position);
-
-		//Math::mat4::orthorh
-
-		shadUniformBuffer.lightM = lightM;
-		shadUniformBuffer.lightV = lightV;
-
-		glGenBuffers(1, this->ubo);
-		glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
-		//all shadow buffers are from 9001 and forward
-		glBindBufferBase(GL_UNIFORM_BUFFER, 9, this->ubo[0]);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(shadowUniformBuffer), &shadUniformBuffer, GL_STATIC_DRAW);*/
-
-		//setup the shadow map frame buffer
-		//this->shadowmapframebuffer = 0;
-		glGenFramebuffers(1, &this->frameBufferObject);
-		glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
+		Math::mat4 lightV, lightM, lightP;
+		// TODO: FIX THIS SHET, MATH IS HARD YOU KNO'
+		Math::point posss = Math::vec4(3.0f, 0.0f, 0.0f, 1.0f);
+		lightV = Math::mat4::lookatrh(spotlight.position, spotlight.coneDirection, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		Render::Resolution res = Render::RenderDevice::Instance()->GetRenderResolution();
+		float aspect = (float)res.x / (float)res.y;
+		lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), aspect, 0.05f, 1000.0f);
+		///DO NOT REMOVE THE UNIFORM FROM THE H-FILE
+		shadUniformBuffer.LSM = Math::mat4::multiply(lightV, lightP);
+		shadUniformBuffer.lProj = lightP;*/
+		///GENERATE A SHADOW BUFFER
+		//glGenBuffers(1, this->ubo);
 		
-		//Depth texture, so we can sample it later in the shader
-		glGenTextures(1, &this->buffer);
-		glBindTexture(GL_TEXTURE_2D, this->buffer);
-		//get render resolution from render device
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->buffer, 0);
-
-		glDrawBuffer(GL_NONE); //don't need any color buffer because its just supposed to render shadows, ergo black and white
-
-		const GLenum drawbuffers[1] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, &drawbuffers[0]);
-
-		//failsafe, check if buffer is alright otherwise stop
-		GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		_assert(e == GL_FRAMEBUFFER_COMPLETE, "Shadow Map Framebuffer Status Error!");
+		
+		///JUST FOR THE TIME BEING
+		//this->buffer = shadowmap;
+		//this->frameBufferObject = shadowmapFBO;
+		
+		this->sendtothisshaderprogram = ShaderServer::Instance()->LoadShader("defaultLit")->GetProgram();
+		
 
 		FramePass::Setup();
 	}
@@ -103,9 +95,28 @@ namespace Render
 
 	void ShadowMap::Execute()
 	{
-
-		// Bind the depth map's frame buffer and draw the depth map to it
 		this->BindFrameBuffer();
+
+		///calculate light MVP from a single spotlight
+		LightServer::SpotLight spotlight;
+
+		if (LightServer::Instance()->GetNumSpotLights() != 0)
+		{
+			spotlight = LightServer::Instance()->GetSpotLightAtIndex(0);
+
+			Math::mat4 lightV, lightM, lightP;
+			Math::vec4 lookat;
+			// TODO: FIX THIS SHET, MATH IS HARD YOU KNO'
+			Math::point posss = Math::vec4::zerovector();
+			lookat = spotlight.position + Math::vec4::multiply(spotlight.coneDirection, spotlight.length);
+			lightV = Math::mat4::lookatrh(spotlight.position, lookat, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+			Render::Resolution res = Render::RenderDevice::Instance()->GetRenderResolution();
+			float aspect = (float)res.x / (float)res.y;
+			lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), aspect, 0.05f, spotlight.length);
+			///DO NOT REMOVE THE UNIFORM FROM THE H-FILE
+			shadUniformBuffer.LSM = Math::mat4::multiply(lightV, lightP);
+			shadUniformBuffer.lProj = lightP;
+		}
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		GLuint currentProgram = 0;
@@ -121,7 +132,9 @@ namespace Render
 			}
 
 			shader->EnableRenderState();
-			
+			shader->setUniMatrix4fv(shadUniformBuffer.LSM, "lightSpaceMatrix");
+			shader->setUniMatrix4fv(shadUniformBuffer.lProj, "lightProj");
+
 			for (auto surface : material->SurfaceList())
 			{
 				for (auto modelNode : surface->GetModelNodes())
@@ -140,14 +153,11 @@ namespace Render
 				}
 			}
 		}
-/*
+
 		glActiveTexture(GL_TEXTURE9);
-		glUniform1i(glGetUniformLocation(currentProgram, "ShadowMap"), 0);
-		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());*/
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());
 
-		//Unbind Depth FrameBufferObject
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 		FramePass::Execute();
 	}
 

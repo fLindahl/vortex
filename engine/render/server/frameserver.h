@@ -18,7 +18,6 @@ class FlatGeometryLitPass;
 class PickingPass;
 class ReflectionPass;
 class ShadowMap; ///SWARLEY
-class RenderShadowMap;
 
 class FrameServer
 {
@@ -50,7 +49,6 @@ public:
 	std::shared_ptr<ReflectionPass> GetReflectionPass();
 	std::shared_ptr<PickingPass> GetPickingPass();
 	std::shared_ptr<ShadowMap> GetShadowMap();
-	std::shared_ptr<RenderShadowMap> GetRenderShadowMap();
 
 
 private:
@@ -82,8 +80,6 @@ private:
 
 	///SWARLEY
 	std::shared_ptr<ShadowMap> shadowmap;
-
-	std::shared_ptr<RenderShadowMap> rendershadowmap;
 
 };
 

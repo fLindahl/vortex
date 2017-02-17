@@ -13,7 +13,7 @@ uniform sampler2D AlbedoMap;
 uniform sampler2D NormalMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D RoughnessMap;
-uniform sampler2D ShadowMapTest;
+uniform sampler2D ShadowMap;
 
 struct PointLight
 {
@@ -177,7 +177,7 @@ void main()
 		
 		vec3 uvcords = 0.5f * projcords + 0.5f;
 		
-		float depth = texture(ShadowMapTest, uvcords.xy).r;
+		float depth = texture(ShadowMap, uvcords.xy).r;
 		float z = uvcords.z;
 	
 		float shadowfactor = z > depth ? 1.0 : 0.0;  

@@ -1,8 +1,9 @@
 /// Shadow Map ///
 
-layout(location = 0) out float fragMentDepth;
-	
+uniform mat4 lightProj;
+
 void main() 
 {
-	//fragMentDepth = gl_FragCoord.z;
+	//doesnt need to do anything
+	gl_FragDepth = ((0.5 * lightProj[3][2]) / (gl_FragCoord.z + 0.5 * lightProj[2][2] - 0.5)/ 99.95f);
 }

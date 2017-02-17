@@ -85,16 +85,16 @@ Application::Open()
 		sTransform.translate(Math::vector(0.0f, -2.0f, 0.0f));
 		this->sponza->SetTransform(sTransform);
 
-		//spawn in a cube somewhere
+		//Spawns a cube
 		this->wall1 = std::make_shared<Game::StaticEntity>();
 		this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 		this->wall1->Activate();
-		this->wall1->SetTransform(Math::mat4::translation(-5.5f, -0.5f, -0.9f));
+		this->wall1->SetTransform(Math::mat4::translation(-0.063, -1.0f, -0.27f));
 
 		this->wall2 = std::make_shared<Game::StaticEntity>();
 		this->wall2->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 		this->wall2->Activate();
-		this->wall2->SetTransform(Math::mat4::translation(-5.5f, 4.5f, -0.9f));
+		this->wall2->SetTransform(Math::mat4::translation(-4.19, -1.0f, -0.27f));
 
 		/*
 		this->wall1 = std::make_shared<Game::ModelEntity>();
@@ -174,7 +174,7 @@ Application::Open()
         LightServer::Instance()->AddSpotLight(sLight);*/
 
 		/// Creates a directional light in the scene
-		Render::LightServer::Instance()->CreateDirectionalLight(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f), Math::vec4(1.0f, 0.8f, 0.6f, 0.0f));
+		//Render::LightServer::Instance()->CreateDirectionalLight(Math::vec4(0.0f, 0.0f, 0.0f, 1.0f), Math::vec4(1.0f, 0.8f, 0.6f, 0.0f));
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -231,9 +231,10 @@ Application::Run()
 		//Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		//Debug::DebugRenderer::Instance()->DrawLine(this->reflectStart, this->reflectEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
-		Debug::DebugRenderer::Instance()->DrawLine(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position, 
-												   Render::LightServer::Instance()->GetSpotLightAtIndex(0).position + Render::LightServer::Instance()->GetSpotLightAtIndex(0).coneDirection * Render::LightServer::Instance()->GetSpotLightAtIndex(0).length,
-												   4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		if(Render::LightServer::Instance()->GetNumSpotLights() != 0)
+			Debug::DebugRenderer::Instance()->DrawLine(	Render::LightServer::Instance()->GetSpotLightAtIndex(0).position, 
+														Render::LightServer::Instance()->GetSpotLightAtIndex(0).position + Render::LightServer::Instance()->GetSpotLightAtIndex(0).coneDirection * Render::LightServer::Instance()->GetSpotLightAtIndex(0).length,
+														4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
         //a += 0.0001f;
         //Render::LightServer::Instance()->GetSpotLightAtIndex(0).position = Math::vec4(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position.x() + a, 2.3f, 3.0f, 1.0f);
