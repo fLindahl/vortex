@@ -1,6 +1,6 @@
 CullFace = true
 FrontFace = cw
-CullMode = back
+CullMode = front
 Blend = false
 BlendSourceFunc = src_alpha
 BlendDestinationFunc = one_minus_src_alpha

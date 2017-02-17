@@ -85,6 +85,15 @@ namespace Render
 		this->framePassByName.insert(std::make_pair(this->shadowmap->name, this->shadowmap));
 		this->framePasses.Append(this->shadowmap);
 
+		// Dynamic unlit pass
+		// Uses the regular flat geometry lit framebuffer object but renders later (after shadows and reflections)
+		this->dynamicUnlitPass = std::make_shared<DynamicUnlitPass>();
+		this->dynamicUnlitPass->name = "DynamicUnlit";
+		this->dynamicUnlitPass->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->dynamicUnlitPass->name, this->dynamicUnlitPass));
+		this->framePasses.Append(this->dynamicUnlitPass);
+
 		//Set final color buffer for easy access
 		RenderDevice::Instance()->SetFinalColorBuffer(this->FlatGeometryLit->buffer);
 
@@ -98,6 +107,7 @@ namespace Render
 		this->reflectionPass->UpdateResolution();
 		this->pickingPass->UpdateResolution();
 		this->shadowmap->UpdateResolution();
+		this->dynamicUnlitPass->UpdateResolution();
 	}
 
 	std::shared_ptr<FramePass> FrameServer::GetFramePass(const std::string& name)

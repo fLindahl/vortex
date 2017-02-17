@@ -39,7 +39,7 @@ TransformHandle TranslateTool::GetMouseHandle(const Math::line& worldMouseRay)
 	Math::point rayPoint, handlePoint;
 	Math::line axis;
 	float axis_t;
-	float nearestHandle = FLT_MAX;
+	float nearestHandle = 10000000.0f;
 
 	TransformHandle modes[] = { XAXIS, YAXIS, ZAXIS };
 	Math::vector handles[] = { this->xAxis, this->yAxis, this->zAxis };

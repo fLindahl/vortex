@@ -15,6 +15,8 @@
 
 #ifndef PI
 #define PI 3.14159265358979323846
+#define DEGTORAD (3.14159265358979323846 / 180)
+#define RADTODEG (180 / 3.14159265358979323846)
 #endif
 
 namespace Math
@@ -57,7 +59,13 @@ namespace Math
 	{
 		return (a < b) ? b : a;
 	}
-
+	
+	template <class T>
+	//Returns the sign of T
+	static T sign(const T& x)
+	{
+		return (x == 0 ? 0 : (x > 0 ? 1 : -1));
+	}
 	
 	template <class T>
 	// Clamps a value between to other values. 
@@ -110,11 +118,11 @@ namespace Math
 
 	static float Deg2Rad(const float& deg)
 	{
-		return (float)(deg * (PI / 180.0f));
+		return (float)(deg * (DEGTORAD));
 	}
 
 	static float Rad2Deg(const float& rad)
 	{
-		return (float)(rad * (180.0f / PI));
+		return (float)(rad * (RADTODEG));
 	}
 }

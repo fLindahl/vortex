@@ -4,6 +4,7 @@
 #include <memory>
 #include "shaderobject.h"
 #include "render/server/renderdevice.h"
+#include "geometryproxy.h"
 
 namespace Render
 {
@@ -43,6 +44,9 @@ public:
 
 	float GetBlendFactor() { return this->blendFactor; }
 
+	void SetGeometryProxy(std::shared_ptr<Render::GeometryProxy> proxy) { this->proxy = proxy; }
+	std::shared_ptr<Render::GeometryProxy> GetGeometryProxy() { return this->proxy; }
+
 private:
 	friend class LightServer;
 
@@ -61,6 +65,10 @@ private:
 	bool isLoaded;
 	bool isActive;
 
+	//Used for approximating level geometry to correct reflection vector's intersection with the cubemap (parallax correction)
+	std::shared_ptr<Render::GeometryProxy> proxy;
+
+	//Cubemaps worldspace position
 	Math::point position;
 
 	// cubemaps influence shape

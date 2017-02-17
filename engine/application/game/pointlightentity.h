@@ -44,14 +44,7 @@ public:
     Render::LightServer::PointLight* GetPointLightEnity(){ return this->lightEntity; } const
     void SetPointLightEnity(Render::LightServer::PointLight* sLight){ this->lightEntity = sLight; }
 
-    void SetLightIndex(const uint& index){ this->lightIndex = index; }
-    int GetLightIndex(){ return this->lightIndex; }
-
-    Render::LightServer::LightType& GetLightType(){ return this->lightEntity->lightType; }
-
 protected:
-
-    uint lightIndex;
     Render::LightServer::PointLight* lightEntity;
     Render::GraphicsProperty* gProperty;
 };
