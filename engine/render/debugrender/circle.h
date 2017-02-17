@@ -173,7 +173,7 @@ namespace Debug
 
 		if ((cmd->rendermode & RenderMode::AlwaysOnTop) == RenderMode::AlwaysOnTop)
 		{
-			glDepthFunc(GL_LESS);
+			glDepthFunc(GL_LEQUAL);
 		}
 	}
 

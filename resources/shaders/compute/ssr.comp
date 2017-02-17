@@ -56,7 +56,7 @@ void GetBlendedCubeMapColor(in vec3 reflectionDir, out vec3 reflectionColor)
 }
 
 
-void GetBlendedAndParallaxCorrectedCubeMapColor(in vec3 rayPosition, in vec3 reflectionDir, out vec3 reflectionColor)
+void GetBlendedAndParallaxCorrectedCubeMapColor(in float roughness, in vec3 rayPosition, in vec3 reflectionDir, out vec3 reflectionColor)
 {
 	vec3 cubeColor = vec3(0.0f,0.0f,0.0f);
 	
@@ -79,8 +79,9 @@ void GetBlendedAndParallaxCorrectedCubeMapColor(in vec3 rayPosition, in vec3 ref
 		vec3 IntersectPositionWS = rayPosition + reflectionDir * Distance;
 		vec3 newWorldDirection = IntersectPositionWS - cubemapData[i].cubeMapPosition.xyz;
 
+		float mipLevel = floor((1 - roughness) * 6);
 	
-		cubeColor += texture(Cubemaps[i], newWorldDirection).rgb * cubemapData[i].blendfactor;
+		cubeColor += textureLod(Cubemaps[i], newWorldDirection, mipLevel).rgb * cubemapData[i].blendfactor;
 	}
 	
 	reflectionColor = cubeColor;
@@ -187,25 +188,26 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 
 		hitTexCoord = permute ? pqk.yx : pqk.xy;
 
-		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0 || pqk.x * stepDir>= end)
+		//This doesn't seem necessary anymore...
+		// || pqk.x * stepDir >= end
+		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0)
 		{
 			break;
 		}
 
 		float depth = -texelFetch(depthMap, ivec2(hitTexCoord), 0).r;
 
-		//intersect = (zB <= depth);
-
 		intersect = (zB >= depth - zThickness) && (zA <= depth);
 	}
+	
 	/*
 	// Binary search refinement
-	if( pixelStride > 1.0 && intersect)
+	if( stride > 1.0 && intersect)
 	{
 		pqk -= dPQK;
-		dPQK /= pixelStride;
+		dPQK /= stride;
 
-		float originalStride = pixelStride * 0.5;
+		float originalStride = stride * 0.5;
 		float stride = originalStride;
 		zA = pqk.z / pqk.w;
 		zB = zA;
@@ -293,10 +295,10 @@ void main()
 		
 		vec3 worldPosition = (InvView * vec4(rayOrigin, 1.0f)).xyz;
 		vec3 worldDirection = normalize(mat3(InvView) * reflectionDir);
-		GetBlendedAndParallaxCorrectedCubeMapColor(worldPosition, worldDirection, reflectionColor);
+		GetBlendedAndParallaxCorrectedCubeMapColor(roughness, worldPosition, worldDirection, reflectionColor);
 	}
 
-	vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb) * roughness, 1-roughness);
+	vec4 finalColor = vec4(BGColor, roughness) + vec4(reflectionColor.rgb * (specularAndRoughness.rgb) * (roughness), 1-roughness);
 	//vec4 finalColor = vec4(reflectionColor, 1.0f);
 	imageStore(reflectionImage, location, finalColor);
 	

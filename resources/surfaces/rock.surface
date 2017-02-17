@@ -2,7 +2,7 @@
 	<Surface material="Static">
 		<!-- Textures -->
 		<Param name="AlbedoMap" type="string" value="resources/textures/rock.png"/>
-		
+
 		<!-- Specific Parameters -->
 	</Surface>
 </Vortex>

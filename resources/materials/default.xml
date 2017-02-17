@@ -23,6 +23,29 @@
             <!-- various parameters -->
         </Material>
 		
+		<Material name="StaticAlphaCutout" desc="A lit opaque material">
+			<!-- Examples of future frame passes -->
+			<!--
+			<Pass name="SpotLightShadow" shader="shadow"/>
+			<Pass name="PointLightShadow" shader="shadow"/>
+			<Pass name="GlobalShadow" shader="shadow"/>
+			-->
+			
+			<Pass name="Depth" shader="depthStatic"/>
+			<Pass name="Picking" shader="picking"/>
+			<Pass name="FlatGeometryLit" shader="defaultLitAlphaCutout"/>
+			<Pass name="ShadowMap" shader="shadowMap"/>
+			
+			
+            <!-- material textures -->
+            <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
+			<Param name="NormalMap" type="string" defaultValue="resources/textures/placeholder_normal.png"/>
+			<Param name="SpecularMap" type="string" defaultValue="resources/textures/placeholder_specular.png"/>
+			<Param name="RoughnessMap" type="string" defaultValue="resources/textures/placeholder_roughness.png"/>
+
+            <!-- various parameters -->
+        </Material>
+		
 		<Material name="Billboard" desc="A lit billboard material">
 			<!-- Examples of future frame passes -->
 			<!--
