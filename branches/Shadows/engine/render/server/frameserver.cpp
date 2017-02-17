@@ -9,7 +9,6 @@
 #include "render/frame/pickingpass.h"
 #include "render/frame/reflectionpass.h"
 #include "render/frame/shadowmap.h"
-#include "render/frame/rendershadowmap.h"
 
 namespace Render
 {
@@ -30,6 +29,8 @@ namespace Render
 
 		this->framePassByName.insert(std::make_pair(this->Depth->name, this->Depth));
 		this->framePasses.Append(this->Depth);
+
+		
 
 		//Light culling compute shader pass
 		this->lightCullingPass = std::make_shared<LightCullingPass>();
@@ -76,16 +77,6 @@ namespace Render
 
 		this->framePassByName.insert(std::make_pair(this->shadowmap->name, this->shadowmap));
 		this->framePasses.Append(this->shadowmap);
-
-		//render shadowmap pass
-		this->rendershadowmap = std::make_shared<RenderShadowMap>();
-		this->rendershadowmap->name = "RenderShadowMap";
-		this->rendershadowmap->SetShadowMapBuffer(this->shadowmap->GetShadowMap());
-		this->rendershadowmap->Setup();
-
-		this->framePassByName.insert(std::make_pair(this->rendershadowmap->name, this->rendershadowmap));
-		this->framePasses.Append(this->rendershadowmap);
-
 		//Set final color buffer for easy access
 		RenderDevice::Instance()->SetFinalColorBuffer(this->FlatGeometryLit->buffer);
 
@@ -99,7 +90,6 @@ namespace Render
 		this->reflectionPass->UpdateResolution();
 		this->pickingPass->UpdateResolution();
 		this->shadowmap->UpdateResolution();
-		this->rendershadowmap->UpdateResolution();
 	}
 
 	std::shared_ptr<FramePass> FrameServer::GetFramePass(const std::string& name)
@@ -147,11 +137,6 @@ namespace Render
 	std::shared_ptr<Render::ShadowMap> FrameServer::GetShadowMap()
 	{
 		return this->shadowmap;
-	}
-
-	std::shared_ptr<Render::RenderShadowMap> FrameServer::GetRenderShadowMap()
-	{
-		return this->rendershadowmap;
 	}
 
 }

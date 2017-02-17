@@ -21,19 +21,16 @@ namespace Render
 	private:
 		//Uniform Buffer Object
 		GLuint ubo[1];
-		GLuint ubo2[1];
+		GLuint shadowmap;
+		GLuint shadowmapFBO;
+		GLuint shadowmapprogram;
+		GLuint sendtothisshaderprogram;
 
 		struct  shadowUniformBuffer
 		{
-			Math::mat4 DepthBias;
-			Math::mat4 lightM;
-			Math::mat4 lightV;
+			Math::mat4 LSM;
+			Math::mat4 lProj;
 		}shadUniformBuffer;
-
-		struct SpotLightBuffer
-		{
-			LightServer::SpotLight spotLight;
-		}spotLightBuffer;
 
 	
 

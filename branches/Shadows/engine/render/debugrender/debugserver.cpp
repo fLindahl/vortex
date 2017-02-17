@@ -10,7 +10,7 @@
 #include "render/frame/framepass.h"
 #include "render/frame/reflectionpass.h"
 #include "render/frame/pickingpass.h"
-#include "render/frame/rendershadowmap.h"
+#include "render/frame/shadowmap.h"
 
 namespace Debug
 {
@@ -36,7 +36,6 @@ void DebugServer::ImGuiDebugBar()
 			if (ImGui::MenuItem("FlatGeometryLit Normals")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Specular")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer()); }
 			if (ImGui::MenuItem("Shadow Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetShadowMap()->GetBuffer());}
-			if (ImGui::MenuItem("Render Shadow Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetRenderShadowMap()->GetBuffer()); }
 			ImGui::Separator();
 			ImGui::EndMenu();
 		}

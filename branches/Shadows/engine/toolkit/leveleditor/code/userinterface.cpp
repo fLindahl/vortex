@@ -464,6 +464,17 @@ namespace Toolkit
                 std::shared_ptr<Edit::AddBox> command = std::make_shared<Edit::AddBox>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
                 commandManager->DoCommand(command);
             }
+			if (ImGui::Button("MINE!", { 125, 20 }))
+			{
+				if (Render::LightServer::Instance()->GetNumSpotLights() == 0)
+					return;
+
+				Graphics::MainCamera::Instance()->SetPosition(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position);
+				Math::vec4 lookat;
+				lookat = Render::LightServer::Instance()->GetSpotLightAtIndex(0).position + Math::vec4::multiply(Render::LightServer::Instance()->GetSpotLightAtIndex(0).coneDirection , Render::LightServer::Instance()->GetSpotLightAtIndex(0).length);
+				
+				Graphics::MainCamera::Instance()->LookAt(lookat, Math::point::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+			}
 			ImGui::EndDock();
 		}
 	}
