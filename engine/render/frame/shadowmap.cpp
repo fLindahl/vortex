@@ -95,6 +95,8 @@ namespace Render
 
 	void ShadowMap::Execute()
 	{
+		glViewport(0.0f, 0.0f, 1024.0f, 1024.0f);
+
 		this->BindFrameBuffer();
 
 		///calculate light MVP from a single spotlight
@@ -107,12 +109,11 @@ namespace Render
 			Math::mat4 lightV, lightM, lightP;
 			Math::vec4 lookat;
 			// TODO: FIX THIS SHET, MATH IS HARD YOU KNO'
-			Math::point posss = Math::vec4::zerovector();
 			lookat = spotlight.position + Math::vec4::multiply(spotlight.coneDirection, spotlight.length);
 			lightV = Math::mat4::lookatrh(spotlight.position, lookat, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-			Render::Resolution res = Render::RenderDevice::Instance()->GetRenderResolution();
-			float aspect = (float)res.x / (float)res.y;
-			lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), aspect, 0.05f, spotlight.length);
+			//Render::Resolution res = Render::RenderDevice::Instance()->GetRenderResolution();
+			//float aspect = (float)res.x / (float)res.y;
+			lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), 1.0f, 0.05f, spotlight.length);
 			///DO NOT REMOVE THE UNIFORM FROM THE H-FILE
 			shadUniformBuffer.LSM = Math::mat4::multiply(lightV, lightP);
 			shadUniformBuffer.lProj = lightP;
@@ -154,19 +155,31 @@ namespace Render
 			}
 		}
 
+		
+		glUseProgram(sendtothisshaderprogram);
+
 		glActiveTexture(GL_TEXTURE9);
 		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());
+		
+		
+		glUniform1i(glGetUniformLocation(sendtothisshaderprogram, "ShadowMap"), 9);
+		const GLuint loc = glGetUniformLocation(this->sendtothisshaderprogram, "LSM");
+		glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)&shadUniformBuffer.LSM.mat.m[0][0]);
+		
+
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glViewport(0.0f, 0.0f, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
+
 		FramePass::Execute();
 	}
 
 	void ShadowMap::UpdateResolution()
 	{
-		const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
-
-		glBindTexture(GL_TEXTURE_2D, this->buffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newRes.x, newRes.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		//const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
+		//glBindTexture(GL_TEXTURE_2D, this->buffer);
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newRes.x, newRes.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	}
 }
 

@@ -173,6 +173,9 @@ void main()
 	/// Loop for SpotLights
 	for (uint i = 0; i < tileLights && visibleSpotLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{		
+		uint lightIndex = visibleSpotLightIndicesBuffer.data[offset + i].index;
+		SpotLight light = spotLightBuffer.data[lightIndex];
+	
 		vec3 projcords = FragPosLightSpace.xyz / FragPosLightSpace.w;
 		
 		vec3 uvcords = 0.5f * projcords + 0.5f;
@@ -180,11 +183,11 @@ void main()
 		float depth = texture(ShadowMap, uvcords.xy).r;
 		float z = uvcords.z;
 	
-		float shadowfactor = z > depth ? 1.0 : 0.0;  
+		float bias = max(0.0005f * (1.0f - dot(normal.xyz, light.coneDirection.xyz)), 0.00005f);
+		float shadowfactor = z-bias > depth ? 1.0f : 0.0f;  
 
 		
-		uint lightIndex = visibleSpotLightIndicesBuffer.data[offset + i].index;
-		SpotLight light = spotLightBuffer.data[lightIndex];
+
 		/// Light Direction
 		vec3 L = light.position.xyz - FragmentPos.xyz;
 		float distance = length(L);
@@ -204,7 +207,7 @@ void main()
 			specular = pow(max(dot(H, N), 0.0), shininess);		
 		//}
 		
-		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse * (1.0 - shadowfactor)) + (vec3(specular) * spec) * (1.0 - shadowfactor)) * attenuation * spotIntensity;
+		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse * (1.0f-shadowfactor)) + (vec3(specular) * spec) * (1.0f-shadowfactor)) * attenuation * spotIntensity;
 		color.rgb += irradiance;
 	}
 	
