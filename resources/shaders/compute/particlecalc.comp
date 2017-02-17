@@ -1,10 +1,10 @@
 
 //#extension GL_ARB_compute_variable_group_size: enable
 #define WORK_GROUP_SIZE 256
-#define SORT_SIZE 512
-#define HALF_SIZE (SORT_SIZE/2)
-#define ITERATIONS (HALF_SIZE > 1024 ? HALF_SIZE/1024 : 1)
-#define NUM_THREADS	(HALF_SIZE/ITERATIONS)
+//#define SORT_SIZE 512
+//#define HALF_SIZE (SORT_SIZE/2)
+//#define ITERATIONS (HALF_SIZE > 1024 ? HALF_SIZE/1024 : 1)
+//#define NUM_THREADS	(HALF_SIZE/ITERATIONS)
 
 struct ParticleState
 {
@@ -25,9 +25,11 @@ layout(std430, binding=5) buffer StartSettings
 	ParticleState settings[]; // array of structures
 } startSettings;
 
-uniform sampler2D depthMap;
+layout (binding = 4) uniform sampler2D depthMap;
+layout (binding = 5) uniform sampler2D normalMap;
 
 const float DT = 0.016;
+const float thickness = 0.1;
 
 layout( local_size_x = WORK_GROUP_SIZE,  local_size_y = 1, local_size_z = 1)   in;
 void main()
@@ -40,16 +42,28 @@ void main()
 	}
 	else
 	{
-		vec3 p  = pSettings.settings[gid].pos.xyz;
-		vec3 v  = pSettings.settings[gid].vel.xyz;
+		vec4 p  = pSettings.settings[gid].pos;
+		vec4 v  = pSettings.settings[gid].vel;
+		
+		vec4 clipPos = p*View;
+		
+		float depth = texelFetch(depthMap,clipPos.xy).r;
+		vec4 normal = normalize(texture2D(normalMap, clipPos.xy));
+		
+		vec4 depthWorldPos = vec4(clipPos.x,clipPos.y, depth, 1.0)*InvView;
+		
+		if(distance(depthWorldPos,p) < thickness)
+		{
+			v = reflect(v, normal);
+		}
 		
 		//if(p.y <= 2.0)
 		//{
 			//v = reflect(v,vec3(0,1,0));
 		//}
 		
-		vec3 pp = p + (v*DT + 0.5*DT*DT*pSettings.settings[gid].accLife.xyz);
-		vec3 vp = v + pSettings.settings[gid].accLife.xyz*DT;
+		vec3 pp = p.xyz + (v.xyz*DT + 0.5*DT*DT*pSettings.settings[gid].accLife.xyz);
+		vec3 vp = v.xyz + pSettings.settings[gid].accLife.xyz*DT;
 		pSettings.settings[gid].pos = vec4(pp,1.0);
 		pSettings.settings[gid].vel = vec4(vp,1.0);
 		pSettings.settings[gid].accLife.w -= DT;
