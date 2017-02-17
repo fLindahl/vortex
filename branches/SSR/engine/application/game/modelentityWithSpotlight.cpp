@@ -48,16 +48,12 @@ void ModelEntitySpotLight::Update()
 {
 	Entity::Update();
 
-
-	//Math::mat4 coneTransform = Math::mat4::multiply(Math::mat4::scaling(Math::vec4(this->)), Math::mat4::transpose(Math::mat4::inverse(this->transform)));
-	//coneTransform.set_position();
-
-	Math::point center = this->lightEntity->centerAndRadius;
-	float radius = this->lightEntity->centerAndRadius.w();
-	
-	Debug::DebugRenderer::Instance()->DrawCircle(center, Math::quaternion::identity(), radius, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::WireFrame, 2.0f);
-	Debug::DebugRenderer::Instance()->DrawCircle(center, Math::quaternion::rotationyawpitchroll(0.0f, 1.57075f, 0.0f), radius, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::WireFrame, 2.0f);
-	Debug::DebugRenderer::Instance()->DrawCircle(center, Math::quaternion::rotationyawpitchroll(1.57075f, 0.0f, 1.57075f), radius, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::WireFrame, 2.0f);
+	//Draw bounding sphere
+	//Math::point center = this->lightEntity->centerAndRadius;
+	//float radius = this->lightEntity->centerAndRadius.w();
+	//Debug::DebugRenderer::Instance()->DrawCircle(center, Math::quaternion::identity(), radius, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::WireFrame, 2.0f);
+	//Debug::DebugRenderer::Instance()->DrawCircle(center, Math::quaternion::rotationyawpitchroll(0.0f, 1.57075f, 0.0f), radius, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::WireFrame, 2.0f);
+	//Debug::DebugRenderer::Instance()->DrawCircle(center, Math::quaternion::rotationyawpitchroll(1.57075f, 0.0f, 1.57075f), radius, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Debug::RenderMode::WireFrame, 2.0f);
 
 }
 
