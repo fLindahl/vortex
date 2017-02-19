@@ -35,7 +35,7 @@ void DebugServer::ImGuiDebugBar()
 			if (ImGui::MenuItem("Light Tiles")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(dynamic_cast<Render::LightCullingPass*>(Render::FrameServer::Instance()->GetLightCullingPass().get())->GetBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Normals")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Specular")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer()); }
-			if (ImGui::MenuItem("Shadow Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetShadowMap()->GetBuffer());}
+			if (ImGui::MenuItem("Shadow Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetShadowMap()->GetShadowMap());}
 			ImGui::Separator();
 			ImGui::EndMenu();
 		}

@@ -29,20 +29,22 @@ namespace Render
 		///GENERATE A SHADOWMAP TEXTURE
 		glGenFramebuffers(1, &this->frameBufferObject);
 
-		glGenTextures(1, &this->buffer);
-		glBindTexture(GL_TEXTURE_2D, this->buffer);
+		glGenTextures(1, &this->shadowmap);
+		glBindTexture(GL_TEXTURE_2D, this->shadowmap);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-			1024,
-			1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+			512,
+			512, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		GLfloat bordercolor[] = { 1.0,1.0,1.0,1.0 };
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bordercolor);
 
 		///PUT THE SHADOW MAP INTO A FRAMEBUFFER
 		glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->buffer, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->shadowmap, 0);
 		///DONT NEED COLOR BUFFER
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
@@ -95,7 +97,7 @@ namespace Render
 
 	void ShadowMap::Execute()
 	{
-		glViewport(0.0f, 0.0f, 1024.0f, 1024.0f);
+		glViewport(0.0f, 0.0f, 512.0f, 512.0f);
 
 		this->BindFrameBuffer();
 
@@ -159,7 +161,7 @@ namespace Render
 		glUseProgram(sendtothisshaderprogram);
 
 		glActiveTexture(GL_TEXTURE9);
-		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetShadowMap());
 		
 		
 		glUniform1i(glGetUniformLocation(sendtothisshaderprogram, "ShadowMap"), 9);
@@ -177,9 +179,9 @@ namespace Render
 
 	void ShadowMap::UpdateResolution()
 	{
-		//const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
-		//glBindTexture(GL_TEXTURE_2D, this->buffer);
-		//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newRes.x, newRes.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
+		glBindTexture(GL_TEXTURE_2D, this->buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newRes.x, newRes.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	}
 }
 

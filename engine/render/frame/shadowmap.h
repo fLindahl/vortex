@@ -17,7 +17,7 @@ namespace Render
 		void UpdateResolution();
 
 
-		GLuint& GetShadowMap() { return this->buffer; }
+		GLuint& GetShadowMap() { return this->shadowmap; }
 	private:
 		//Uniform Buffer Object
 		GLuint ubo[1];

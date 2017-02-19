@@ -107,7 +107,7 @@ float DoSpotCone(SpotLight light, vec3 L)
 
 	/// Lerps between minCos and 1
     float maxCos = mix(minCos, 1.0, 0.5);
-    float cosAngle = dot(light.coneDirection.xyz, -L);
+    float cosAngle = dot(normalize(light.coneDirection.xyz), -L);
     
     return smoothstep(minCos, maxCos, cosAngle);
 }
@@ -118,6 +118,7 @@ float DoAttenuation(SpotLight light, float direction)
 
 // Assume the monitor is calibrated to the sRGB color space
 const float screenGamma = 2.2;
+
 
 void main()
 {
@@ -182,12 +183,31 @@ void main()
 		
 		float depth = texture(ShadowMap, uvcords.xy).r;
 		float z = uvcords.z;
-	
-		float bias = max(0.0005f * (1.0f - dot(normal.xyz, light.coneDirection.xyz)), 0.00005f);
-		float shadowfactor = z-bias > depth ? 1.0f : 0.0f;  
-
 		
-
+		float shadowfactor = 0.0f;
+		float nordir = clamp(dot(normal.xyz, light.coneDirection.xyz), 0,1);
+		float bias = 0.0005f * tan(acos(nordir));
+		bias = min(max(bias, 0.005f), 0.0005f);
+		
+		
+		if (projcords.z > 1.0) //outside of shadowmap and therefore it should not be shaded
+			shadowfactor = 0.0f;
+		else
+		{
+			//PCF, sample pixles for smooth shadows. DO NOT INCREASE THE SAMPLE RATE: IT WILL HAVE MASSIVE PERFORMANCE IMPACT
+			vec2 texelsize = 1.0 / textureSize(ShadowMap, 0);
+			for (int x=-3; x<=3; ++x)
+			{
+				for(int y = -3; y <= 3; ++y)
+				{
+					float pcfDepth = texture(ShadowMap, uvcords.xy + vec2(x, y) * texelsize).r; 
+					shadowfactor += z-bias > pcfDepth ? 1.0f : 0.0f;      
+				}
+			}
+			shadowfactor /= 49.0f;
+			  
+		}
+		
 		/// Light Direction
 		vec3 L = light.position.xyz - FragmentPos.xyz;
 		float distance = length(L);
