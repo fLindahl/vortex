@@ -109,11 +109,11 @@ void LightServer::UpdateWorkGroups()
 
 	// Bind visible Point light indices buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, visiblePointLightIndicesBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * tileLights, 0, GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * tileLights, 0, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, visibleSpotLightIndicesBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * tileLights, 0, GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * tileLights, 0, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
@@ -124,7 +124,7 @@ void LightServer::UpdatePointLightBuffer()
 
 	// Bind light buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPointLights * sizeof(PointLight), &this->pointLights[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPointLights * sizeof(PointLight), &this->pointLights[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
@@ -135,7 +135,7 @@ void LightServer::UpdateSpotLightBuffer()
 
 	// Bind light buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numSpotLights * sizeof(SpotLight), &this->spotLights[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numSpotLights * sizeof(SpotLight), &this->spotLights[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
