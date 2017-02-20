@@ -139,23 +139,23 @@ Application::Open()
 		//particleList.Append(billboard2);
 
 
-		LightServer::PointLight pLight;
-		pLight.position = Math::vec4(-3.0f, 0.0f, -2.5f, 1.0f);
-		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		pLight.radiusAndPadding.set_x(10.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-		
-		pLight.position = Math::vec4(-6.0f, 0.0f, 2.5f, 1.0f);
-		pLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-		
-		pLight.position = Math::vec4(2.0f, -1.0f, -0.0f, 1.0f);
-		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-		
-		pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
-		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
+		//LightServer::PointLight pLight;
+		//pLight.position = Math::vec4(-3.0f, 0.0f, -2.5f, 1.0f);
+		//pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		//pLight.radiusAndPadding.set_x(10.0f);
+		//LightServer::Instance()->AddPointLight(pLight);
+		//
+		//pLight.position = Math::vec4(-6.0f, 0.0f, 2.5f, 1.0f);
+		//pLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		//LightServer::Instance()->AddPointLight(pLight);
+		//
+		//pLight.position = Math::vec4(2.0f, -1.0f, -0.0f, 1.0f);
+		//pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
+		//LightServer::Instance()->AddPointLight(pLight);
+		//
+		//pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
+		//pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
+		//LightServer::Instance()->AddPointLight(pLight);
 
      	/*Render::LightServer::SpotLight sLight;
 	    sLight.position = Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f);
