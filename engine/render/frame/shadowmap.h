@@ -32,9 +32,13 @@ namespace Render
 			Math::mat4 lProj;
 		}shadUniformBuffer;
 
-	
+	    GLuint shadowMapProgram;
+
+		GLfloat shadowWidth, shadowHeight;
+		/// Aspect ratio of the shadow map texture
+		GLfloat shadowAspect;
+		GLfloat shadowNearPlane;
 
 	};
-
 
 }

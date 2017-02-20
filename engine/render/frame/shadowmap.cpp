@@ -17,6 +17,10 @@ namespace Render
 		this->buffer = 0;
 		this->shadowmap = 0;
 		this->shadowmapFBO = 0;
+		this->shadowWidth = 1024;
+		this->shadowHeight = 1024;
+		this->shadowAspect = this->shadowWidth / this->shadowHeight;
+		this->shadowNearPlane = 0.05f;
 	}
 
 	ShadowMap::~ShadowMap()
@@ -29,11 +33,9 @@ namespace Render
 		///GENERATE A SHADOWMAP TEXTURE
 		glGenFramebuffers(1, &this->frameBufferObject);
 
-		glGenTextures(1, &this->shadowmap);
-		glBindTexture(GL_TEXTURE_2D, this->shadowmap);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-			512,
-			512, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glGenTextures(1, &this->shadowmap);
+        glBindTexture(GL_TEXTURE_2D, this->shadowmap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->shadowWidth, this->shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -54,42 +56,7 @@ namespace Render
 		///UNBIND BUFFER
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-		///SETUP LIGHTSPACE MATRIX FOR THE SHADER
-		/*Render::LightServer::SpotLight sLight;
-		sLight.position = Math::vec4(-5.5f, 3.5f, -0.9f, 1.0f);
-		sLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
-		sLight.length = 10.0f;
-		sLight.angle = 15.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
-		
-		///calculate light MVP from a single spotlight
-		LightServer::SpotLight spotlight;
-
-		if (LightServer::Instance()->GetNumSpotLights() != 0)
-			spotlight = LightServer::Instance()->GetSpotLightAtIndex(0);
-
-		Math::mat4 lightV, lightM, lightP;
-		// TODO: FIX THIS SHET, MATH IS HARD YOU KNO'
-		Math::point posss = Math::vec4(3.0f, 0.0f, 0.0f, 1.0f);
-		lightV = Math::mat4::lookatrh(spotlight.position, spotlight.coneDirection, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		Render::Resolution res = Render::RenderDevice::Instance()->GetRenderResolution();
-		float aspect = (float)res.x / (float)res.y;
-		lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), aspect, 0.05f, 1000.0f);
-		///DO NOT REMOVE THE UNIFORM FROM THE H-FILE
-		shadUniformBuffer.LSM = Math::mat4::multiply(lightV, lightP);
-		shadUniformBuffer.lProj = lightP;*/
-		///GENERATE A SHADOW BUFFER
-		//glGenBuffers(1, this->ubo);
-		
-		
-		///JUST FOR THE TIME BEING
-		//this->buffer = shadowmap;
-		//this->frameBufferObject = shadowmapFBO;
-		
 		this->sendtothisshaderprogram = ShaderServer::Instance()->LoadShader("defaultLit")->GetProgram();
-		
 
 		FramePass::Setup();
 	}
@@ -97,7 +64,8 @@ namespace Render
 
 	void ShadowMap::Execute()
 	{
-		glViewport(0.0f, 0.0f, 512.0f, 512.0f);
+		/// Set the view port of the shadow camera light
+		glViewport(0.0f, 0.0f, this->shadowWidth, this->shadowHeight);
 
 		this->BindFrameBuffer();
 
@@ -108,14 +76,13 @@ namespace Render
 		{
 			spotlight = LightServer::Instance()->GetSpotLightAtIndex(0);
 
-			Math::mat4 lightV, lightM, lightP;
+			Math::mat4 lightV, lightP;
 			Math::vec4 lookat;
 			// TODO: FIX THIS SHET, MATH IS HARD YOU KNO'
 			lookat = spotlight.position + Math::vec4::multiply(spotlight.coneDirection, spotlight.length);
 			lightV = Math::mat4::lookatrh(spotlight.position, lookat, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-			//Render::Resolution res = Render::RenderDevice::Instance()->GetRenderResolution();
-			//float aspect = (float)res.x / (float)res.y;
-			lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), 1.0f, 0.05f, spotlight.length);
+			//lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), this->shadowAspect, this->shadowNearPlane, spotlight.length);
+            lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle * 2.0f), this->shadowAspect, this->shadowNearPlane, spotlight.length);
 			///DO NOT REMOVE THE UNIFORM FROM THE H-FILE
 			shadUniformBuffer.LSM = Math::mat4::multiply(lightV, lightP);
 			shadUniformBuffer.lProj = lightP;
@@ -157,7 +124,7 @@ namespace Render
 			}
 		}
 
-		
+		glViewport(0.0f, 0.0f, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
 		glUseProgram(sendtothisshaderprogram);
 
 		glActiveTexture(GL_TEXTURE9);
@@ -165,14 +132,11 @@ namespace Render
 		
 		
 		glUniform1i(glGetUniformLocation(sendtothisshaderprogram, "ShadowMap"), 9);
-		const GLuint loc = glGetUniformLocation(this->sendtothisshaderprogram, "LSM");
-		glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)&shadUniformBuffer.LSM.mat.m[0][0]);
-		
+		const GLuint loc = (GLuint)glGetUniformLocation(this->sendtothisshaderprogram, "LSM");
+		glUniformMatrix4fv(loc, 1, GL_FALSE, &shadUniformBuffer.LSM.mat.m[0][0]);
 
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		glViewport(0.0f, 0.0f, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
 
 		FramePass::Execute();
 	}

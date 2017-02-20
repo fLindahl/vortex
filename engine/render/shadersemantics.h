@@ -13,7 +13,7 @@
 #define VORTEX_SEMANTIC_INVPROJECTION              "InvProjection"
 #define VORTEX_SEMANTIC_CAMERAPOSITION             "CameraPosition"
 #define VORTEX_SEMANTIC_SCREENSIZE		           "ScreenSize"
-#define VORTEX_SEMANTIC_CAMERAPOSITION             "CameraPosition"
+//#define VORTEX_SEMANTIC_CAMERAPOSITION             "CameraPosition"
 #define VORTEX_SEMANTIC_TIMEANDRANDOM			   "TimeAndRandom"
 #define VORTEX_SEMANTIC_LIGHTTILEWORKGROUPS		   "LightTileWorkGroups"
 #define VORTEX_SEMANTIC_VIEWTOTEXTURESPACE		   "ViewToTextureSpace"

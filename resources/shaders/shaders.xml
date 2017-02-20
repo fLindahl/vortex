@@ -71,7 +71,7 @@
 			<VertexShader name="resources/shaders/vertex/shadowmap.vert"/>
 			<FragmentShader name="resources/shaders/fragment/shadowmap.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
-		</Shader>	
+		</Shader>
 		
 		
 		<!-- --------------- -->

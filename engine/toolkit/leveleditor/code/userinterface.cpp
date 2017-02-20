@@ -414,9 +414,9 @@ namespace Toolkit
 							ImGui::SliderFloat("Red"   , &settings.color.x(), 0.0f, 1.0f,  "%.01f");
 							ImGui::SliderFloat("Green" , &settings.color.y(), 0.0f, 1.0f,  "%.01f");
 							ImGui::SliderFloat("Blue"  , &settings.color.z(), 0.0f, 1.0f,  "%.01f");
-							ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.01f");
-							ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.01f");
-							ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.01f");
+							ImGui::SliderFloat("X-Direction"  , &settings.coneDirection.x(), -1.0f, 1.0f, "%.0001f");
+							ImGui::SliderFloat("Y-Direction"  , &settings.coneDirection.y(), -1.0f, 1.0f, "%.0001f");
+							ImGui::SliderFloat("Z-Direction"  , &settings.coneDirection.z(), -1.0f, 1.0f, "%.0001f");
 
                             this->toggleLight = true;
 						}

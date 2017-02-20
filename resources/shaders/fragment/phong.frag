@@ -111,9 +111,9 @@ float DoSpotCone(SpotLight light, vec3 L)
     
     return smoothstep(minCos, maxCos, cosAngle);
 }
-float DoAttenuation(SpotLight light, float direction)
+float DoAttenuation(SpotLight light, float distance)
 {
-    return 1.0f - smoothstep(light.length * 0.75f, light.length, direction);
+    return 1.0f - smoothstep(light.length * 0.75f, light.length, distance);
 }
 
 // Assume the monitor is calibrated to the sRGB color space
@@ -185,14 +185,14 @@ void main()
 		float z = uvcords.z;
 		
 		float shadowfactor = 0.0f;
-		float nordir = clamp(dot(normal.xyz, light.coneDirection.xyz), 0,1);
+		float nordir = clamp(dot(normal.xyz, normalize(light.coneDirection.xyz)), 0,1);
 		float bias = 0.0005f * tan(acos(nordir));
 		bias = min(max(bias, 0.005f), 0.0005f);
 		
 		
-		if (projcords.z > 1.0) //outside of shadowmap and therefore it should not be shaded
-			shadowfactor = 0.0f;
-		else
+		//if (projcords.z > 1.0 && projcords.z < 0.0) //outside of shadowmap and therefore it should not be shaded
+			//shadowfactor = 0.0f;
+		if(projcords.z < 1.0 && projcords.z > 0.0)
 		{
 			//PCF, sample pixles for smooth shadows. DO NOT INCREASE THE SAMPLE RATE: IT WILL HAVE MASSIVE PERFORMANCE IMPACT
 			vec2 texelsize = 1.0 / textureSize(ShadowMap, 0);
@@ -205,7 +205,6 @@ void main()
 				}
 			}
 			shadowfactor /= 49.0f;
-			  
 		}
 		
 		/// Light Direction
