@@ -357,7 +357,7 @@ GLuint ShaderServer::LoadVertexShader(const std::string& file)
 
 		const char* vs = content.c_str();
 
-		// setup fragment shader
+		// setup vertex shader
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		GLint length = (GLint)content.length();
 		glShaderSource(vertexShader, 1, &vs, &length);
@@ -471,7 +471,7 @@ GLuint ShaderServer::LoadComputeShader(const std::string& file)
 
 		const char* fs = content.c_str();
 
-		// setup fragment shader
+		// setup compute shader
 		GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
 		GLint length = (GLint)content.length();
 		glShaderSource(computeShader, 1, &fs, &length);

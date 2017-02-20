@@ -27,7 +27,7 @@ public:
 		GLuint workGroups[2];	
 		GLfloat padding; //TODO: padding might not be needed here
 	};
-
+	
 	ReflectionPass();
 	~ReflectionPass();
 
@@ -44,12 +44,24 @@ public:
 	ReflectionQuality& GetReflectionQuality() { return this->quality; }
 
 private:
+	GLuint numCubemaps;
+	struct CubemapData
+	{		
+		Math::mat4 geometryproxy;
+		Math::point cubemapposition;
+		GLfloat blendfactor;
+	};
+
+	Util::Array<CubemapData> cubemapData;
+
 	ReflectionQuality quality;
 
 	SSRSettings uniformBlock;
 	
 	//Uniform Buffer Object
 	GLuint ubo[1];
+
+	GLuint cubemapUBO[1];
 
 	GLuint SSRComputeProgram;
 	GLuint CubemapProgram;

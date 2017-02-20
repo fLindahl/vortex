@@ -9,6 +9,7 @@
 #include "render/frame/pickingpass.h"
 #include "render/frame/reflectionpass.h"
 #include "render/frame/shadowmap.h"
+#include "render/frame/particlecomputepass.h"
 
 namespace Render
 {
@@ -62,6 +63,14 @@ namespace Render
 		this->framePassByName.insert(std::make_pair(this->FlatGeometryLit->name, this->FlatGeometryLit));
 		this->framePasses.Append(this->FlatGeometryLit);
 
+		//Particle compute shader pass
+		this->particleComputePass = std::make_shared<ParticleComputePass>();
+		this->particleComputePass->name = "ParticleCompute";
+		this->particleComputePass->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->particleComputePass->name, this->particleComputePass));
+		this->framePasses.Append(this->particleComputePass);
+
 		// Reflection pass
 		this->reflectionPass = std::make_shared<ReflectionPass>();
 		this->reflectionPass->name = "Reflection";
@@ -77,6 +86,15 @@ namespace Render
 
 		this->framePassByName.insert(std::make_pair(this->shadowmap->name, this->shadowmap));
 		this->framePasses.Append(this->shadowmap);
+		// Dynamic unlit pass
+		// Uses the regular flat geometry lit framebuffer object but renders later (after shadows and reflections)
+		this->dynamicUnlitPass = std::make_shared<DynamicUnlitPass>();
+		this->dynamicUnlitPass->name = "DynamicUnlit";
+		this->dynamicUnlitPass->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->dynamicUnlitPass->name, this->dynamicUnlitPass));
+		this->framePasses.Append(this->dynamicUnlitPass);
+
 		//Set final color buffer for easy access
 		RenderDevice::Instance()->SetFinalColorBuffer(this->FlatGeometryLit->buffer);
 
@@ -90,6 +108,7 @@ namespace Render
 		this->reflectionPass->UpdateResolution();
 		this->pickingPass->UpdateResolution();
 		this->shadowmap->UpdateResolution();
+		this->dynamicUnlitPass->UpdateResolution();
 	}
 
 	std::shared_ptr<FramePass> FrameServer::GetFramePass(const std::string& name)
@@ -132,6 +151,12 @@ namespace Render
 	std::shared_ptr<PickingPass> FrameServer::GetPickingPass()
 	{
 		return this->pickingPass;
+	}
+
+
+	std::shared_ptr<ParticleComputePass> FrameServer::GetParticleComputePass()
+	{
+		return this->particleComputePass;
 	}
 
 	std::shared_ptr<Render::ShadowMap> FrameServer::GetShadowMap()

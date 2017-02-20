@@ -5,6 +5,7 @@
 #include "foundation/util/array.h"
 #include "render/frame/shadowmap.h"
 #include "render/frame/reflectionpass.h"
+#include "render/frame/dynamicunlitpass.h"
 
 namespace Debug { class DebugServer; }
 
@@ -18,6 +19,7 @@ class FlatGeometryLitPass;
 class PickingPass;
 class ReflectionPass;
 class ShadowMap; ///SWARLEY
+class ParticleComputePass;
 
 class FrameServer
 {
@@ -49,6 +51,7 @@ public:
 	std::shared_ptr<ReflectionPass> GetReflectionPass();
 	std::shared_ptr<PickingPass> GetPickingPass();
 	std::shared_ptr<ShadowMap> GetShadowMap();
+	std::shared_ptr<ParticleComputePass> GetParticleComputePass();
 
 
 private:
@@ -68,6 +71,10 @@ private:
 	
 	/// Used for lightculling as part of tiled forward rendering.
 	std::shared_ptr<FramePass> lightCullingPass;
+
+	//Used for particle computing
+	std::shared_ptr<ParticleComputePass> particleComputePass;
+
 	//GLuint lightCullingProgram;
 
 	std::shared_ptr<PickingPass> pickingPass;
@@ -80,6 +87,10 @@ private:
 
 	///SWARLEY
 	std::shared_ptr<ShadowMap> shadowmap;
+	
+	/// For icons etc.
+	/// Objects rendered in this pass are not shown in reflections
+	std::shared_ptr<DynamicUnlitPass> dynamicUnlitPass;
 
 };
 

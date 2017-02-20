@@ -1,0 +1,7 @@
+<Vortex>
+	<Model name="billboard">
+		<Mesh name="resources/meshes/quad_tris.obj">
+			<Node primitivegroup="0" surface="resources/surfaces/billboard.surface"/>
+		</Mesh>
+	</Model>
+</Vortex>

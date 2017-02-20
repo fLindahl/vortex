@@ -8,6 +8,7 @@
 #include <render/server/lightserver.h>
 #include "foundation/math/point.h"
 #include "undo.h"
+#include "application/properties/particleemitter.h"
 
 namespace LevelEditor { class Application; }
 
@@ -16,11 +17,11 @@ namespace Tools
 	class BaseTool;
 	class SelectTool;
 	class TranslateTool;
+	class RotateTool;
 }
 
 namespace Toolkit
 {
-
 
 	class UserInterface
 	{
@@ -38,6 +39,8 @@ namespace Toolkit
 		void RenderDocks();
 		void ExecShortCuts();
 		void ShowFileMenu();
+
+		void ParticlesSettings(std::shared_ptr<Property::ParticleEmitter> emitter);
 		
 		double prevFPSTime;
 		double currentFPS;
@@ -50,6 +53,7 @@ namespace Toolkit
 		
 		Tools::SelectTool* selectTool;
 		Tools::TranslateTool* translateTool;
+		Tools::RotateTool* rotateTool;
 
 		///Texture Handles
 		//Toolbar
@@ -60,6 +64,9 @@ namespace Toolkit
 		GLuint entityToolTextureHandle;
 		GLuint brushToolTextureHandle;
 		GLuint polygonEditTextureHandle;
+	
+		GLuint particleCount;
+
 
 		/// this will be removed once someone finds a better solution
 		bool toggleLight;
