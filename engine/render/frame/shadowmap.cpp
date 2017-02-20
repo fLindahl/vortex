@@ -7,6 +7,7 @@
 #include "render/properties/graphicsproperty.h"
 #include "render/server/renderdevice.h"
 #include "render/frame/flatgeometrylitpass.h"
+#include "render/server/shadowserver.h"
 
 
 namespace Render
@@ -70,19 +71,25 @@ namespace Render
 		this->BindFrameBuffer();
 
 		///calculate light MVP from a single spotlight
-		LightServer::SpotLight spotlight;
+		Game::ModelEntitySpotLight* spotlight;
 
-		if (LightServer::Instance()->GetNumSpotLights() != 0)
+		auto shadowEntities = ShadowServer::Instance()->GetSpotLightEntities();
+
+		if (shadowEntities.Size() != 0)
 		{
-			spotlight = LightServer::Instance()->GetSpotLightAtIndex(0);
+			spotlight = shadowEntities[0];
 
 			Math::mat4 lightV, lightP;
 			Math::vec4 lookat;
-			// TODO: FIX THIS SHET, MATH IS HARD YOU KNO'
-			lookat = spotlight.position + Math::vec4::multiply(spotlight.coneDirection, spotlight.length);
-			lightV = Math::mat4::lookatrh(spotlight.position, lookat, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+			/// TODO: FIX THIS SHET, MATH IS HARD YOU KNO'
+			lookat = spotlight->GetTransform().get_position() + Math::vec4::multiply(spotlight->GetSpotLightDirection(), spotlight->GetSpotLightLength());
+			lightV = Math::mat4::lookatrh(spotlight->GetTransform().get_position(), lookat, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+			//lightV = Math::mat4::transpose(spotlight->GetTransform());
+			
+
 			//lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), this->shadowAspect, this->shadowNearPlane, spotlight.length);
-            lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle * 2.0f), this->shadowAspect, this->shadowNearPlane, spotlight.length);
+            lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight->GetSpotLightAngle() * 2.0f), this->shadowAspect, this->shadowNearPlane, spotlight->GetSpotLightLength() * 2.0f);
 			///DO NOT REMOVE THE UNIFORM FROM THE H-FILE
 			shadUniformBuffer.LSM = Math::mat4::multiply(lightV, lightP);
 			shadUniformBuffer.lProj = lightP;
@@ -111,6 +118,8 @@ namespace Render
 				{
 					//Bind mesh
 					//TODO: We should probably check and make sure we don't bind these more than once
+					///Bind mesh
+					///TODO: We should probably check and make sure we don't bind these more than once
 					modelNode->modelInstance->GetMesh()->Bind();
 
 					for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())

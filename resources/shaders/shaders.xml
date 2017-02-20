@@ -27,6 +27,12 @@
 			<FragmentShader name="resources/shaders/fragment/unlit.frag"/>
 			<RenderState name="resources/shaders/states/alphacutout.state"/>
 		</Shader>
+
+		<Shader name="defaultUnLitBillboard" desc="Default shader for rendering opaque lit billboards">            
+			<VertexShader name="resources/shaders/vertex/particleshader.vert"/>
+			<FragmentShader name="resources/shaders/fragment/particleshader.frag"/>
+			<RenderState name="resources/shaders/states/particlealphablend.state"/>
+		</Shader>
 		
 		<Shader name="pickingBillboard" desc="Billboard shader for writing ID to a render buffer">
 			<VertexShader name="resources/shaders/vertex/billboard.vert"/>
@@ -94,5 +100,8 @@
 			<ComputeShader name="resources/shaders/compute/lightculling.comp"/>
 		</Shader>
 		
+		<Shader name="ParticleCompute" desc="Compute shader for computing Particles">    
+			<ComputeShader name="resources/shaders/compute/particlecalc.comp"/>
+		</Shader>
     </Shaders>
 </Vortex>

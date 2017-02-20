@@ -27,6 +27,8 @@ ReflectionPass::ReflectionPass() :
 	this->uniformBlock.workGroups[1] = (RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % TILE_SIZE)) / TILE_SIZE;
 	this->uniformBlock.maxSteps = 80.0f;
 	this->uniformBlock.maxDistance = 280.0f;
+
+	this->cubemapData.Fill(0, 8, CubemapData());
 }
 
 ReflectionPass::~ReflectionPass()
@@ -52,7 +54,49 @@ void ReflectionPass::Setup()
 	this->CubemapProgram = ShaderServer::Instance()->LoadShader("CubemapsOnly")->GetProgram();
 	this->PCCubemapProgram = ShaderServer::Instance()->LoadShader("ParallaxCorrectedCubemaps")->GetProgram();
 	
+	//Holy jesus this wall is greater than Trumps
+	glUseProgram(this->SSRComputeProgram);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "depthMap"), 4);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "normalMap"), 5);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "specularMap"), 6);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "colorMap"), 7);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[0]"), 8 + 0);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[1]"), 8 + 1);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[2]"), 8 + 2);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[3]"), 8 + 3);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[4]"), 8 + 4);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[5]"), 8 + 5);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[6]"), 8 + 6);
+	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[7]"), 8 + 7);
+	glUseProgram(this->CubemapProgram);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, "depthMap"), 4);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, "normalMap"), 5);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, "specularMap"), 6);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, "colorMap"), 7);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[0]"), 8 + 0);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[1]"), 8 + 1);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[2]"), 8 + 2);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[3]"), 8 + 3);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[4]"), 8 + 4);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[5]"), 8 + 5);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[6]"), 8 + 6);
+	glUniform1i(glGetUniformLocation(this->CubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[7]"), 8 + 7);
+	glUseProgram(this->PCCubemapProgram);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, "depthMap"), 4);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, "normalMap"), 5);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, "specularMap"), 6);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, "colorMap"), 7);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[0]"), 8 + 0);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[1]"), 8 + 1);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[2]"), 8 + 2);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[3]"), 8 + 3);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[4]"), 8 + 4);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[5]"), 8 + 5);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[6]"), 8 + 6);
+	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[7]"), 8 + 7);
+	
 	glGenBuffers(1, this->ubo);
+	glGenBuffers(1, this->cubemapUBO);
 
 	FramePass::Setup();
 }
@@ -62,7 +106,7 @@ void ReflectionPass::Execute()
 	double time = glfwGetTime();
 	
 	//This needs to be done before rendering reflections on AMD cards as the compute shader dispatches before the renderpasses are done otherwise
-	glFinish();
+	//glFinish();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, this->ubo[0]);
@@ -70,74 +114,80 @@ void ReflectionPass::Execute()
 	
 	//Switch quality settings
 	//TODO: we should probably move this to vertex+fragmentshader to ~maybe~ gain performance but also enable older hardware to run these effects.
+	GLuint currentProgram;
 	switch (quality)
 	{
 	case Render::ReflectionPass::HIGH:
 		glUseProgram(this->SSRComputeProgram);
+		currentProgram = this->SSRComputeProgram;
 		break;
 	case Render::ReflectionPass::MEDIUM:
 		glUseProgram(this->PCCubemapProgram);
+		currentProgram = this->PCCubemapProgram;
 		break;
 	case Render::ReflectionPass::LOW:
 		glUseProgram(this->CubemapProgram);
+		currentProgram = this->CubemapProgram;
 		break;
 	default:
 		_assert(false, "No valid reflection quality selected!");
 		break;
 	}
 
+	//TEMPORARY for reloading realtime
+	glUniform1i(glGetUniformLocation(currentProgram, "depthMap"), 4);
+	glUniform1i(glGetUniformLocation(currentProgram, "normalMap"), 5);
+	glUniform1i(glGetUniformLocation(currentProgram, "specularMap"), 6);
+	glUniform1i(glGetUniformLocation(currentProgram, "colorMap"), 7);
+	glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[0]"), 8 + 0);
+	glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[1]"), 8 + 1);
+	glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[2]"), 8 + 2);
+	glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[3]"), 8 + 3);
+	glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[4]"), 8 + 4);
+	glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[5]"), 8 + 5);
+	glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[6]"), 8 + 6);
+	glUniform1i(glGetUniformLocation(currentProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[7]"), 8 + 7);
+
 	// Bind depth map texture to texture location 4 (which will not be used by any model texture)
 	glActiveTexture(GL_TEXTURE4);
-	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "depthMap"), 4);
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer());
 
 	glActiveTexture(GL_TEXTURE5);
-	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "normalMap"), 5);
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer());
 
 	glActiveTexture(GL_TEXTURE6);
-	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "specularMap"), 6);
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer());
 
 	glActiveTexture(GL_TEXTURE7);
-	glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "colorMap"), 7);
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer());
 
 	auto cubemaps = Render::LightServer::Instance()->GetClosestCubemapToPoint(Graphics::MainCamera::Instance()->GetPosition());
-	if (cubemaps.Size() > 0)
+	//Limit to max 8 cubemaps
+	this->numCubemaps = Math::min(cubemaps.Size(), size_t(8));
+	
+	if (this->numCubemaps > 0)
 	{
-		int numCubeMaps = Math::min(cubemaps.Size(), size_t(4));
-
-		glUniform1i(glGetUniformLocation(this->SSRComputeProgram, "NumCubemaps"), numCubeMaps);
-
-		float blendFactor;
-
-		for (int i = 0; i < 4; ++i)
+		for (int i = 0; i < this->numCubemaps; ++i)
 		{
-			std::string samplerUniformName;
-			std::string blendFactorUniformName;
-			if (i == 0) { samplerUniformName = VORTEX_SEMANTIC_CUBEMAP1; blendFactorUniformName = VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR1; }
-			else if (i == 1) { samplerUniformName = VORTEX_SEMANTIC_CUBEMAP2; blendFactorUniformName = VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR2; }
-			else if (i == 2) { samplerUniformName = VORTEX_SEMANTIC_CUBEMAP3; blendFactorUniformName = VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR3; }
-			else if (i == 3) { samplerUniformName = VORTEX_SEMANTIC_CUBEMAP4; blendFactorUniformName = VORTEX_SEMANTIC_CUBEMAP_BLENDFACTOR4; }
-
-			if (i < numCubeMaps)
+			glActiveTexture(GL_TEXTURE8 + i);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemaps[i]->GetCubeMap());
+			this->cubemapData[i].blendfactor = cubemaps[i]->GetBlendFactor();
+			this->cubemapData[i].cubemapposition = cubemaps[i]->GetPosition();
+			if (cubemaps[i]->GetGeometryProxy() != nullptr)
 			{
-				glActiveTexture(GL_TEXTURE8 + i);
-				glUniform1i(glGetUniformLocation(this->SSRComputeProgram, samplerUniformName.c_str()), 8 + i);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, cubemaps[i]->GetCubeMap());
-				blendFactor = cubemaps[i]->GetBlendFactor();
+				this->cubemapData[i].geometryproxy = cubemaps[i]->GetGeometryProxy()->Transform();
 			}
-			else
-			{
-				blendFactor = 0.0f;
-			}
-
-			glUniform1f(glGetUniformLocation(this->SSRComputeProgram, blendFactorUniformName.c_str()), blendFactor);
 		}
+
+		glBindBuffer(GL_UNIFORM_BUFFER, this->cubemapUBO[0]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 10, this->cubemapUBO[0]);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(CubemapData) * 8, &cubemapData[0], GL_DYNAMIC_DRAW);
 	}
 
-	const GLint location = glGetUniformLocation(this->SSRComputeProgram, "reflectionImage");
+	//Update number of cubemaps
+	glUniform1ui(glGetUniformLocation(currentProgram, "numCubemaps"), numCubemaps);
+	
+	const GLint location = glGetUniformLocation(currentProgram, "reflectionImage");
 	if (location == -1){
 		printf("Could not locate uniform location for texture in SSRComputeProgram");
 	}
@@ -162,7 +212,7 @@ void ReflectionPass::Execute()
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	glFinish();
+	//glFinish();
 	
 	double time1 = glfwGetTime();
 	

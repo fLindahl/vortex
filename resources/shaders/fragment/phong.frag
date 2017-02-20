@@ -17,8 +17,6 @@ uniform sampler2D ShadowMap;
 
 struct PointLight
 {
-	int lightType;
-	
 	vec4 color;
 	vec4 position;
 	vec4 radiusAndPadding;
@@ -32,17 +30,29 @@ struct DirectionalLight
 	vec4 direction;
 };
 
+uniform DirectionalLight sun;
+
 struct SpotLight 
 {
-	int lightType;
+	//centerAndRadius:
+	//Contains the center of the cone bounding sphere and the radius of it's sphere.
+	vec4 centerAndRadius;
 	
-    vec4 color;
-	vec4 position;
-	vec4 coneDirection;
-	vec4 midPoint;
-	float length;
-	float fRadius;
-	float angle;
+	//colorAndCenterOffset:
+	//Color of the light and center offset
+	//if angle is greater than 50 (tan(50) = 1) the distance from the cornerpoints to the center is greater than the distance to the spotlight position.
+	//In this special case we need to apply a center offset for the position of the spotlight
+    vec4 colorAndCenterOffset;
+	
+	//params:
+	//Contains direction, angle and the falloff radius of the cone
+	//XY is direction (we can reconstruct Z because we know the direction is normalized and we know the sign of Z dir)
+	//Z is cosine of cone angle and lightdir Z sign (Sign bit is used to store sign for the z component of the light direction)
+	//W is falloff radius
+	vec4 params;
+	
+	//We can reconstruct position of spotlight by knowing that the top of the cone will be the 
+	//bounding spheres radius away from it's center in the direction of the spotlight 
 };
 
 struct VisibleIndex 
@@ -90,7 +100,7 @@ layout(std430, binding = 6) readonly buffer VisibleDirectionalLightIndicesBuffer
 } visibleDirectionalLightIndicesBuffer;
 
 // parameters of the light and possible values
-const vec3 u_lightAmbientIntensity = vec3(0.1f, 0.1f, 0.1f);
+const vec3 u_lightAmbientIntensity = vec3(0.005f, 0.005f, 0.005f);
 
 // Attenuate the point light intensity
 float attenuate(vec3 lightDirection, float radius)
@@ -99,21 +109,6 @@ float attenuate(vec3 lightDirection, float radius)
     float atten = max(0.0, 1.0 - dot(l,l));
 
 	return atten;
-}
-
-float DoSpotCone(SpotLight light, vec3 L)
-{
-    float minCos = cos(radians(light.angle));
-
-	/// Lerps between minCos and 1
-    float maxCos = mix(minCos, 1.0, 0.5);
-    float cosAngle = dot(normalize(light.coneDirection.xyz), -L);
-    
-    return smoothstep(minCos, maxCos, cosAngle);
-}
-float DoAttenuation(SpotLight light, float distance)
-{
-    return 1.0f - smoothstep(light.length * 0.75f, light.length, distance);
 }
 
 // Assume the monitor is calibrated to the sRGB color space
@@ -165,7 +160,7 @@ void main()
 			vec3 H = normalize(L + V);
 			specular = pow(max(dot(H, N), 0.0), shininess);
 		//}
-
+		
 		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
 		
 		color.rgb += irradiance;
@@ -176,16 +171,31 @@ void main()
 	{		
 		uint lightIndex = visibleSpotLightIndicesBuffer.data[offset + i].index;
 		SpotLight light = spotLightBuffer.data[lightIndex];
-	
+		
+		vec3 spotDir;
+		spotDir.xy = light.params.xy;
+		
+		//Reconstruct z component
+		//Because we know that our direction is normalized, we can easily calculate Z. however, we still don't know the sign of it.
+		spotDir.z = sqrt(1 - spotDir.x*spotDir.x - spotDir.y*spotDir.y);
+		//sign bit for cone is used for storing the sign of direction Z
+		spotDir.z = (light.params.z > 0) ? spotDir.z : -spotDir.z;
+		//Spotlight direction is now reconstructed
+		
+		//We can reconstruct position of spotlight by knowing that the top of the cone will be the 
+		//bounding spheres radius away from it's center in the direction of the spotlight 
+		vec3 spotPos = light.centerAndRadius.xyz - ((light.colorAndCenterOffset.a) * spotDir);
+
 		vec3 projcords = FragPosLightSpace.xyz / FragPosLightSpace.w;
 		
 		vec3 uvcords = 0.5f * projcords + 0.5f;
 		
 		float depth = texture(ShadowMap, uvcords.xy).r;
+		
 		float z = uvcords.z;
 		
 		float shadowfactor = 0.0f;
-		float nordir = clamp(dot(normal.xyz, normalize(light.coneDirection.xyz)), 0,1);
+		float nordir = clamp(dot(normal, spotDir), 0,1);
 		float bias = 0.0005f * tan(acos(nordir));
 		bias = min(max(bias, 0.005f), 0.0005f);
 		
@@ -208,28 +218,46 @@ void main()
 		}
 		
 		/// Light Direction
-		vec3 L = light.position.xyz - FragmentPos.xyz;
+		vec3 L = spotPos - FragmentPos.xyz;
 		float distance = length(L);
+		//As we already have distance, we can normalize by dividing by it.
+		//normalize
 		L = L / distance;
 		
-		float attenuation = DoAttenuation(light, distance);
-		float spotIntensity = DoSpotCone(light, L);
+		//float attenuation = DoAttenuation(light, distance);
+		//float spotIntensity = DoSpotCone(light, L);
+		float cosineOfCurrentConeAngle = dot(-L, spotDir);
 		
-		L = normalize(L);
-		float diffuse = max(dot(L, N), 0.0);
-		float specular = 0.0f;
+		//Falloff radius gives us more freedom to fiddle with attenuation.
+		float falloffRadius = light.params.w;
 		
-		//Hope this looks better with shadows...
-		//if(diffuse > 0.0f)
-		//{
+		//params.z is angle
+		float cosineOfConeAngle = (light.params.z > 0) ? light.params.z : -light.params.z;
+		
+		// If we're outside of distance or not within the cone, we can just discard doing any more work
+		if (distance < falloffRadius && cosineOfCurrentConeAngle > cosineOfConeAngle)
+        {
+			float radialAttenuation = (cosineOfCurrentConeAngle - cosineOfConeAngle) / (1.0 - cosineOfConeAngle);
+			//square the attenuation
+			radialAttenuation = radialAttenuation * radialAttenuation;
+			
+			float x = distance / falloffRadius;
+			// fast inverse squared falloff for a bit more accurate falloff. This is only approximative though
+			//This is borrowed by AMD and their DX11 example of spotlights
+            // -(1/k)* (1-(k+1) / (1+k*x^2))
+            // k=20: -(1/20)*(1 - 21/(1+20*x^2))
+			float falloff = -0.05 + 1.05/(1+20*x*x);
+			
+			float diffuse = max(dot(L, N), 0.0);
+			
 			vec3 H = normalize(L + V);
-			specular = pow(max(dot(H, N), 0.0), shininess);		
-		//}
-		
-		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse * (1.0f-shadowfactor)) + (vec3(specular) * spec) * (1.0f-shadowfactor)) * attenuation * spotIntensity;
-		color.rgb += irradiance;
+			float specular = pow(max(dot(H, N), 0.0), shininess);
+			
+			vec3 irradiance = (light.colorAndCenterOffset.rgb * (albedoDiffuseColor.rgb * diffuse * (1.0f-shadowfactor)) + (vec3(specular) * spec) * (1.0f-shadowfactor)) * falloff * radialAttenuation;
+			color.rgb += irradiance;
+		} 	
 	}
-	
+	/*
 	for (uint i = 0; i < tileLights && visibleDirectionalLightIndicesBuffer.data[offset + i].index != -1; i++)
 	{
 		uint lightIndex = visibleDirectionalLightIndicesBuffer.data[offset + i].index;
@@ -253,7 +281,7 @@ void main()
 		
 		color.rgb += irradiance;
 	}
-	
+	*/
 	color.rgb += albedoDiffuseColor.rgb * u_lightAmbientIntensity;
 
 	fragColor = color;

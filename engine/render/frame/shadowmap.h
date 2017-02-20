@@ -1,7 +1,12 @@
 #pragma once
+//------------------------------------------------------------------------
+// Copyright Rasmus, Viktor. Inte dunder.
+// With contribution by Shaggy, se contribution comment in .cpp
+//------------------------------------------------------------------------
 #include "drawpass.h"
 #include "foundation/math/matrix4.h"
 #include "render/server/lightserver.h"
+#include "application/game/modelentityWithSpotlight.h"
 
 namespace Render
 {
@@ -39,6 +44,7 @@ namespace Render
 		GLfloat shadowAspect;
 		GLfloat shadowNearPlane;
 
+		Util::Array<std::shared_ptr<Game::ModelEntitySpotLight>> spotlightEntities;
 	};
 
 }

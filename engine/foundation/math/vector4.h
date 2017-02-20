@@ -154,6 +154,8 @@ namespace Math
 		/// return component-wise absolute
 		vec4 abs() const;
 
+		/// returns an arbitrary orthogonal vector to v
+		static vec4 orthogonal(const vec4 &v);
 		/// return 1.0 / vec
 		static vec4 reciprocal(const vec4 &v);
 		/// return 1.0 / vec, faster version using approximation
@@ -711,6 +713,30 @@ namespace Math
 		vec4::lengthsq3() const
 	{
 		return _mm_cvtss_f32(_mm_dp_ps(this->vec.vec, this->vec.vec, 0x71));
+	}
+
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	__forceinline vec4
+		vec4::orthogonal(const vec4 &v)
+	{
+		if (0.0 != v.x())
+		{
+			return Math::vec4((-v.y() - v.z()) / v.x(), 1.0f, 1.0f, 0.0f);
+		}
+		else if (0.0 != v.y())
+		{
+			return Math::vec4(1.0, (-v.x() - v.z()) / v.y(), 1.0f, 0.0f);
+		}
+		else if (0.0 != v.z())
+		{
+			return Math::vec4(1.0f, 1.0f, (-v.x() - v.y()) / v.z(), 0.0f);
+		}
+		else
+		{
+			return Math::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		}
 	}
 
 	//------------------------------------------------------------------------------

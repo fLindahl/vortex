@@ -15,6 +15,8 @@
 #include "application/basegamefeature/managers/scenemanager.h"
 
 #include "application/basegamefeature/keyhandler.h"
+#include "render/server/shadowserver.h"
+#include "application/basegamefeature/managers/envmanager.h"
 
 using namespace Display;
 using namespace Render;
@@ -40,6 +42,8 @@ Application::Application()
 	hit.object = nullptr;
 
 	this->pickingPixels = new GLuint[1920 * 1020];
+
+	this->renderGeoProxies = false;
 }
 
 //------------------------------------------------------------------------------
@@ -86,12 +90,12 @@ Application::Open()
 		this->sponza->SetTransform(sTransform);
 
 		//Spawns a cube
-		this->wall1 = std::make_shared<Game::StaticEntity>();
+		this->wall1 = std::make_shared<Game::ModelEntity>();
 		this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 		this->wall1->Activate();
 		this->wall1->SetTransform(Math::mat4::translation(-0.063, -1.0f, -0.27f));
 
-		this->wall2 = std::make_shared<Game::StaticEntity>();
+		this->wall2 = std::make_shared<Game::ModelEntity>();
 		this->wall2->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 		this->wall2->Activate();
 		this->wall2->SetTransform(Math::mat4::translation(-4.19, -1.0f, -0.27f));
@@ -231,14 +235,21 @@ Application::Run()
 		//Debug::DebugRenderer::Instance()->DrawLine(this->rayStart, this->rayEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 		//Debug::DebugRenderer::Instance()->DrawLine(this->reflectStart, this->reflectEnd, 4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
-		if(Render::LightServer::Instance()->GetNumSpotLights() != 0)
-			Debug::DebugRenderer::Instance()->DrawLine(	Render::LightServer::Instance()->GetSpotLightAtIndex(0).position, 
-														Render::LightServer::Instance()->GetSpotLightAtIndex(0).position + Render::LightServer::Instance()->GetSpotLightAtIndex(0).coneDirection * Render::LightServer::Instance()->GetSpotLightAtIndex(0).length,
-														4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		//if(Render::LightServer::Instance()->GetNumSpotLights() != 0)
+		//	Debug::DebugRenderer::Instance()->DrawLine(	Render::LightServer::Instance()->GetSpotLightAtIndex(0).position, 
+		//												Render::LightServer::Instance()->GetSpotLightAtIndex(0).position + Render::LightServer::Instance()->GetSpotLightAtIndex(0).coneDirection * Render::LightServer::Instance()->GetSpotLightAtIndex(0).length,
+		//												4.0f, Math::vec4(1.0f, 0.0f, 0.0f, 1.0f), Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		//Render::ShadowServer::Instance()->GetSpotLightEntities()[0]->GetSpotLightDirection();
 
         //a += 0.0001f;
         //Render::LightServer::Instance()->GetSpotLightAtIndex(0).position = Math::vec4(Render::LightServer::Instance()->GetSpotLightAtIndex(0).position.x() + a, 2.3f, 3.0f, 1.0f);
         //Render::LightServer::Instance()->Update();
+
+		if (renderGeoProxies)
+		{
+			BaseGameFeature::EnvManager::Instance()->RenderGeometryProxies();
+		}
 
 		if (this->hit.object != nullptr)
 		{
