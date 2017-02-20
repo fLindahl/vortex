@@ -83,7 +83,7 @@ namespace Edit
             this->entity->SetTransform(Math::mat4::translation(position));
 
             /// Default values ///
-            Render::LightServer::Instance()->CreateSpotLight(Math::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+            Render::LightServer::Instance()->CreateSpotLight(Math::vec4(1.0f, 1.0f, 1.0f, 1.0f),
                                                              this->entity->GetTransform().get_position(),
                                                              Math::vec4(0.0f, -1.0f, 0.0f, 1.0f),
                                                              5.0f,

@@ -48,7 +48,7 @@ void LightServer::CalculateSpotlight(SpotLight& sLight)
 	Math::vec4 m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection, sLight.position));
 	Math::vec4 Q1 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
 	/// Get perpendicular, -direction
-	m = Math::vec4::normalize(Math::vec4::cross3(sLight.coneDirection * -1.0f, sLight.position));
+	m = Math::vec4::normalize(Math::vec4::cross3(-sLight.coneDirection, sLight.position));
 	Math::vec4 Q2 = sLight.position + sLight.coneDirection * sLight.length - m * radius;
 
 	/// Calculate the Mid Point of the Sphere

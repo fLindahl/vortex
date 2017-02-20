@@ -303,8 +303,8 @@ void main()
 	/// Debug Light ///
 	barrier();
 	//float c = float(visiblePointLightCount) / float(visiblePointLightCount);
-	//float c = float(visibleSpotLightCount) / float(visibleSpotLightCount);
-	float c = float(visibleDirectionalLightCount) / float(visibleDirectionalLightCount);
+	float c = float(visibleSpotLightCount) / float(visibleSpotLightCount);
+	//float c = float(visibleDirectionalLightCount) / float(visibleDirectionalLightCount);
 	imageStore(lightImage, location, vec4(c,c,c,1.0f));
 	//imageStore(lightImage, location, vec4(0,0,0,1.0f));
 }
