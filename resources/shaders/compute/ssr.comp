@@ -157,6 +157,7 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	dP *= stride;
 	dQ *= stride;
 	dk *= stride;
+	
 	P0 += dP * jitter;
 	Q0 += dQ * jitter;
 	k0 += dk * jitter;
@@ -190,7 +191,7 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 
 		//This doesn't seem necessary anymore...
 		// || pqk.x * stepDir >= end
-		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0)
+		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0 || pqk.x * stepDir >= end)
 		{
 			break;
 		}
@@ -200,7 +201,7 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 		intersect = (zB >= depth - zThickness) && (zA <= depth);
 	}
 	
-	/*
+	
 	// Binary search refinement
 	if( stride > 1.0 && intersect)
 	{
@@ -231,7 +232,7 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 			stride = (zB <= (-texelFetch(depthMap, ivec2(hitTexCoord), 0).r)) ? -originalStride : originalStride;
 		}
 	}
-	*/
+	
 
 	Q0.xy += dQ.xy * i;
 	Q0.z = pqk.z;
@@ -296,6 +297,7 @@ void main()
 		vec3 worldPosition = (InvView * vec4(rayOrigin, 1.0f)).xyz;
 		vec3 worldDirection = normalize(mat3(InvView) * reflectionDir);
 		GetBlendedAndParallaxCorrectedCubeMapColor(roughness, worldPosition, worldDirection, reflectionColor);
+		//reflectionColor = vec3(1.0f,0.0,0.0);
 	}
 
 	vec4 finalColor = vec4((BGColor.rgb * (1-specularAndRoughness.r)) + (reflectionColor.rgb * specularAndRoughness.r), BGColor.a);

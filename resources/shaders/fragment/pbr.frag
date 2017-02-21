@@ -13,7 +13,7 @@ uniform sampler2D NormalMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D RoughnessMap;
 
-const float metallic = 0.0f;
+const float metallic = 0.3f;
 #define PI 3.14159265358979323846
 
 struct PointLight

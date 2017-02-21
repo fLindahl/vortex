@@ -179,7 +179,7 @@ namespace Toolkit
 
 		if (ImGui::MenuItem("Save to sponza.xml")) 
 		{
-			BaseGameFeature::SceneManager::Instance()->SaveXMLScene("resources/scenes/sponza2.xml");
+			BaseGameFeature::SceneManager::Instance()->SaveXMLScene("resources/scenes/sponza.xml");
 		}
 		ImGui::Separator();
 
