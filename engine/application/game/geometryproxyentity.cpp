@@ -4,6 +4,7 @@
 #include "render/resources/modelinstance.h"
 #include "render/debugrender/debugrenderer.h"
 #include "application/basegamefeature/managers/envmanager.h"
+#include "render/resources/geometryproxy.h"
 
 namespace Game
 {

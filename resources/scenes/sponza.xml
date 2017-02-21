@@ -1,0 +1,8 @@
+<Vortex>
+    <GeometryProxy x="0" y="0" z="0" scalex="5" scaley="2" scalez="3">
+        <EnvironmentProbe x="2" y="1" z="0" innerScale="1" outerScale="4"/>
+        <EnvironmentProbe x="4" y="2" z="0.4" innerScale="1" outerScale="1.5"/>
+        <EnvironmentProbe x="2" y="2" z="0.6" innerScale="1" outerScale="2"/>
+        <EnvironmentProbe x="4" y="1" z="1" innerScale="1" outerScale="3"/>
+    </GeometryProxy>
+</Vortex>

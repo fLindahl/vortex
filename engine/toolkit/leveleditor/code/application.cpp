@@ -88,6 +88,9 @@ Application::Open()
 		sTransform.translate(Math::vector(0.0f, -2.0f, 0.0f));
 		this->sponza->SetTransform(sTransform);
 
+		//LOAD XML file
+		BaseGameFeature::SceneManager::Instance()->LoadXMLScene("resources/scenes/sponza.xml");
+
 		//spawn in a cube somewhere
 		//this->wall1 = std::make_shared<Game::StaticEntity>();
 		//this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
