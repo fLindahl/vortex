@@ -1,4 +1,30 @@
 <Vortex>
+    <GeometryProxy x="-10.761642" y="-0.17104656" z="-0.039926142" scalex="4.5560002" scaley="3.7" scalez="12.102">
+        <EnvironmentProbe x="-11.267967" y="-1.2963042" z="-4.368588" innerScale="0.5" outerScale="3.1560001"/>
+        <EnvironmentProbe x="-10.877868" y="-0.5861966" z="-0.036447268" innerScale="0.5" outerScale="2.9790001"/>
+        <EnvironmentProbe x="-11.220358" y="-1.4041388" z="4.1564312" innerScale="0.5" outerScale="3.9190001"/>
+    </GeometryProxy>
+    <GeometryProxy x="0.6343624" y="-0.1713727" z="4.2751837" scalex="27.299999" scaley="3.7" scalez="3.5999999">
+        <EnvironmentProbe x="10.599654" y="-0.43287751" z="4.1117911" innerScale="0.5" outerScale="3.1560001"/>
+        <EnvironmentProbe x="8.0639896" y="-0.44497094" z="4.2383165" innerScale="0.5" outerScale="3.1560001"/>
+        <EnvironmentProbe x="4.1863289" y="-0.47517121" z="4.2562008" innerScale="0.5" outerScale="2.4760001"/>
+        <EnvironmentProbe x="0.65038103" y="-0.56366485" z="4.4005246" innerScale="0.5" outerScale="2.4760001"/>
+        <EnvironmentProbe x="-2.7057743" y="-0.64765877" z="4.5375109" innerScale="0.5" outerScale="2.4760001"/>
+        <EnvironmentProbe x="-6.4936786" y="-0.74215192" z="4.3918705" innerScale="0.5" outerScale="2.4760001"/>
+        <EnvironmentProbe x="-10.158695" y="-0.68486893" z="4.3012547" innerScale="0.5" outerScale="3.1560001"/>
+    </GeometryProxy>
+    <GeometryProxy x="0.63025242" y="4.6669531" z="0.074204817" scalex="18.449001" scaley="13.375001" scalez="4.8840003">
+        <EnvironmentProbe x="8.7641468" y="-0.2179708" z="0.054747552" innerScale="0.5" outerScale="3.1390002"/>
+        <EnvironmentProbe x="4.4061832" y="-0.17535166" z="0.070985049" innerScale="0.5" outerScale="2.5660002"/>
+        <EnvironmentProbe x="0.73214871" y="-0.20923229" z="-0.095121592" innerScale="0.5" outerScale="2.7240002"/>
+        <EnvironmentProbe x="-3.0454659" y="-0.27134165" z="0.073665574" innerScale="0.5" outerScale="2.8050001"/>
+        <EnvironmentProbe x="-6.7831659" y="-0.37155768" z="-0.0021571219" innerScale="0.5" outerScale="2.6390002"/>
+    </GeometryProxy>
+    <GeometryProxy x="12.057897" y="-0.10869634" z="0.00088623166" scalex="4.4830003" scaley="3.8320003" scalez="12.156">
+        <EnvironmentProbe x="11.140993" y="-0.22242063" z="0.043840364" innerScale="0.5" outerScale="4.1570001"/>
+        <EnvironmentProbe x="11.885821" y="0.24048877" z="4.6033649" innerScale="0.5" outerScale="4.0580001"/>
+        <EnvironmentProbe x="11.757522" y="0.24048901" z="-4.2757096" innerScale="0.5" outerScale="3.6770003"/>
+    </GeometryProxy>
     <GeometryProxy x="0.63494247" y="-0.12389734" z="-4.2449551" scalex="27.299999" scaley="3.7650001" scalez="3.6340001">
         <EnvironmentProbe x="8.15347" y="-0.30545312" z="-4.3982682" innerScale="0.5" outerScale="2.3380001"/>
         <EnvironmentProbe x="4.3756948" y="-1.011848" z="-4.1544623" innerScale="0.5" outerScale="2.6450002"/>
@@ -6,17 +32,6 @@
         <EnvironmentProbe x="-3.1831415" y="-0.68198162" z="-4.2858915" innerScale="0.5" outerScale="2.4890001"/>
         <EnvironmentProbe x="-6.7824221" y="-0.60601377" z="-4.3579035" innerScale="0.5" outerScale="2.4130001"/>
         <EnvironmentProbe x="11.708955" y="-0.55534315" z="-4.2472315" innerScale="0.5" outerScale="6.8720002"/>
-    </GeometryProxy>
-    <GeometryProxy x="12.057897" y="-0.10869634" z="0.00088623166" scalex="4.4830003" scaley="3.8320003" scalez="12.156">
-        <EnvironmentProbe x="11.140993" y="-0.22242063" z="0.043840364" innerScale="0.5" outerScale="4.1570001"/>
-        <EnvironmentProbe x="11.885821" y="0.24048877" z="4.6033649" innerScale="0.5" outerScale="4.0580001"/>
-        <EnvironmentProbe x="11.757522" y="0.24048901" z="-4.2757096" innerScale="0.5" outerScale="3.6770003"/>
-    </GeometryProxy>
-    <GeometryProxy x="0.63025242" y="4.6669531" z="0.074204817" scalex="18.449001" scaley="13.375001" scalez="4.8840003">
-        <EnvironmentProbe x="8.7641468" y="-0.2179708" z="0.054747552" innerScale="0.5" outerScale="3.1390002"/>
-        <EnvironmentProbe x="4.4061832" y="-0.17535166" z="0.070985049" innerScale="0.5" outerScale="2.5660002"/>
-        <EnvironmentProbe x="0.73214871" y="-0.20923229" z="-0.095121592" innerScale="0.5" outerScale="2.7240002"/>
-        <EnvironmentProbe x="-3.0454659" y="-0.27134165" z="0.073665574" innerScale="0.5" outerScale="2.8050001"/>
-        <EnvironmentProbe x="-6.7831659" y="-0.37155768" z="-0.0021571219" innerScale="0.5" outerScale="2.8870001"/>
+        <EnvironmentProbe x="-11.253786" y="0.14034975" z="-4.4628382" innerScale="0.5" outerScale="2.9790001"/>
     </GeometryProxy>
 </Vortex>
