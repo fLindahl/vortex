@@ -141,6 +141,7 @@ bool SceneManager::SaveXMLScene(const char* filename)
 	tinyxml2::XMLError eResult = data.SaveFile(filename);
 	assert(!eResult);
 
+	return true;
 }
 
 }

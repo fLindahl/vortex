@@ -89,7 +89,7 @@ Application::Open()
 		this->sponza->SetTransform(sTransform);
 
 		//LOAD XML file
-		BaseGameFeature::SceneManager::Instance()->LoadXMLScene("resources/scenes/sponza.xml");
+		//BaseGameFeature::SceneManager::Instance()->LoadXMLScene("resources/scenes/sponza.xml");
 
 		//spawn in a cube somewhere
 		//this->wall1 = std::make_shared<Game::StaticEntity>();

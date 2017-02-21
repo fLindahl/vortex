@@ -1,8 +1,22 @@
 <Vortex>
-    <GeometryProxy x="0" y="0" z="0" scalex="5" scaley="2" scalez="3">
-        <EnvironmentProbe x="2" y="1" z="0" innerScale="1" outerScale="4"/>
-        <EnvironmentProbe x="4" y="2" z="0.4" innerScale="1" outerScale="1.5"/>
-        <EnvironmentProbe x="2" y="2" z="0.6" innerScale="1" outerScale="2"/>
-        <EnvironmentProbe x="4" y="1" z="1" innerScale="1" outerScale="3"/>
+    <GeometryProxy x="0.63494247" y="-0.12389734" z="-4.2449551" scalex="27.299999" scaley="3.7650001" scalez="3.6340001">
+        <EnvironmentProbe x="8.15347" y="-0.30545312" z="-4.3982682" innerScale="0.5" outerScale="2.3380001"/>
+        <EnvironmentProbe x="4.3756948" y="-1.011848" z="-4.1544623" innerScale="0.5" outerScale="2.6450002"/>
+        <EnvironmentProbe x="0.59611845" y="-0.79129672" z="-4.2111783" innerScale="0.5" outerScale="2.1920002"/>
+        <EnvironmentProbe x="-3.1831415" y="-0.68198162" z="-4.2858915" innerScale="0.5" outerScale="2.4890001"/>
+        <EnvironmentProbe x="-6.7824221" y="-0.60601377" z="-4.3579035" innerScale="0.5" outerScale="2.4130001"/>
+        <EnvironmentProbe x="11.708955" y="-0.55534315" z="-4.2472315" innerScale="0.5" outerScale="6.8720002"/>
+    </GeometryProxy>
+    <GeometryProxy x="12.057897" y="-0.10869634" z="0.00088623166" scalex="4.4830003" scaley="3.8320003" scalez="12.156">
+        <EnvironmentProbe x="11.140993" y="-0.22242063" z="0.043840364" innerScale="0.5" outerScale="4.1570001"/>
+        <EnvironmentProbe x="11.885821" y="0.24048877" z="4.6033649" innerScale="0.5" outerScale="4.0580001"/>
+        <EnvironmentProbe x="11.757522" y="0.24048901" z="-4.2757096" innerScale="0.5" outerScale="3.6770003"/>
+    </GeometryProxy>
+    <GeometryProxy x="0.63025242" y="4.6669531" z="0.074204817" scalex="18.449001" scaley="13.375001" scalez="4.8840003">
+        <EnvironmentProbe x="8.7641468" y="-0.2179708" z="0.054747552" innerScale="0.5" outerScale="3.1390002"/>
+        <EnvironmentProbe x="4.4061832" y="-0.17535166" z="0.070985049" innerScale="0.5" outerScale="2.5660002"/>
+        <EnvironmentProbe x="0.73214871" y="-0.20923229" z="-0.095121592" innerScale="0.5" outerScale="2.7240002"/>
+        <EnvironmentProbe x="-3.0454659" y="-0.27134165" z="0.073665574" innerScale="0.5" outerScale="2.8050001"/>
+        <EnvironmentProbe x="-6.7831659" y="-0.37155768" z="-0.0021571219" innerScale="0.5" outerScale="2.8870001"/>
     </GeometryProxy>
 </Vortex>
