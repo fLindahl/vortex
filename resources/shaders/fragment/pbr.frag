@@ -316,8 +316,8 @@ void main()
 	fragColor.rgb = color.rgb;
 	fragColor.a = albedo.a;
 	normalColor = N;
-	//Specular term based on fresnel. This is for IBL and works ok for reflections
-	specularAndRoughness.rgb = fresnelSchlick(max(dot(N, V), 0.0), F0, roughness);;
+	//Specular term based on fresnel. This is for IBL and works for our reflection pass
+	specularAndRoughness.rgb = fresnelSchlick(max(dot(N, V), 0.0), F0, roughness);
 	specularAndRoughness.a = roughness;
 
 }

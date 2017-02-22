@@ -528,9 +528,9 @@ namespace Toolkit
 				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
 				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
 
-				const char* items[] = { "HIGH", "MEDIUM", "LOW"};
+				const char* items[] = { "ULTRA", "HIGH", "MEDIUM", "LOW"};
 
-				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
+				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 4);
 			}
 			ImGui::EndDock();
 			

@@ -1,3 +1,7 @@
+#define THREADS_X 32
+#define THREADS_Y 32
+#define PI 3.14159265358979323846
+
 layout(std140, binding = 1) uniform UniformBlock
 {
 	float zThickness; // How thick is each depth fragment? higher value yields some wierd smudging at edges of reflection, but thinner z means we might miss some geometry. This should essentially be the average thickness of the geometry. to do dynamically would be a nightmare however...
@@ -9,91 +13,63 @@ layout(std140, binding = 1) uniform UniformBlock
 	float padding; // Just padding. Might not be needed because std140
 };
 
-#define THREADS_X 32
-#define THREADS_Y 32
+uniform ivec2 RayCastSize;
+uniform float bias;
 
-// All the samplers we need!
 uniform sampler2D depthMap;
 uniform sampler2D normalMap;
 uniform sampler2D specularMap;
 uniform sampler2D colorMap;
 
-layout (rgba32f) uniform writeonly image2D reflectionImage;
+uniform sampler2D noiseMap;
 
-//We can have a maximum of 8 cubemaps blended simultaneously
-uniform samplerCube Cubemaps[8];
+layout (rgba32f) uniform writeonly image2D rays;
 
-struct CubemapData
-{
-	mat4 geometryproxy;
-	vec4 cubeMapPosition;
-	float blendfactor;
-};
-
-uniform uint numCubemaps;
-
-layout(std140, binding = 10) uniform CubeMapBlock
-{
-	//how many cubemaps we are currently blending between
-	CubemapData cubemapData[8];
-};
-
-// Shared values between all the threads in a group
-//shared DepthSamples
-
-
-void GetBlendedCubeMapColor(in vec3 reflectionDir, out vec3 reflectionColor)
-{
-	vec3 worldDirection = (mat3(InvView) * reflectionDir);
-	vec3 cubeColor = vec3(0.0f,0.0f,0.0f);
-
-	for(int i = 0; i < numCubemaps; ++i)
-	{
-		cubeColor += texture(Cubemaps[i], worldDirection).rgb * cubemapData[i].blendfactor;
-	}
-
-	reflectionColor = cubeColor;
-}
-
-
-void GetBlendedAndParallaxCorrectedCubeMapColor(in float roughness, in vec3 rayPosition, in vec3 reflectionDir, out vec3 reflectionColor)
-{
-	vec3 cubeColor = vec3(0.0f,0.0f,0.0f);
-
-	for(int i = 0; i < numCubemaps; ++i)
-	{
-		// Intersection with OBB
-		// convert to unit box space
-		// Transform in local unit parallax cube space (scaled and rotated)
-		// Why multiply by 2? Magic.
-		vec3 RayLS = (mat3(inverse(cubemapData[i].geometryproxy)) * reflectionDir) * 2.0f;
-		vec3 PositionLS = (inverse(cubemapData[i].geometryproxy) * vec4(rayPosition, 1.0f)).xyz * 2.0f;
-
-		vec3 Unitary = vec3(1.0f,1.0f,1.0f);
-		vec3 FirstPlaneIntersect = (Unitary - PositionLS) / RayLS;
-		vec3 SecondPlaneIntersect = (-Unitary - PositionLS) / RayLS;
-		vec3 FurthestPlane = max(FirstPlaneIntersect, SecondPlaneIntersect);
-		float Distance = min(FurthestPlane.x, min(FurthestPlane.y, FurthestPlane.z));
-
-		// Use Distance in WS directly to recover intersection
-		vec3 IntersectPositionWS = rayPosition + reflectionDir * Distance;
-		vec3 newWorldDirection = IntersectPositionWS - cubemapData[i].cubeMapPosition.xyz;
-
-		float mipLevel = floor((1 - roughness) * 6);
-
-		cubeColor += textureLod(Cubemaps[i], newWorldDirection, mipLevel).rgb * cubemapData[i].blendfactor;
-	}
-
-	reflectionColor = cubeColor;
-}
-
-
+//**--------------------------------------------
+/* Distance Squared
+*/
 float distanceSquared(vec2 a, vec2 b)
 {
 	a -= b;
 	return dot(a, a);
 }
 
+//**--------------------------------------------
+/* Importance-Sample GGX
+Xi is a tangentspace sample
+out PDF is set to the probability distribution function
+*/
+vec3 ImportanceSampleGGX(out float PDF, in vec2 Xi, in float roughness, in vec3 N)
+{
+	//Disney roughness
+	float a = roughness * roughness;
+	float a2 = a*a;
+
+	float phi = 2 * PI * Xi.x;
+	float cosTheta = sqrt((1.0f - Xi.y) / (1.0f + (a2 - 1.0f) * Xi.y));
+	float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
+
+	vec3 H;
+	H.x = sinTheta * cos(phi);
+	H.y = sinTheta * sin(phi);
+	H.z = cosTheta;
+
+	//Probability Distribution Function
+	float d = (cosTheta * a2 - cosTheta) * cosTheta + 1.0f;
+	float D = a2 / (PI * d * d);
+	PDF = D * cosTheta;
+
+	// Tangent to worldspace adjustment
+	vec3 upvec = abs(N.z) < 0.999f ? vec3(0.0f,0.0f,1.0f) : vec3(1.0f,0.0f,0.0f);
+	vec3 tangentX = normalize(cross(upvec, N));
+	vec3 tangentY = cross(N, tangentX);
+
+	return tangentX * H.x + tangentY * H.y + N * H.z;
+}
+
+//**--------------------------------------------
+/* Trace Screen Space Ray
+*/
 bool TraceScreenSpaceRay(in vec3 rayOrigin,
 						 in vec3 rayDirection,
 						 out vec2 hitTexCoord,
@@ -157,16 +133,13 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	dP *= stride;
 	dQ *= stride;
 	dk *= stride;
-
-	float fraction = 100/(gl_GlobalInvocationID.x * gl_LocalInvocationID.x * gl_GlobalInvocationID.y * gl_LocalInvocationID.y);
-
 	P0 += dP * jitter;
 	Q0 += dQ * jitter;
 	k0 += dk * jitter;
 
 	float i;
-	float zA = rayOrigin.z;
-	float zB = rayOrigin.z;
+	float zA = 0.0;
+	float zB = 0.0;
 
 	// Track ray step and derivatives in a float4 to parallelize
 	vec4 pqk = vec4( P0, Q0.z, k0);
@@ -175,7 +148,7 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 
 	float end = P1.x * stepDir;
 
-	for(i = 0.0f; i < maxSteps && intersect == false; i += 1.0f)
+	for(i = 0; i < maxSteps && intersect == false; i++)
 	{
 		pqk += dPQK;
 
@@ -193,7 +166,7 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 
 		//This doesn't seem necessary anymore...
 		// || pqk.x * stepDir >= end
-		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0 || pqk.x * stepDir >= end)
+		if(hitTexCoord.x > ScreenSize.x || hitTexCoord.y > ScreenSize.y || hitTexCoord.x < 0 || hitTexCoord.y < 0)
 		{
 			break;
 		}
@@ -203,60 +176,26 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 		intersect = (zB >= depth - zThickness) && (zA <= depth);
 	}
 
-
-	// Binary search refinement
-	if( stride > 1.0 && intersect)
-	{
-		pqk -= dPQK;
-		dPQK /= stride;
-
-		float originalStride = stride * 0.5;
-		float stride = originalStride;
-		zA = pqk.z / pqk.w;
-		zB = zA;
-		float j;
-		for(j=0; j< 64.0f; j++)
-		{
-			pqk += dPQK * stride;
-			zA = zB;
-			zB = (dPQK.z * -0.5 + pqk.z) / (dPQK.w * -0.5 + pqk.w);
-			if (zB > zA)
-			{
-				//Swap
-				float t = zA;
-				zA = zB;
-				zB = t;
-			}
-
-			hitTexCoord = permute ? pqk.yx : pqk.xy;
-
-			originalStride *= 0.5;
-			stride = (zB <= (-texelFetch(depthMap, ivec2(hitTexCoord), 0).r)) ? -originalStride : originalStride;
-		}
-	}
-
-
 	Q0.xy += dQ.xy * i;
 	Q0.z = pqk.z;
 	hitPoint = Q0 / pqk.w;
-	//iterationCount = i;
 
 	return intersect;
 }
+
 
 layout(local_size_x = THREADS_X, local_size_y = THREADS_Y, local_size_z = 1) in;
 void main()
 {
 	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
 
-	//Per pixel on depthbuffer
-
-	vec2 TexCoord = vec2(location) / ScreenSize;
-	//First of all we need to generate a reflection vector that we can raytrace
+	vec2 TexCoord = vec2(location) / RayCastSize;
+	
+	vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
+	float roughness = specularAndRoughness.w;
 
 	//Get normal from normal map. This only needs to be done once per pixel
 	vec3 worldNormal = (texelFetch(normalMap, location, 0).rgb);
-
 	//We need the normal to be in viewspace coordinates.
 	vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
 
@@ -274,37 +213,43 @@ void main()
 
 	vec3 viewDir = (rayOrigin.xyz);
 
-	//Reflect vector against normal
-	vec3 reflectionDir = (reflect(viewDir, viewSpaceNormal));
+	vec2 noiseJitter = texture(noiseMap, TexCoord).xy;
 
-	vec2 hitTexCoord = vec2(0.0,0.0);
-	vec3 hitPoint = vec3(0.0,0.0,0.0);
+	//our distribution sample
+	vec2 Xi = noiseJitter;
+	//lerp with bias
+	Xi.y = mix(Xi.y, 0.0, bias);
 
-	vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
-	float roughness = specularAndRoughness.w;
-	vec4 BGColor = texelFetch(colorMap, location, 0).rgba;
+	//This is set by the importance sampling function
+	float pdf;
+	
+	vec3 H = ImportanceSampleGGX(pdf, Xi, roughness, viewSpaceNormal);	
 
-	vec3 reflectionColor;
+	//Reflect vector against H
+	vec3 reflectionDir = (reflect(viewDir, H));
 
-
+	//raymarch and find a collision point
+	//TODO: Use either hierical Z stepping, cheap raymarching or the efficient DDA algorithm described in "Efficient GPU Raytracing"
+	vec4 outray;
+	vec2 hitTexCoord;
+	vec3 hitPoint;
 	if (TraceScreenSpaceRay(rayOrigin.xyz, reflectionDir, hitTexCoord, hitPoint))
 	{
-		reflectionColor = texelFetch(colorMap, ivec2(hitTexCoord), 0).rgb;
+		outray.xy = hitPoint.xy; //screen space UV hit
+		outray.z = hitPoint.z; //hit depth
+		outray.w = pdf;
 	}
 	else
 	{
-		//Get fall-back value.
-		//GetBlendedCubeMapColor(reflectionDir, reflectionColor);
-
-		vec3 worldPosition = (InvView * vec4(rayOrigin, 1.0f)).xyz;
-		vec3 worldDirection = normalize(mat3(InvView) * reflectionDir);
-		GetBlendedAndParallaxCorrectedCubeMapColor(roughness, worldPosition, worldDirection, reflectionColor);
-		//reflectionColor = vec3(1.0f,0.0,0.0);
+		//No hit was found.
+		//We set the outray to reflectionDir
+		outray.xyz = reflectionDir.xyz;
+		//We need some way of telling the resolve pass that this is not a true hit.
+		//We do this by setting the PDF to a negative value. This is later interpreted as a boolean value: (pdf < 0 ? 0 : 1)
+		outray.w = -pdf;
 	}
 
-	vec4 finalColor = vec4((BGColor.rgb * (1-specularAndRoughness.r)) + (reflectionColor.rgb * specularAndRoughness.r), BGColor.a);
-	//vec4 finalColor = vec4(reflectionColor, 1.0f);
-	imageStore(reflectionImage, location, finalColor);
-
+	imageStore(rays, location, outray);
+	
 	groupMemoryBarrier();
 }
