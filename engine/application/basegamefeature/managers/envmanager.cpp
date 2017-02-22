@@ -1,7 +1,7 @@
 #include "config.h"
 #include "envmanager.h"
-#include "render/server/renderdevice.h"
 #include "render/debugrender/debugrenderer.h"
+#include "render/resources/geometryproxy.h"
 
 namespace BaseGameFeature
 {

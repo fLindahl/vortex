@@ -19,17 +19,17 @@ namespace Render
 		void Setup();
 		void Execute();
 
+        void GenerateShadowMap();
 		void UpdateResolution();
 
 
 		GLuint& GetShadowMap() { return this->shadowmap; }
 	private:
 		//Uniform Buffer Object
-		GLuint ubo[1];
 		GLuint shadowmap;
-		GLuint shadowmapFBO;
-		GLuint shadowmapprogram;
 		GLuint sendtothisshaderprogram;
+
+		GLuint shadowAtlas;
 
 		struct  shadowUniformBuffer
 		{
@@ -40,6 +40,7 @@ namespace Render
 	    GLuint shadowMapProgram;
 
 		GLfloat shadowWidth, shadowHeight;
+		GLfloat shadowAtlasWidth, shadowAtlasHeight;
 		/// Aspect ratio of the shadow map texture
 		GLfloat shadowAspect;
 		GLfloat shadowNearPlane;

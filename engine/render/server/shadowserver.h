@@ -35,5 +35,6 @@ namespace Render
 		Util::Array<Game::ModelEntitySpotLight*>& GetSpotLightEntities();
 	private:
 		Util::Array<Game::ModelEntitySpotLight*> spotLightEntities;
+        GLuint spotLighEntetiesSize;
 	};
 }

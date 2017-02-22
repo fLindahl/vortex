@@ -2,18 +2,20 @@
 #include "lightserver.h"
 #include "renderdevice.h"
 #include "render/resources/cubemapnode.h"
-#include "foundation/math/math.h"
 
 namespace Render
 {
 
-	LightServer::LightServer() : pointLightBuffer(0), spotLightBuffer(0), visiblePointLightIndicesBuffer(0), visibleSpotLightIndicesBuffer(0), workGroupsX(0), workGroupsY(0), tileLights(512)
+	LightServer::LightServer() : pointLightBuffer(0), spotLightBuffer(0), directionalLightBuffer(0), visiblePointLightIndicesBuffer(0), visibleSpotLightIndicesBuffer(0), workGroupsX(0), workGroupsY(0), tileLights(512)
 	{
 		// Generate our shader storage buffers
 		glGenBuffers(1, &pointLightBuffer);
 		glGenBuffers(1, &spotLightBuffer);
+        glGenBuffers(1, &directionalLightBuffer);
 		glGenBuffers(1, &visiblePointLightIndicesBuffer);
 		glGenBuffers(1, &visibleSpotLightIndicesBuffer);
+
+        this->directionalLight.direction.w() = 1.0f;
 	}
 
 	void LightServer::AddPointLight(const PointLight& pLight)
@@ -49,8 +51,6 @@ namespace Render
 		/// Get perpendicular direction
 		Math::vector m = Math::vec4::normalize(Math::vector::orthogonal(direction)) * radius;
 		Math::vec4 Q1 = endPoint - m;
-		/// Get perpendicular, -direction
-		//m = Math::vec4::normalize(Math::vec4::cross3(direction * -1.0f, position));
 		Math::vec4 Q2 = endPoint + m;
 
 		/// Calculate the Mid Point of the Sphere
@@ -102,18 +102,18 @@ namespace Render
 	void LightServer::UpdateWorkGroups()
 	{
 		// Define work group sizes in x and y direction based off screen size and tile size (in pixels)
-		workGroupsX = (GLuint)(RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % 16)) / 16;
-		workGroupsY = (GLuint)(RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % 16)) / 16;
+        this->workGroupsX = (GLuint)(RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % 16)) / 16;
+        this->workGroupsY = (GLuint)(RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % 16)) / 16;
 
-		size_t numberOfTiles = workGroupsX * workGroupsY;
+		size_t numberOfTiles = this->workGroupsX * this->workGroupsY;
 
 		// Bind visible Point light indices buffer
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, visiblePointLightIndicesBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * tileLights, 0, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->visiblePointLightIndicesBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * this->tileLights, 0, GL_STATIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, visibleSpotLightIndicesBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * tileLights, 0, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->visibleSpotLightIndicesBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(VisibleIndex) * this->tileLights, 0, GL_STATIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
@@ -123,7 +123,7 @@ namespace Render
 		size_t numPointLights = this->pointLights.Size();
 
 		// Bind light buffer
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->pointLightBuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, numPointLights * sizeof(PointLight), &this->pointLights[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
@@ -134,10 +134,17 @@ namespace Render
 		size_t numSpotLights = this->spotLights.Size();
 
 		// Bind light buffer
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->spotLightBuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, numSpotLights * sizeof(SpotLight), &this->spotLights[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
+
+    void LightServer::UpdateDirectionalLightBuffer()
+    {
+        glBindBuffer(GL_UNIFORM_BUFFER, this->directionalLightBuffer);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(DirectionalLight), &directionalLight, GL_STATIC_DRAW);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
 
 	LightServer::SpotLight& LightServer::CreateSpotLight(Math::point color,
 		Math::point position,
@@ -146,18 +153,19 @@ namespace Render
 		float angle)
 	{
 		SpotLight sLight = CalculateSpotlight(color, position, direction, length, angle);
-		/*
-		SpotLight sLight = SpotLight();
-		sLight.color = color;
-		sLight.position = position;
-		sLight.coneDirection = direction;
-		sLight.length = length;
-		sLight.angle = angle;
-		*/
 		this->AddSpotLight(sLight);
 
 		return this->spotLights[this->spotLights.Size() - 1];
 	}
+
+    void LightServer::AddDirectionalLight(Math::vec4 color, Math::vec4 direction)
+    {
+        this->directionalLight.color = color;
+        this->directionalLight.direction = direction;
+        this->directionalLight.direction.w() = 0.0f;
+
+        this->UpdateDirectionalLightBuffer();
+    }
 
 	void LightServer::RemoveSpotLight(SpotLight* light)
 	{
@@ -284,5 +292,4 @@ namespace Render
 			this->selectedInfluenceVolumes[0]->blendFactor = 1.0f;
 		}
 	}
-
 }

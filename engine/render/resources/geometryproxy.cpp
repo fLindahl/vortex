@@ -1,20 +1,22 @@
 #include "config.h"
 #include "geometryproxy.h"
-#include "application/basegamefeature/managers/envmanager.h"
+//#include "application/basegamefeature/managers/envmanager.h"
 
 namespace Render
 {
 
 GeometryProxy::GeometryProxy() :
-		isActive(false)
+		isActive(false),
+		transform(Math::mat4::identity())
 {
-	transform = Math::mat4::identity();
+	//transform = Math::mat4::identity();
 }
 
 GeometryProxy::GeometryProxy(Math::mat4 transform) :
-	isActive(false)
+	isActive(false),
+	transform(transform)
 {
-	this->transform = transform;
+	//this->transform = transform;
 }
 
 
@@ -38,7 +40,5 @@ void GeometryProxy::Deactivate()
 		this->isActive = false;
 	}
 }
-
-
 
 }

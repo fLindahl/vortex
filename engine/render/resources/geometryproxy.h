@@ -7,9 +7,9 @@ ex. Parallax corrected cubemaps use these proxies to find an approximative inter
 ---------------*/
 
 #pragma once
-#include "GL/glew.h"
-#include <memory>
-#include "shaderobject.h"
+//#include "GL/glew.h"
+//#include <memory>
+//#include "shaderobject.h"
 #include "render/server/renderdevice.h"
 
 namespace Render
