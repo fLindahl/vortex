@@ -124,13 +124,13 @@ Application::Open()
 
 
 		billboard = std::make_shared<Game::ParticleEntity>();
-		billboard->SetTransform(Math::mat4::translation(11.18f, -1.0f, 4.02f));	
+		billboard->SetTransform(Math::mat4::translation(11.18f, -0.9f, 4.02f));	
 		billboard->LoadEmitters("resources/particles/Fire.particle");
 		//billboard->GetEmitter()->CreateEmitter(1000, "resources/textures/particles/sprite_rapids2.tga");
 		billboard->Activate();
 
 		billboard2 = std::make_shared<Game::ParticleEntity>();
-		billboard2->SetTransform(Math::mat4::translation(0.0f, 5.5f, 0.0f));
+		billboard2->SetTransform(Math::mat4::multiply(Math::mat4::rotationyawpitchroll(0.0f, 0.0f, -45.0f),Math::mat4::translation(0.0f, 5.5f, 0.0f)));
 		billboard2->Activate();
 		billboard2->GetEmitters()[0]->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");		
 		
