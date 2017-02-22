@@ -1,0 +1,168 @@
+#define THREADS_X 32
+#define THREADS_Y 32
+#define PI 3.14159265358979323846
+
+uniform ivec2 ResolveSize;
+uniform float bias;
+
+uniform sampler2D depthMap;
+uniform sampler2D normalMap;
+uniform sampler2D specularMap;
+uniform sampler2D colorMap;
+
+uniform sampler2D noiseMap;
+
+uniform sampler2D rayMap;
+
+//Constants
+const vec2 offset[4] =
+{
+	vec2(0, 0),
+	vec2(2, -2),
+	vec2(-2, -2),
+	vec2(0, 2)
+};
+//const float weights[7] = {0.001f, 0.028f, 0.233f, 0.474f, 0.233f, 0.028f, 0.001f};
+
+
+layout (rgba32f) uniform writeonly image2D reflectionImage;
+
+//We use GGX for our normal distribution function (NDF)
+//This approximates the ratio of microfacets aligned to given halfway vector H
+float NormalDistributionGGX(in vec3 N, in vec3 H, in float roughness)
+{
+	float a = pow(roughness, 4);
+	
+	float NdotH = max(dot(N, H), 0.0f);
+	NdotH = NdotH * NdotH;
+	
+	float denom = (NdotH * (a - 1.0f) + 1.0f);
+	denom = PI * denom * denom;
+	
+	return (a / denom);
+}
+
+//We use Smith with Schlick-GGX for our geometry function
+//This statistically approximates the ratio of microfacets that overshadow each other
+//TODO: These two functions can be optimized
+float GeometrySchlickGGX(in float NdotV, in float roughness)
+{
+	//Optimization: Moved to GeometrySmith, so that we don't calculate it twice
+	//float r = roughness + 1.0f;
+	//float k = (r*r) * 0.125f; // (r^2 / 8)
+	float k = roughness;
+	
+	float denom = NdotV * (1.0f - k) + k;
+	return NdotV / denom;
+}
+
+float GeometrySmith(in float NdotV, in float NdotL, in float roughness)
+{	
+	//Optimization: Moved here from GeometrySchlickGGX so that we don't calculate it twice
+	float r = roughness + 1.0f;
+	float k = (r*r) * 0.125f; // (r^2 / 8)
+	
+	float ggxNV = GeometrySchlickGGX(NdotV, k);
+	float ggxNL = GeometrySchlickGGX(NdotL, k);
+	
+	return ggxNV * ggxNL;
+}
+
+// TEMPORARY: We have already calculated this. We should be able to just pass it from the PBR shader
+float localbrdf(in vec3 V, in vec3 L, in vec3 N, in float roughness)
+{
+	vec3 H = normalize(L + V);
+	
+	float NdotL = max(dot(L, N), 0.0f);
+	float NdotV = max(dot(V, N), 0.0f);
+	
+	float NDF = NormalDistributionGGX(N, H, roughness);
+	float G = GeometrySmith(NdotV, NdotL, roughness);
+
+	return NDF * G;	
+}
+
+layout(local_size_x = THREADS_X, local_size_y = THREADS_Y, local_size_z = 1) in;
+void main()
+{
+	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
+
+	vec2 TexCoord = vec2(location) / ScreenSize;
+	
+	vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
+	float roughness = specularAndRoughness.w;
+
+	//Get normal from normal map. This only needs to be done once per pixel
+	vec3 worldNormal = (texelFetch(normalMap, location, 0).rgb);
+	//We need the normal to be in viewspace coordinates.
+	vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
+
+	float pixelDepth = texelFetch(depthMap, location, 0).r;
+
+	//Calculate world pos
+	vec4 clipSpaceLocation;
+	clipSpaceLocation.xy = TexCoord * 2.0f - 1.0f;
+	clipSpaceLocation.z = 1.0f;
+	clipSpaceLocation.w = 1.0f;
+	vec4 homogenousLocation = InvProjection * clipSpaceLocation;
+
+	vec3 viewPos = homogenousLocation.xyz * pixelDepth;
+	vec3 viewDir = normalize(viewPos);
+
+	float NdotV = (dot(worldNormal, -viewDir));
+	float coneTangent = mix(0.0, roughness * (1.0 - bias), pow(NdotV, 1.5) * sqrt(roughness));
+	
+	const float maxMipLevel = 6.0f;
+
+	//Noise
+	vec2 blueNoise = texture(noiseMap, TexCoord).rg * 2.0 - 1.0; // works better with [-1, 1] range
+	mat2x2 offsetRotationMatrix = mat2x2(blueNoise.x, blueNoise.y, -blueNoise.y, blueNoise.x);
+
+	vec3 result = vec3(0.0f);
+	float weightSum = 0.0f;
+
+	// 4 resolves
+	for (int i = 0; i < 4; ++i)
+	{
+		vec2 offsetUV = offset[i] * (1.0 / ScreenSize.xy);
+		offsetUV =  offsetRotationMatrix * offsetUV;
+
+		//UV of neighbor pixel
+		vec2 neighborUv = TexCoord + offsetUV;
+
+		vec4 hitPos = texture(rayMap, neighborUv, 0);
+		float pdf = hitPos.w;
+		hitPos.w = 1.0f;
+
+		bool intersection = (pdf < 0 ? false : true);
+		pdf = abs(pdf);
+
+		if(intersection == false)
+		{
+			//TODO: we should sample cubemap here.
+			continue;
+		}
+
+		float weight = localbrdf(normalize(-viewPos), normalize(hitPos.xyz - viewPos), viewSpaceNormal, roughness) / max(0.00001f, pdf);
+
+		vec4 hitPosClipSpace = Projection * hitPos;
+		vec2 hitUV = ((hitPosClipSpace / hitPosClipSpace.w).xy + 1.0f) / 2.0f;
+
+		float intersectionCircleRadius = coneTangent * length(hitUV - TexCoord);
+		float mip = clamp(log2(intersectionCircleRadius * max(ResolveSize.x, ResolveSize.y)), 0.0, maxMipLevel);
+
+		vec3 reflectionColor = textureLod(colorMap, hitUV, mip).rgb;
+
+		result += reflectionColor * weight;
+		weightSum += weight;
+	}
+	
+	result /= (weightSum != 0 ? weightSum : 1.0f);
+
+	//vec4 BGColor = texelFetch(colorMap, location, 0).rgba;
+	//vec4 finalColor = vec4((BGColor.rgb * (1-specularAndRoughness.r)) + (result.rgb * specularAndRoughness.r), BGColor.a);
+	vec4 finalColor = vec4(result, 1.0f);
+	imageStore(reflectionImage, location, finalColor);
+	
+	groupMemoryBarrier();
+}

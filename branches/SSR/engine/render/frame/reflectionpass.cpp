@@ -11,6 +11,7 @@
 #include "render/resources/cubemapnode.h"
 #include "render/server/lightserver.h"
 #include "foundation/math/math.h"
+#include "render/server/resourceserver.h"
 
 namespace Render
 {
@@ -51,6 +52,8 @@ void ReflectionPass::Setup()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Setup compute shader programs
+	this->SSSRraycastpass = ShaderServer::Instance()->LoadShader("SSSR-Raycast")->GetProgram();
+	this->SSSRresolvepass = ShaderServer::Instance()->LoadShader("SSSR-Resolve")->GetProgram();
 	this->SSRComputeProgram = ShaderServer::Instance()->LoadShader("SSR")->GetProgram();
 	this->CubemapProgram = ShaderServer::Instance()->LoadShader("CubemapsOnly")->GetProgram();
 	this->PCCubemapProgram = ShaderServer::Instance()->LoadShader("ParallaxCorrectedCubemaps")->GetProgram();
@@ -118,6 +121,64 @@ void ReflectionPass::Execute()
 	GLuint currentProgram;
 	switch (quality)
 	{
+	case Render::ReflectionPass::ULTRA:
+	{
+		//Special case pass
+		glUseProgram(this->SSSRraycastpass);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "depthMap"), 4);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "normalMap"), 5);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "specularMap"), 6);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "colorMap"), 7);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "noiseMap"), 8);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer());
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer());
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer());
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer());
+		glActiveTexture(GL_TEXTURE8);
+		GLuint t = ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle();
+		glBindTexture(GL_TEXTURE_2D, ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle());
+
+		Render::Resolution raycastRes = Render::RenderDevice::Instance()->GetRenderResolution();
+		raycastRes.x /= 2;
+		raycastRes.y /= 2;
+
+		glUniform2i(glGetUniformLocation(SSSRraycastpass, "RayCastSize"), raycastRes.x, raycastRes.y);
+		glUniform1f(glGetUniformLocation(SSSRraycastpass, "bias"), 0.7f);
+
+		const GLint location = glGetUniformLocation(SSSRraycastpass, "rays");
+		if (location == -1){
+			printf("Could not locate uniform location for texture in SSRComputeProgram");
+		}
+		glUniform1i(location, 0);
+		glBindImageTexture(0, this->raycastBuffer, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+		// Dispatch the compute shader, using the workgroup values calculated earlier
+		// TODO: This shouldnt be lightserver work groups.
+		int wgx = (raycastRes.x + (raycastRes.x % TILE_SIZE)) / TILE_SIZE;
+		int wgy = (raycastRes.y + (raycastRes.y % TILE_SIZE)) / TILE_SIZE;
+
+		glDispatchCompute(wgx, wgy, 1);
+
+		glUseProgram(this->SSSRresolvepass);
+		currentProgram = this->SSSRresolvepass;
+
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "noiseMap"), 8);
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle());
+
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "rayMap"), 9);
+		glActiveTexture(GL_TEXTURE9);
+		glBindTexture(GL_TEXTURE_2D, this->raycastBuffer);
+
+		glUniform2i(glGetUniformLocation(SSSRraycastpass, "ResolveSize"), raycastRes.x, raycastRes.y);
+		glUniform1f(glGetUniformLocation(SSSRraycastpass, "bias"), 0.7f);
+
+		break;
+	}
 	case Render::ReflectionPass::HIGH:
 		glUseProgram(this->SSRComputeProgram);
 		currentProgram = this->SSRComputeProgram;
