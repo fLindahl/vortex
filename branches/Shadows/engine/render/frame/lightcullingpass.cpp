@@ -35,7 +35,6 @@ void LightCullingPass::Execute()
 
 	uniformBlock.pointLightCount        = (GLint)LightServer::Instance()->GetNumPointLights();
 	uniformBlock.spotLightCount         = (GLint)LightServer::Instance()->GetNumSpotLights();
-	uniformBlock.directionalLightCount  = (GLint)LightServer::Instance()->GetNumDirectionalLights();
     uniformBlock.tileLights             = LightServer::Instance()->GetTileLights();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
@@ -49,11 +48,10 @@ void LightCullingPass::Execute()
 	// Bind shader storage buffer objects for the light and index buffers
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, lightServer->GetPointLightBuffer());
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, lightServer->GetSpotLightBuffer());
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, lightServer->GetDirectionalLightBuffer());
+    glBindBufferBase(GL_UNIFORM_BUFFER, 20, lightServer->GetDirectionalLightBuffer());
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, lightServer->GetVisiblePointLightIndicesBuffer());
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, lightServer->GetVisibleSpotLightIndicesBuffer());
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, lightServer->GetVisibleDirectionalLightIndicesBuffer());
 
 	const GLint location = glGetUniformLocation(this->lightCullingProgram, "lightImage");
 	if (location == -1)

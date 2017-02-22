@@ -1,7 +1,12 @@
 #pragma once
 #include "foundation/math/line.h"
 #include "foundation/math/matrix4.h"
-#include "render/resources/geometryproxy.h"
+#include "foundation/util/array.h"
+
+namespace Render
+{
+    class GeometryProxy;
+}
 
 namespace BaseGameFeature
 {
@@ -9,10 +14,7 @@ namespace BaseGameFeature
 class EnvManager
 {
 private:
-	EnvManager()
-	{
-
-	}
+	EnvManager(){}
 
 public:
 	static EnvManager* Instance()

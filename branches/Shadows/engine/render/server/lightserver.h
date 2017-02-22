@@ -1,7 +1,13 @@
+//------------------------------------------------------------------------
+// Copyright Fredrik Lindahl
+// With contribution by Viktor Andersson
+//------------------------------------------------------------------------
+
+
 /*
  * TODO: The Update method should only calculate the lights that are moving or the ones that have been moved
- *       The Directional Light should not be an array.
- *       If you spam spawn lights you get segmentation fault, look in here/modelentityWithSpotLight/pointlightentity
+ *       The Directional Light should not be an array. Should be a uniform in the phong.frag
+ *       If you spam spawn lights you get segmentation fault, look in here -> /modelentityWithSpotLight/pointlightentity
  */
 
 #pragma once
@@ -10,8 +16,6 @@
 #include "foundation/util/array.h"
 #include "foundation/math/math.h"
 #include "foundation/math/vector4.h"
-
-
 
 namespace Render
 {
@@ -92,9 +96,8 @@ namespace Render
 		SpotLight& GetSpotLightAtIndex(const int& index);
 
         /// Directional Lights ///
-        void AddDirectionalLight(const DirectionalLight& dLight);
-        size_t GetNumDirectionalLights() { return this->directionlLights.Size(); }
-        DirectionalLight& GetDirectionalLightAtIndex(const int& index);
+        void AddDirectionalLight(Math::vec4 color, Math::vec4 direction);
+        DirectionalLight& GetDirectionalLight() { return this->directionalLight; }
 
 		GLuint GetWorkGroupsX() { return this->workGroupsX; }
 		GLuint GetWorkGroupsY() { return this->workGroupsY; }
@@ -102,9 +105,9 @@ namespace Render
 		GLuint GetPointLightBuffer() { return this->pointLightBuffer; }
 		GLuint GetSpotLightBuffer() { return this->spotLightBuffer; }
         GLuint GetDirectionalLightBuffer() { return this->directionalLightBuffer; }
+
 		GLuint GetVisiblePointLightIndicesBuffer() { return this->visiblePointLightIndicesBuffer; }
 		GLuint GetVisibleSpotLightIndicesBuffer() { return this->visibleSpotLightIndicesBuffer; }
-        GLuint GetVisibleDirectionalLightIndicesBuffer() { return this->visibleDirectionaltLightIndicesBuffer; }
 
         GLuint GetTileLights() { return this->tileLights; }
 
@@ -115,7 +118,7 @@ namespace Render
         /// Debug and Easier Access ///
 		LightServer::SpotLight& CreateSpotLight(Math::point color, Math::point position, Math::vec4 direction, float length, float angle);
 		LightServer::PointLight& CreatePointLight(Math::point color, Math::point position, float radius);
-        void CreateDirectionalLight(Math::point color, Math::point direction);
+        //void CreateDirectionalLight(Math::point color, Math::point direction);
 
 		void AddCubeMap(std::shared_ptr<CubeMapNode> node);
 		void RemoveCubeMap(std::shared_ptr<CubeMapNode> node);
@@ -137,7 +140,6 @@ namespace Render
         GLuint directionalLightBuffer;
 		GLuint visiblePointLightIndicesBuffer;
 		GLuint visibleSpotLightIndicesBuffer;
-        GLuint visibleDirectionaltLightIndicesBuffer;
 
 		// X and Y work group dimension variables for compute shader
 		GLuint workGroupsX;
@@ -146,7 +148,8 @@ namespace Render
 		/// Contains all the pointlights in the game
 		Util::Array<PointLight> pointLights;
 		Util::Array<SpotLight> spotLights;
-        Util::Array<DirectionalLight> directionlLights;
+        /// Should only be one in the scene
+        DirectionalLight directionalLight;
 
         /// Determines how many light should be registred per tile
         GLuint tileLights = 512;

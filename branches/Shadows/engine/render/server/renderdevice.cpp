@@ -46,6 +46,7 @@ void RenderDevice::SetRenderResolution(const Resolution& res)
 	LightServer::Instance()->UpdateWorkGroups();
 	LightServer::Instance()->UpdatePointLightBuffer();
 	LightServer::Instance()->UpdateSpotLightBuffer();
+	LightServer::Instance()->UpdateDirectionalLightBuffer();
 }
 
 void RenderDevice::SetRenderResolution(const int& x, const int& y)

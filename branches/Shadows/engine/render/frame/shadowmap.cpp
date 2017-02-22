@@ -6,7 +6,6 @@
 #include "render/resources/meshresource.h"
 #include "render/properties/graphicsproperty.h"
 #include "render/server/renderdevice.h"
-#include "render/frame/flatgeometrylitpass.h"
 #include "render/server/shadowserver.h"
 
 
@@ -17,11 +16,14 @@ namespace Render
 		this->frameBufferObject = 0;
 		this->buffer = 0;
 		this->shadowmap = 0;
-		this->shadowmapFBO = 0;
-		this->shadowWidth = 1024;
-		this->shadowHeight = 1024;
+		this->shadowWidth = 512;
+		this->shadowHeight = 512;
 		this->shadowAspect = this->shadowWidth / this->shadowHeight;
 		this->shadowNearPlane = 0.05f;
+
+		this->shadowAtlas = 0;
+		this->shadowAtlasWidth = 8192;
+		this->shadowAtlasHeight = 8192;
 	}
 
 	ShadowMap::~ShadowMap()
@@ -34,7 +36,7 @@ namespace Render
 		///GENERATE A SHADOWMAP TEXTURE
 		glGenFramebuffers(1, &this->frameBufferObject);
 
-        glGenTextures(1, &this->shadowmap);
+        /*glGenTextures(1, &this->shadowmap);
         glBindTexture(GL_TEXTURE_2D, this->shadowmap);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->shadowWidth, this->shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
@@ -43,11 +45,21 @@ namespace Render
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		GLfloat bordercolor[] = { 1.0,1.0,1.0,1.0 };
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bordercolor);
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bordercolor);*/
+        this->GenerateShadowMap();
 
-		///PUT THE SHADOW MAP INTO A FRAMEBUFFER
+        //glActiveTexture(GL_TEXTURE10);
+        glGenTextures(1, &this->shadowAtlas);
+        glBindTexture(GL_TEXTURE_2D, this->shadowAtlas);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, this->shadowAtlasWidth, this->shadowAtlasHeight, 0, GL_ALPHA, GL_UNSIGNED_BYTE, NULL);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->shadowWidth, this->shadowHeight, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, &this->frameBufferObject);
+
+		///PUT THE SHADOW MAP ATLAS INTO A FRAMEBUFFER
 		glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->shadowmap, 0);
+        //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_ALPHA, GL_TEXTURE_2D, this->shadowAtlas, 0);
 		///DONT NEED COLOR BUFFER
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
@@ -86,7 +98,6 @@ namespace Render
 			lightV = Math::mat4::lookatrh(spotlight->GetTransform().get_position(), lookat, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
 			//lightV = Math::mat4::transpose(spotlight->GetTransform());
-			
 
 			//lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), this->shadowAspect, this->shadowNearPlane, spotlight.length);
             lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight->GetSpotLightAngle() * 2.0f), this->shadowAspect, this->shadowNearPlane, spotlight->GetSpotLightLength() * 2.0f);
@@ -156,5 +167,19 @@ namespace Render
 		glBindTexture(GL_TEXTURE_2D, this->buffer);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newRes.x, newRes.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	}
+
+void ShadowMap::GenerateShadowMap()
+{
+    glGenTextures(1, &this->shadowmap);
+    glBindTexture(GL_TEXTURE_2D, this->shadowmap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->shadowWidth, this->shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    GLfloat bordercolor[] = { 1.0,1.0,1.0,1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bordercolor);
+}
 }
 

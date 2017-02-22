@@ -21,7 +21,6 @@ private:
 	{
 		GLint pointLightCount;
 		GLint spotLightCount;
-		GLint directionalLightCount;
         GLuint tileLights;
 	} uniformBlock;
 

@@ -7,7 +7,7 @@
 namespace Render
 {
 
-	ShadowServer::ShadowServer()
+	ShadowServer::ShadowServer(): spotLighEntetiesSize(0)
 	{
 		
 	}
@@ -15,6 +15,7 @@ namespace Render
 	void ShadowServer::AppendSpotLightEntity(Game::ModelEntitySpotLight* entity)
 	{
 		this->spotLightEntities.Append(entity);
+        this->spotLighEntetiesSize++;
 	}
 
 	void ShadowServer::RemoveSpotLightEntity(Game::ModelEntitySpotLight* itr)

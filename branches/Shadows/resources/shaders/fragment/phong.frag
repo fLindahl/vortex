@@ -22,16 +22,6 @@ struct PointLight
 	vec4 radiusAndPadding;
 };
 
-struct DirectionalLight 
-{
-	int lightType;
-	
-	vec4 color;
-	vec4 direction;
-};
-
-uniform DirectionalLight sun;
-
 struct SpotLight 
 {
 	//centerAndRadius:
@@ -64,7 +54,6 @@ layout (std140, binding = 24) uniform uniformBlock
 {
 	int pointLightCount;
 	int spotLightCount;
-	int directionalLightCount;
 	int tileLights;
 };
 
@@ -79,11 +68,6 @@ layout(std430, binding = 2) readonly buffer SpotLightBuffer
 	SpotLight data[];
 } spotLightBuffer;
 
-layout(std430, binding = 3) readonly buffer DirectionalLightBuffer 
-{
-	DirectionalLight data[];
-} directionalLightBuffer;
-
 layout(std430, binding = 4) readonly buffer VisiblePointLightIndicesBuffer 
 {
 	VisibleIndex data[];
@@ -94,13 +78,14 @@ layout(std430, binding = 5) readonly buffer VisibleSpotLightIndicesBuffer
 	VisibleIndex data[];
 } visibleSpotLightIndicesBuffer;
 
-layout(std430, binding = 6) readonly buffer VisibleDirectionalLightIndicesBuffer 
+layout(std140, binding = 20) uniform directionalLight 
 {
-	VisibleIndex data[];
-} visibleDirectionalLightIndicesBuffer;
+	vec4 color;
+	vec4 direction;
+}dirLight;
 
 // parameters of the light and possible values
-const vec3 u_lightAmbientIntensity = vec3(0.005f, 0.005f, 0.005f);
+const vec3 u_lightAmbientIntensity = vec3(0.05f, 0.05f, 0.05f);
 
 // Attenuate the point light intensity
 float attenuate(vec3 lightDirection, float radius)
@@ -257,13 +242,10 @@ void main()
 			color.rgb += irradiance;
 		} 	
 	}
-	/*
-	for (uint i = 0; i < tileLights && visibleDirectionalLightIndicesBuffer.data[offset + i].index != -1; i++)
+	
+	if(dirLight.direction.w == 0.0)
 	{
-		uint lightIndex = visibleDirectionalLightIndicesBuffer.data[offset + i].index;
-		DirectionalLight light = directionalLightBuffer.data[lightIndex];
-		
-		vec3 L = normalize(light.direction.xyz);
+		vec3 L = normalize(dirLight.direction.xyz);
 
 		float attenuation = 1.0f;
 		
@@ -277,11 +259,11 @@ void main()
 			specular = pow(max(dot(H, N), 0.0), shininess);
 		//}
 
-		vec3 irradiance = (light.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
+		vec3 irradiance = (dirLight.color.rgb * (albedoDiffuseColor.rgb * diffuse) + (vec3(specular) * spec)) * attenuation;
 		
 		color.rgb += irradiance;
 	}
-	*/
+	
 	color.rgb += albedoDiffuseColor.rgb * u_lightAmbientIntensity;
 
 	fragColor = color;

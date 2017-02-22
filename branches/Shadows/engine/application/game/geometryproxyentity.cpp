@@ -4,14 +4,15 @@
 #include "render/resources/modelinstance.h"
 #include "render/debugrender/debugrenderer.h"
 #include "application/basegamefeature/managers/envmanager.h"
+#include "render/resources/geometryproxy.h"
 
 namespace Game
 {
 
-GeometryProxyEntity::GeometryProxyEntity () : ModelEntity()
+GeometryProxyEntity::GeometryProxyEntity () : ModelEntity(), proxy(BaseGameFeature::EnvManager::Instance()->NewGeometryProxy(this->transform))
 {
 	//Call baseclass first
-	this->proxy = BaseGameFeature::EnvManager::Instance()->NewGeometryProxy(this->transform);
+	//this->proxy = BaseGameFeature::EnvManager::Instance()->NewGeometryProxy(this->transform);
 }
 	
 GeometryProxyEntity::~GeometryProxyEntity()

@@ -386,9 +386,9 @@ namespace Toolkit
 					Math::mat4 transform = Math::mat4::multiply(Math::mat4::rotationyawpitchroll(yRot, xRot, zRot), application->hit.object->GetTransform());
 					application->hit.object->SetTransform(transform);
 
-					float yaw = atan2(-transform.getrow0().z(), transform.getrow0().x());
-					float pitch = asin(transform.getrow0().y());
-					float roll = atan2(-transform.getrow2().y(), transform.getrow1().y());
+					float yaw =   (float)atan2(-transform.getrow0().z(), transform.getrow0().x());
+					float pitch = (float)asin(transform.getrow0().y());
+					float roll =  (float)atan2(-transform.getrow2().y(), transform.getrow1().y());
 
 					ImGui::Text("Pitch : %f | Yaw : %f | Roll : %f", pitch, yaw, roll);
 					ImGui::Separator();
