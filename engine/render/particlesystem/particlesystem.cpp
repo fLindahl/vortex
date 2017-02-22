@@ -46,7 +46,7 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 		particleArray[i].accLife[2] =  Math::randFloat(-0.5f, 1.0f);
 		particleArray[i].accLife[1] =  Math::randFloat(-9.82f, -7.82f);
 		particleArray[i].accLife[0] =  Math::randFloat(-0.5f, 1.0f);
-		particleArray[i].pos = owner.GetModelMatrix().get_position()+(pos*1.0f);
+		particleArray[i].pos = owner.GetModelMatrix().get_position() + (pos*1.0f);
 		particleArray[i].vel = pos * Math::randFloat(1.0f, 2.5f);
 		particleArray[i].vel[3] = 1.0f;
 	}
@@ -182,7 +182,7 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 	return buf;
 }
 
-	void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff)
+void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff)
 {
 	Util::Array<ParticleState> arr;
 	arr.Reserve(this->particleArray.Size() - (eBuff.endIndex - eBuff.startIndex) + bufferSize);
@@ -270,6 +270,7 @@ void ParticleSystem::DrawParticleSystem()
 		GetParticleEmitters()[i]->GetEmitterTexture()->BindTexture(0);
 		GetParticleEmitters()[i]->BindUniformBuffer();
 		GLuint num = GetParticleEmitters()[i]->GetNumberOfParticles();
+		sh->setModelMatrix(GetParticleEmitters()[i]->GetModelMatrix());
 		glDrawElementsInstanced(GL_TRIANGLES, this->mesh->getNumIndices(), GL_UNSIGNED_INT, NULL, num);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

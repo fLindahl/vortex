@@ -40,12 +40,12 @@ void ParticleComputePass::Execute()
 	glUseProgram(this->particleComputeProgram);
 
 	// Bind depth map texture to texture location 4 (which will not be used by any model texture)
-	glActiveTexture(GL_TEXTURE4);
-	glUniform1i(glGetUniformLocation(this->particleComputeProgram, "depthMap"), 4);
+	glActiveTexture(GL_TEXTURE7);
+	glUniform1i(glGetUniformLocation(this->particleComputeProgram, "depthMap"), 7);
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer());
 
-	glActiveTexture(GL_TEXTURE5);
-	glUniform1i(glGetUniformLocation(this->particleComputeProgram, "normalMap"), 5);
+	glActiveTexture(GL_TEXTURE8);
+	glUniform1i(glGetUniformLocation(this->particleComputeProgram, "normalMap"), 8);
 	glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer());
 
 	// Bind shader storage buffer objects for the particle buffer

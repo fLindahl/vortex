@@ -66,7 +66,7 @@ void ParticleEmitter::CreateEmitter(Particles::FileSettings& set)
 	UpdateUniformBuffer();
 }
 
-	void ParticleEmitter::UpdateUniformBuffer()
+void ParticleEmitter::UpdateUniformBuffer()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 3, this->ubo[0]);

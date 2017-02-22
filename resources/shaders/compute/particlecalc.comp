@@ -25,11 +25,11 @@ layout(std430, binding=5) buffer StartSettings
 	ParticleState settings[]; // array of structures
 } startSettings;
 
-layout (binding = 4) uniform sampler2D depthMap;
-layout (binding = 5) uniform sampler2D normalMap;
+uniform sampler2D depthMap;
+uniform sampler2D normalMap;
 
 const float DT = 0.016;
-const float thickness = 0.1;
+const float thickness = 0.5;
 
 layout( local_size_x = WORK_GROUP_SIZE,  local_size_y = 1, local_size_z = 1)   in;
 void main()
@@ -45,22 +45,24 @@ void main()
 		vec4 p  = pSettings.settings[gid].pos;
 		vec4 v  = pSettings.settings[gid].vel;
 		
-		vec4 clipPos = p*View;
+		vec4 clipPos = ViewProjection*p;
 		
-		float depth = texelFetch(depthMap,clipPos.xy).r;
-		vec4 normal = normalize(texture2D(normalMap, clipPos.xy));
-		
-		vec4 depthWorldPos = vec4(clipPos.x,clipPos.y, depth, 1.0)*InvView;
-		
-		if(distance(depthWorldPos,p) < thickness)
-		{
-			v = reflect(v, normal);
+		//clipPos /= clipPos.w;
+		vec2 coord = ((clipPos.xy / clipPos.w) + 1) / 2;
+		if(coord.x >= 0.0 && coord.x <= 1.0 && coord.y <= 1.0 && coord.y >= 0.0)
+		{		
+			float depth = -texelFetch(depthMap,ivec2(coord*ScreenSize),0).r;
+			//vec4 depthWorldPos = vec4(clipPos.xy, depth, 1.0)*InvViewProjection;//WorldPosFromDepth(coord,depth);
+			
+			vec3 partPosInView = (View*p).xyz;
+			
+			if(partPosInView.z < depth + thickness && partPosInView.z > depth)
+			{
+				vec3 normal = normalize(texelFetch(normalMap, ivec2(coord*ScreenSize), 0).rgb);
+				v = reflect(v, vec4(normal,0.0));
+			}
 		}
-		
-		//if(p.y <= 2.0)
-		//{
-			//v = reflect(v,vec3(0,1,0));
-		//}
+
 		
 		vec3 pp = p.xyz + (v.xyz*DT + 0.5*DT*DT*pSettings.settings[gid].accLife.xyz);
 		vec3 vp = v.xyz + pSettings.settings[gid].accLife.xyz*DT;
