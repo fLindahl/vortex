@@ -107,7 +107,7 @@ float NormalDistributionGGX(in vec3 N, in vec3 H, in float roughness)
 	float denom = (NdotH * (a - 1.0f) + 1.0f);
 	denom = PI * denom * denom;
 	
-	return (a / denom);
+	return (a / denom + 0.00001f);
 }
 
 //We use Smith with Schlick-GGX for our geometry function
@@ -207,7 +207,7 @@ void main()
 
 		if(intersection == true)
 		{
-			float weight = 0.2f;//localbrdf(normalize(-viewPos), normalize(hitPos.xyz - viewPos), viewSpaceNormal, roughness) / max(0.00001f, pdf);
+			float weight = 0.25f;//localbrdf(normalize(-viewPos), normalize(hitPos.xyz - viewPos), viewSpaceNormal, roughness) / max(0.00001f, pdf);
         
 			vec4 hitPosClipSpace = Projection * hitPos;
 			vec2 hitUV = ((hitPosClipSpace / hitPosClipSpace.w).xy + 1.0f) / 2.0f;
@@ -228,7 +228,7 @@ void main()
 			vec3 reflectionColor;
 			GetBlendedAndParallaxCorrectedCubeMapColor(coneTangent, worldPosition, worldDirection, TexCoord, reflectionColor);
 			
-			float weight = localbrdf(normalize(-viewPos), normalize(hitPos.xyz), viewSpaceNormal, roughness) / max(0.00001f, pdf);
+			float weight = 0.25f;//localbrdf(normalize(-viewPos), normalize(hitPos.xyz), viewSpaceNormal, roughness) / max(0.00001f, pdf);
 			
 			result += reflectionColor * weight;
 			weightSum += weight;	
