@@ -165,7 +165,7 @@ void main()
 		
 	vec3 normal = texture(NormalMap, TexCoords).rgb;
 	//vec3 spec = texture(SpecularMap, TexCoords).rgb;
-	float metallic = 1.0;//texture(SpecularMap, TexCoords).r;
+	float metallic = 0.2;//texture(SpecularMap, TexCoords).r;
 	float roughness = texture(RoughnessMap, TexCoords).r;
 
 	vec3 N = normalize(NormalMatrix * ((normal*2.0f) - 1.0f));
