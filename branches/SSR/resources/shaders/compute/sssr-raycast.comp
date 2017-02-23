@@ -47,7 +47,7 @@ vec3 ImportanceSampleGGX(out float PDF, in vec2 Xi, in float roughness, in vec3 
 
 	float phi = 2 * PI * Xi.x;
 	float cosTheta = sqrt((1.0f - Xi.y) / (1.0f + (a2 - 1.0f) * Xi.y));
-	float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
+	float sinTheta = sqrt(max(1e-5, 1.0f - cosTheta * cosTheta));
 
 	vec3 H;
 	H.x = sinTheta * cos(phi);
@@ -70,6 +70,7 @@ vec3 ImportanceSampleGGX(out float PDF, in vec2 Xi, in float roughness, in vec3 
 //**--------------------------------------------
 /* Trace Screen Space Ray
 */
+
 bool TraceScreenSpaceRay(in vec3 rayOrigin,
 						 in vec3 rayDirection,
 						 out vec2 hitTexCoord,
@@ -138,8 +139,8 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	k0 += dk * jitter;
 
 	float i;
-	float zA = 0.0;
-	float zB = 0.0;
+	float zA = rayOrigin.z;
+	float zB = rayOrigin.z;
 
 	// Track ray step and derivatives in a float4 to parallelize
 	vec4 pqk = vec4( P0, Q0.z, k0);
@@ -152,6 +153,8 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	{
 		pqk += dPQK;
 
+		hitTexCoord = permute ? pqk.yx : pqk.xy;
+
 		zA = zB;
 		zB = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
 		if (zB > zA)
@@ -162,7 +165,6 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 			zB = t;
         }
 
-		hitTexCoord = permute ? pqk.yx : pqk.xy;
 
 		//This doesn't seem necessary anymore...
 		// || pqk.x * stepDir >= end
@@ -191,15 +193,15 @@ void main()
 
 	vec2 TexCoord = vec2(location) / RayCastSize;
 	
-	vec4 specularAndRoughness = texelFetch(specularMap, location, 0).rgba;
+	vec4 specularAndRoughness = texture(specularMap, TexCoord, 0).rgba;
 	float roughness = specularAndRoughness.w;
 
 	//Get normal from normal map. This only needs to be done once per pixel
-	vec3 worldNormal = (texelFetch(normalMap, location, 0).rgb);
+	vec3 worldNormal = (texture(normalMap, TexCoord, 0).rgb);
 	//We need the normal to be in viewspace coordinates.
 	vec3 viewSpaceNormal = normalize((View * vec4(worldNormal, 0.0f)).rgb);
 
-	float pixelDepth = texelFetch(depthMap, location, 0).r;
+	float pixelDepth = texture(depthMap, TexCoord, 0).r;
 
 	//Calculate world pos
 	vec4 clipSpaceLocation;
@@ -211,7 +213,7 @@ void main()
 
 	vec3 rayOrigin = viewSpacePosition * pixelDepth;
 
-	vec3 viewDir = (rayOrigin.xyz);
+	vec3 viewDir = normalize(rayOrigin.xyz);
 
 	vec2 noiseJitter = texture(noiseMap, TexCoord).xy;
 
@@ -224,9 +226,10 @@ void main()
 	float pdf;
 	
 	vec3 H = ImportanceSampleGGX(pdf, Xi, roughness, viewSpaceNormal);	
-
+	
 	//Reflect vector against H
-	vec3 reflectionDir = (reflect(viewDir, H));
+	//vec3 reflectionDir = (reflect(viewDir, H));
+	vec3 reflectionDir = (reflect(viewDir, viewSpaceNormal));
 
 	//raymarch and find a collision point
 	//TODO: Use either hierical Z stepping, cheap raymarching or the efficient DDA algorithm described in "Efficient GPU Raytracing"

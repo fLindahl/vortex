@@ -13,7 +13,7 @@ uniform sampler2D NormalMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D RoughnessMap;
 
-const float metallic = 0.0f;
+//const float metallic = 0.0f;
 #define PI 3.14159265358979323846
 
 struct PointLight
@@ -73,7 +73,7 @@ layout(std430, binding = 12) readonly buffer VisibleSpotLightIndicesBuffer
 } visibleSpotLightIndicesBuffer;
 
 // parameters of the light and possible values
-const vec3 u_lightAmbientIntensity = vec3(0.005f, 0.005f, 0.005f);
+const vec3 u_lightAmbientIntensity = vec3(0.05f, 0.05f, 0.05f);
 
 // Attenuate the point light intensity
 float attenuate(vec3 lightDirection, float radius)
@@ -85,7 +85,7 @@ float attenuate(vec3 lightDirection, float radius)
 }
 
 //Inverse gamma
-#define GAMMA 1.2f
+#define GAMMA 2.2f
 const float screenGamma = 1.0f / GAMMA;
 
 
@@ -93,7 +93,14 @@ const float screenGamma = 1.0f / GAMMA;
 //creates a rim-lighting effect, as the closer we get to zero incidence, the more the light the material will reflect.
 vec3 fresnelSchlick(in float cosTheta, in vec3 F0, float roughness)
 {
-	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+	//Spherical Gaussian approximation
+	//return F0 + (1.0f - F0) * pow(2,((-5.55473f*cosTheta - 6.98316f) * cosTheta));
+	
+	//With roughness
+	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(2,((-5.55473f*cosTheta - 6.98316f) * cosTheta));
+	
+	//Old, yields artifacts every now and then
+	//return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
 //We use GGX for our normal distribution function (NDF)
@@ -108,7 +115,7 @@ float NormalDistributionGGX(in vec3 N, in vec3 H, in float roughness)
 	float denom = (NdotH * (a - 1.0f) + 1.0f);
 	denom = PI * denom * denom;
 	
-	return (a / denom);
+	return (a / (denom + 0.00001f));
 }
 
 //We use Smith with Schlick-GGX for our geometry function
@@ -157,7 +164,8 @@ void main()
 	albedo.rgb = pow(albedo.rgb, vec3(GAMMA));
 		
 	vec3 normal = texture(NormalMap, TexCoords).rgb;
-	vec3 spec = texture(SpecularMap, TexCoords).rgb;
+	//vec3 spec = texture(SpecularMap, TexCoords).rgb;
+	float metallic = 1.0;//texture(SpecularMap, TexCoords).r;
 	float roughness = texture(RoughnessMap, TexCoords).r;
 
 	vec3 N = normalize(NormalMatrix * ((normal*2.0f) - 1.0f));
@@ -168,7 +176,7 @@ void main()
 	//for metallic surfaces we interpolate between F0 and the albedo value with metallic value as our lerp weight
 	F0 = mix(F0, albedo.rgb, metallic);
 	
-	vec3 irradiance = vec3(0.0f);
+	vec3 irradiance = vec3(0.0f, 0.0f, 0.0f);
 	
 	/// Loop for Point Lights
 	uint offset = index * tileLights;

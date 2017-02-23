@@ -198,10 +198,10 @@ namespace Display
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glfwWindowHint(GLFW_RED_BITS, 3);
+		glfwWindowHint(GLFW_RED_BITS, 8);
 		glfwWindowHint(GLFW_GREEN_BITS, 8);
 		glfwWindowHint(GLFW_BLUE_BITS, 8);
-		glfwWindowHint(GLFW_SRGB_CAPABLE, GL_TRUE);
+		//glfwWindowHint(GLFW_SRGB_CAPABLE, GL_TRUE);
 		//glfwWindowHint(GLFW_SAMPLES, 8);
 
 		// open window
@@ -230,7 +230,7 @@ namespace Display
 			//glDepthRange(0, -1);
 
 			// setup stuff
-			glEnable(GL_FRAMEBUFFER_SRGB);
+			//glEnable(GL_FRAMEBUFFER_SRGB);
 			//glEnable(GL_LINE_SMOOTH);
 			//glEnable(GL_POLYGON_SMOOTH);
 			//glEnable(GL_MULTISAMPLE);

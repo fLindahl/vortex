@@ -41,6 +41,7 @@ void GetBlendedAndParallaxCorrectedCubeMapColor(in float roughness, in vec3 rayP
 		// convert to unit box space
 		// Transform in local unit parallax cube space (scaled and rotated)
 		// Why multiply by 2? Magic.
+		// TODO: the inverse should be pre-calculated
 		vec3 RayLS = (mat3(inverse(cubemapData[i].geometryproxy)) * reflectionDir) * 2.0f;
 		vec3 PositionLS = (inverse(cubemapData[i].geometryproxy) * vec4(rayPosition, 1.0f)).xyz * 2.0f;
 		
@@ -54,6 +55,10 @@ void GetBlendedAndParallaxCorrectedCubeMapColor(in float roughness, in vec3 rayP
 		vec3 IntersectPositionWS = rayPosition + reflectionDir * Distance;
 		vec3 newWorldDirection = IntersectPositionWS - cubemapData[i].cubeMapPosition.xyz;
 
+		// Contact hardening
+		// We want to go from 0 to 'roughness' based on distance to intersection
+		
+		
 		float mipLevel = floor((1 - roughness) * 6);
 	
 		cubeColor += textureLod(Cubemaps[i], newWorldDirection, mipLevel).rgb * cubemapData[i].blendfactor;

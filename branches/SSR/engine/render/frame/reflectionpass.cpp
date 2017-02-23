@@ -51,6 +51,16 @@ void ReflectionPass::Setup()
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	glGenTextures(1, &this->raycastBuffer);
+	glBindTexture(GL_TEXTURE_2D, this->raycastBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, RenderDevice::Instance()->GetRenderResolution().x / 2, RenderDevice::Instance()->GetRenderResolution().y / 2, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	// Setup compute shader programs
 	this->SSSRraycastpass = ShaderServer::Instance()->LoadShader("SSSR-Raycast")->GetProgram();
 	this->SSSRresolvepass = ShaderServer::Instance()->LoadShader("SSSR-Resolve")->GetProgram();
@@ -129,7 +139,7 @@ void ReflectionPass::Execute()
 		glUniform1i(glGetUniformLocation(SSSRraycastpass, "normalMap"), 5);
 		glUniform1i(glGetUniformLocation(SSSRraycastpass, "specularMap"), 6);
 		glUniform1i(glGetUniformLocation(SSSRraycastpass, "colorMap"), 7);
-		glUniform1i(glGetUniformLocation(SSSRraycastpass, "noiseMap"), 8);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "noiseMap"), 16);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer());
 		glActiveTexture(GL_TEXTURE5);
@@ -138,7 +148,7 @@ void ReflectionPass::Execute()
 		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer());
 		glActiveTexture(GL_TEXTURE7);
 		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer());
-		glActiveTexture(GL_TEXTURE8);
+		glActiveTexture(GL_TEXTURE16);
 		GLuint t = ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle();
 		glBindTexture(GL_TEXTURE_2D, ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle());
 
@@ -166,16 +176,16 @@ void ReflectionPass::Execute()
 		glUseProgram(this->SSSRresolvepass);
 		currentProgram = this->SSSRresolvepass;
 
-		glUniform1i(glGetUniformLocation(SSSRraycastpass, "noiseMap"), 8);
-		glActiveTexture(GL_TEXTURE8);
+		glUniform1i(glGetUniformLocation(currentProgram, "noiseMap"), 16);
+		glActiveTexture(GL_TEXTURE16);
 		glBindTexture(GL_TEXTURE_2D, ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle());
 
-		glUniform1i(glGetUniformLocation(SSSRraycastpass, "rayMap"), 9);
-		glActiveTexture(GL_TEXTURE9);
+		glUniform1i(glGetUniformLocation(currentProgram, "rayMap"), 17);
+		glActiveTexture(GL_TEXTURE17);
 		glBindTexture(GL_TEXTURE_2D, this->raycastBuffer);
 
-		glUniform2i(glGetUniformLocation(SSSRraycastpass, "ResolveSize"), raycastRes.x, raycastRes.y);
-		glUniform1f(glGetUniformLocation(SSSRraycastpass, "bias"), 0.7f);
+		glUniform2i(glGetUniformLocation(currentProgram, "ResolveSize"), raycastRes.x, raycastRes.y);
+		glUniform1f(glGetUniformLocation(currentProgram, "bias"), 0.7f);
 
 		break;
 	}
@@ -291,6 +301,9 @@ void ReflectionPass::UpdateResolution()
 
 	glBindTexture(GL_TEXTURE_2D, this->reflectionBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, newRes.x, newRes.y, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, this->raycastBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, newRes.x/2, newRes.y/2, 0, GL_RGBA, GL_FLOAT, NULL);
 
 	this->uniformBlock.workGroups[0] = (newRes.x + (newRes.x % TILE_SIZE)) / TILE_SIZE;
 	this->uniformBlock.workGroups[1] = (newRes.y + (newRes.y % TILE_SIZE)) / TILE_SIZE;
