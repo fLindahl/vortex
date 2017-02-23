@@ -128,7 +128,7 @@ void Application::DoPicking()
 	
 	if (ImGui::GetIO().MouseDown[0])
 	{		
-		GLuint SelectedID;
+		GLuint SelectedID = 0;
 
 		int pixelx = (mouse_pos_in_dock.x / dockSize.x) * Render::RenderDevice::Instance()->GetRenderResolution().x;
 		int pixely = (mouse_pos_in_dock.y / dockSize.y) * Render::RenderDevice::Instance()->GetRenderResolution().y;
@@ -137,7 +137,7 @@ void Application::DoPicking()
 		GLuint frame = Render::FrameServer::Instance()->GetPickingPass()->GetFrameBufferObject();
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, frame);
-		glReadPixels(pixelx, pixely, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, (GLvoid*)&SelectedID);
+		//glReadPixels(pixelx, pixely, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, (GLvoid*)&SelectedID);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 		if (SelectedID != 0)

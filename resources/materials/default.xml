@@ -18,7 +18,7 @@
             <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>
 			<Param name="NormalMap" type="string" defaultValue="resources/textures/placeholder_normal.png"/>
 			<Param name="SpecularMap" type="string" defaultValue="resources/textures/placeholder_specular.png"/>
-			<Param name="RoughnessMap" type="string" defaultValue="resources/textures/placeholder_roughness.png"/>
+			<Param name="RoughnessMap" type="string" defaultValue="resources/textures/shiny.png"/>
 
             <!-- various parameters -->
         </Material>
