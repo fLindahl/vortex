@@ -162,6 +162,9 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 			this->particleArray[i].color = settings.color;
 		}
 
+		this->particleArray[i].startSize = settings.startSize;
+		this->particleArray[i].endSize = settings.endSize;
+
 	}
 
 	this->particleStartSettings = this->particleArray;
@@ -553,11 +556,31 @@ void ParticleSystem::UpdateParticleColor(std::shared_ptr<Property::ParticleEmitt
 
 void ParticleSystem::UpdateParticleSize(std::shared_ptr<Property::ParticleEmitter> owner, float start, float end)
 {
-	owner->GetRenderBuffer().startSize = Math::vec4(start);
-	owner->GetRenderBuffer().endSize = Math::vec4(end);
-	glBindBuffer(GL_UNIFORM_BUFFER, owner->GetUniformBuffer()[0]);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 3, owner->GetUniformBuffer()[0]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(owner->GetRenderBuffer()), &owner->GetRenderBuffer(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
+	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
+	ParticleState* particles = (ParticleState*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, owner->GetEmitterBuffer().startIndex * sizeof(ParticleState), (owner->GetEmitterBuffer().endIndex - owner->GetEmitterBuffer().startIndex) * sizeof(ParticleState), bufferMask);
+
+	if (particles == NULL)
+	{
+		GLint size;
+		glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, &size);
+		printf("Size is: %i", size / sizeof(ParticleState));
+		printf("Error: %i", glGetError());
+	}
+
+	for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
+	{
+		particles[i].startSize = Math::vec4(start);
+		particles[i].endSize = Math::vec4(end);
+	}
+
+
+	owner->GetState().startSize = Math::vec4(start);
+	owner->GetState().endSize = Math::vec4(end);
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 }
 
 std::shared_ptr<Render::ShaderObject> ParticleSystem::GetParticleShaderObject()

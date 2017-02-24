@@ -40,6 +40,7 @@ namespace Toolkit
 		void ShowFileMenu();
 
 		void ParticlesSettings(std::shared_ptr<Property::ParticleEmitter> emitter);
+		void OpenTexture(std::shared_ptr<Property::ParticleEmitter> emitter);
 		
 		double prevFPSTime;
 		double currentFPS;
@@ -67,6 +68,9 @@ namespace Toolkit
 
 		std::string saveName;
 		std::string appendedEmitters;
+		Util::String textureName;
+
+		bool openFilePopup;
 
 	};
 

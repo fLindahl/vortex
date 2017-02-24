@@ -34,7 +34,6 @@ void ParticleComputePass::Setup()
 
 void ParticleComputePass::Execute()
 {
-	
 
 	// Particle compute shader
 	glUseProgram(this->particleComputeProgram);
@@ -51,14 +50,15 @@ void ParticleComputePass::Execute()
 	// Bind shader storage buffer objects for the particle buffer
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, Particles::ParticleSystem::Instance()->GetParticleBuffer());
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, Particles::ParticleSystem::Instance()->GetParticleStartBuffer());
-	// Unbind the maps
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glDispatchCompute((Particles::ParticleSystem::Instance()->GetParticleArray().Size() / WORK_GROUP_SIZE)+1, 1, 1);
+
+	// Unbind the maps
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	Particles::ParticleSystem::Instance()->DrawParticleSystem();
 

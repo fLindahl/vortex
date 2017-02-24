@@ -5,11 +5,23 @@
             <Velocity vel="0.109" vel2="0.13700001" random="true"/>
             <Acceleration acc="0.000000 0.114000 0.000000" acc2="0.000000 0.348000 0.000000" random="true"/>
             <Lifetime life="1.6800001" life2="2.345" random="true"/>
-            <Color color="0.803493 0.042104 0.000000 1.000000" color2="0.266376 0.097710 0.000000 1.000000" random="true"/>
-            <Size startSize="0.18200001" endSize="0.067000002"/>
-            <ParticleAmount num="1500"/>
+            <Color color="0.803493 0.042104 0.000000 0.131004" color2="0.266376 0.097710 0.000000 0.100437" random="true"/>
+            <Size startSize="0.74400002" endSize="0.57900006"/>
+            <ParticleAmount num="600"/>
             <EmitterShapes shape="2">
-                <Radius radius="0.23300001"/>
+                <Radius radius="0.093000002"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+        <ParticleEmitter name="Sparks">
+            <Texture path="D:\Programming\vortex\resources\textures\particles\rain1.tga"/>
+            <Velocity vel="0.0050000004" vel2="0.021000002" random="true"/>
+            <Acceleration acc="0.000000 0.114000 0.000000" acc2="0.000000 0.206000 0.000000" random="true"/>
+            <Lifetime life="1.9900001" life2="3.0460002" random="true"/>
+            <Color color="1.000000 0.471616 0.000000 0.816594" color2="0.947598 0.322763 0.000000 0.772926" random="true"/>
+            <Size startSize="0.44400004" endSize="0.64100003"/>
+            <ParticleAmount num="20"/>
+            <EmitterShapes shape="2">
+                <Radius radius="0.156"/>
             </EmitterShapes>
         </ParticleEmitter>
     </ParticleSystem>
