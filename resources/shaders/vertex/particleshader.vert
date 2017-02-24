@@ -8,12 +8,13 @@ struct ParticleState
 	vec4 rot;
 	vec4 accLife;
 	vec4 color;
+	vec4 size;
+	vec4 startSize;
+	vec4 endSize;
 };
 
 layout(std140, binding = 3) uniform RenderBuffer 
 {
-	vec4 startSize;
-	vec4 endSize;
 	uint offset;
 };  
 
@@ -50,13 +51,12 @@ const float DT = 0.016;
 void main()
 {
 	uint index = gl_InstanceID + offset;
-	float lerp = pSettings.settings[index].accLife.w / startSettings.settings[index].accLife.w;
 	
 	vec3 camRight = vec3(View[0][0],View[1][0], View[2][0]);
 	vec3 camUp = vec3(View[0][1],View[1][1], View[2][1]);
 	vec3 normVel =  normalize(pSettings.settings[index].vel.xyz);	
 	float signX = sign(dot(camRight, normVel));
-	vec3 scaleVec = mix(endSize,startSize, lerp).xyz;
+	vec3 scaleVec = pSettings.settings[index].size.xyz;
 	mat3 scale = mat3(scaleVec.x, 0, 0,
 					  0, scaleVec.y, 0,
 					  0, 0, scaleVec.z);

@@ -36,6 +36,7 @@ public:
 	void CreateEmitter(Particles::FileSettings& set);
 	void UpdateUniformBuffer();
 	void BindUniformBuffer();
+	void UpdateTexture(const char* texturePath);
 
 	GLuint& GetNumberOfParticles(){ return numOfParticles; }
 

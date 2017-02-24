@@ -25,13 +25,13 @@ struct ParticleState
 	Math::vec4 rot = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	Math::vec4 accLife = Math::vec4(0.0f, 1.0f, 0.0f, 0.5f);
 	Math::vec4 color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-
+	Math::vec4 size = Math::vec4(0.1f,0.1f,0.1f,1.0f);
+	Math::vec4 startSize = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+	Math::vec4 endSize = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 };
 
 struct ParticleRenderingBuffer
 {
-	Math::vec4 startSize = Math::vec4(0.1f,0.1f,0.1f,1.0f);
-	Math::vec4 endSize = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	uint offset = 0;
 };
 
@@ -57,6 +57,8 @@ struct ParticleUISettings
 	float endSize = 0.05f;
 
 	EmitterShapes shapes = CONE;
+
+	std::string texName = "";
 
 };
 

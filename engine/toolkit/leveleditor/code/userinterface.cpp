@@ -17,6 +17,7 @@
 #include "render/debugrender/debugrenderer.h"
 #include "imgui_internal.h"
 #include "render/particlesystem/particlefile.h"
+#include "nfd.h"
 
 
 #define CONSOLE_BUFFER_SIZE 8096
@@ -44,6 +45,7 @@ namespace Toolkit
 
 		this->saveName = "Name";
 		this->appendedEmitters = "Appended emitters: ";
+		this->textureName = "";
 
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
@@ -492,7 +494,6 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 	std::string id = "Particle "+std::to_string(particleCount);
 	if (ImGui::CollapsingHeader(id.c_str()))
 	{
-		
 		id = "Append Emitter##" + std::to_string(particleCount);
 		if (ImGui::Button(id.c_str()))
 		{
@@ -514,6 +515,16 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 			ImGui::Text("Emitter name");
 			ImGui::EndTooltip();
 		}
+
+		id = "Open##text" + std::to_string(particleCount);
+		if (ImGui::Button(id.c_str()))
+		{
+			this->openFilePopup = true;
+			OpenTexture(emitter);
+		}	
+		ImGui::SameLine(120);
+		id = "texname##" + std::to_string(particleCount);
+		ImGui::InputText(id.c_str(), (char*) emitter->GetParticleUISettings().texName.c_str(), 64, ImGuiInputTextFlags_ReadOnly);
 		
 		id = "Base Settings##" + std::to_string(particleCount);
 		if (ImGui::TreeNode(id.c_str()))
@@ -745,4 +756,42 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 
 }
 
+void UserInterface::OpenTexture(std::shared_ptr<Property::ParticleEmitter> emitter)
+{
+	if (this->openFilePopup){ ImGui::OpenPopup("OpenTexture"); }
+	if (ImGui::BeginPopupModal("OpenTexture", &this->openFilePopup))
+	{
+		nfdchar_t* outpath;
+		nfdresult_t result = NFD_OpenDialog("tga,png", NULL, &outpath);
+
+		if (result == NFD_OKAY)
+		{
+			printf("path: %s\n", outpath);
+			
+			Util::String s = outpath;
+#ifdef _WIN32
+			Util::Array<Util::String> path = Util::String::Tokenize(s, "\\");
+#else
+			Util::Array<Util::String> path = Util::String::Tokenize(s, "/");
+#endif
+			emitter->GetParticleUISettings().texName = path[path.Size() - 1];
+			emitter->UpdateTexture(outpath);
+
+			this->openFilePopup = false;
+			free(outpath);
+		}
+		else if (result == NFD_CANCEL)
+		{
+			this->openFilePopup = false;
+		}
+		else
+		{
+			printf("Error: %s\n", NFD_GetError());
+			assert(false);
+			this->openFilePopup = false;
+		}
+
+		ImGui::EndPopup();
+	}
+}
 }

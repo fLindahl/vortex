@@ -13,6 +13,9 @@ struct ParticleState
 	vec4 rot;
 	vec4 accLife;
 	vec4 color;
+	vec4 size;
+	vec4 startSize;
+	vec4 endSize;
 };
 
 layout(std430, binding=4) buffer source 
@@ -29,7 +32,7 @@ uniform sampler2D depthMap;
 uniform sampler2D normalMap;
 
 const float DT = 0.016;
-const float thickness = 0.5;
+const float thickness = 0.4;
 
 layout( local_size_x = WORK_GROUP_SIZE,  local_size_y = 1, local_size_z = 1)   in;
 void main()
@@ -44,6 +47,8 @@ void main()
 	{
 		vec4 p  = pSettings.settings[gid].pos;
 		vec4 v  = pSettings.settings[gid].vel;
+		
+		float lerp = pSettings.settings[gid].accLife.w / startSettings.settings[gid].accLife.w;
 		
 		vec4 clipPos = ViewProjection*p;
 		
@@ -63,7 +68,7 @@ void main()
 			}
 		}
 
-		
+		pSettings.settings[gid].size = mix(pSettings.settings[gid].endSize,pSettings.settings[gid].startSize, lerp);
 		vec3 pp = p.xyz + (v.xyz*DT + 0.5*DT*DT*pSettings.settings[gid].accLife.xyz);
 		vec3 vp = v.xyz + pSettings.settings[gid].accLife.xyz*DT;
 		pSettings.settings[gid].pos = vec4(pp,1.0);

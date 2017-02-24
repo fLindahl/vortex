@@ -61,8 +61,6 @@ void ParticleEmitter::CreateEmitter(Particles::FileSettings& set)
 	this->pSet = set.set;
 
 	this->renderBuff.offset = this->buff.startIndex;
-	this->renderBuff.startSize = set.set.startSize;
-	this->renderBuff.endSize = set.set.endSize;
 	UpdateUniformBuffer();
 }
 
@@ -80,7 +78,13 @@ void ParticleEmitter::BindUniformBuffer()
 	//glBufferData(GL_UNIFORM_BUFFER, sizeof(renderBuff), &renderBuff, GL_STATIC_DRAW);
 }
 
-Math::mat4 ParticleEmitter::GetModelMatrix()
+void ParticleEmitter::UpdateTexture(const char* texturePath)
+{
+	this->texture = Render::ResourceServer::Instance()->LoadTexture(texturePath);
+	this->texPath = texturePath;
+}
+
+	Math::mat4 ParticleEmitter::GetModelMatrix()
 {
 	return this->owner->GetTransform();
 }
