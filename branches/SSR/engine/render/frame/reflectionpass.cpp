@@ -19,15 +19,15 @@ namespace Render
 #define TILE_SIZE 32
 
 ReflectionPass::ReflectionPass() : 
-	quality(HIGH)
+	quality(ULTRA)
 {
-	this->uniformBlock.zThickness = 3.5f;
-	this->uniformBlock.jitter = 0.45f;
-	this->uniformBlock.stride = 11.0f;
+	this->uniformBlock.zThickness = 2.5f;
+	this->uniformBlock.jitter = 0.225f;
+	this->uniformBlock.stride = 4.0f;
 	this->uniformBlock.workGroups[0] = (RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % TILE_SIZE)) / TILE_SIZE;
 	this->uniformBlock.workGroups[1] = (RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % TILE_SIZE)) / TILE_SIZE;
-	this->uniformBlock.maxSteps = 80.0f;
-	this->uniformBlock.maxDistance = 280.0f;
+	this->uniformBlock.maxSteps = 125.0f;
+	this->uniformBlock.maxDistance = 10000.0f;
 
 	this->cubemapData.Fill(0, 8, CubemapData());
 }
@@ -108,9 +108,26 @@ void ReflectionPass::Setup()
 	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[5]"), 8 + 5);
 	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[6]"), 8 + 6);
 	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[7]"), 8 + 7);
+	glUseProgram(this->SSSRresolvepass);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, "depthMap"), 4);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, "normalMap"), 5);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, "specularMap"), 6);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, "colorMap"), 7);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[0]"), 8 + 0);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[1]"), 8 + 1);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[2]"), 8 + 2);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[3]"), 8 + 3);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[4]"), 8 + 4);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[5]"), 8 + 5);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[6]"), 8 + 6);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[7]"), 8 + 7);
+
 	
 	glGenBuffers(1, this->ubo);
 	glGenBuffers(1, this->cubemapUBO);
+
+	// Create a query object.
+	glGenQueries(1, queries);
 
 	FramePass::Setup();
 }
@@ -118,8 +135,12 @@ void ReflectionPass::Setup()
 void ReflectionPass::Execute()
 {
 	double time = glfwGetTime();
+
+	GLuint64 timeElapsed = 0;
+	// Query current timestamp 1
+	glBeginQuery(GL_TIME_ELAPSED, queries[0]);
 	
-	//This needs to be done before rendering reflections on AMD cards as the compute shader dispatches before the renderpasses are done otherwise
+	//This needs to be done before rendering reflections on AMD cards as the compute shader dispatches before the other renderpasses are done
 	//glFinish();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
@@ -269,6 +290,7 @@ void ReflectionPass::Execute()
 
 	// Dispatch the compute shader, using the workgroup values calculated earlier
 	// TODO: This shouldnt be lightserver work groups.
+
 	glDispatchCompute(this->uniformBlock.workGroups[0], this->uniformBlock.workGroups[1], 1);
 
 	// Unbind the maps
@@ -286,11 +308,19 @@ void ReflectionPass::Execute()
 
 	//glFinish();
 	
-	double time1 = glfwGetTime();
+	//double time1 = glfwGetTime();
 	
-	double elapsedTime = time1 - time;
+	//double elapsedTime = time1 - time;
 	
 	//printf("Elapsed time for reflections: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
+
+
+	glEndQuery(GL_TIME_ELAPSED);
+	// See how much time the rendering of object i took in nanoseconds.
+	glGetQueryObjectui64v(queries[0], GL_QUERY_RESULT, &timeElapsed);
+
+
+	printf("Elapsed time for reflections: %f\n\n\n\n\n\n\n\n\n\n\n", (float)timeElapsed * 0.000001f);
 
 	FramePass::Execute();
 }

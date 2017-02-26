@@ -73,6 +73,7 @@ private:
 	GLuint PCCubemapProgram;
 	GLuint reflectionBuffer;
 
+	GLuint queries[1];
 };
 
 }
