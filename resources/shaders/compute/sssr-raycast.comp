@@ -185,7 +185,6 @@ bool TraceScreenSpaceRay(in vec3 rayOrigin,
 	return intersect;
 }
 
-
 layout(local_size_x = THREADS_X, local_size_y = THREADS_Y, local_size_z = 1) in;
 void main()
 {
@@ -193,8 +192,8 @@ void main()
 
 	vec2 TexCoord = vec2(location) / RayCastSize;
 	
-	vec4 specularAndRoughness = texture(specularMap, TexCoord, 0).rgba;
-	float roughness = specularAndRoughness.w;
+	//vec4 specularAndRoughness = texture(specularMap, TexCoord, 0).rgba;
+	//float roughness = specularAndRoughness.w;
 
 	//Get normal from normal map. This only needs to be done once per pixel
 	vec3 worldNormal = (texture(normalMap, TexCoord, 0).rgb);
@@ -215,17 +214,17 @@ void main()
 
 	vec3 viewDir = normalize(rayOrigin.xyz);
 
-	vec2 noiseJitter = texture(noiseMap, TexCoord).xy;
+	//vec2 noiseJitter = texture(noiseMap, TexCoord).xy;
 
 	//our distribution sample
-	vec2 Xi = noiseJitter;
+	//vec2 Xi = noiseJitter;
 	//lerp with bias
-	Xi.y = mix(Xi.y, 0.0, bias);
+	//Xi.y = mix(Xi.y, 0.0, bias);
 
 	//This is set by the importance sampling function
-	float pdf;
+	float pdf = 1.0f;
 	
-	vec3 H = ImportanceSampleGGX(pdf, Xi, roughness, viewSpaceNormal);	
+	//vec3 H = ImportanceSampleGGX(pdf, Xi, roughness, viewSpaceNormal);	
 	
 	//Reflect vector against H
 	vec3 reflectionDir = (reflect(viewDir, viewSpaceNormal));
@@ -238,9 +237,25 @@ void main()
 	vec3 hitPoint;
 	if (TraceScreenSpaceRay(rayOrigin.xyz, reflectionDir, hitTexCoord, hitPoint))
 	{
-		outray.xy = hitPoint.xy; //screen space UV hit
-		outray.z = hitPoint.z; //hit depth
-		outray.w = pdf;
+		vec3 N = (texture(normalMap, (hitTexCoord / ScreenSize), 0).rgb);
+		//We need the normal to be in viewspace coordinates.
+		vec3 vN = ((View * vec4(N, 0.0f)).rgb);
+		
+		if(dot(vN, reflectionDir) > 0)
+		{
+			//No hit was found.
+			//We set the outray to reflectionDir
+			outray.xyz = reflectionDir.xyz;
+			//We need some way of telling the resolve pass that this is not a true hit.
+			//We do this by setting the PDF to a negative value. This is later interpreted as a boolean value: (pdf < 0 ? 0 : 1)
+			outray.w = -pdf;
+		}
+		else
+		{
+			outray.xy = hitPoint.xy; //screen space UV hit
+			outray.z = hitPoint.z; //hit depth
+			outray.w = pdf;
+		}
 	}
 	else
 	{
@@ -254,5 +269,5 @@ void main()
 
 	imageStore(rays, location, outray);
 	
-	groupMemoryBarrier();
+	//groupMemoryBarrier();
 }

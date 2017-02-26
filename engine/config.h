@@ -12,6 +12,8 @@
 #include <immintrin.h>
 #include <memory>
 #include <assert.h>
+#include <exception>
+#include <iostream>
 
 #define InvalidIndex -1;
 
@@ -50,7 +52,15 @@ typedef double		float64;
 #ifdef __GNUC__
 #define _assert(expr, msg) ((expr) ? __ASSERT_VOID_CAST (0) : __assert_fail (#msg, __FILE__, __LINE__, __ASSERT_FUNCTION))
 #else
-#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(_Msg), _CRT_WIDE(__FILE__), __LINE__), 0) )
+//#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(_Msg), _CRT_WIDE(__FILE__), __LINE__), 0) )
+#define _assert(condition, message) \
+    do { \
+        if (! (condition)) { \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::terminate(); \
+		        } \
+	    } while (false)
 #endif
 
 #ifdef NULL
