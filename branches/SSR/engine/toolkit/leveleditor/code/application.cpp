@@ -256,8 +256,6 @@ Application::Run()
 
 		RenderDevice::Instance()->Render(false);
 
-		
-
 		this->window->SwapBuffers();
 		UI->frameTime = glfwGetTime() - time;
 	}
