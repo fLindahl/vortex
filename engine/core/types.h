@@ -5,7 +5,7 @@
 * @details      Describes the basic types that we use in Vortex and defines types that might be platform specific.
 * @date         28-02-2017
 * @author       Fredrik Lindahl
-* @copyright    2016-2017 Vortex Team. All Rights Reserved.
+* @copyright    See LICENCE file
 */
 
 #define InvalidIndex -1;
