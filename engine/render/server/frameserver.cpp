@@ -81,7 +81,7 @@ namespace Render
 		this->shadowmap = std::make_shared<ShadowMap>();
 		this->shadowmap->name = "ShadowMap";
 		this->shadowmap->Setup();
-
+		
 		this->framePassByName.insert(std::make_pair(this->shadowmap->name, this->shadowmap));
 		this->framePasses.Append(this->shadowmap);
 

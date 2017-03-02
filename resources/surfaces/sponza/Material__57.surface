@@ -1,10 +1,10 @@
 <Vortex>
-	<Surface material="Static">
+	<Surface material="StaticAlphaCutout">
 		<!-- Textures -->
 		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/vase_plant.tga"/>
 		<Param name="NormalMap" type="string" value="resources/textures/sponza/vase_plant_ddn.tga"/>
 		<Param name="SpecularMap" type="string" value="resources/textures/sponza/vase_plant_spec.tga"/>
-		<Param name="RoughnessMap" type="string" value="resources/textures/placeholder_rough.png"/>		
+		<Param name="RoughnessMap" type="string" value="resources/textures/sponza/vase_plant_roughness.png"/>		
 		
 		<!-- Specific Parameters -->
 	</Surface>

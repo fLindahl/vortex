@@ -62,7 +62,7 @@ void PointLightEntity::SetPointLightRadius(const float& radius)
 
 void PointLightEntity::SetPointLightColor(const Math::vec4& color)
 {
-    this->lightEntity->color = color;
+    this->lightEntity->color.set(color.x(), color.y(), color.z());
 	Render::LightServer::Instance()->UpdatePointLightBuffer();
 }
 };

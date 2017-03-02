@@ -1,6 +1,5 @@
 #include "config.h"
 #include "geometryproxy.h"
-#include "application/basegamefeature/managers/envmanager.h"
 
 namespace Render
 {

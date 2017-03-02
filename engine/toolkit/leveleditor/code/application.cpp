@@ -84,9 +84,12 @@ Application::Open()
 		this->sponza = std::make_shared<Game::ModelEntity>();
 		this->sponza->SetModel(ResourceServer::Instance()->LoadModel("resources/models/sponza.mdl"));
 		this->sponza->Activate();
-		Math::mat4 sTransform = Math::mat4::scaling(0.01f, 0.01f, 0.01f);
+		Math::mat4 sTransform = Math::mat4::scaling(0.1f, 0.1f, 0.1f);
 		sTransform.translate(Math::vector(0.0f, -2.0f, 0.0f));
 		this->sponza->SetTransform(sTransform);
+		
+		//LOAD XML file
+		BaseGameFeature::SceneManager::Instance()->LoadXMLScene("resources/scenes/sponza.xml");
 
 		//spawn in a cube somewhere
 		//this->wall1 = std::make_shared<Game::StaticEntity>();
@@ -122,7 +125,7 @@ Application::Open()
 		//this->wall4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
 		//this->wall1->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
 		//this->ceiling->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
-		
+		//
 
 
 		//billboard = std::make_shared<Game::ParticleEntity>();
@@ -139,23 +142,23 @@ Application::Open()
 		//particleList.Append(billboard2);
 
 
-		//LightServer::PointLight pLight;
-		//pLight.position = Math::vec4(-3.0f, 0.0f, -2.5f, 1.0f);
-		//pLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		//pLight.radiusAndPadding.set_x(5.0f);
-		//LightServer::Instance()->AddPointLight(pLight);
-		//
-		//pLight.position = Math::vec4(-6.0f, 0.0f, 2.5f, 1.0f);
-		//pLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		//LightServer::Instance()->AddPointLight(pLight);
-		//
-		//pLight.position = Math::vec4(2.0f, -1.0f, -0.0f, 1.0f);
-		//pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
-		//LightServer::Instance()->AddPointLight(pLight);
-		//
-		//pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
-		//pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
-		//LightServer::Instance()->AddPointLight(pLight);
+		LightServer::PointLight pLight;
+		pLight.position = Math::vec4(-3.0f, 0.0f, -2.5f, 1.0f);
+		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		pLight.radiusAndPadding.set_x(50.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+		
+		pLight.position = Math::vec4(-6.0f, 0.0f, 2.5f, 1.0f);
+		pLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+		
+		pLight.position = Math::vec4(2.0f, -1.0f, -0.0f, 1.0f);
+		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
+		
+		pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
+		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
+		LightServer::Instance()->AddPointLight(pLight);
 
      	/*Render::LightServer::SpotLight sLight;
 	    sLight.position = Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f);
@@ -252,8 +255,6 @@ Application::Run()
 		}
 
 		RenderDevice::Instance()->Render(false);
-
-		
 
 		this->window->SwapBuffers();
 		UI->frameTime = glfwGetTime() - time;

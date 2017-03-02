@@ -8,7 +8,7 @@ namespace Render
 CubeMapNode::CubeMapNode() :
 		isLoaded(false),
 		isActive(false),
-		resolution({ 128, 128 }),
+		resolution({ 512, 512 }),
 		mipLevels(6),
 		shape(SPHERE),
 		innerScale(0.5f,0.5f,0.5f),
@@ -17,11 +17,11 @@ CubeMapNode::CubeMapNode() :
 	glGenTextures(1, &this->cubeSampler);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeSampler);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, mipLevels);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	for (size_t i = 0; i < 6; i++)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, this->resolution.x, this->resolution.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, this->resolution.x, this->resolution.y, 0, GL_RGB, GL_FLOAT, NULL);
 
 	this->isLoaded = true;
 
@@ -102,6 +102,10 @@ void CubeMapNode::GenerateCubeMap()
 	this->RenderTexture(temporaryFrameBuffer, CubeFace::BOTTOM, camera);
 	this->RenderTexture(temporaryFrameBuffer, CubeFace::BACK, camera);
 	this->RenderTexture(temporaryFrameBuffer, CubeFace::FRONT, camera);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeSampler);
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 	//Delete FrameBuffer
 	glDeleteFramebuffers(1, &temporaryFrameBuffer);

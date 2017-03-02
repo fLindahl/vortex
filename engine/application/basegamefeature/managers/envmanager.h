@@ -1,7 +1,12 @@
 #pragma once
 #include "foundation/math/line.h"
 #include "foundation/math/matrix4.h"
-#include "render/resources/geometryproxy.h"
+#include "foundation/util/array.h"
+
+namespace Render
+{
+	class GeometryProxy;
+}
 
 namespace BaseGameFeature
 {
@@ -36,6 +41,7 @@ public:
 	void RenderGeometryProxies();
 
 private:
+	friend class SceneManager;
 	Util::Array<std::shared_ptr<Render::GeometryProxy>> geometryProxies;
 
 };

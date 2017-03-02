@@ -11,6 +11,7 @@
 #include "render/resources/cubemapnode.h"
 #include "render/server/lightserver.h"
 #include "foundation/math/math.h"
+#include "render/server/resourceserver.h"
 
 namespace Render
 {
@@ -18,15 +19,15 @@ namespace Render
 #define TILE_SIZE 32
 
 ReflectionPass::ReflectionPass() : 
-	quality(HIGH)
+	quality(ULTRA)
 {
-	this->uniformBlock.zThickness = 3.5f;
-	this->uniformBlock.jitter = 0.45f;
-	this->uniformBlock.stride = 11.0f;
+	this->uniformBlock.zThickness = 2.5f;
+	this->uniformBlock.jitter = 0.225f;
+	this->uniformBlock.stride = 4.0f;
 	this->uniformBlock.workGroups[0] = (RenderDevice::Instance()->GetRenderResolution().x + (RenderDevice::Instance()->GetRenderResolution().x % TILE_SIZE)) / TILE_SIZE;
 	this->uniformBlock.workGroups[1] = (RenderDevice::Instance()->GetRenderResolution().y + (RenderDevice::Instance()->GetRenderResolution().y % TILE_SIZE)) / TILE_SIZE;
-	this->uniformBlock.maxSteps = 80.0f;
-	this->uniformBlock.maxDistance = 280.0f;
+	this->uniformBlock.maxSteps = 125.0f;
+	this->uniformBlock.maxDistance = 10000.0f;
 
 	this->cubemapData.Fill(0, 8, CubemapData());
 }
@@ -50,7 +51,19 @@ void ReflectionPass::Setup()
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	glGenTextures(1, &this->raycastBuffer);
+	glBindTexture(GL_TEXTURE_2D, this->raycastBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, RenderDevice::Instance()->GetRenderResolution().x / 2, RenderDevice::Instance()->GetRenderResolution().y / 2, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	// Setup compute shader programs
+	this->SSSRraycastpass = ShaderServer::Instance()->LoadShader("SSSR-Raycast")->GetProgram();
+	this->SSSRresolvepass = ShaderServer::Instance()->LoadShader("SSSR-Resolve")->GetProgram();
 	this->SSRComputeProgram = ShaderServer::Instance()->LoadShader("SSR")->GetProgram();
 	this->CubemapProgram = ShaderServer::Instance()->LoadShader("CubemapsOnly")->GetProgram();
 	this->PCCubemapProgram = ShaderServer::Instance()->LoadShader("ParallaxCorrectedCubemaps")->GetProgram();
@@ -95,9 +108,26 @@ void ReflectionPass::Setup()
 	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[5]"), 8 + 5);
 	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[6]"), 8 + 6);
 	glUniform1i(glGetUniformLocation(this->PCCubemapProgram, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[7]"), 8 + 7);
+	glUseProgram(this->SSSRresolvepass);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, "depthMap"), 4);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, "normalMap"), 5);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, "specularMap"), 6);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, "colorMap"), 7);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[0]"), 8 + 0);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[1]"), 8 + 1);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[2]"), 8 + 2);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[3]"), 8 + 3);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[4]"), 8 + 4);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[5]"), 8 + 5);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[6]"), 8 + 6);
+	glUniform1i(glGetUniformLocation(this->SSSRresolvepass, VORTEX_SEMANTIC_CUBEMAP_ARRAY "[7]"), 8 + 7);
+
 	
 	glGenBuffers(1, this->ubo);
 	glGenBuffers(1, this->cubemapUBO);
+
+	// Create a query object.
+	glGenQueries(1, queries);
 
 	FramePass::Setup();
 }
@@ -105,8 +135,12 @@ void ReflectionPass::Setup()
 void ReflectionPass::Execute()
 {
 	double time = glfwGetTime();
+
+	GLuint64 timeElapsed = 0;
+	// Query current timestamp 1
+	glBeginQuery(GL_TIME_ELAPSED, queries[0]);
 	
-	//This needs to be done before rendering reflections on AMD cards as the compute shader dispatches before the renderpasses are done otherwise
+	//This needs to be done before rendering reflections on AMD cards as the compute shader dispatches before the other renderpasses are done
 	//glFinish();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, this->ubo[0]);
@@ -118,6 +152,64 @@ void ReflectionPass::Execute()
 	GLuint currentProgram;
 	switch (quality)
 	{
+	case Render::ReflectionPass::ULTRA:
+	{
+		//Special case pass
+		glUseProgram(this->SSSRraycastpass);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "depthMap"), 4);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "normalMap"), 5);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "specularMap"), 6);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "colorMap"), 7);
+		glUniform1i(glGetUniformLocation(SSSRraycastpass, "noiseMap"), 16);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer());
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer());
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer());
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer());
+		glActiveTexture(GL_TEXTURE16);
+		GLuint t = ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle();
+		glBindTexture(GL_TEXTURE_2D, ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle());
+
+		Render::Resolution raycastRes = Render::RenderDevice::Instance()->GetRenderResolution();
+		raycastRes.x /= 2;
+		raycastRes.y /= 2;
+
+		glUniform2i(glGetUniformLocation(SSSRraycastpass, "RayCastSize"), raycastRes.x, raycastRes.y);
+		glUniform1f(glGetUniformLocation(SSSRraycastpass, "bias"), 0.7f);
+
+		const GLint location = glGetUniformLocation(SSSRraycastpass, "rays");
+		if (location == -1){
+			printf("Could not locate uniform location for texture in SSRComputeProgram");
+		}
+		glUniform1i(location, 0);
+		glBindImageTexture(0, this->raycastBuffer, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+		// Dispatch the compute shader, using the workgroup values calculated earlier
+		// TODO: This shouldnt be lightserver work groups.
+		int wgx = (raycastRes.x + (raycastRes.x % TILE_SIZE)) / TILE_SIZE;
+		int wgy = (raycastRes.y + (raycastRes.y % TILE_SIZE)) / TILE_SIZE;
+
+		glDispatchCompute(wgx, wgy, 1);
+
+		glUseProgram(this->SSSRresolvepass);
+		currentProgram = this->SSSRresolvepass;
+
+		glUniform1i(glGetUniformLocation(currentProgram, "noiseMap"), 16);
+		glActiveTexture(GL_TEXTURE16);
+		glBindTexture(GL_TEXTURE_2D, ResourceServer::Instance()->LoadTexture("resources/textures/noise.tga")->GetHandle());
+
+		glUniform1i(glGetUniformLocation(currentProgram, "rayMap"), 17);
+		glActiveTexture(GL_TEXTURE17);
+		glBindTexture(GL_TEXTURE_2D, this->raycastBuffer);
+
+		glUniform2i(glGetUniformLocation(currentProgram, "ResolveSize"), raycastRes.x, raycastRes.y);
+		glUniform1f(glGetUniformLocation(currentProgram, "bias"), 0.7f);
+
+		break;
+	}
 	case Render::ReflectionPass::HIGH:
 		glUseProgram(this->SSRComputeProgram);
 		currentProgram = this->SSRComputeProgram;
@@ -198,6 +290,7 @@ void ReflectionPass::Execute()
 
 	// Dispatch the compute shader, using the workgroup values calculated earlier
 	// TODO: This shouldnt be lightserver work groups.
+
 	glDispatchCompute(this->uniformBlock.workGroups[0], this->uniformBlock.workGroups[1], 1);
 
 	// Unbind the maps
@@ -215,11 +308,19 @@ void ReflectionPass::Execute()
 
 	//glFinish();
 	
-	double time1 = glfwGetTime();
+	//double time1 = glfwGetTime();
 	
-	double elapsedTime = time1 - time;
+	//double elapsedTime = time1 - time;
 	
 	//printf("Elapsed time for reflections: %f\n\n\n\n\n\n\n\n\n\n\n", elapsedTime);
+
+
+	glEndQuery(GL_TIME_ELAPSED);
+	// See how much time the rendering of object i took in nanoseconds.
+	glGetQueryObjectui64v(queries[0], GL_QUERY_RESULT, &timeElapsed);
+
+
+	printf("Elapsed time for reflections: %f\n\n\n\n\n\n\n\n\n\n\n", (float)timeElapsed * 0.000001f);
 
 	FramePass::Execute();
 }
@@ -230,6 +331,9 @@ void ReflectionPass::UpdateResolution()
 
 	glBindTexture(GL_TEXTURE_2D, this->reflectionBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, newRes.x, newRes.y, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, this->raycastBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, newRes.x/2, newRes.y/2, 0, GL_RGBA, GL_FLOAT, NULL);
 
 	this->uniformBlock.workGroups[0] = (newRes.x + (newRes.x % TILE_SIZE)) / TILE_SIZE;
 	this->uniformBlock.workGroups[1] = (newRes.y + (newRes.y % TILE_SIZE)) / TILE_SIZE;

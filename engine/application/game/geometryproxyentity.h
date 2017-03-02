@@ -1,11 +1,11 @@
 #pragma once
 #include "modelentity.h"
-#include "render/resources/geometryproxy.h"
 
 namespace Render
 {
 class GraphicsProperty;
 class ModelInstance;
+class GeometryProxy;
 }
 
 namespace Game

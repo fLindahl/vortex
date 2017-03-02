@@ -19,6 +19,8 @@
 #include "imgui_internal.h"
 #include "render/particlesystem/particlefile.h"
 
+#include "application/basegamefeature/managers/scenemanager.h"
+
 
 #define CONSOLE_BUFFER_SIZE 8096
 
@@ -109,7 +111,7 @@ namespace Toolkit
 					if (ImGui::MenuItem("Show Geometry Proxies", NULL, &this->application->renderGeoProxies)) {}
 					if (ImGui::MenuItem("New Geometry Proxy", NULL)) 
 					{
-						std::shared_ptr<Edit::AddGeometryProxyEntity> command = std::make_shared<Edit::AddGeometryProxyEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
+						std::shared_ptr<Edit::AddGeometryProxyEntity> command = std::make_shared<Edit::AddGeometryProxyEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/geometryproxy_icon.mdl"));
 						commandManager->DoCommand(command);
 					}
 					
@@ -161,7 +163,10 @@ namespace Toolkit
 	void UserInterface::ShowFileMenu()
 	{
 		if (ImGui::MenuItem("New")) {}
-		if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+		if (ImGui::MenuItem("Open", "Ctrl+O"))
+		{
+			
+		}
 		if (ImGui::BeginMenu("Open Recent"))
 		{
 			ImGui::MenuItem("example1.map");
@@ -171,6 +176,11 @@ namespace Toolkit
 		}
 		if (ImGui::MenuItem("Save", "Ctrl+S")) {}
 		if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S")) {}
+
+		if (ImGui::MenuItem("Save to sponza.xml")) 
+		{
+			BaseGameFeature::SceneManager::Instance()->SaveXMLScene("resources/scenes/sponza.xml");
+		}
 		ImGui::Separator();
 
 		if (ImGui::BeginMenu("Layout"))
@@ -518,9 +528,9 @@ namespace Toolkit
 				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
 				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
 
-				const char* items[] = { "HIGH", "MEDIUM", "LOW"};
+				const char* items[] = { "ULTRA", "HIGH", "MEDIUM", "LOW"};
 
-				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 3);
+				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 4);
 			}
 			ImGui::EndDock();
 			
