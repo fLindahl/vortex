@@ -16,9 +16,16 @@
 		
 		<Shader name="defaultLit" desc="Default shader for rendering opaque lit geometry">            
 			<VertexShader name="resources/shaders/vertex/static.vert"/>
-			<FragmentShader name="resources/shaders/fragment/phong.frag"/>
+			<FragmentShader name="resources/shaders/fragment/pbr.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
+		
+		<Shader name="defaultLitAlphaCutout" desc="Default shader for rendering Cutout lit geometry">            
+			<VertexShader name="resources/shaders/vertex/static.vert"/>
+			<FragmentShader name="resources/shaders/fragment/pbr.frag"/>
+			<RenderState name="resources/shaders/states/alphacutout.state"/>
+		</Shader>
+		
 		<!-- END STATIC GEOMETRY -->
 		
 		<!-- BILLBOARDS -->
@@ -84,8 +91,16 @@
 		<!-- COMPUTE SHADERS -->
 		<!-- --------------- -->
 		
+		<Shader name="SSSR-Raycast" desc="Compute shader for calculating realtime reflections using screenspace ray tracing and parallax corrected cubemap fallback">
+			<ComputeShader name="resources/shaders/compute/sssr-raycast.comp"/>
+		</Shader>
+		
+		<Shader name="SSSR-Resolve" desc="Compute shader for calculating realtime reflections using screenspace ray tracing and parallax corrected cubemap fallback">
+			<ComputeShader name="resources/shaders/compute/sssr-resolve.comp"/>
+		</Shader>
+
 		<Shader name="SSR" desc="Compute shader for calculating realtime reflections using screenspace ray tracing and parallax corrected cubemap fallback">
-			<ComputeShader name="resources/shaders/compute/ssr.comp"/>
+			<ComputeShader name="resources/shaders/compute/raytracing-ssr.comp"/>
 		</Shader>
 		
 		<Shader name="CubemapsOnly" desc="Compute shader for calculating reflections based on blended POI infinite cubemaps only">    

@@ -1,59 +1,37 @@
-//------------------------------------------------------------------------------
 /**
-    @file core/config.h
-    
-	Main configure file for types and OS-specific stuff.
-	
-	(C) 2015 See the LICENSE file.
+* @file         config.h
+* @brief        Configurations for Vortex
+* @date         28-02-2017
+* @author       Fredrik Lindahl
+* @copyright    See LICENCE file
 */
+
 #include <stdint.h>
 #include <atomic>
 #include <xmmintrin.h>
 #include <immintrin.h>
 #include <memory>
 #include <assert.h>
-
-#define InvalidIndex -1;
-
-typedef uint32_t	uint32;
-typedef int32_t		int32;
-typedef uint16_t	uint16;
-typedef int16_t		int16;
-typedef uint8_t		uint8;
-typedef int8_t		int8;
-typedef uint8_t		uchar;
-typedef size_t      index_t;
-
-typedef unsigned int	uint;
-typedef unsigned short	ushort;
-
-typedef uint8_t      byte;
-
-typedef uint8_t		ubyte;
-typedef float		float32;
-typedef double		float64;
-
-#if _MSC_VER
-#define VORTEX_ALIGN16 __declspec(align(16))
-
-#elif __GNUC__
-#define __forceinline inline
-#define VORTEX_ALIGN16 __attribute__((aligned(16)))
-
-#else
-#define VORTEX_ALIGN16
-#endif
+#include <exception>
+#include <iostream>
+#include "core/types.h"
+//#include "core/debug.h"
 
 // assert macro
 //#define assert(_Expression) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(#_Expression), _CRT_WIDE(__FILE__), __LINE__), 0) )
 
 #ifdef __GNUC__
-#define _assert(expr, msg) ((expr) ? __ASSERT_VOID_CAST (0) : __assert_fail (#msg, __FILE__, __LINE__, __ASSERT_FUNCTION))
+#define _assert(expr, msg) ((expr) ? __ASSERT_VOID_CAST(0) : __assert_fail(#msg, __FILE__, __LINE__, __ASSERT_FUNCTION))
 #else
-#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(_Msg), _CRT_WIDE(__FILE__), __LINE__), 0) )
-#endif
-
-#ifdef NULL
-#undef NULL
-#define NULL nullptr
+//#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(_Msg), _CRT_WIDE(__FILE__), __LINE__), 0) )
+#define _assert(condition, message)                                            \
+    do                                                                         \
+    {                                                                          \
+        if (!(condition))                                                      \
+        {                                                                      \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__   \
+                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::terminate();                                                  \
+        }                                                                      \
+    } while (false)
 #endif

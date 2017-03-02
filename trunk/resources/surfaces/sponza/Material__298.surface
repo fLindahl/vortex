@@ -4,6 +4,7 @@
 		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/background.tga"/>
 		<Param name="NormalMap" type="string" value="resources/textures/sponza/background_ddn.tga"/>
 		<Param name="SpecularMap" type="string" value="resources/textures/sponza/background_spec.tga"/>
+		<Param name="RoughnessMap" type="string" value="resources/textures/sponza/background_roughness.tga"/>
 		
 		<!-- Specific Parameters -->
 	</Surface>

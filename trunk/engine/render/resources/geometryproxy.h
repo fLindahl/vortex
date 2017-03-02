@@ -9,11 +9,13 @@ ex. Parallax corrected cubemaps use these proxies to find an approximative inter
 #pragma once
 #include "GL/glew.h"
 #include <memory>
-#include "shaderobject.h"
-#include "render/server/renderdevice.h"
+#include "foundation/math/matrix4.h"
+#include "foundation/util/array.h"
 
 namespace Render
 {
+
+class CubeMapNode;
 
 class GeometryProxy : public std::enable_shared_from_this<GeometryProxy>
 {
@@ -28,12 +30,15 @@ public:
 
 	Math::mat4& Transform() { return this->transform; }
 
+	const Util::Array<std::shared_ptr<CubeMapNode>>& GetConnectedCubemaps() const { return this->connectedCubemaps; }
+	void ConnectCubemap(std::shared_ptr<CubeMapNode> cubemap) {this->connectedCubemaps.Append(cubemap);}
 private:
-	friend class LightServer;
-
 	bool isActive;
 
 	//Rotation, scale and position. Starts as a unit box. Scale to the size you need.
 	Math::mat4 transform;
+
+	//Contains pointers to each environmentprobe that is connected to this proxy
+	Util::Array<std::shared_ptr<CubeMapNode>> connectedCubemaps;
 };
 }

@@ -44,7 +44,7 @@ public:
 
 	float GetBlendFactor() { return this->blendFactor; }
 
-	void SetGeometryProxy(std::shared_ptr<Render::GeometryProxy> proxy) { this->proxy = proxy; }
+	void SetGeometryProxy(std::shared_ptr<Render::GeometryProxy> proxy) { this->proxy = proxy; proxy->ConnectCubemap( this->shared_from_this()); }
 	std::shared_ptr<Render::GeometryProxy> GetGeometryProxy() { return this->proxy; }
 
 private:

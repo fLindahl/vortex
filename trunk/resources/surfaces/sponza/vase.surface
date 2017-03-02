@@ -3,8 +3,8 @@
 		<!-- Textures -->
 		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/vase_dif.tga"/>
 		<Param name="NormalMap" type="string" value="resources/textures/sponza/vase_ddn.tga"/>
-		<Param name="SpecularMap" type="string" value="resources/textures/sponza/vase_spec.tga"/>
-		<Param name="RoughnessMap" type="string" value="resources/textures/placeholder_rough.png"/>		
+		<Param name="SpecularMap" type="string" value="resources/textures/sponza/vase_spec.png"/>
+		<Param name="RoughnessMap" type="string" value="resources/textures/sponza/vase_roughness.tga"/>		
 		
 		<!-- Specific Parameters -->
 	</Surface>

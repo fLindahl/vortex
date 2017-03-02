@@ -12,6 +12,7 @@ class ReflectionPass : public FramePass
 public:
 	enum ReflectionQuality
 	{
+		ULTRA,
 		HIGH,
 		MEDIUM,
 		LOW
@@ -63,10 +64,16 @@ private:
 
 	GLuint cubemapUBO[1];
 
+	GLuint SSSRraycastpass;
+	GLuint SSSRresolvepass;
+	GLuint raycastBuffer;
+
 	GLuint SSRComputeProgram;
 	GLuint CubemapProgram;
 	GLuint PCCubemapProgram;
 	GLuint reflectionBuffer;
+
+	GLuint queries[1];
 };
 
 }

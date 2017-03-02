@@ -30,4 +30,4 @@ private:
     std::shared_ptr<Physics::RigidBody> rigidBody;
 
 };
-}
+}	
