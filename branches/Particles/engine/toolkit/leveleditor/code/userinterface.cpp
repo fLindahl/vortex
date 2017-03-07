@@ -376,10 +376,12 @@ namespace Toolkit
 
 			ImGui::BeginDock("Particle Settings", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
+
 				this->particleCount = 0;
 				if (ImGui::Button("Save"))
 				{
 					Particles::ParticleFile::Instance()->SaveParticle(this->saveName.c_str());
+					this->appendedEmitters = "Appended emitters: ";
 				}
 				if (ImGui::IsItemHovered())
 				{
@@ -515,16 +517,6 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 			ImGui::Text("Emitter name");
 			ImGui::EndTooltip();
 		}
-
-		id = "Open##text" + std::to_string(particleCount);
-		if (ImGui::Button(id.c_str()))
-		{
-			this->openFilePopup = true;
-			OpenTexture(emitter);
-		}	
-		ImGui::SameLine(120);
-		id = "texname##" + std::to_string(particleCount);
-		ImGui::InputText(id.c_str(), (char*) emitter->GetParticleUISettings().texName.c_str(), 64, ImGuiInputTextFlags_ReadOnly);
 		
 		id = "Base Settings##" + std::to_string(particleCount);
 		if (ImGui::TreeNode(id.c_str()))
@@ -688,6 +680,45 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 				{
 					Particles::ParticleSystem::Instance()->UpdateParticleSize(emitter, emitter->GetParticleUISettings().startSize, emitter->GetParticleUISettings().endSize);
 				}
+
+				ImGui::TreePop();
+			}
+
+			id = "Texture##" + std::to_string(particleCount);
+			if (ImGui::TreeNode(id.c_str()))
+			{
+				id = "Open##text" + std::to_string(particleCount);
+				if (ImGui::Button(id.c_str()))
+				{
+					this->openFilePopup = true;
+					OpenTexture(emitter);
+				}
+				ImGui::SameLine(100);	
+				id = "##texname" + std::to_string(particleCount);
+				ImGui::InputText(id.c_str(), (char*)emitter->GetParticleUISettings().texName.c_str(), 64, ImGuiInputTextFlags_ReadOnly);
+
+				ImGui::Text("SpriteSheet"); ImGui::SameLine(140);
+				id = "##texsheet" + std::to_string(particleCount);
+				if(ImGui::Checkbox(id.c_str(),&emitter->GetParticleUISettings().spriteSheetTex))
+				{
+					emitter->GetRenderBuffer().textureAnimation[3] = int(emitter->GetParticleUISettings().spriteSheetTex);
+					emitter->UpdateUniformBuffer();
+				}
+				ImGui::Text("Frames per row"); ImGui::SameLine(180);
+				id = "##fpr1" + std::to_string(particleCount);
+				int i = 10;
+				if (ImGui::InputInt(id.c_str(), &emitter->GetParticleUISettings().framesPerRow, 0, 255, ImGuiInputTextFlags_EnterReturnsTrue))
+				{
+					emitter->GetRenderBuffer().textureAnimation[0] = emitter->GetParticleUISettings().framesPerRow;
+					emitter->UpdateUniformBuffer();
+				}
+				ImGui::Text("Total frames"); ImGui::SameLine(180);
+				id = "##tnf2" + std::to_string(particleCount);
+				if (ImGui::InputInt(id.c_str(), &emitter->GetParticleUISettings().numberOfFrames, 0, 255, ImGuiInputTextFlags_EnterReturnsTrue))
+				{
+					emitter->GetRenderBuffer().textureAnimation[1] = emitter->GetParticleUISettings().numberOfFrames;
+					emitter->UpdateUniformBuffer();
+				}	
 
 				ImGui::TreePop();
 			}

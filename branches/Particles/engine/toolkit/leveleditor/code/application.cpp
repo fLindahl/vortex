@@ -128,22 +128,39 @@ Application::Open()
 		this->billboard->LoadEmitters("resources/particles/Fire.particle");
 		this->billboard->Activate();
 
-		billboard3 = std::make_shared<Game::ParticleEntity>();
-		billboard3->SetTransform(Math::mat4::translation(11.18f, -0.85f, 4.02f));
-		//billboard3->LoadEmitters("resources/particles/Fire.particle");
-		//billboa3rd->GetEmitter()->CreateEmitter(1000, "resources/textures/particles/sprite_rapids2.tga");
-		billboard3->Activate();
-		this->billboard3->GetEmitters()[0]->CreateEmitter(20, "resources/textures/particles/fireparticle3.tga");
+		this->billboard3 = std::make_shared<Game::ParticleEntity>();
+		this->billboard3->SetTransform(Math::mat4::multiply(Math::mat4::rotationyawpitchroll(0.0f, -45.0f, 0.0f), Math::mat4::translation(11.5f, 0.0f, 2.0f)));
+		this->billboard3->LoadEmitters("resources/particles/Sparks.particle"); 
+		this->billboard3->Activate();
 
+		this->billboard2 = std::make_shared<Game::ParticleEntity>();
+		this->billboard2->SetTransform(Math::mat4::translation(11.18f, -0.85f, -4.52f));
+		this->billboard2->LoadEmitters("resources/particles/Fountain.particle");
+		this->billboard2->Activate();
+
+		/*
 		this->billboard2 = std::make_shared<Game::ParticleEntity>();
 		this->billboard2->SetTransform(Math::mat4::multiply(Math::mat4::rotationyawpitchroll(0.0f, 0.0f, -45.0f),Math::mat4::translation(0.0f, 5.5f, 0.0f)));
 		this->billboard2->Activate();
-		this->billboard2->GetEmitters()[0]->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");		
+		this->billboard2->GetEmitters()[0]->CreateEmitter(1000, "resources/textures/particles/fireparticle3.tga");
+		*/
 		
-		for (size_t i = 0; i < billboard->GetEmitters().Size(); i++)
-			particleList.Append(billboard->GetEmitters()[i]);
-		particleList.Append(billboard3->GetEmitters()[0]);
-		particleList.Append(billboard2->GetEmitters()[0]);
+		for (size_t i = 0; i < this->billboard->GetEmitters().Size(); i++)
+		{
+			this->particleList.Append(this->billboard->GetEmitters()[i]);
+		}
+
+		for (size_t i = 0; i < this->billboard3->GetEmitters().Size(); i++)
+		{
+			this->particleList.Append(this->billboard3->GetEmitters()[i]);
+		}
+
+		for (size_t i = 0; i < this->billboard2->GetEmitters().Size(); i++)
+		{
+			this->particleList.Append(this->billboard2->GetEmitters()[i]);
+		}
+			
+		//this->particleList.Append(this->billboard2->GetEmitters()[0]);
 
 
 /*		PointLight pLight;

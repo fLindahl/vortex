@@ -1,10 +1,10 @@
 CullFace = true
-FrontFace = cw
-CullMode = front
+FrontFace = ccw
+CullMode = back
 Blend = true
 BlendSourceFunc = src_alpha
 BlendDestinationFunc = one
-AlphaTest = false
+AlphaTest = true
 AlphaFunc = greater
 AlphaClamp = 0.0
 DepthTest = true

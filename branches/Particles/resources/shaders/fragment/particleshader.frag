@@ -5,12 +5,13 @@ in vec4 inColor;
 in float render;
 out vec4 diffuseColor;
 
+const int spriteX = 8;
+const int totSprites = 64;
 
 void main()
 {
 	vec4 text = texture(AlbedoMap, TexCoords);
 	vec4 col = text*inColor;
-	if(col.a  < 0.05)
-		discard;
+
 	diffuseColor = col;
 }
