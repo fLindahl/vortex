@@ -1,15 +1,27 @@
 <Vortex>
     <ParticleSystem>
-        <ParticleEmitter name="Fountain">
-            <Texture path="resources/textures/particles/sprite_rapids2.tga"/>
-            <Velocity vel="1.5560001" vel2="1.7040001" random="true"/>
-            <Acceleration acc="0.000000 -1.294000 0.000000" acc2="0.000000 -1.874000 0.000000" random="true"/>
-            <Lifetime life="1.585" life2="1.9900001" random="true"/>
-            <Color color="0.529166 0.790646 0.969432 0.825328" color2="0.272153 0.688878 0.973799 0.825328" random="true"/>
-            <Size startSize="0.171" endSize="0.33600003"/>
-            <ParticleAmount num="1000"/>
+        <ParticleEmitter name="Water1">
+            <Texture path="D:\Programming\vortex\resources\textures\particles\particle_spritesheet_smoke3.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
+            <Velocity vel="1.1160001" vel2="1.23" random="true"/>
+            <Acceleration acc="0.000000 -1.294000 0.000000" acc2="0.000000 -0.867000 0.000000" random="true"/>
+            <Lifetime life="1.6800001" life2="2.345" random="true"/>
+            <Color color="0.160784 0.243137 0.529412 0.203922" color2="0.282353 0.423529 0.650980 0.219608" random="true"/>
+            <Size startSize="0.14" endSize="0.52200001"/>
+            <ParticleAmount num="300"/>
             <EmitterShapes shape="0">
-                <Radius radius="0.29100001"/>
+                <Radius radius="0.44400004"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+        <ParticleEmitter name="Water2">
+            <Texture path="D:\Programming\vortex\resources\textures\particles\particle_spritesheet_smoke2.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
+            <Velocity vel="0.565" vel2="0.91400003" random="true"/>
+            <Acceleration acc="0.000000 -0.348000 0.000000" acc2="0.000000 -0.561000 0.000000" random="true"/>
+            <Lifetime life="1.9900001" life2="3.0460002" random="true"/>
+            <Color color="0.191377 0.407575 0.842795 0.323144" color2="0.259206 0.316950 0.860262 0.275109" random="true"/>
+            <Size startSize="0.052000001" endSize="0.64100003"/>
+            <ParticleAmount num="20"/>
+            <EmitterShapes shape="0">
+                <Radius radius="0.25100002"/>
             </EmitterShapes>
         </ParticleEmitter>
     </ParticleSystem>

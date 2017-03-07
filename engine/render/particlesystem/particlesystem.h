@@ -11,13 +11,16 @@ namespace Render{ class ShaderObject; }
 namespace Particles
 {
 
+//Emitting shapes of the particle system
 enum EmitterShapes
 {
 	CONE,
 	SPHERE,
-	HEMISPHERE
+	HEMISPHERE,
+	MESH //TODO: IMPLEMENT ME!
 };
 
+//Physics state and settings of the particles in the compute shader
 struct ParticleState
 {
 	Math::vec4 pos = Math::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -30,12 +33,18 @@ struct ParticleState
 	Math::vec4 endSize = Math::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 };
 
+//Uniform buffer used by the vertex shader
 struct ParticleRenderingBuffer
 {
+	//Used to offset to the right texture per emitter 
 	uint offset = 0;
+	//x = number of frames per row
+	//y = total number of frames
+	//w = if it is a spreedsheet or not 1.0 = spreedsheet 0.0 = no spreedsheet
+	Math::vec4 textureAnimation = Math::vec4(0.0f);
 };
 
-
+//Particles settings used by the UI to set up the particle state
 struct ParticleUISettings
 {
 	float vel = 1.0f;
@@ -52,9 +61,13 @@ struct ParticleUISettings
 	bool accRand = false;
 	bool colorRand = false;
 	bool lifeTimeRand = false;
+	bool spriteSheetTex = false;
 
 	float startSize = 0.05f;
 	float endSize = 0.05f;
+
+	int framesPerRow = 1;
+	int numberOfFrames = 1;
 
 	EmitterShapes shapes = CONE;
 
@@ -62,6 +75,7 @@ struct ParticleUISettings
 
 };
 
+//Sent to the emitter by the particle system
 struct EmitterBuffer
 {
 	size_t startIndex;
@@ -71,6 +85,7 @@ struct EmitterBuffer
 
 };
 
+//Singleton class that handles all the particle emitters
 class ParticleSystem
 {
 public:
@@ -108,13 +123,17 @@ private:
 
 	// Used for storage buffer objects to hold particle data
 	GLuint particleBuffer;
+	// Used for storage buffer objects to hold particle data used when a particle spawnes
 	GLuint particleStartBuffer;
 
 	std::shared_ptr<Render::MeshResource> mesh;
 
+	//Array of all emitters particle settings
 	Util::Array<ParticleState> particleArray;
+	//Array of all emitters particle start settings
 	Util::Array<ParticleState> particleStartSettings;
 
+	//List of emitters
 	Util::Array<Property::ParticleEmitter*> emitters;
 
 	std::shared_ptr<Render::ShaderObject> sh;

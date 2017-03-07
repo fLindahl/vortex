@@ -32,7 +32,8 @@ uniform sampler2D depthMap;
 uniform sampler2D normalMap;
 
 const float DT = 0.016;
-const float thickness = 0.4;
+const float thickness = 0.1;
+const float linearDamp = 0.7;
 
 layout( local_size_x = WORK_GROUP_SIZE,  local_size_y = 1, local_size_z = 1)   in;
 void main()
@@ -41,6 +42,8 @@ void main()
 	
 	if(pSettings.settings[gid].accLife.w <= 0)
 	{
+		pSettings.settings[gid].size = startSettings.settings[gid].startSize;
+		startSettings.settings[gid].size = startSettings.settings[gid].startSize;
 		pSettings.settings[gid] = startSettings.settings[gid];
 	}
 	else
@@ -69,6 +72,7 @@ void main()
 		}
 
 		pSettings.settings[gid].size = mix(pSettings.settings[gid].endSize,pSettings.settings[gid].startSize, lerp);
+		v *= pow(linearDamp,DT);
 		vec3 pp = p.xyz + (v.xyz*DT + 0.5*DT*DT*pSettings.settings[gid].accLife.xyz);
 		vec3 vp = v.xyz + pSettings.settings[gid].accLife.xyz*DT;
 		pSettings.settings[gid].pos = vec4(pp,1.0);
@@ -76,7 +80,7 @@ void main()
 		pSettings.settings[gid].accLife.w -= DT;
 		if(pSettings.settings[gid].accLife.w <= 0.5)
 		{
-			pSettings.settings[gid].color.a -= 0.1;
+			pSettings.settings[gid].color.a -= 0.016;
 		}
 	}
 

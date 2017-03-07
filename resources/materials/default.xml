@@ -31,8 +31,9 @@
 			<Pass name="PointLightShadow" shader="shadow"/>
 			<Pass name="GlobalShadow" shader="shadow"/>
 			-->
+			<Pass name="Picking" shader="pickingBillboard"/>
 			
-			<Pass name="Depth" shader="depthStatic"/>
+			<!--<Pass name="Depth" shader="depthStatic"/>-->
 			<Pass name="FlatGeometryLit" shader="defaultUnLitBillboard"/>
 			
             <!-- material textures -->

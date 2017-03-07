@@ -1,5 +1,5 @@
 CullFace = true
-FrontFace = cw
+FrontFace = ccw
 CullMode = back
 Blend = false
 BlendSourceFunc = src_alpha

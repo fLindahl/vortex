@@ -42,7 +42,6 @@ void ParticleEmitter::CreateEmitter(GLuint numOfParticles, const char* texturepa
 	this->texture = Render::ResourceServer::Instance()->LoadTexture(texturepath);
 	this->texPath = texturepath;
 	this->state = Particles::ParticleState();
-	//state.pos = owner->GetTransform().get_position();
 	this->buff = Particles::ParticleSystem::Instance()->GetEmitterBuffer(this->numOfParticles, *this);
 	this->pSet.numParticles = numOfParticles;
 	this->renderBuff.offset = this->buff.startIndex;
@@ -61,6 +60,7 @@ void ParticleEmitter::CreateEmitter(Particles::FileSettings& set)
 	this->pSet = set.set;
 
 	this->renderBuff.offset = this->buff.startIndex;
+	this->renderBuff.textureAnimation = Math::vec4(set.set.framesPerRow, set.set.numberOfFrames, 0.0f, int(set.set.spriteSheetTex));
 	UpdateUniformBuffer();
 }
 

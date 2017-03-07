@@ -162,6 +162,7 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 			this->particleArray[i].color = settings.color;
 		}
 
+		this->particleArray[i].size = settings.startSize;
 		this->particleArray[i].startSize = settings.startSize;
 		this->particleArray[i].endSize = settings.endSize;
 

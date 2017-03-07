@@ -33,6 +33,9 @@ bool ParticleFile::SaveParticle(Util::String name)
 
 		pElement = xmlDoc.NewElement("Texture");
 		pElement->SetAttribute("path", this->emitters[i]->GetTexturePath().c_str());
+		pElement->SetAttribute("framesPerRow", set.framesPerRow);
+		pElement->SetAttribute("numberOfFrames", set.numberOfFrames);
+		pElement->SetAttribute("spritesheet", set.spriteSheetTex);
 		pEmitter->InsertEndChild(pElement);
 
 		pElement = xmlDoc.NewElement("Velocity");
@@ -131,6 +134,9 @@ Util::Array<FileSettings> ParticleFile::LoadParticle(Util::String path)
 		//Texture
 		XMLElement* pValues = pElement->FirstChildElement("Texture");
 		fileSet.texPath = pValues->Attribute("path");
+		fileSet.set.framesPerRow = pValues->IntAttribute("framesPerRow");
+		fileSet.set.numberOfFrames = pValues->IntAttribute("numberOfFrames");
+		fileSet.set.spriteSheetTex = pValues->BoolAttribute("spritesheet");
 
 		//Velocity
 		pValues = pElement->FirstChildElement("Velocity");

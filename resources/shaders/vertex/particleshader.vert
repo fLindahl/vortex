@@ -16,6 +16,10 @@ struct ParticleState
 layout(std140, binding = 3) uniform RenderBuffer 
 {
 	uint offset;
+	//x = number of frames per row
+	//y = total number of frames
+	//w = if it is a spreedsheet or not 1.0 = spreedsheet 0.0 = no spreedsheet
+	vec4 textureAnimation;
 };  
 
 layout(std430, binding = 4) buffer source 
@@ -74,7 +78,20 @@ void main()
 	// normal in world space
 	//Normal = vec3(normalize(Model * vec4(normal, 0)));
 
-	TexCoords = uv;
+	if(textureAnimation.w >= 1.0)
+	{
+		float lerp = 1-(pSettings.settings[index].accLife.w / startSettings.settings[index].accLife.w);
+		float indx = textureAnimation.y*lerp;
+		
+		vec2 offset = vec2((int(floor(indx))% int(textureAnimation.x))/textureAnimation.x, floor(indx/textureAnimation.x)/textureAnimation.x);
+		
+		TexCoords = (uv/textureAnimation.x)+offset;
+	}
+	else
+	{
+		TexCoords = uv;
+	}
+	
 
 	gl_Position = ViewProjection * wPos;
 	
