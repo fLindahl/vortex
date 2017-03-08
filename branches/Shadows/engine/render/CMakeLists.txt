@@ -60,6 +60,8 @@ SET(files_render_frame
 	frame/shadowmap.cpp
 	frame/dynamicunlitpass.h
 	frame/dynamicunlitpass.cpp
+	frame/VSMshadowmap.h
+	frame/VSMshadowmap.cpp
 	)
 	
 SET(files_render_resources

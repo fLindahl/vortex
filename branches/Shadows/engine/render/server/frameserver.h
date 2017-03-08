@@ -20,6 +20,7 @@ class PickingPass;
 class ReflectionPass;
 class ShadowMap; ///SWARLEY
 class ParticleComputePass;
+class VSMShadowMap; // SWARLEY
 
 class FrameServer
 {
@@ -52,6 +53,7 @@ public:
 	std::shared_ptr<PickingPass> GetPickingPass();
 	std::shared_ptr<ShadowMap> GetShadowMap();
 	std::shared_ptr<ParticleComputePass> GetParticleComputePass();
+	std::shared_ptr<VSMShadowMap> GetVSMShadowMap();
 
 
 private:
@@ -87,6 +89,8 @@ private:
 
 	///SWARLEY
 	std::shared_ptr<ShadowMap> shadowmap;
+
+	std::shared_ptr<VSMShadowMap> VSMshadowmap;
 	
 	/// For icons etc.
 	/// Objects rendered in this pass are not shown in reflections
