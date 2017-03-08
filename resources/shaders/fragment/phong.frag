@@ -14,6 +14,7 @@ uniform sampler2D NormalMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D RoughnessMap;
 uniform sampler2D ShadowMap;
+uniform sampler2D VSMShadowMap;
 
 struct PointLight
 {
@@ -96,9 +97,269 @@ float attenuate(vec3 lightDirection, float radius)
 	return atten;
 }
 
+//////////////////////////////MSM//////////////////////////////////////////
+vec4 UndoQuantTransform(vec4 oldmoments)
+{
+	vec4 moments;
+	mat4 quant = mat4(-0.333333333333333f, 0.0f, 1.732050807568877f, 0.0f,
+					   0.0f, 0.125f, 0.0f, 1.0f,
+					   -0.75f, 0.0f, (0.75*1.732050807568877f), 0.0f,
+					   0.0f, -0.125f, 0.0f, 1.0f);
+	vec4 changecoordspace = vec4(0.5f, 0.0f,0.5f,0.0f);
+	mat4 transposed = transpose(quant);
+	moments = transposed*(oldmoments-changecoordspace);
+	
+	return moments;
+}
+
+vec4 GetOptimisedMoments(float depth)
+{
+	float square = depth * depth;
+    vec4 moments = vec4(depth, square, square * depth, square * square);
+	mat4 optimizedvalues = mat4(-2.07224649f,    13.7948857237f,  0.105877704f,   9.7924062118f,
+                                 32.23703778f,  -59.4683975703f, -1.9077466311f, -33.7652110555f,
+                                -68.571074599f,  82.0359750338f,  9.3496555107f,  47.9456096605f,
+                                 39.3703274134f,-35.364903257f,  -6.6543490743f, -23.9728048165f);
+	vec4 optimized = moments *  optimizedvalues;
+    optimized[0] += 0.035955884801f;
+	return optimized;
+}
+
+vec4 ConvertMoments(vec4 optmoments)
+{
+	optmoments[0] -= 0.035955884801f;
+	mat4 temp = mat4(0.2227744146f, 0.1549679261f, 0.1451988946f, 0.163127443f,
+                     0.0771972861f, 0.1394629426f, 0.2120202157f, 0.2591432266f,
+                     0.7926986636f, 0.7963415838f, 0.7258694464f, 0.6539092497f,
+					 0.0319417555f,-0.1722823173f,-0.2758014811f,-0.3376131734f);
+	return optmoments * temp;
+}
+
+float ComputeMSMUnbound(vec4 moments, float fragdepth, float depthbias, float momentbias)
+{
+	//use bias to avoid artifacts
+	vec4 b = mix(moments, vec4(0.5f,0.5f,0.5f,0.5f), momentbias);
+	vec3 z;
+	z.x = fragdepth - depthbias;
+	//vec4 b = moments;
+	//compute Cholesky factorization
+	//mad = The result of mvalue * avalue + bvalue.
+	float L32D22 = -b.x * b.y + b.z;
+	float D22 = -b.x * b.x + b.y;
+	float squaredzvariance = -b.y * b.y + b.w;
+	float D33D22 = dot(vec2(squaredzvariance, -L32D22), vec2(D22, L32D22));
+	float InvD22 = 1.0f / D22;
+	float L32 = L32D22 * InvD22;
+	
+	//get scaled image of b
+	vec3 c = vec3(1.0f, z.x, z.x * z.x);
+	
+	c.y -= b.x;
+	c.z -= b.y + L32 * c.y;
+	
+	//scale to solve D*c2=c1
+	c.y *= InvD22;
+	c.z *= D22 / L32D22;
+	
+	//solve L^T*c3 = c2
+	c.y -= L32 * c.z;
+	c.x -= dot(c.yz, b.xy);
+	
+	//solve c.x+c.y*z+c.z^2
+	float p = c.y / c.z;
+	float q = c.x / c.z;
+	float D = (p * p * 0.25f) - q;
+	float r = sqrt(D);
+	z.y = -p * 0.5f - r;
+	z.z = -p * 0.5f + r;
+	
+	//compute the shadow intensity by summing
+	vec4 switchvalue = (z.z < z.x) ? vec4(z.y, z.x, 1.0f, 1.0f) :
+                       ((z.y < z.x) ? vec4(z.x, z.y, 0.0f, 1.0f) :
+                       vec4(0.0f,0.0f,0.0f,0.0f));
+	
+	
+	
+	float quotient = (switchvalue.x * z.z - b.x * (switchvalue.x + z.y) + b.y) 
+						/ ((z.z - switchvalue.y) * (z.x - z.y));
+	float shadowintesity = switchvalue.z + switchvalue.w * quotient;
+	
+	return clamp(shadowintesity, 0, 1);
+}
+float ComputeMSM(vec4 moments, float fragdepth, float depthbias, float momentbias)
+{
+	//use bias to avoid artifacts
+	vec4 b = mix(moments, vec4(0.5f,0.5f,0.5f,0.5f), momentbias);
+	vec3 z;
+	z.x = fragdepth - depthbias;
+	
+	//compute Cholesky factorization
+	//mad = The result of mvalue * avalue + bvalue.
+	float L32D22 = -b.x * b.y + b.z;
+	float D22 = -b.x * b.x + b.y;
+	float squaredzvariance = -b.y * b.y + b.w;
+	float D33D22 = dot(vec2(squaredzvariance, -L32D22), vec2(D22, L32D22));
+	float InvD22 = 1.0f / D22;
+	float L32 = L32D22 * InvD22;
+	
+	//get scaled image of b
+	vec3 c = vec3(1.0f, z.x, z.x * z.x);
+	
+	c.y -=b.x;
+	c.z -= b.y + L32 * c.y;
+	
+	//scale to solve D*c2=c1
+	c.y *= InvD22;
+	c.z *= D22 / D33D22;
+	
+	//solve L^T*c3 = c2
+	c.y -= L32 * c.z;
+	c.x -= dot(c.yz, b.xy);
+	
+	//solve c.x+c.y*z+c.z^2
+	float p = c.y / c.z;
+	float q = c.x / c.z;
+	float D = ((p * p) * 0.25f) - q;
+	float r = sqrt(D);
+	z.y =- p * 0.5f - r;
+	z.z =- p * 0.5f + r;
+	
+	float shadowintesity = 1.0f;
+	
+	//use four deltas if 3 three delta solution is invalid
+	if (z.y < 0.0f || z.z > 1.0f)
+	{
+		float FreeZ = ((b.z-b.y) * z.x + b.z -b.w) / ((b.y-b.x) * z.x +b.y-b.z);
+		float w1Factor = (z.x > FreeZ) ? 1.0f : 0.0f; //maybe swicth 1 and 0 here
+		
+		shadowintesity = ( b.y - b.x + (b.z - b.x - (FreeZ + 1.0f) * (b.y - b.x)) * (FreeZ - w1Factor - z.x) 
+						   / (z.x * (z.x - FreeZ))) / (FreeZ - w1Factor) + 1.0f - b.x;
+		
+	}
+	else
+	{
+		vec4 switchvalue =  (z.z < z.x) ? vec4(z.y, z.x, 1.0f, 1.0f) :
+							((z.y < z.x) ? vec4(z.x, z.y, 0.0f, 1.0f) :
+							vec4(0.0f, 0.0f, 0.0f, 0.0f));
+							
+		float quotient = (switchvalue.x * z.z - b.x * (switchvalue.x + z.z) + b.y) / ((z.z - switchvalue.y) * (z.x - z.y));
+		
+		shadowintesity = switchvalue.z + switchvalue.w * quotient;
+	}
+	
+	return clamp(shadowintesity, 0.0f, 1.0f);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Assume the monitor is calibrated to the sRGB color space
 const float screenGamma = 2.2;
+///VSM
+//for lightbleeding reduction
+float linstep(float low, float high, float v)
+{
+	return clamp((v-low)/(high-low), 0.0, 1.0);
+}
+float VSMexperiment(sampler2D smap, vec2 scoords, float compare, float bias)
+{
+	
+	vec2 dmoments = texture(smap, scoords.xy).rg;
+	
+	float p = step(compare, dmoments.x);
+	///0.00002 is a bias value to make sure variance aint 0
+	float variance = max(dmoments.y - dmoments.x*dmoments.x, bias);
+	float distance = compare - dmoments.x;
+	//upper bound percentage
+	float varianceeq = variance / (variance + distance*distance);
+	//the first 1 here is the lightbleedreduction, keep at 1 or we have shadows on all walls
+	float upperp = linstep(1.0, 1.0, varianceeq);
+	
+	return min(max(p, upperp), 1.0);
+	
+	
+	//return step(compare, texture(smap, scoords.xy).r);
+}
 
+float VSMexperimentMM(sampler2D smap, vec2 scoords, float compare, float bias)
+{
+	vec2 dmoments = texture(smap, scoords).rg;
+	vec2 texelsize = 1.0 / textureSize(smap, 0);
+	
+	//small filtering, makes it a tiny bit smoother
+	
+	vec2 c1 = scoords+vec2(0, texelsize.y);
+	vec2 c2 = scoords+vec2(texelsize.x, 0);
+	vec2 c3 = scoords+vec2(texelsize.x, texelsize.y);
+	vec2 c4 = scoords;
+	vec2 c5 = scoords+vec2(0, -texelsize.y);
+	vec2 c6 = scoords+vec2(-texelsize.x, 0);
+	vec2 c7 = scoords+vec2(-texelsize.x, -texelsize.y);
+	
+	vec2 d1 = texture(smap, c1).rg;
+	vec2 d2 = texture(smap, c2).rg;
+	vec2 d3 = texture(smap, c3).rg;
+	vec2 d4 = texture(smap, c4).rg;
+	vec2 d5 = texture(smap, c5).rg;
+	vec2 d6 = texture(smap, c6).rg;
+	vec2 d7 = texture(smap, c7).rg;
+	
+	vec2 SevenAAmoments = (d1+d2+d3+d4+d5+d6+d7)/7.0;
+	vec2 FourAAmoments = (d1+d2+d3+d4) /4.0;
+	
+	//gaussian filtering
+	vec2 color = vec2(0,0);
+	//small gaussian filter 7x1 filter
+	color += texture( smap, scoords + vec2( -3.0*texelsize.x, -3.0*texelsize.y ) ).rg * 0.015625;
+	color += texture( smap, scoords + vec2( -2.0*texelsize.x, -2.0*texelsize.y ) ).rg *0.09375;
+	color += texture( smap, scoords + vec2( -1.0*texelsize.x, -1.0*texelsize.y ) ).rg *0.234375;
+	color += texture( smap, scoords + vec2( 0.0 , 0.0) ).rg*0.3125;
+	color += texture( smap, scoords + vec2( 1.0*texelsize.x,  1.0*texelsize.y ) ).rg *0.234375;
+	color += texture( smap, scoords + vec2( 2.0*texelsize.x,  2.0*texelsize.y ) ).rg *0.09375;
+	color += texture( smap, scoords + vec2( 3.0*texelsize.x,  3.0*texelsize.y ) ).rg * 0.015625;
+
+	vec2 GAdmoments = color;
+	
+	
+	//dmoments = (FourAAmoments + GAdmoments)/ 2;
+	//dmoments = (SevenAAmoments + GAdmoments)/ 2;
+	
+	//dmoments = SwarleyAA(smap, scoords, 1);
+	dmoments = SevenAAmoments;
+	
+	float p = step(compare, dmoments.x);
+	///0.00002 is a bias value to make sure variance aint 0
+	float variance = max(dmoments.y - dmoments.x*dmoments.x, bias);
+	float distance = compare - dmoments.x;
+	//upper bound percentage
+	float varianceeq = variance / (variance + distance*distance);
+	//the first 1 here is the lightbleedreduction, keep at 1 or we have shadows on all walls
+	float upperp = linstep(1.0, 1.0, varianceeq);
+	
+	return min(max(p, upperp), 1.0);
+	
+	
+	//return step(compare, texture(smap, scoords.xy).r);
+}
+
+
+
+//PCF-------------------------------------------------------------------------
+
+float PCFsampling(sampler2D shamap, vec2 uvcords, float fragdepth, float bias)
+{
+		
+	//Percentage closer filtering, be careful with incresing the sample rate. It looks weird
+	float shadowfactor = 0;
+	vec2 texelsize = 1.0 / textureSize(shamap, 0);
+	for (float x=-3; x <= 3; ++x)
+	{
+		for(float y = -3; y <= 3; ++y)
+		{
+			float pcfDepth = texture(shamap, uvcords.xy + vec2(x, y) * texelsize).x;
+			shadowfactor += fragdepth-bias > pcfDepth ? 0.0f : 1.0f; 					
+		}
+	}
+	return shadowfactor /= 49.0f;
+		
+}
 
 void main()
 {
@@ -174,33 +435,42 @@ void main()
 		vec3 projcords = FragPosLightSpace.xyz / FragPosLightSpace.w;
 		
 		vec3 uvcords = 0.5f * projcords + 0.5f;
-		
-		float depth = texture(ShadowMap, uvcords.xy).r;
-		
 		float z = uvcords.z;
-		
 		float shadowfactor = 0.0f;
-		float nordir = clamp(dot(normal, spotDir), 0,1);
-		float bias = 0.0005f * tan(acos(nordir));
-		bias = min(max(bias, 0.005f), 0.0005f);
 		
 		
-		//if (projcords.z > 1.0 && projcords.z < 0.0) //outside of shadowmap and therefore it should not be shaded
-			//shadowfactor = 0.0f;
-		if(projcords.z < 1.0 && projcords.z > 0.0)
+		
+		//dont shade fragments thats outside of the shadowmap
+		if (z < 1.0)
 		{
-			//PCF, sample pixles for smooth shadows. DO NOT INCREASE THE SAMPLE RATE: IT WILL HAVE MASSIVE PERFORMANCE IMPACT
-			vec2 texelsize = 1.0 / textureSize(ShadowMap, 0);
-			for (int x=-3; x<=3; ++x)
-			{
-				for(int y = -3; y <= 3; ++y)
-				{
-					float pcfDepth = texture(ShadowMap, uvcords.xy + vec2(x, y) * texelsize).r; 
-					shadowfactor += z-bias > pcfDepth ? 1.0f : 0.0f;      
-				}
-			}
-			shadowfactor /= 49.0f;
+			///PCF
+			//bias calc for PCF
+			float nordir = clamp(dot(normal, spotDir), 0,1);
+			float bias = 0.005f * tan(acos(nordir));
+			bias = min(max(bias, 0.005f), 0.0005f);
+			//shadowfactor = PCFsampling(ShadowMap, uvcords.xy, z, bias);
+			
+			///VSM without filtering, lots of light leaking compared to pcf, however the shadows look better(or rahter the edges look better)
+			//shadowfactor = VSMexperiment(VSMShadowMap, uvcords.xy, z-bias, 0.000038);
+			shadowfactor = VSMexperimentMM(VSMShadowMap, uvcords.xy, z-bias, 0.000038);
+			
+			
+			
 		}
+		
+		
+		
+	
+		///MSM with no filtering, Atleast I thinks its msm
+		//vec4 moments = texture(MSMShadowMap, uvcords.xy).rgba;
+		////vec4 usefulmoments = UndoQuantTransform(moments);
+		//float momentbias = 0.08f;
+		//uhm the CamputeMSM function only works on a lenght of 31 ish otherwise its retarded ??
+		//shadowfactor = ComputeMSM(ConvertMoments(GetOptimisedMoments(depth)), z, bias, momentbias);
+		//shadowfactor = 1.0f-ComputeMSMUnbound(usefulmoments, gl_FragCoord.z , bias, momentbias);
+		
+		
+		
 		
 		/// Light Direction
 		vec3 L = spotPos - FragmentPos.xyz;
@@ -238,7 +508,7 @@ void main()
 			vec3 H = normalize(L + V);
 			float specular = pow(max(dot(H, N), 0.0), shininess);
 			
-			vec3 irradiance = (light.colorAndCenterOffset.rgb * (albedoDiffuseColor.rgb * diffuse * (1.0f-shadowfactor)) + (vec3(specular) * spec) * (1.0f-shadowfactor)) * falloff * radialAttenuation;
+			vec3 irradiance = (light.colorAndCenterOffset.rgb * (albedoDiffuseColor.rgb * diffuse * (shadowfactor)) + (vec3(specular) * spec) * (shadowfactor)) * falloff * radialAttenuation;
 			color.rgb += irradiance;
 		} 	
 	}

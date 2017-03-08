@@ -79,7 +79,13 @@
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		
+		<Shader name="VSMshadowMap" desc="Shader for creating VSM shadowmaps">    
+			<VertexShader name="resources/shaders/vertex/VSMshadowmap.vert"/>
+			<FragmentShader name="resources/shaders/fragment/VSMshadowmap.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
 		
+	
 		<!-- --------------- -->
 		<!-- COMPUTE SHADERS -->
 		<!-- --------------- -->

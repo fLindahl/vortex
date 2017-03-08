@@ -10,6 +10,7 @@
 #include "render/frame/reflectionpass.h"
 #include "render/frame/shadowmap.h"
 #include "render/frame/particlecomputepass.h"
+#include "render/frame/VSMshadowmap.h"
 
 namespace Render
 {
@@ -86,6 +87,17 @@ namespace Render
 
 		this->framePassByName.insert(std::make_pair(this->shadowmap->name, this->shadowmap));
 		this->framePasses.Append(this->shadowmap);
+
+		// MSM shadowmap pass ///Swarley
+		this->VSMshadowmap = std::make_shared<VSMShadowMap>();
+		this->VSMshadowmap->name = "VSMShadowMap";
+		this->VSMshadowmap->Setup();
+
+		this->framePassByName.insert(std::make_pair(this->VSMshadowmap->name, this->VSMshadowmap));
+		this->framePasses.Append(this->VSMshadowmap);
+
+
+
 		// Dynamic unlit pass
 		// Uses the regular flat geometry lit framebuffer object but renders later (after shadows and reflections)
 		this->dynamicUnlitPass = std::make_shared<DynamicUnlitPass>();
@@ -157,6 +169,11 @@ namespace Render
 	std::shared_ptr<ParticleComputePass> FrameServer::GetParticleComputePass()
 	{
 		return this->particleComputePass;
+	}
+
+	std::shared_ptr<Render::VSMShadowMap> FrameServer::GetVSMShadowMap()
+	{
+		return this->VSMshadowmap;
 	}
 
 	std::shared_ptr<Render::ShadowMap> FrameServer::GetShadowMap()
