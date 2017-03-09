@@ -62,10 +62,8 @@ void LightCullingPass::Execute()
 	glUniform1i(location, 0);
 	glBindImageTexture(0, this->buffer, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
-
 	// Dispatch the compute shader, using the workgroup values calculated earlier
 	glDispatchCompute(lightServer->GetWorkGroupsX(), lightServer->GetWorkGroupsY(), 1);
-
 
 	// Unbind the depth map
 	glActiveTexture(GL_TEXTURE4);
@@ -92,9 +90,6 @@ void LightCullingPass::Setup()
 	GLfloat borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-
-
 
     FramePass::Setup();
 }

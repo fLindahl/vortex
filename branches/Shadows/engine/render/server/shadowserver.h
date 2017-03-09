@@ -32,6 +32,8 @@ namespace Render
 		void AppendSpotLightEntity(Game::ModelEntitySpotLight* entity);
 		void RemoveSpotLightEntity(Game::ModelEntitySpotLight* itr);
 
+		GLuint& GetNumShadowEntities() { return this->spotLighEntetiesSize; }
+
 		Util::Array<Game::ModelEntitySpotLight*>& GetSpotLightEntities();
 	private:
 		Util::Array<Game::ModelEntitySpotLight*> spotLightEntities;

@@ -58,7 +58,6 @@ private:
 	GLuint program;
 
 	Util::Array<GLuint> shaders;
-	
 
 	// TODO: Add renderstates to the rendering system
 	RenderState renderState;

@@ -99,8 +99,6 @@ void DrawPass::Execute()
 
 void DrawPass::Setup()
 {
-
-
     FramePass::Setup();
 }
 

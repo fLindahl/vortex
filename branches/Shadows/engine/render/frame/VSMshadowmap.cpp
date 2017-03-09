@@ -11,18 +11,40 @@
 
 namespace Render
 {
-	VSMShadowMap::VSMShadowMap()
+	VSMShadowMap::VSMShadowMap(): LSMBuffer(0), texOffsetBuffer(0), lightCoordinatesBuffer(0)
 	{
 		this->frameBufferObject = 0;
-		this->buffer = 0;
-		this->framebuffer = 0;
-		this->depthtexture = 0;
-		this->VSMtexture = 0;
-		this->shadowWidth = 2048;
-		this->shadowHeight = 2048;
+		this->buffer            = 0;
+		this->framebuffer       = 0;
+		this->depthtexture      = 0;
+		this->shadowAtlas       = 0;
+
+		this->shadowWidth  = 1024;
+		this->shadowHeight = 1024;
 		this->shadowAspect = this->shadowWidth / this->shadowHeight;
+
+		this->shadowAtlasWidth  = 8192;
+		this->shadowAtlasHeight = 8192;
+
+		this->shadowMapTextureLocation = 9;
+
+		this->maxColumns = (int)std::floor(this->shadowAtlasWidth / this->shadowWidth);
+		this->maxRows    = (int)std::floor(this->shadowAtlasHeight / this->shadowHeight);
+		this->maxShadows = this->maxColumns * this->maxRows;
+
+		this->textureScale = ((float)this->shadowWidth / (float)this->shadowAtlasWidth);
+
+		this->xOffset = 0;
+		this->yOffset = 0;
+
+		this->prevLightSize = 0;
+
 		this->shadowNearPlane = 0.05f;
-		this->MSAA = 4.0f;
+		this->MSAA            = 4.0f;
+
+		glGenBuffers(1, &this->LSMBuffer);
+		glGenBuffers(1, &this->texOffsetBuffer);
+		glGenBuffers(1, &this->lightCoordinatesBuffer);
 	}
 
 	VSMShadowMap::~VSMShadowMap()
@@ -32,172 +54,223 @@ namespace Render
 
 	void VSMShadowMap::Setup()
 	{
-		///MULTI FBO
-		/*glEnable(GL_MULTISAMPLE);
-		glGenFramebuffers(1, &multiFBO);
-		glBindFramebuffer(GL_FRAMEBUFFER, multiFBO);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-
-		
-		///FIRST GENERATE A MULTI 2D TEXTURE
-		//glGenTextures(1, &this->MSMshadowmap);
-		//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->MSMshadowmap);
-		///GENERATE A RENDERBUFFER FOR DEPTH ATTACHMENT
-		///SET 4 SAMPLES (4xMSAA) SAME AS IN WINDOW.CC
-		glGenRenderbuffers(1, &rbo);
-		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, MSAA, GL_DEPTH_COMPONENT, shadowWidth, shadowHeight);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
-		GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		_assert(e == GL_FRAMEBUFFER_COMPLETE, "MSM ShadowMap MultiFramebuffer Status Error!");
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		///BIND THE BLIT BUFFER
-		glGenFramebuffers(1, &fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-		///GENERATE A TEXTURE AND BIND IT TO THE BLIT FBO
-		glGenTextures(1, &MSMshadowmap);
-		glBindTexture(GL_TEXTURE_2D, MSMshadowmap);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowWidth, shadowWidth, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, MSMshadowmap, 0);*/
-
 		glGenFramebuffers(1, &this->frameBufferObject);
+
 		///VSM EXPERIMENTING
-		glGenTextures(1, &depthtexture);
-		glBindTexture(GL_TEXTURE_2D, depthtexture);
+		/// Activating this texture will mess with the Texture Atlas
+		glGenTextures(1, &this->depthtexture);
+		glBindTexture(GL_TEXTURE_2D, this->depthtexture);
+
 		// Remove artifact on the edges of the shadowmap
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, this->shadowAtlasWidth, this->shadowAtlasWidth, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		///color texture to overwrite with moments
-		glGenTextures(1, &VSMtexture);
-		glBindTexture(GL_TEXTURE_2D, VSMtexture);
+
+		/// Color texture to overwrite with moments
+		glGenTextures(1, &this->shadowAtlas);
+		glBindTexture(GL_TEXTURE_2D, this->shadowAtlas);
+
 		//glTexStorage2D(GL_TEXTURE_2D, 1, GL_RG16, shadowWidth, shadowHeight);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		// Remove artifact on the edges
+
+		/// Remove artifact on the edges
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, shadowWidth, shadowHeight, 0, GL_RG, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, this->shadowAtlasWidth, this->shadowAtlasHeight, 0, GL_RG, GL_FLOAT, NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		// bind fbo
+
+		/// Bind fbo
 		glBindFramebuffer(GL_FRAMEBUFFER, this->frameBufferObject);
-		// attach the textures
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthtexture, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, VSMtexture, 0);
+		/// Attach the textures
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthtexture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->shadowAtlas, 0);
 		
 		GLenum k = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		_assert(k == GL_FRAMEBUFFER_COMPLETE, "VSM ShadowMap Framebuffer Status Error!");
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+		/// Stores the Render Program & the Shadow Map Generation program
+		this->shadowMapRenderProgram = ShaderServer::Instance()->LoadShader("defaultLit")->GetProgram();
+		this->shadowMapProgram = ShaderServer::Instance()->LoadShader("VSMshadowMap")->GetProgram();
 
-		this->sendtothisshaderprogram = ShaderServer::Instance()->LoadShader("defaultLit")->GetProgram();
 		FramePass::Setup();
 	}
 
 
 	void VSMShadowMap::Execute()
 	{
-		//this->frameBufferObject = multiFBO;
-		//glCullFace(GL_FRONT);
-		glViewport(0.0f, 0.0f, this->shadowWidth, this->shadowHeight);
-		
-		this->BindFrameBuffer();
-		
-		
-		///calculate light MVP from a single spotlight
-		Game::ModelEntitySpotLight* spotlight;
-
+		glUseProgram(this->shadowMapProgram);
 		auto shadowEntities = ShadowServer::Instance()->GetSpotLightEntities();
 
-		if (shadowEntities.Size() != 0)
+		if (shadowEntities.Size() >= 0)
 		{
-			spotlight = shadowEntities[0];
+			if (ShadowServer::Instance()->GetNumShadowEntities() > this->maxShadows)
+				printf("Maximum number of shadows has been reached! %i\n", this->maxShadows);
+
+			//this->frameBufferObject = multiFBO;
+
+			this->BindFrameBuffer();
+
+			/// Clear the Depth Buffer
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			///calculate light MVP from a single spotlight
+			Game::ModelEntitySpotLight* spotlight;
+
+			/// Reset the offset
+			this->xOffset = 0;
+			this->yOffset = 0;
 
 			Math::mat4 lightV, lightP;
 			Math::vec4 lookat;
-			/// TODO: FIX THIS SHET, MATH IS HARD YOU KNO'
-			lookat = spotlight->GetTransform().get_position() + Math::vec4::multiply(spotlight->GetSpotLightDirection(), spotlight->GetSpotLightLength());
-			lightV = Math::mat4::lookatrh(spotlight->GetTransform().get_position(), lookat, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
-			//lightV = Math::mat4::transpose(spotlight->GetTransform());
-
-
-			//lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight.angle), this->shadowAspect, this->shadowNearPlane, spotlight.length);
-			lightP = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight->GetSpotLightAngle() * 2.0f), this->shadowAspect, this->shadowNearPlane, spotlight->GetSpotLightLength()*2);
-			///DO NOT REMOVE THE UNIFORM FROM THE H-FILE
-			shadUniformBuffer.LSM = Math::mat4::multiply(lightV, lightP);
-			shadUniformBuffer.lProj = lightP;
-		}
-		
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		///DRAW STUFF HERE
-		GLuint currentProgram = 0;
-
-		for (Material* material : this->materials)
-		{
-			auto shader = material->GetShader(this->name);
-
-			if (shader->GetProgram() != currentProgram)
+			/// Add a new Shadow Maps MVP
+			if (this->prevLightSize < shadowEntities.Size() && this->prevLightSize >= 0)
 			{
-				currentProgram = shader->GetProgram(); //36
-				glUseProgram(currentProgram);
+				spotlight = shadowEntities[ShadowServer::Instance()->GetNumShadowEntities() - 1];
+
+				this->CreateLightSpaceMatrix(spotlight, lookat, lightV, lightP);
+				Math::mat4 ls = Math::mat4::multiply(lightV, lightP);
+				Math::mat4 lp = lightP;
+				this->AddNewLSM(ls, lp);
+
+				/// Update the previousLightSize to be the current Size of Shadow Entities
+				this->prevLightSize = (int)shadowEntities.Size();
 			}
 
-			shader->EnableRenderState();
-			shader->setUniMatrix4fv(shadUniformBuffer.LSM, "lightSpaceMatrix");
-			shader->setUniMatrix4fv(shadUniformBuffer.lProj, "lightProj");
-			///SET UNIFORMS HERE
-			for (auto surface : material->SurfaceList())
+			/// Update the existing Shadwo Maps MVP
+			for (unsigned int i = 0; i < shadowEntities.Size(); i++)
 			{
-				for (auto modelNode : surface->GetModelNodes())
+				spotlight = shadowEntities[i];
+
+				/// If the maximum colums for one row has been reached, add one to the yOffset to move down to Row(n)
+				if (this->xOffset % this->maxColumns == 0 && this->xOffset > 0)
 				{
-					///Bind mesh
-					///TODO: We should probably check and make sure we don't bind these more than once
-					modelNode->modelInstance->GetMesh()->Bind();
-
-					for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())
-					{
-						shader->setModelMatrix(graphicsProperty->getModelMatrix());
-						modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
-					}
-
-					modelNode->modelInstance->GetMesh()->Unbind();
+					this->xOffset = 0;
+					this->yOffset++;
 				}
+
+				/// Offset the different shadow maps in the Atlas
+				glViewport(this->xOffset * this->shadowWidth, this->yOffset * this->shadowHeight, this->shadowWidth, this->shadowHeight);
+
+				/// This just Re-Calculates the Light Space Matrix of the Light
+				this->CreateLightSpaceMatrix(spotlight, lookat, lightV, lightP);
+				this->LightSpaceMatrix[i] = Math::mat4::multiply(lightV, lightP);
+				this->LightProjection[i] = lightP;
+
+				glUniformMatrix4fv(glGetUniformLocation(this->shadowMapProgram, "lightSpaceMatrix"), 1, false, &this->LightSpaceMatrix[i].mat.m[0][0]);
+				glUniformMatrix4fv(glGetUniformLocation(this->shadowMapProgram, "lightProj"), 1, false, &this->LightProjection[i].mat.m[0][0]);
+
+				/// TODO: At some point this needs to be a better solution
+				for (Material *material : this->materials)
+				{
+					auto shader = material->GetShader(this->name);
+					shader->EnableRenderState();
+
+					for (auto surface : material->SurfaceList())
+					{
+						for (auto modelNode : surface->GetModelNodes())
+						{
+							modelNode->modelInstance->GetMesh()->Bind();
+							for (GraphicsProperty *graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())
+							{
+								shader->setModelMatrix(graphicsProperty->getModelMatrix());
+								modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
+							}
+							modelNode->modelInstance->GetMesh()->Unbind();
+						}
+					}
+				}
+				/// Increase xOffset if it has a lower number than the amount of shadow casting entities in the level
+				if (this->xOffset < shadowEntities.Size())
+					this->xOffset++;
 			}
+
+			//after its been rendered, do some type of filtering to it(curretnyl being made in the phong shader)
+
+			glViewport(0.0f, 0.0f, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
+			glUseProgram(this->shadowMapRenderProgram);
+
+			glUniform1i(glGetUniformLocation(this->shadowMapRenderProgram, "numShadows"), shadowEntities.Size());
+
+			/// Activate the Atlas Texture in the Render Program
+			glActiveTexture(GL_TEXTURE0 + this->shadowMapTextureLocation);
+			glBindTexture(GL_TEXTURE_2D, this->shadowAtlas);
+
+			glUniform1i(glGetUniformLocation(this->shadowMapRenderProgram, "VSMShadowMap"), this->shadowMapTextureLocation);
+
+			/// Update the LightMatrixBuffer
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->LSMBuffer);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, shadowEntities.Size() * sizeof(Math::mat4), &this->LightSpaceMatrix[0], GL_STATIC_DRAW);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			/// Update the TextureOffsetBuffer
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->texOffsetBuffer);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, shadowEntities.Size() * sizeof(Math::vec4), &this->textureCoordinates[0], GL_STATIC_DRAW);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+			/// Should be a buffer for the positions for the Lights in the scene #static.vert
+			/*glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->lightCoordinatesBuffer);
+            glBufferData(GL_SHADER_STORAGE_BUFFER, shadowEntities.Size() * sizeof(Math::vec4), 0, GL_STATIC_DRAW);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);*/
+
+			/// Bind Buffers
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 16, this->LSMBuffer);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 17, this->texOffsetBuffer);
+			//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 18, this->lightCoordinatesBuffer);
+
+		}
+		else
+		{
+			printf("You can not have a negative value of lights!\n");
 		}
 
-		//after its been rendered, do some type of filtering to it(curretnyl being made in the phong shader)
-
-
-		glUseProgram(sendtothisshaderprogram);
-
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, this->VSMtexture);
-
-
-		glUniform1i(glGetUniformLocation(sendtothisshaderprogram, "VSMShadowMap"), 10);
-		const GLuint loc = (GLuint)glGetUniformLocation(this->sendtothisshaderprogram, "LSM");
-		glUniformMatrix4fv(loc, 1, GL_FALSE, &shadUniformBuffer.LSM.mat.m[0][0]);
-
-		glCullFace(GL_BACK);
-		glViewport(0.0f, 0.0f, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
 		FramePass::Execute();
 	}
 
 	void VSMShadowMap::UpdateResolution()
 	{
+		const Resolution& newRes = RenderDevice::Instance()->GetRenderResolution();
+		glBindTexture(GL_TEXTURE_2D, this->buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, newRes.x, newRes.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	}
 
+	void VSMShadowMap::CreateLightSpaceMatrix(Game::ModelEntitySpotLight* spotlight, Math::vec4& lookat, Math::mat4& view, Math::mat4& projection)
+	{
+		lookat = spotlight->GetTransform().get_position() + Math::vec4::multiply(spotlight->GetSpotLightDirection(), spotlight->GetSpotLightLength());
+		view = Math::mat4::lookatrh(spotlight->GetTransform().get_position(), lookat, Math::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		projection = Math::mat4::perspfovrh(-Math::Deg2Rad(spotlight->GetSpotLightAngle() * 2.0f), this->shadowAspect, 0.05f, spotlight->GetSpotLightLength());
+	}
+
+	void VSMShadowMap::AddNewLSM(Math::mat4& LightSpaceMatrix, Math::mat4& LightProjection)
+	{
+		int xOffset = 0;
+		int yOffset = 0;
+
+		auto shadowEntities = ShadowServer::Instance()->GetSpotLightEntities();
+
+		for (unsigned int i = 0; i < shadowEntities.Size() && shadowEntities.Size() > 0; i++)
+		{
+			if (xOffset % this->maxColumns == 0 && xOffset > 0)
+			{
+				xOffset = 0;
+				yOffset++;
+			}
+
+			if (xOffset < shadowEntities.Size())
+				xOffset++;
+		}
+
+		this->textureCoordinates.Append(Math::vec4(xOffset * this->textureScale, yOffset * this->textureScale, this->textureScale, 0.0f));
+
+		this->LightSpaceMatrix.Append(LightSpaceMatrix);
+		this->LightProjection.Append(LightProjection);
 	}
 }
 

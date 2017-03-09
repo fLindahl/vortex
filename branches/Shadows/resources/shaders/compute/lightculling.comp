@@ -26,7 +26,6 @@ struct SpotLight
 	vec4 params;
 	
 	
-	
 	//We can reconstruct position of spotlight by knowing that the top of the cone will be the 
 	//bounding spheres radius away from it's center in the direction of the spotlight 
 };
