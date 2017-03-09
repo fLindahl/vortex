@@ -255,7 +255,7 @@ namespace Render
 
 		auto shadowEntities = ShadowServer::Instance()->GetSpotLightEntities();
 
-		for (unsigned int i = 0; i < shadowEntities.Size() && shadowEntities.Size() > 0; i++)
+		for (unsigned int i = 1; i < shadowEntities.Size(); i++)
 		{
 			if (xOffset % this->maxColumns == 0 && xOffset > 0)
 			{

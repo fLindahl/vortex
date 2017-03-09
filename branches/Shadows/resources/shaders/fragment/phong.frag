@@ -467,11 +467,11 @@ void main()
 			float nordir = clamp(dot(normal, spotDir), 0,1);
 			float bias = 0.005f * tan(acos(nordir));
 			bias = min(max(bias, 0.005f), 0.0005f);
-			shadowfactor = PCFsampling(ShadowMap, uvcords.xy, z, bias);
+			//shadowfactor = PCFsampling(ShadowMap, uvcords.xy, z, bias);
 
 			///VSM without filtering, lots of light leaking compared to pcf, however the shadows look better(or rahter the edges look better)
 			//shadowfactor = VSMexperiment(VSMShadowMap, uvcords.xy, z-bias, 0.00001);
-			//shadowfactor = VSMexperimentMM(VSMShadowMap, uvcords.xy, z-bias, 0.000038);
+			shadowfactor = VSMexperimentMM(VSMShadowMap, uvcords.xy, z-bias, 0.000038);
 		}
 
 		///MSM with no filtering, Atleast I thinks its msm
