@@ -1,7 +1,7 @@
 ///MSM Shadow Map ///
 
 uniform mat4 lightProj;
-out vec4 FragColor;
+out vec2 FragColor;
 										
 /*mat4 basispolynomialsmat = mat4(1.5f, 0.0f, -2.0f, 0.0f,
 								0.0f, 4.0f, 0.0f, -4.0f,
@@ -35,5 +35,5 @@ void main()
 	float dy = dFdy(depth1);
 	depth2 += 0.25*(dx*dx+dy*dy);
 	
-	FragColor = vec4(depth1, depth2, 0, 0);
+	FragColor = vec2(depth1, depth2);
 }

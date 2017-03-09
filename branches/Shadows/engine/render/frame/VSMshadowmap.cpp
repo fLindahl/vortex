@@ -18,8 +18,8 @@ namespace Render
 		this->framebuffer = 0;
 		this->depthtexture = 0;
 		this->VSMtexture = 0;
-		this->shadowWidth = 512;
-		this->shadowHeight = 512;
+		this->shadowWidth = 2048;
+		this->shadowHeight = 2048;
 		this->shadowAspect = this->shadowWidth / this->shadowHeight;
 		this->shadowNearPlane = 0.05f;
 		this->MSAA = 4.0f;
@@ -72,6 +72,8 @@ namespace Render
 		glGenTextures(1, &depthtexture);
 		glBindTexture(GL_TEXTURE_2D, depthtexture);
 		// Remove artifact on the edges of the shadowmap
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -106,6 +108,7 @@ namespace Render
 	void VSMShadowMap::Execute()
 	{
 		//this->frameBufferObject = multiFBO;
+		//glCullFace(GL_FRONT);
 		glViewport(0.0f, 0.0f, this->shadowWidth, this->shadowHeight);
 		
 		this->BindFrameBuffer();
@@ -187,6 +190,7 @@ namespace Render
 		const GLuint loc = (GLuint)glGetUniformLocation(this->sendtothisshaderprogram, "LSM");
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &shadUniformBuffer.LSM.mat.m[0][0]);
 
+		glCullFace(GL_BACK);
 		glViewport(0.0f, 0.0f, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
 		FramePass::Execute();
 	}

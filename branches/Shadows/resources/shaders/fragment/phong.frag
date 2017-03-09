@@ -280,11 +280,10 @@ float VSMexperiment(sampler2D smap, vec2 scoords, float compare, float bias)
 
 float VSMexperimentMM(sampler2D smap, vec2 scoords, float compare, float bias)
 {
-	vec2 dmoments = texture(smap, scoords).rg;
-	vec2 texelsize = 1.0 / textureSize(smap, 0);
+	vec2 dmoments = textureLod(smap, scoords, 0).rg;
+	vec2 texelsize = vec2(1.0f) / textureSize(smap, 0);
 	
-	//small filtering, makes it a tiny bit smoother
-	
+	//small filtering, makes it quite a bit smoother
 	vec2 c1 = scoords+vec2(0, texelsize.y);
 	vec2 c2 = scoords+vec2(texelsize.x, 0);
 	vec2 c3 = scoords+vec2(texelsize.x, texelsize.y);
@@ -293,13 +292,14 @@ float VSMexperimentMM(sampler2D smap, vec2 scoords, float compare, float bias)
 	vec2 c6 = scoords+vec2(-texelsize.x, 0);
 	vec2 c7 = scoords+vec2(-texelsize.x, -texelsize.y);
 	
-	vec2 d1 = texture(smap, c1).rg;
-	vec2 d2 = texture(smap, c2).rg;
-	vec2 d3 = texture(smap, c3).rg;
-	vec2 d4 = texture(smap, c4).rg;
-	vec2 d5 = texture(smap, c5).rg;
-	vec2 d6 = texture(smap, c6).rg;
-	vec2 d7 = texture(smap, c7).rg;
+	vec2 d1 = textureLod(smap, c1,0).rg;
+	vec2 d2 = textureLod(smap, c2,0).rg;
+	vec2 d3 = textureLod(smap, c3,0).rg;
+	vec2 d4 = textureLod(smap, c4,0).rg;
+	vec2 d5 = textureLod(smap, c5,0).rg;
+	vec2 d6 = textureLod(smap, c6,0).rg;
+	vec2 d7 = textureLod(smap, c7,0).rg;
+	
 	
 	vec2 SevenAAmoments = (d1+d2+d3+d4+d5+d6+d7)/7.0;
 	vec2 FourAAmoments = (d1+d2+d3+d4) /4.0;
@@ -318,25 +318,31 @@ float VSMexperimentMM(sampler2D smap, vec2 scoords, float compare, float bias)
 	vec2 GAdmoments = color;
 	
 	
-	//dmoments = (FourAAmoments + GAdmoments)/ 2;
-	//dmoments = (SevenAAmoments + GAdmoments)/ 2;
-	
 	//dmoments = SwarleyAA(smap, scoords, 1);
 	dmoments = SevenAAmoments;
 	
-	float p = step(compare, dmoments.x);
+	float p = smoothstep(compare-0.0002,compare, dmoments.x);
 	///0.00002 is a bias value to make sure variance aint 0
 	float variance = max(dmoments.y - dmoments.x*dmoments.x, bias);
 	float distance = compare - dmoments.x;
 	//upper bound percentage
 	float varianceeq = variance / (variance + distance*distance);
-	//the first 1 here is the lightbleedreduction, keep at 1 or we have shadows on all walls
-	float upperp = linstep(1.0, 1.0, varianceeq);
+	//the first 1 here is the lightbleedreduction, 1=only shadows on 1 wall but bad AA, 
+	//less than 1(0.2 is the best) gives very smooth edges but gives very weird shadows considering
+	//the distance to the occluder
+	float upperp = linstep(0.2, 1.0, varianceeq);
 	
 	return min(max(p, upperp), 1.0);
 	
+	/*float p2 = smoothstep(compare-0.02, compare, dmoments.x);
+	float var2 = max(dmoments.y - dmoments.x*dmoments.x, -0.001);
+	float d = compare - dmoments.x;
+	float pmax = linstep(1.0, 1.0, (var2+d*d));*/
 	
-	//return step(compare, texture(smap, scoords.xy).r);
+	//return clamp(max(p2, pmax), 0.0, 1.0);
+	
+	
+
 }
 
 
@@ -349,15 +355,15 @@ float PCFsampling(sampler2D shamap, vec2 uvcords, float fragdepth, float bias)
 	//Percentage closer filtering, be careful with incresing the sample rate. It looks weird
 	float shadowfactor = 0;
 	vec2 texelsize = 1.0 / textureSize(shamap, 0);
-	for (float x=-3; x <= 3; ++x)
+	for (float x=-1; x <= 1; ++x)
 	{
-		for(float y = -3; y <= 3; ++y)
+		for(float y = -1; y <= 1; ++y)
 		{
 			float pcfDepth = texture(shamap, uvcords.xy + vec2(x, y) * texelsize).x;
 			shadowfactor += fragdepth-bias > pcfDepth ? 0.0f : 1.0f; 					
 		}
 	}
-	return shadowfactor /= 49.0f;
+	return shadowfactor /= 9.0f;
 		
 }
 
@@ -448,10 +454,10 @@ void main()
 			float nordir = clamp(dot(normal, spotDir), 0,1);
 			float bias = 0.005f * tan(acos(nordir));
 			bias = min(max(bias, 0.005f), 0.0005f);
-			//shadowfactor = PCFsampling(ShadowMap, uvcords.xy, z, bias);
+			//shadowfactor = PCFsampling(VSMShadowMap, uvcords.xy, z, bias);
 			
 			///VSM without filtering, lots of light leaking compared to pcf, however the shadows look better(or rahter the edges look better)
-			//shadowfactor = VSMexperiment(VSMShadowMap, uvcords.xy, z-bias, 0.000038);
+			//shadowfactor = VSMexperiment(VSMShadowMap, uvcords.xy, z-bias, 0.00001);
 			shadowfactor = VSMexperimentMM(VSMShadowMap, uvcords.xy, z-bias, 0.000038);
 			
 			
