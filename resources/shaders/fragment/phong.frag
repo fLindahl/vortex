@@ -3,7 +3,7 @@ in vec3 FragmentPos;
 in vec2 TexCoords;
 // For normalmapping
 in mat3 NormalMatrix;
-in vec4 FragPosLightSpace;
+in vec4 lightSpaceCoordinates[10];
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 normalColor;
@@ -79,7 +79,20 @@ layout(std430, binding = 5) readonly buffer VisibleSpotLightIndicesBuffer
 	VisibleIndex data[];
 } visibleSpotLightIndicesBuffer;
 
-layout(std140, binding = 20) uniform directionalLight 
+/// Shadow Map
+layout(std430, binding = 17) readonly buffer TextureOffsetCoordinates
+{
+	vec4 data[];
+} textureOffsetCoordinates;
+
+/*layout(std430, binding = 18) readonly buffer VisibleSpotLightIndicesBuffer
+{
+	VisibleIndex data[];
+} visibleSpotLightIndicesBuffer;*/
+
+/// Shadow Map
+
+layout(std140, binding = 20) uniform directionalLight
 {
 	vec4 color;
 	vec4 direction;
@@ -249,6 +262,7 @@ float ComputeMSM(vec4 moments, float fragdepth, float depthbias, float momentbia
 	
 	return clamp(shadowintesity, 0.0f, 1.0f);
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Assume the monitor is calibrated to the sRGB color space
 const float screenGamma = 2.2;
@@ -280,10 +294,11 @@ float VSMexperiment(sampler2D smap, vec2 scoords, float compare, float bias)
 
 float VSMexperimentMM(sampler2D smap, vec2 scoords, float compare, float bias)
 {
-	vec2 dmoments = textureLod(smap, scoords, 0).rg;
-	vec2 texelsize = vec2(1.0f) / textureSize(smap, 0);
-	
-	//small filtering, makes it quite a bit smoother
+	vec2 dmoments = texture(smap, scoords).rg;
+	vec2 texelsize = 1.0 / textureSize(smap, 0);
+
+	//small filtering, makes it a tiny bit smoother
+
 	vec2 c1 = scoords+vec2(0, texelsize.y);
 	vec2 c2 = scoords+vec2(texelsize.x, 0);
 	vec2 c3 = scoords+vec2(texelsize.x, texelsize.y);
@@ -291,16 +306,15 @@ float VSMexperimentMM(sampler2D smap, vec2 scoords, float compare, float bias)
 	vec2 c5 = scoords+vec2(0, -texelsize.y);
 	vec2 c6 = scoords+vec2(-texelsize.x, 0);
 	vec2 c7 = scoords+vec2(-texelsize.x, -texelsize.y);
-	
-	vec2 d1 = textureLod(smap, c1,0).rg;
-	vec2 d2 = textureLod(smap, c2,0).rg;
-	vec2 d3 = textureLod(smap, c3,0).rg;
-	vec2 d4 = textureLod(smap, c4,0).rg;
-	vec2 d5 = textureLod(smap, c5,0).rg;
-	vec2 d6 = textureLod(smap, c6,0).rg;
-	vec2 d7 = textureLod(smap, c7,0).rg;
-	
-	
+
+	vec2 d1 = texture(smap, c1).rg;
+	vec2 d2 = texture(smap, c2).rg;
+	vec2 d3 = texture(smap, c3).rg;
+	vec2 d4 = texture(smap, c4).rg;
+	vec2 d5 = texture(smap, c5).rg;
+	vec2 d6 = texture(smap, c6).rg;
+	vec2 d7 = texture(smap, c7).rg;
+
 	vec2 SevenAAmoments = (d1+d2+d3+d4+d5+d6+d7)/7.0;
 	vec2 FourAAmoments = (d1+d2+d3+d4) /4.0;
 	
@@ -308,44 +322,34 @@ float VSMexperimentMM(sampler2D smap, vec2 scoords, float compare, float bias)
 	vec2 color = vec2(0,0);
 	//small gaussian filter 7x1 filter
 	color += texture( smap, scoords + vec2( -3.0*texelsize.x, -3.0*texelsize.y ) ).rg * 0.015625;
-	color += texture( smap, scoords + vec2( -2.0*texelsize.x, -2.0*texelsize.y ) ).rg *0.09375;
-	color += texture( smap, scoords + vec2( -1.0*texelsize.x, -1.0*texelsize.y ) ).rg *0.234375;
+	color += texture( smap, scoords + vec2( -2.0*texelsize.x, -2.0*texelsize.y ) ).rg * 0.09375;
+	color += texture( smap, scoords + vec2( -1.0*texelsize.x, -1.0*texelsize.y ) ).rg * 0.234375;
 	color += texture( smap, scoords + vec2( 0.0 , 0.0) ).rg*0.3125;
-	color += texture( smap, scoords + vec2( 1.0*texelsize.x,  1.0*texelsize.y ) ).rg *0.234375;
-	color += texture( smap, scoords + vec2( 2.0*texelsize.x,  2.0*texelsize.y ) ).rg *0.09375;
+	color += texture( smap, scoords + vec2( 1.0*texelsize.x,  1.0*texelsize.y ) ).rg * 0.234375;
+	color += texture( smap, scoords + vec2( 2.0*texelsize.x,  2.0*texelsize.y ) ).rg * 0.09375;
 	color += texture( smap, scoords + vec2( 3.0*texelsize.x,  3.0*texelsize.y ) ).rg * 0.015625;
 
 	vec2 GAdmoments = color;
-	
-	
+
+	//dmoments = (FourAAmoments + GAdmoments)/ 2;
+	//dmoments = (SevenAAmoments + GAdmoments)/ 2;
+
 	//dmoments = SwarleyAA(smap, scoords, 1);
 	dmoments = SevenAAmoments;
-	
-	float p = smoothstep(compare-0.0002,compare, dmoments.x);
+
+	float p = step(compare, dmoments.x);
 	///0.00002 is a bias value to make sure variance aint 0
 	float variance = max(dmoments.y - dmoments.x*dmoments.x, bias);
 	float distance = compare - dmoments.x;
 	//upper bound percentage
 	float varianceeq = variance / (variance + distance*distance);
-	//the first 1 here is the lightbleedreduction, 1=only shadows on 1 wall but bad AA, 
-	//less than 1(0.2 is the best) gives very smooth edges but gives very weird shadows considering
-	//the distance to the occluder
-	float upperp = linstep(0.2, 1.0, varianceeq);
-	
+	//the first 1 here is the lightbleedreduction, keep at 1 or we have shadows on all walls
+	float upperp = linstep(1.0, 1.0, varianceeq);
+
 	return min(max(p, upperp), 1.0);
-	
-	/*float p2 = smoothstep(compare-0.02, compare, dmoments.x);
-	float var2 = max(dmoments.y - dmoments.x*dmoments.x, -0.001);
-	float d = compare - dmoments.x;
-	float pmax = linstep(1.0, 1.0, (var2+d*d));*/
-	
-	//return clamp(max(p2, pmax), 0.0, 1.0);
-	
-	
 
+	//return step(compare, texture(smap, scoords.xy).r);
 }
-
-
 
 //PCF-------------------------------------------------------------------------
 
@@ -364,7 +368,6 @@ float PCFsampling(sampler2D shamap, vec2 uvcords, float fragdepth, float bias)
 		}
 	}
 	return shadowfactor /= 9.0f;
-		
 }
 
 void main()
@@ -438,14 +441,24 @@ void main()
 		//bounding spheres radius away from it's center in the direction of the spotlight 
 		vec3 spotPos = light.centerAndRadius.xyz - ((light.colorAndCenterOffset.a) * spotDir);
 
-		vec3 projcords = FragPosLightSpace.xyz / FragPosLightSpace.w;
+		vec3 projcords = lightSpaceCoordinates[lightIndex].xyz / lightSpaceCoordinates[lightIndex].w;
+		//vec3 projcords = lightPositionCoordinates.data[lightIndex].xyz / lightPositionCoordinates.data[lightIndex].w;
 		
 		vec3 uvcords = 0.5f * projcords + 0.5f;
+
+		/// Sets the scale of the Shadow Maps in the Atlas
+		uvcords.x *= textureOffsetCoordinates.data[lightIndex].z;
+		uvcords.y *= textureOffsetCoordinates.data[lightIndex].z;
+		// A Shadow Maps Offset in the Atlas
+		uvcords.x += textureOffsetCoordinates.data[lightIndex].x;
+		uvcords.y += textureOffsetCoordinates.data[lightIndex].y;
+
+		//float depth = texture(ShadowMap, uvcords.xy).r;
+
 		float z = uvcords.z;
+
 		float shadowfactor = 0.0f;
-		
-		
-		
+
 		//dont shade fragments thats outside of the shadowmap
 		if (z < 1.0)
 		{
@@ -454,19 +467,13 @@ void main()
 			float nordir = clamp(dot(normal, spotDir), 0,1);
 			float bias = 0.005f * tan(acos(nordir));
 			bias = min(max(bias, 0.005f), 0.0005f);
-			//shadowfactor = PCFsampling(VSMShadowMap, uvcords.xy, z, bias);
-			
+			shadowfactor = PCFsampling(ShadowMap, uvcords.xy, z, bias);
+
 			///VSM without filtering, lots of light leaking compared to pcf, however the shadows look better(or rahter the edges look better)
 			//shadowfactor = VSMexperiment(VSMShadowMap, uvcords.xy, z-bias, 0.00001);
-			shadowfactor = VSMexperimentMM(VSMShadowMap, uvcords.xy, z-bias, 0.000038);
-			
-			
-			
+			//shadowfactor = VSMexperimentMM(VSMShadowMap, uvcords.xy, z-bias, 0.000038);
 		}
-		
-		
-		
-	
+
 		///MSM with no filtering, Atleast I thinks its msm
 		//vec4 moments = texture(MSMShadowMap, uvcords.xy).rgba;
 		////vec4 usefulmoments = UndoQuantTransform(moments);
@@ -474,10 +481,7 @@ void main()
 		//uhm the CamputeMSM function only works on a lenght of 31 ish otherwise its retarded ??
 		//shadowfactor = ComputeMSM(ConvertMoments(GetOptimisedMoments(depth)), z, bias, momentbias);
 		//shadowfactor = 1.0f-ComputeMSMUnbound(usefulmoments, gl_FragCoord.z , bias, momentbias);
-		
-		
-		
-		
+
 		/// Light Direction
 		vec3 L = spotPos - FragmentPos.xyz;
 		float distance = length(L);

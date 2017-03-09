@@ -7,18 +7,33 @@ layout(location=4) in vec3 binormal;
 out vec3 FragmentPos;
 out vec2 TexCoords;
 out mat3 NormalMatrix;
-out vec4 FragPosLightSpace;
+out vec4 lightSpaceCoordinates[10];
 
-uniform mat4 LSM;
+layout(std430, binding = 16) readonly buffer LightSpaceMatrixs 
+{
+	mat4 data[];
+}lightSpaceMatrixs;
+
+/*layout(std430, binding = 18) writeonly buffer LightPositionCoordinates 
+{
+	vec4 data[];
+}lightPositionCoordinates;*/
+
+uniform int numShadows;
 
 void main()
 {
 	vec4 wPos = Model * vec4(pos, 1.0f);
-	FragPosLightSpace = LSM * wPos;
 	
 	// position in world space
-	FragmentPos = wPos.xyz;	
-		
+	FragmentPos = wPos.xyz;
+	
+	for(int i = 0; i < numShadows && numShadows > 0; i++)
+	{
+		lightSpaceCoordinates[i] = lightSpaceMatrixs.data[i] * wPos;
+		//lightPositionCoordinates.data[i] = lightSpaceMatrixs.data[i] * wPos;
+	}
+	
 	mat3 model33 = mat3(Model);
 		
 	vec3 t = normalize(model33 * (tangent));

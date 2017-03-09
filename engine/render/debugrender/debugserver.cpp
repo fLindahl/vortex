@@ -36,8 +36,8 @@ void DebugServer::ImGuiDebugBar()
 			if (ImGui::MenuItem("Light Tiles")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(dynamic_cast<Render::LightCullingPass*>(Render::FrameServer::Instance()->GetLightCullingPass().get())->GetBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Normals")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Specular")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer()); }
-			if (ImGui::MenuItem("Shadow Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetShadowMap()->GetShadowMap());}
-			if (ImGui::MenuItem("VSM Shadow Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetVSMShadowMap()->GetVSMShadowMap()); }
+			if (ImGui::MenuItem("Shadow Map Atlas")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetShadowMap()->GetShadowMapAtlasBuffer());}
+			if (ImGui::MenuItem("VSM Shadow Map Atlas")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetVSMShadowMap()->GetVSMShadowMapAtlas());}
 			ImGui::Separator();
 			ImGui::EndMenu();
 		}
