@@ -8,6 +8,22 @@
 * @copyright    See LICENCE file
 */
 
+#if _MSC_VER
+#define VORTEX_ALIGN16 __declspec(align(16))
+#elif __GNUC__
+#define __forceinline inline
+#define VORTEX_ALIGN16 __attribute__((aligned(16)))
+#else
+#define VORTEX_ALIGN16
+#endif
+
+#ifdef NULL
+#undef NULL
+#define NULL nullptr
+#endif
+
+#include "foundation/memory/memory.h"
+
 #define InvalidIndex -1;
 
 typedef uint32_t	uint32;
@@ -29,17 +45,3 @@ typedef uint8_t      byte;
 typedef uint8_t		ubyte;
 typedef float		float32;
 typedef double		float64;
-
-#if _MSC_VER
-#define VORTEX_ALIGN16 __declspec(align(16))
-#elif __GNUC__
-#define __forceinline inline
-#define VORTEX_ALIGN16 __attribute__((aligned(16)))
-#else
-#define VORTEX_ALIGN16
-#endif
-
-#ifdef NULL
-#undef NULL
-#define NULL nullptr
-#endif
