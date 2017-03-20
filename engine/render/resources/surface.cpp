@@ -26,7 +26,7 @@ void Surface::AddParameter(const Util::String& name, const Util::Variable& varia
         //This should probably be done in some other way
 		std::shared_ptr<TextureResource> tex = ResourceServer::Instance()->LoadTexture(*variable.GetString());
 		this->textures.Append(tex);
-		this->texturesByType.insert(std::make_pair(Material::TextureTypeFromString(name.c_str()), tex));
+		this->texturesByType.insert(std::make_pair(Material::TextureTypeFromString(name.AsCharPtr()), tex));
     }
     else
     {

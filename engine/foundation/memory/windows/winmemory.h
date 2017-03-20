@@ -38,12 +38,12 @@ __forceinline void* Alloc(HeapType heapType, size_t size)
 
     void* allocPtr = nullptr;
     {
-		allocPtr = _aligned_malloc(size, 16);
-		if (!allocPtr) 
-		{
-			printf("Memory ERROR: Could not allocate 16 byte aligned memory of size %i!", size);
-			assert(false);
-		}
+		allocPtr = malloc(size);//_aligned_malloc(size, 16);
+		//if (!allocPtr) 
+		//{
+		//	printf("Memory ERROR: Could not allocate 16 byte aligned memory of size %i!", size);
+		//	assert(false);
+		//}
     }
 
     return allocPtr;
@@ -57,7 +57,7 @@ __forceinline void* Realloc(HeapType heapType, void* ptr, size_t size)
 {
     assert(heapType < NumHeapTypes);
     
-    void* allocPtr = realloc(ptr, size);
+	void* allocPtr = realloc(ptr, size);//_aligned_realloc(ptr, size, 16);
 
     return allocPtr;
 }
@@ -73,7 +73,7 @@ __forceinline void Free(HeapType heapType, void* ptr)
         assert(heapType < NumHeapTypes);
         
         {
-            free(ptr);
+			free(ptr);//_aligned_free(ptr);
         }
     }
 }

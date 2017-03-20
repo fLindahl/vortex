@@ -66,7 +66,7 @@ namespace Render
 
 		void SetWindowResolution(const int& x, const int& y);
 
-		void AddMaterial(Material* obj) { this->materials.Append(obj); }
+		//void AddMaterial(Material* obj) { this->materials.Append(obj); }
         
 		void SetUniformBuffer(const Graphics::Camera* camera);
 		void Render(bool drawToScreen = true);
@@ -95,6 +95,6 @@ namespace Render
 		GLuint finalColorBuffer = 0;
 		
         //contains all the shader objects that we've loaded
-        Util::Array<Material*> materials;
+        //Util::Array<Material*> materials;
     };
 }

@@ -62,11 +62,11 @@ void DrawPass::Execute()
                 switch (surface->ParameterList()[i]->var.GetType())
                 {
                     case Util::Variable::Type::Float:
-                        shader->setUni1f(*surface->ParameterList()[i]->var.GetFloat(), surface->ParameterList()[i]->name);
+                        shader->setUni1f(*surface->ParameterList()[i]->var.GetFloat(), surface->ParameterList()[i]->name.AsCharPtr());
                         break;
 
                     case Util::Variable::Type::Vector4:
-                        shader->setUniVector4fv(surface->ParameterList()[i]->var.GetVector4(), surface->ParameterList()[i]->name);
+                        shader->setUniVector4fv(surface->ParameterList()[i]->var.GetVector4(), surface->ParameterList()[i]->name.AsCharPtr());
                         break;
 
                     default:

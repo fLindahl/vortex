@@ -29,24 +29,15 @@
 #include <exception>
 #include <iostream>
 #include "core/types.h"
-//#include "core/debug.h"
+#include "foundation/memory/memory.h"
+#include <cstdarg>
+#include "core/debug.h"
 
+#ifdef __WIN32__
+#pragma warning ( disable : 4091)
+#pragma warning off (10358)     // illegal or unsupported __attribute__
+#endif
 
-// assert macro
-//#define assert(_Expression) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(#_Expression), _CRT_WIDE(__FILE__), __LINE__), 0) )
-
-#ifdef __GNUC__
-#define _assert(expr, msg) ((expr) ? __ASSERT_VOID_CAST(0) : __assert_fail(#msg, __FILE__, __LINE__, __ASSERT_FUNCTION))
-#else
-//#define _assert(_Expression, _Msg) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(_Msg), _CRT_WIDE(__FILE__), __LINE__), 0) )
-#define _assert(condition, message)                                            \
-    do                                                                         \
-    {                                                                          \
-        if (!(condition))                                                      \
-        {                                                                      \
-            std::cerr << "Assertion `" #condition "` failed in " << __FILE__   \
-                      << " line " << __LINE__ << ": " << message << std::endl; \
-            std::terminate();                                                  \
-        }                                                                      \
-    } while (false)
+#ifdef __WIN32__
+#define  __attribute__(x) /**/
 #endif

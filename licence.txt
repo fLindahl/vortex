@@ -1,0 +1,77 @@
+Vortex Engine is written by the following authors:
+
+Fredrik Lindahl (fredrik-lindahl@outlook.com)
+Anton Grönberg (Aggro)
+Viktor Andersson
+Various others...
+
+If not otherwise noted in either the file or folder all source code is subject to the following 
+licensing terms:
+
+====================================================================================================
+                                Start Of Vortex Engine Licensing Terms
+====================================================================================================
+
+Copyright (c) 2016 - 2017, Fredrik Lindahl, Anton Grönberg, Viktor Andersson
+All rights reserved.
+
+Redistribution and use in source forms, with or without modification, are NOT permitted 
+unless the following conditions are met:
+
+ - Permission is granted by any of the original authors of the engine.
+ - The above copyright notice is never to be removed
+
+Redistribution in binary forms are permitted if the following conditions are met:
+ 
+ - You fulfill the source forms conditions.
+ - Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+   and the following disclaimer  in the documentation and/or other materials provided with the 
+   distribution.
+   
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
+FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+====================================================================================================
+                                End Of Vortex Engine Licensing Terms
+====================================================================================================
+
+
+Other Licences used are either listed in their respective directory, or in the following list:
+Nebula Trifid (Licence further down in this file)
+
+
+====================================================================================================
+                                Start Of Nebula Trifid Licensing Terms
+====================================================================================================
+
+Copyright (c) 1999 - 2010, Radon Labs GmbH, Berlin/Germany
+Copyright (c) 2011 - 2017, Johannes Hirche, Gustav Sterbrant, Joel Marklund
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted 
+provided that the following conditions are met:
+
+ - Redistributions of source code must retain the above copyright notice, this list of conditions 
+   and the following disclaimer.
+ - Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+   and the following disclaimer  in the documentation and/or other materials provided with the 
+   distribution.
+   
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
+FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+====================================================================================================
+                                End Of Nebula Trifid Licensing Terms
+====================================================================================================

@@ -214,7 +214,7 @@ namespace Math
 		static vec4 forwardvec();
 
 		/// return distance squared between two points
-		static float distancesq(Math::vec4 a, Math::vec4 b);
+		static float distancesq(const Math::vec4& a, const Math::vec4& b);
 
 		/// return true if any XYZ component is less-then
 		static bool less3_any(const vec4 &v0, const vec4 &v1);
@@ -1450,7 +1450,7 @@ namespace Math
 	/**
 	*/
 	__forceinline float
-		vec4::distancesq(Math::vec4 a, Math::vec4 b)
+		vec4::distancesq(const Math::vec4& a, const Math::vec4& b)
 	{
 		return _mm_cvtss_f32(_mm_dp_ps(a.vec, b.vec, 0xF1));
 	}

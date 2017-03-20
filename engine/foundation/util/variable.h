@@ -164,7 +164,7 @@ namespace Util
 
 		case Matrix4:
 			float flts[16];
-			sscanf(value.c_str(), "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", &flts[0], &flts[1], &flts[2], &flts[3], &flts[4], &flts[5], &flts[6], &flts[7], &flts[8], &flts[9], &flts[10], &flts[11], &flts[12], &flts[13], &flts[14], &flts[15]);
+			sscanf(value.AsCharPtr(), "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", &flts[0], &flts[1], &flts[2], &flts[3], &flts[4], &flts[5], &flts[6], &flts[7], &flts[8], &flts[9], &flts[10], &flts[11], &flts[12], &flts[13], &flts[14], &flts[15]);
 			
 			this->m = new Math::mat4(flts);
 			
@@ -172,7 +172,7 @@ namespace Util
 
 		case Float:
 			float flt;
-			sscanf(value.c_str(), "%f", &flt);
+			sscanf(value.AsCharPtr(), "%f", &flt);
 
 			this->f[0] = flt;
 
@@ -180,7 +180,7 @@ namespace Util
 
 		case Vector2:
 			float flts2[2];
-			sscanf(value.c_str(), "%f, %f", &flts2[0], &flts2[1]);
+			sscanf(value.AsCharPtr(), "%f, %f", &flts2[0], &flts2[1]);
 
 			this->f[0] = flts2[0];
 			this->f[1] = flts2[1];
@@ -189,7 +189,7 @@ namespace Util
 
 		case Vector3:
 			float flts3[3];
-			sscanf(value.c_str(), "%f, %f, %f", &flts3[0], &flts3[1], &flts3[2]);
+			sscanf(value.AsCharPtr(), "%f, %f, %f", &flts3[0], &flts3[1], &flts3[2]);
 
 			this->f[0] = flts3[0];
 			this->f[1] = flts3[1];
@@ -199,7 +199,7 @@ namespace Util
 
 		case Vector4:
 			float flts4[4];
-			sscanf(value.c_str(), "%f, %f, %f, %f", &flts4[0], &flts4[1], &flts4[2], &flts4[3]);
+			sscanf(value.AsCharPtr(), "%f, %f, %f, %f", &flts4[0], &flts4[1], &flts4[2], &flts4[3]);
 
 			this->f[0] = flts4[0];
 			this->f[1] = flts4[1];

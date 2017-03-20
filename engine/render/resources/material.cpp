@@ -52,7 +52,7 @@ namespace Render
 		}
 		else
 		{
-			printf("ERROR: Could not find parameter with name %s!", name.c_str());
+			printf("ERROR: Could not find parameter with name %s!", name.AsCharPtr());
 
 #ifdef _DEBUG
 			assert(false);
@@ -68,8 +68,9 @@ namespace Render
 		{
 			//HACK: Since we're loading a string, we're probably loading a texture
 			//This should probably be done in some other way
-			this->textures.Append(ResourceServer::Instance()->LoadTexture(*variable.GetString()));
-			this->TextureParamTypes.Append(Material::TextureTypeFromString(name.c_str()));
+			const Util::String str = *variable.GetString();
+			this->textures.Append(ResourceServer::Instance()->LoadTexture(str));
+			this->TextureParamTypes.Append(Material::TextureTypeFromString(name.AsCharPtr()));
 		}
 		else
 		{
@@ -88,19 +89,19 @@ namespace Render
 
 	void Material::SetFramePass(const Util::String& pass, const Util::String& shader)
 	{
-		if (FrameServer::Instance()->HasPassNamed(pass.c_str()))
+		if (FrameServer::Instance()->HasPassNamed(pass.AsCharPtr()))
 		{
-			auto drawpass = std::dynamic_pointer_cast<DrawPass>(FrameServer::Instance()->GetFramePass(pass.c_str()));
+			auto drawpass = std::dynamic_pointer_cast<DrawPass>(FrameServer::Instance()->GetFramePass(pass.AsCharPtr()));
 			
 			//Make sure we can actually cast
 			assert(drawpass != nullptr);
 
 			drawpass->AddMaterial(this);
-			this->framepasses.insert(std::make_pair(pass, ShaderServer::Instance()->LoadShader(std::string(shader.c_str()))));
+			this->framepasses.insert(std::make_pair(pass, ShaderServer::Instance()->LoadShader(std::string(shader.AsCharPtr()))));
 		}
 		else
 		{
-			printf("ERROR Material::SetFramePass : Cannot find pass named %s!\n", pass.c_str());
+			printf("ERROR Material::SetFramePass : Cannot find pass named %s!\n", pass.AsCharPtr());
 			assert(false);
 		}		
 	}

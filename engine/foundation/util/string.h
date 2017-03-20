@@ -1,548 +1,976 @@
 #pragma once
-//  String.h
-//  A String class for the Vortex Engine
-//  by Anton Grönberg
-//  Copyright (c) 2016
-//
+//------------------------------------------------------------------------------
+/**
+    @class Util::String
 
-#ifdef _MSC_VER
-// disable pragma warnings
-#pragma warning( disable : 4068 )
-// standard function missing from MS library
-#include <cstdarg>
-int vasprintf(char ** ret, const char * format, va_list ap);
-#else
-#define _NOEXCEPT noexcept
-#endif
+    Nebula3's universal string class. An empty string object is always 32
+    bytes big. The string class tries to avoid costly heap allocations
+    with the following tactics:
 
-#include <cstring>
-#include <cstdarg>
-#define STRING_MAX_LEN 65535
-#define STRING_MAX_SPLIT 1023
+    - a local embedded buffer is used if the string is short enough
+    - if a heap buffer must be allocated, care is taken to reuse an existing
+      buffer instead of allocating a new buffer if possible (usually if
+      an assigned string fits into the existing buffer, the buffer is reused
+      and not re-allocated)
 
-// simple smart C-string
+    Heap allocations are performed through a local heap which should
+    be faster then going through the process heap.
+
+    Besides the usual string manipulation methods, the String class also
+    offers methods to convert basic Nebula3 datatypes from and to string,
+    and a group of methods which manipulate filename strings.
+
+    (C) 2006 RadonLabs GmbH
+    (C) 2013-2016 Individual contributors, see LICENCE file
+*/
+
+#include "core/types.h"
+#include "foundation/util/array.h"
+#include "foundation/util/dictionary.h"
+
+#include "foundation/math/vector4.h"
+#include "foundation/math/matrix4.h"
+
+
+//------------------------------------------------------------------------------
 namespace Util
 {
-    class String
-    {
-
-    private:
-        char * str = nullptr;
-        size_t str_len = 0;
-
-        // this is a poor man's vector
-        // shared ptr to array of shared pointer String objects
-        typedef std::shared_ptr<String> stringSp;
-        typedef std::unique_ptr<stringSp[]> splitPtr;
-        mutable splitPtr splitArray;
-        mutable size_t splitCount = 0;
-
-        // private methods
-        void ResetSplitArr() const;
-        void AppendSplitArr(const String & s) const;
-
-
-
-    public:
-
-        String();                             // default constructor
-        String( const char * s );             // c-string
-        String( const String & );           // copy constructor
-        String( String &&) _NOEXCEPT;       // move constructor
-        ~String();
-
-        // data management
-        const char * alloc_str( size_t sz );    // smart alloc string
-        void reset();                           // reset data
-        void swap(String & b);                // member function swap
-        const char * c_str() const;             // getter
-        const char * copy_str( const char * );  // alloc & copy
-
-        // operators
-        String & operator = ( String );             // copy-and-swap assignment
-        String & operator += ( const char * );        // concatenation operator
-        String & operator += ( const String & );    // concatenation operator
-        const char operator[] ( const int ) const;      // subscript operator
-
-        // comparison operators
-        bool operator == ( const String & ) const;
-		bool operator == (const char* ) const;
-        bool operator != ( const String & ) const;
-        bool operator > ( const String & ) const;
-        bool operator < ( const String & ) const;
-        bool operator >= ( const String & ) const;
-        bool operator <= ( const String & ) const;
-
-        // conversion operators
-        operator const char * () const;             // c-string type
-
-        // utility methods
-		bool Append(const char*);
-		bool Append(const String&);
-
-        bool HaveValue() const;
-        size_t length() const { return str_len; }
-        size_t size() const { return str_len; }
-        String & format( const char * format, ... );
-        String & trim();
-        String lower() const;
-        String upper() const;
-        const char & back() const;
-        const char & front() const;
-
-        // find and replace methods
-        long int CharFind( const char & match ) const;
-        const String & CharRepl( const char & match, const char & repl );
-        String Substr( size_t start, size_t length );
-        long Find(const String & match) const;
-        const String Replace( const String & match, const String & repl );
-
-        // split methods
-        const splitPtr & Split( const char * match ) const;
-        const splitPtr & Split( const char match ) const;
-        const splitPtr & Split( const char * match, int max_split ) const;
-        const String & SplitItem( size_t index ) const;
-        size_t SplitCount() const { return splitCount; }
-
-        //Tokenize
-        static Util::Array<Util::String> Tokenize(Util::String str, Util::String delim);
-
-        static const size_t npos = -1;
-    };
-
-    inline String::String( )
-    {
-        reset();
-    }
-
-    inline String::String( const char * s )
-    {
-        copy_str(s);
-    }
-
-    inline String::String( const String & old )
-    {
-        copy_str(old);
-    }
-
-    // move constructor
-    inline String::String( String && other ) _NOEXCEPT
-    {
-        reset();
-        str = other.str;
-        str_len = other.str_len;
-        other.str = nullptr;
-        other.str_len = 0;
-        other.reset();
-    }
-
-    inline String::~String()
-    {
-        reset();
-    }
-
-// non-member operator overloads
-    String operator + ( const String & lhs, const String & rhs );
-
-
-    inline void String::ResetSplitArr() const
-    {
-        if (splitCount)
-        {
-            // dtor the elements in the array
-            while(splitCount)
-            {
-                splitArray[--splitCount].reset();
-            }
-            splitArray.reset();
-            splitCount = 0;
-        }
-    }
-
-    inline void String::AppendSplitArr(const String &s) const
-    {
-        if (splitCount >= STRING_MAX_SPLIT)
-            return;
-        if (!splitCount)
-        {
-            splitArray.reset(new stringSp[STRING_MAX_SPLIT + 1]);
-        }
-        splitArray[splitCount] = std::make_shared<String>(s);
-        ++splitCount;
-    }
-
-
-    inline const char * String::alloc_str( size_t sz )
-    {
-        if (str)
-            reset();
-        str_len = (sz > STRING_MAX_LEN) ? STRING_MAX_LEN : sz;
-        str = new char[str_len + 1]();  // new char[]() fills with 0
-        return str;
-    }
-
-    inline void String::reset()
-    {
-        ResetSplitArr();
-        if(str)
-            delete [] str;
-        str = nullptr;
-        str_len = 0;
-    }
-
-    inline void String::swap(String & other)
-    {
-        std::swap(str, other.str);
-        std::swap(str_len, other.str_len);
-    }
-
-    inline const char * String::c_str() const
-    {
-        return str;
-    }
-
-    inline const char * String::copy_str( const char * s) {
-        if(s) {
-            size_t len = strnlen(s, STRING_MAX_LEN);
-            alloc_str(len);
-            strncpy((char *)str, s, len);
-            str_len = len;
-        }
-        return str;
-    }
-
-
-// copy-and-swap assignment
-    inline String & String::operator = ( String other ) {
-        swap(other);
-        return *this;
-    }
-
-    inline String & String::operator += ( const char * rhs ) {
-        if(rhs) {
-            size_t newlen = str_len + strnlen(rhs, STRING_MAX_LEN);
-            if (newlen > STRING_MAX_LEN) newlen = STRING_MAX_LEN;
-
-            size_t rhslen = newlen - str_len;
-            if(rhslen < 1) return *this;
-
-            char * buf = new char[newlen + 1]();
-            if(str && str_len) memcpy(buf, str, str_len);
-            memcpy(buf + str_len, rhs, rhslen);
-            copy_str(buf);
-            delete [] buf;
-        }
-        return *this;
-    }
-
-    inline String & String::operator += ( const String & rhs ) {
-        operator+=(rhs.c_str());
-        return *this;
-    }
-
-    inline const char String::operator[] ( const int index ) const {
-        if(index < 0) return 0;
-        if(index >= (int) str_len) return 0;
-        else return str[index];
-    }
-
-
-    inline bool String::operator == ( const String & rhs ) const {
-        if( std::strncmp(this->c_str(), rhs.c_str(), STRING_MAX_LEN) == 0 ) return true;
-        else return false;
-    }
-
-	inline bool String::operator == (const char* rhs) const {
-		if (std::strncmp(this->c_str(), rhs, STRING_MAX_LEN) == 0) return true;
-		else return false;
-	}
-
-    inline bool String::operator != ( const String & rhs ) const {
-        if( std::strncmp(this->c_str(), rhs.c_str(), STRING_MAX_LEN) != 0 ) return true;
-        else return false;
-    }
-
-    inline bool String::operator > ( const String & rhs ) const {
-        if( std::strncmp(this->c_str(), rhs.c_str(), STRING_MAX_LEN) > 0 ) return true;
-        else return false;
-    }
-
-    inline bool String::operator < ( const String & rhs ) const {
-        if( std::strncmp(this->c_str(), rhs.c_str(), STRING_MAX_LEN) < 0 ) return true;
-        else return false;
-    }
-
-    inline bool String::operator >= ( const String & rhs ) const {
-        if( std::strncmp(this->c_str(), rhs.c_str(), STRING_MAX_LEN) >= 0 ) return true;
-        else return false;
-    }
-
-    inline bool String::operator <= ( const String & rhs ) const {
-        if( std::strncmp(this->c_str(), rhs.c_str(), STRING_MAX_LEN) <= 0 ) return true;
-        else return false;
-    }
-
-	inline bool String::Append(const char* cstr)
-	{
-		this->operator+=(cstr);
-		return true;
-	}
-	
-	inline bool String::Append(const String& rhs)
-	{
-		this->operator+=(rhs.c_str());
-		return true;
-	}
-
-    inline String::operator const char * () const
-    {
-        return c_str();
-    }
-
-    inline bool String::HaveValue() const
-    {
-        if(str)
-            return true;
-        else
-            return false;
-    }
-
-// string format
-    inline String & String::format( const char * format , ... )
-    {
-        char * buffer;
-
-        va_list args;
-        va_start(args, format);
-
-        vasprintf(&buffer, format, args);
-        copy_str(buffer);
-        free(buffer);   // vasprintf uses malloc
-        return *this;
-    }
-
-// trim leading and trailing spaces
-    inline String & String::trim()
-    {
-        const static char * whitespace = "\x20\x1b\t\r\n\v\b\f\a";
-
-        if(!HaveValue())
-            return *this; // make sure we have a string
-
-        size_t begin = 0;
-        size_t end = length() - 1;
-
-        for (begin = 0; begin <= end; ++begin)
-        {
-            if (strchr(whitespace, str[begin]) == nullptr)
-            {
-                break;
-            }
-        }
-
-        for ( ; end > begin; --end)
-        {
-            if (strchr(whitespace, str[end]) == nullptr)
-            {
-                break;
-            }
-            else
-            {
-                str[end] = '\0';
-            }
-        }
-
-        if (begin)
-        {
-            for (size_t i = 0; str[i]; ++i)
-            {
-                str[i] = str[begin++];
-            }
-        }
-
-        str_len = strlen(str);
-        return *this;
-    }
-
-    inline String String::lower() const {
-        String rs = *this;
-        for (size_t i = 0; rs.str[i]; ++i) {
-            rs.str[i] = tolower(rs.str[i]);
-        }
-        return rs;
-    }
-
-    inline String String::upper() const {
-        String rs = *this;
-        for (size_t i = 0; rs.str[i]; ++i)
-        {
-            rs.str[i] = toupper(rs.str[i]);
-        }
-        return rs;
-    }
-
-    inline const char & String::back() const {
-        return str[length() - 1];
-    }
-
-    inline const char & String::front() const {
-        return str[0];
-    }
-
-    inline long int String::CharFind(const char &match) const
-    {
-        for (long i = 0; str[i]; ++i)
-        {
-            if(str[i] == match)
-                return i;
-        }
-        return -1;
-    }
-
-    inline const String & String::CharRepl( const char & match, const char & repl )
-    {
-        for (size_t i = 0; str[i]; ++i)
-        {
-            if(str[i] == match)
-                str[i] = repl;
-        }
-        return *this;
-    }
-
-    inline String String::Substr( size_t start, size_t length ) {
-        String rs;
-        char *buf;
-        if ((length + 1) > STRING_MAX_LEN || (start + length) > STRING_MAX_LEN)
-            return rs;
-        if (length > str_len - start)
-            return rs;
-        if (!str)
-            return rs;
-
-        buf = new char[length + 1]();
-        memcpy(buf, str + start, length);
-        rs = buf;
-        delete[] buf;
-
-        return rs;
-    }
-
-    inline long String::Find(const String & match) const
-    {
-        const char * pos = strstr(str, match.c_str());
-        if(pos)
-            return (long) ( pos - str );
-        else
-            return -1;
-    }
-
-    inline const String String::Replace( const String & match, const String & repl )
-    {
-        String rs;
-        long f1 = Find(match);
-        if (f1 >= 0)
-        {
-            size_t pos1 = (size_t) f1;
-            size_t pos2 = pos1 + match.length();
-            String s1 = pos1 > 0 ? Substr(0, pos1) : "";
-            String s2 = Substr(pos2, length() - pos2);
-            rs = s1 + repl + s2;
-        }
-        return rs;
-    }
-
-// non-destructive split
-    inline const String::splitPtr & String::Split( const char match ) const
-    {
-        const char match_s[2] = { match, 0 };
-        return Split(match_s, -1);
-    }
-
-    inline const String::splitPtr & String::Split( const char * match ) const
-    {
-        return Split(match, -1);
-    }
-
-    inline const String::splitPtr & String::Split( const char * match, int max_split ) const
-    {
-        ResetSplitArr();
-        if (length() < 1)
-            return splitArray;
-        if (max_split < 0)
-            max_split = STRING_MAX_SPLIT;
-
-        size_t match_len = strnlen(match, STRING_MAX_LEN);
-        if(match_len >= STRING_MAX_LEN)
-            return splitArray;
-
-        char * mi;              // match index
-        char * pstr = str;     // string pointer
-        while (( mi = strstr(pstr, match)) && --max_split )
-        {
-            if(mi != pstr) {
-                size_t lhsz = mi - pstr;
-                char * cslhs = new char[lhsz + 1]();
-                memcpy(cslhs, pstr, lhsz);
-                AppendSplitArr(cslhs);
-                delete [] cslhs;
-                pstr += lhsz;
-            }
-            pstr += match_len;
-        }
-
-        if (*pstr != '\0') {
-            AppendSplitArr(pstr);
-        }
-
-        return splitArray;
-    }
-
-// zero-based index of _split_array
-    inline const String & String::SplitItem(size_t index) const
-    {
-        if(splitCount > index)
-            return *splitArray[index];
-        
-        return *this;
-    }
-
-    inline Util::Array<String> String::Tokenize(Util::String str, Util::String delim)
-    {
-        Util::Array<String> tokens;
-
-        char* ptr = const_cast<char*>(str.c_str());
-        const char* token;
-		while (0 != (token = strtok(ptr, delim.c_str())))
-        {
-            tokens.Append(token);
-            ptr = 0;
-        }
-
-        return tokens;
-    }
-
-    inline String operator + ( const String & lhs, const String & rhs ) {
-        String rs = lhs;
-        rs += rhs;
-        return rs;
-    }
-
-#ifdef _MSC_VER
-
-    #pragma mark - MS missing standard functions
-
-inline int vasprintf(char ** ret, const char * format, va_list ap)
+class String
 {
-    int len;
-    char *buffer;
+public:
+    /// override new operator
+    void* operator new(size_t s);
+    /// override delete operator
+    void operator delete(void* ptr);
 
-    len = _vscprintf(format, ap) + 1;
-    buffer = (char *) malloc(len * sizeof(char));
-    if (!buffer) return 0;
-    vsprintf_s(buffer, len, format, ap);
-    *ret = buffer;
-    return len -1;
+    /// constructor
+    String();
+    /// copy constructor
+    String(const String& rhs);
+    /// construct from C string
+    String(const char* cStr);
+    /// destructor
+    ~String();
+
+    /// assignment operator
+    void operator=(const String& rhs);
+    /// assign from const char*
+    void operator=(const char* cStr);
+    /// += operator
+    void operator +=(const String& rhs);
+    /// equality operator
+    friend bool operator==(const String& a, const String& b);
+    /// shortcut equality operator
+    friend bool operator==(const String& a, const char* cStr);
+    /// shortcut equality operator
+    friend bool operator==(const char* cStr, const String& a);
+    /// inequality operator
+    friend bool operator !=(const String& a, const String& b);
+    /// less-then operator
+    friend bool operator <(const String& a, const String& b);
+    /// greater-then operator
+    friend bool operator >(const String& a, const String& b);
+    /// less-or-equal operator
+    friend bool operator <=(const String& a, const String& b);
+    /// greater-then operator
+    friend bool operator >=(const String& a, const String& b);
+    /// read-only index operator
+    char operator[](index_t i) const;
+    /// read/write index operator
+    char& operator[](index_t i);
+
+    /// reserve internal buffer size to prevent heap allocs
+    void Reserve(size_t newSize);
+    /// return length of string
+    size_t Length() const;
+    /// clear the string
+    void Clear();
+    /// return true if string object is empty
+    bool IsEmpty() const;
+    /// return true if string object is not empty
+    bool IsValid() const;
+    /// copy to char buffer (return false if buffer is too small)
+    bool CopyToBuffer(char* buf, size_t bufSize) const;
+
+    /// append string
+    void Append(const String& str);
+    /// append c-string
+    void Append(const char* str);
+    /// append a range of characters
+    void AppendRange(const char* str, size_t numChars);
+
+    /// convert string to lower case
+    void ToLower();
+    /// convert string to upper case
+    void ToUpper();
+    /// convert first char of string to upper case
+    void FirstCharToUpper();
+    /// tokenize string into a provided String array (faster if tokens array can be reused)
+    size_t Tokenize(const String& whiteSpace, Array<String>& outTokens) const;
+    /// tokenize string into a provided String array, SLOW since new array will be constructed
+    Array<String> Tokenize(const String& whiteSpace) const;
+    /// tokenize string, keep strings within fence characters intact (faster if tokens array can be reused)
+    size_t Tokenize(const String& whiteSpace, char fence, Array<String>& outTokens) const;
+    /// tokenize string, keep strings within fence characters intact, SLOW since new array will be constructed
+    Array<String> Tokenize(const String& whiteSpace, char fence) const;
+    /// extract substring
+    String ExtractRange(index_t fromIndex, size_t numChars) const;
+    /// extract substring to end of this string
+    String ExtractToEnd(index_t fromIndex) const;
+    /// terminate string at first occurence of character in set
+    void Strip(const String& charSet);
+    /// return start index of substring, or InvalidIndex if not found
+    index_t FindStringIndex(const String& s, index_t startIndex = 0) const;
+    /// return index of character in string, or InvalidIndex if not found
+    index_t FindCharIndex(char c, index_t startIndex = 0) const;
+    /// terminate string at given index
+    void TerminateAtIndex(index_t index);
+    /// returns true if string contains any character from set
+    bool ContainsCharFromSet(const String& charSet) const;
+    /// delete characters from charset at left side of string
+    void TrimLeft(const String& charSet);
+    /// delete characters from charset at right side of string
+    void TrimRight(const String& charSet);
+    /// trim characters from charset at both sides of string
+    void Trim(const String& charSet);
+    /// substitute every occurance of a string with another string
+    void SubstituteString(const String& str, const String& substStr);
+    /// substiture every occurance of a character with another character
+    void SubstituteChar(char c, char subst);
+    /// format string printf-style
+    void __cdecl Format(const char* fmtString, ...);
+    /// format string printf-style with varargs list
+    void __cdecl FormatArgList(const char* fmtString, va_list argList);
+    /// static constructor for string using printf
+    static String Sprintf(const char* fmtString, ...);
+    /// return true if string only contains characters from charSet argument
+    bool CheckValidCharSet(const String& charSet) const;
+    /// replace any char set character within a srtring with the replacement character
+    void ReplaceChars(const String& charSet, char replacement);
+    /// concatenate array of strings into new string
+    static String Concatenate(const Array<String>& strArray, const String& whiteSpace);
+    /// pattern matching
+    static bool MatchPattern(const String& str, const String& pattern);
+    /// return a 32-bit hash code for the string
+    index_t HashCode() const;
+
+    /// set content to char ptr
+    void SetCharPtr(const char* s);
+    /// set as char ptr, with explicit length
+    void Set(const char* ptr, size_t length);
+    /// set as int value
+    void SetInt(int val);
+    /// set as long value
+    void SetLong(long val);
+    /// set as float value
+    void SetFloat(float val);
+    /// set as bool value
+    void SetBool(bool val);	
+    
+    /// set as vec4 value
+    void SetVec4(const Math::vec4& v);
+    /// set as mat4 value
+    void SetMat4(const Math::mat4& v);
+    
+    /// generic setter
+    template<typename T> void Set(const T& t);
+
+    /// append int value
+    void AppendInt(int val);
+    /// append float value
+    void AppendFloat(float val);
+    /// append bool value
+    void AppendBool(bool val);
+    
+    /// append vec4 value
+    void AppendVec4(const Math::vec4& v);
+    /// append mat4 value
+    void AppendMat4(const Math::mat4& v);
+
+    /// generic append
+    template<typename T> void Append(const T& t);
+
+    /// return contents as character pointer
+    const char* AsCharPtr() const;
+    /// *** OBSOLETE *** only Nebula2 compatibility
+    const char* Get() const;
+    /// return contents as integer
+    int AsInt() const;
+    /// return contents as float
+    float AsFloat() const;
+    /// return contents as bool
+    bool AsBool() const;
+    
+    /// return contents as vec4
+    Math::vec4 AsVec4() const;
+    /// return contents as mat4
+    Math::mat4 AsMat4() const;
+    
+    /// return contents as blob
+	//TODO: implement blobs!
+    //Util::Blob AsBlob() const;
+
+    /// convert to "anything"
+    template<typename T> T As() const;
+
+    /// return true if the content is a valid integer
+    bool IsValidInt() const;
+    /// return true if the content is a valid float
+    bool IsValidFloat() const;
+    /// return true if the content is a valid bool
+    bool IsValidBool() const;
+    /// return true if the content is a valid vec4
+    bool IsValidVec4() const;
+    /// return true if content is a valid mat4
+    bool IsValidMat4() const;
+
+    /// generic valid checker
+    template<typename T> bool IsValid() const;
+
+    /// construct a string from an int
+    static String FromInt(int i);
+    /// construct a string from a long
+    static String FromLong(long i);
+    /// construct a string from a float
+    static String FromFloat(float f);
+    /// construct a string from a bool
+    static String FromBool(bool b);
+    
+    /// construct a string from vec4
+    static String FromVec4(const Math::vec4& v);
+    /// construct a string from mat4
+    static String FromMat4(const Math::mat4& m);
+    
+    /// create from blob
+    //static String FromBlob(const Util::Blob & b);
+	
+    /// convert from "anything"
+    template<typename T> static String From(const T& t);
+
+    /// get filename extension without dot
+    String GetFileExtension() const;
+    /// check file extension
+    bool CheckFileExtension(const String& ext) const;
+    /// convert backslashes to slashes
+    void ConvertBackslashes();
+    /// remove file extension
+    void StripFileExtension();
+    /// change file extension
+    void ChangeFileExtension(const Util::String& newExt);
+	/// remove assign prefix (for example tex:)
+	void StripAssignPrefix();
+	/// change assign prefix
+	void ChangeAssignPrefix(const Util::String& newPref);
+    /// extract the part after the last directory separator
+    String ExtractFileName() const;
+    /// extract the last directory of the path
+    String ExtractLastDirName() const;
+    /// extract the part before the last directory separator
+    String ExtractDirName() const;
+    /// extract path until last slash
+    String ExtractToLastSlash() const;
+    /// replace illegal filename characters
+    void ReplaceIllegalFilenameChars(char replacement);
+
+    /// test if provided character is a digit (0..9)
+    static bool IsDigit(char c);
+    /// test if provided character is an alphabet character (A..Z, a..z)
+    static bool IsAlpha(char c);
+    /// test if provided character is an alpha-numeric character (A..Z,a..z,0..9)
+    static bool IsAlNum(char c);
+    /// test if provided character is a lower case character
+    static bool IsLower(char c);
+    /// test if provided character is an upper-case character
+    static bool IsUpper(char c);
+
+    /// lowlevel string compare wrapper function
+    static int StrCmp(const char* str0, const char* str1);
+    /// lowlevel string length function
+    static int StrLen(const char* str);
+    /// find character in string
+    static const char* StrChr(const char* str, int c);
+
+    /// parse key/value pair string ("key0=value0 key1=value1")
+    static Dictionary<String,String> ParseKeyValuePairs(const String& str);
+
+private:
+    /// delete contents
+    void Delete();
+    /// get pointer to last directory separator
+    char* GetLastSlash() const;
+    /// allocate the string buffer (discards old content)
+    void Alloc(size_t size);
+    /// (re-)allocate the string buffer (copies old content)
+    void Realloc(size_t newSize);
+
+    enum
+    {
+        LocalStringSize = 20,
+    };
+    char* heapBuffer;
+    char localBuffer[LocalStringSize];
+    size_t strLen;
+    size_t heapBufferSize;
+};
+
+//------------------------------------------------------------------------------
+/**
+*/
+__forceinline void*
+String::operator new(size_t size)
+{
+    #if _DEBUG
+		assert(size == sizeof(String));
+    #endif
+	
+	return Memory::Alloc(Memory::StringDataHeap, size);
 }
 
-#endif
+//------------------------------------------------------------------------------
+/**
+*/
+__forceinline void
+String::operator delete(void* ptr)
+{
+    return Memory::Free(Memory::StringDataHeap, ptr);
 }
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline
+String::String() :
+    heapBuffer(0),
+    strLen(0),
+    heapBufferSize(0)
+{
+    this->localBuffer[0] = 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::Delete()
+{
+    if (this->heapBuffer)
+    {
+        Memory::Free(Memory::StringDataHeap, (void*) this->heapBuffer);
+        this->heapBuffer = 0;
+    }
+    this->localBuffer[0] = 0;
+    this->strLen = 0;
+    this->heapBufferSize = 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline 
+String::~String()
+{
+    this->Delete();
+}
+
+//------------------------------------------------------------------------------
+/**
+    Allocate a new heap buffer, discards old contents.
+*/
+inline void
+String::Alloc(size_t newSize)
+{
+    assert(newSize > (this->strLen + 1));
+    assert(newSize > this->heapBufferSize);
+
+    // free old buffer
+    if (this->heapBuffer)
+    {
+        Memory::Free(Memory::StringDataHeap, (void*) this->heapBuffer);
+        this->heapBuffer = 0;
+    }
+
+    // allocate new buffer
+    this->heapBuffer = (char*) Memory::Alloc(Memory::StringDataHeap, newSize);
+    this->heapBufferSize = newSize;
+    this->localBuffer[0] = 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+    (Re-)allocate external buffer and copy existing string contents there.
+*/
+inline void
+String::Realloc(size_t newSize)
+{
+    assert(newSize > (this->strLen + 1));
+    assert(newSize > this->heapBufferSize);
+
+    // allocate a new buffer
+    char* newBuffer = (char*) Memory::Alloc(Memory::StringDataHeap, newSize);
+
+    // copy existing contents there...
+    if (this->strLen > 0)
+    {
+        const char* src = this->AsCharPtr();
+        Memory::Copy(newBuffer, src, this->strLen);
+    }
+    newBuffer[this->strLen] = 0;
+
+    // assign new buffer
+    if (this->heapBuffer)
+    {
+        Memory::Free(Memory::StringDataHeap, (void*) this->heapBuffer);
+        this->heapBuffer = 0;
+    }
+    this->localBuffer[0] = 0;
+    this->heapBuffer = newBuffer;
+    this->heapBufferSize = newSize;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Reserves internal space to prevent excessive heap re-allocations.
+    If you plan to do many Append() operations this may help alot.
+*/
+inline void
+String::Reserve(size_t newSize)
+{
+    if (newSize > this->heapBufferSize)
+    {
+        this->Realloc(newSize);
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::SetInt(int val)
+{
+    this->Format("%d", val);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::SetLong(long val)
+{
+	this->Format("%ld", val);
+}
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::SetFloat(float val)
+{
+    this->Format("%.6f", val);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::SetBool(bool val)
+{
+    if (val)
+    {
+        this->SetCharPtr("true");
+    }
+    else
+    {
+        this->SetCharPtr("false");
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::SetVec4(const Math::vec4& v)
+{
+    this->Format("%.6f,%.6f,%.6f,%.6f", v.x(), v.y(), v.z(), v.w());
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::SetMat4(const Math::mat4& m)
+{
+    this->Format("%.6f, %.6f, %.6f, %.6f, "
+                 "%.6f, %.6f, %.6f, %.6f, "
+                 "%.6f, %.6f, %.6f, %.6f, "
+                 "%.6f, %.6f, %.6f, %.6f",
+                 m.getrow0().x(), m.getrow0().y(), m.getrow0().z(), m.getrow0().w(),
+                 m.getrow1().x(), m.getrow1().y(), m.getrow1().z(), m.getrow1().w(),
+                 m.getrow2().x(), m.getrow2().y(), m.getrow2().z(), m.getrow2().w(),
+                 m.getrow3().x(), m.getrow3().y(), m.getrow3().z(), m.getrow3().w());
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline
+String::String(const char* str) :
+    heapBuffer(0),
+    strLen(0),
+    heapBufferSize(0)
+{
+    this->localBuffer[0] = 0;
+    this->SetCharPtr(str);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline
+String::String(const String& rhs) :
+    heapBuffer(0),
+    strLen(0),
+    heapBufferSize(0)
+{
+    this->localBuffer[0] = 0;
+    this->SetCharPtr(rhs.AsCharPtr());
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline const char*
+String::AsCharPtr() const
+{
+    if (this->heapBuffer)
+    {
+        return this->heapBuffer;
+    }
+    else
+    {
+        return this->localBuffer;
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline const char*
+String::Get() const
+{
+    return this->AsCharPtr();
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::operator=(const String& rhs)
+{
+    if (&rhs != this)
+    {
+        this->SetCharPtr(rhs.AsCharPtr());
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::operator=(const char* cStr)
+{
+    this->SetCharPtr(cStr);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::Append(const String& str)
+{
+    this->AppendRange(str.AsCharPtr(), str.strLen);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::operator += (const String& rhs)
+{
+    this->Append(rhs);    
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline char
+String::operator[](index_t i) const
+{
+    assert(i <= this->strLen);
+    return this->AsCharPtr()[i];
+}
+
+//------------------------------------------------------------------------------
+/**
+    NOTE: unlike the read-only indexer, the terminating 0 is NOT a valid
+    part of the string because it may not be overwritten!!!
+*/
+inline char&
+String::operator[](index_t i)
+{
+    assert(i <= this->strLen);
+    return (char&)(this->AsCharPtr())[i];
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline size_t
+String::Length() const
+{
+    return this->strLen;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::Clear()
+{
+    this->Delete();
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::IsEmpty() const
+{
+    return (0 == this->strLen);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::IsValid() const
+{
+    return (0 != this->strLen);
+}
+
+//------------------------------------------------------------------------------
+/**
+    This method computes a hash code for the string. The method is
+    compatible with the Util::HashTable class.
+*/
+inline index_t
+String::HashCode() const
+{
+    index_t hash = 0;
+    const char* ptr = this->AsCharPtr();
+    size_t len = this->strLen;
+    index_t i;
+    for (i = 0; i < len; i++)
+    {
+        hash += ptr[i];
+        hash += hash << 10;
+        hash ^= hash >>  6;
+    }
+    hash += hash << 3;
+    hash ^= hash >> 11;
+    hash += hash << 15;
+    hash &= ~(1<<31);       // don't return a negative number (in case index_t is defined signed)
+    return hash;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+static inline String
+operator+(const String& s0, const String& s1)
+{
+    String newString = s0;
+    newString.Append(s1);
+    return newString;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Replace character with another.
+*/
+inline void
+String::SubstituteChar(char c, char subst)
+{
+    char* ptr = const_cast<char*>(this->AsCharPtr());
+    index_t i;
+    for (i = 0; i <= this->strLen; i++)
+    {
+        if (ptr[i] == c)
+        {
+            ptr[i] = subst;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+    Converts backslashes to slashes.
+*/
+inline void
+String::ConvertBackslashes()
+{
+    this->SubstituteChar('\\', '/');
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::CheckFileExtension(const String& ext) const
+{
+    return (this->GetFileExtension() == ext);
+}
+
+//------------------------------------------------------------------------------
+/**
+    Return a String object containing the part after the last
+    path separator.
+*/
+inline String
+String::ExtractFileName() const
+{
+    String pathString;
+    const char* lastSlash = this->GetLastSlash();
+    if (lastSlash)
+    {
+        pathString = &(lastSlash[1]);
+    }
+    else
+    {
+        pathString = *this;
+    }
+    return pathString;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Return a path string object which contains of the complete path
+    up to the last slash. Returns an empty string if there is no
+    slash in the path.
+*/
+inline String
+String::ExtractToLastSlash() const
+{
+    String pathString(*this);
+    char* lastSlash = pathString.GetLastSlash();
+    if (lastSlash)
+    {
+        lastSlash[1] = 0;
+    }
+    else
+    {
+        pathString = "";
+    }
+    return pathString;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Return true if the string only contains characters which are in the defined
+    character set.
+*/
+inline bool
+String::CheckValidCharSet(const String& charSet) const
+{
+    index_t i;
+    for (i = 0; i < this->strLen; i++)
+    {
+        if (charSet.FindCharIndex((*this)[i], 0) == InvalidIndex)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::IsValidInt() const
+{
+    return this->CheckValidCharSet(" \t-+01234567890");
+}
+
+//------------------------------------------------------------------------------
+/**
+    Note: this method is not 100% correct, it just checks for invalid characters.
+*/
+inline bool
+String::IsValidFloat() const
+{
+    return this->CheckValidCharSet(" \t-+.e1234567890");
+}
+
+//------------------------------------------------------------------------------
+/**
+    Note: this method is not 100% correct, it just checks for invalid characters.
+*/
+inline bool
+String::IsValidVec4() const
+{
+	Array<String> tokens(4, 0);
+	this->Tokenize(", \t", tokens);
+    return this->CheckValidCharSet(" \t-+.,e1234567890") && tokens.Size() == 4;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Note: this method is not 100% correct, it just checks for invalid characters.
+*/
+inline bool
+String::IsValidMat4() const
+{
+	Array<String> tokens(16, 0);
+	this->Tokenize(", \t", tokens);
+    return this->CheckValidCharSet(" \t-+.,e1234567890") && tokens.Size() == 16;
+}
+    
+
+//------------------------------------------------------------------------------
+/**
+    Returns content as vec4. Note: this method doesn't check whether the
+    contents is actually a valid vec4. Use the IsValidVec4() method
+    for this!
+*/
+inline Math::vec4
+String::AsVec4() const
+{
+    Array<String> tokens(4, 0);
+    this->Tokenize(", \t", tokens);
+    assert(tokens.Size() == 4);
+    Math::vec4 v(tokens[0].AsFloat(), tokens[1].AsFloat(), tokens[2].AsFloat(), tokens[3].AsFloat());
+    return v;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::ReplaceIllegalFilenameChars(char replacement)
+{
+    this->ReplaceChars("\\/:*?\"<>|", replacement);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline String
+String::FromInt(int i)
+{	
+    String str;
+    str.SetInt(i);
+    return str;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline String
+String::FromLong(long i)
+{	
+	String str;
+	str.SetLong(i);
+	return str;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline String
+String::FromFloat(float f)
+{
+    String str;
+    str.SetFloat(f);
+    return str;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline String
+String::FromBool(bool b)
+{
+    String str;
+    str.SetBool(b);
+    return str;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline String
+String::FromVec4(const Math::vec4& v)
+{
+    String str;
+    str.SetVec4(v);
+    return str;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline String
+String::FromMat4(const Math::mat4& m)
+{
+    String str;
+    str.SetMat4(m);
+    return str;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::AppendInt(int val)
+{
+    this->Append(FromInt(val));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::AppendFloat(float val)
+{
+    this->Append(FromFloat(val));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::AppendBool(bool val)
+{
+    this->Append(FromBool(val));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::AppendVec4(const Math::vec4& val)
+{
+    this->Append(FromVec4(val));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+String::AppendMat4(const Math::mat4& val)
+{
+    this->Append(FromMat4(val));
+}
+
+} // namespace Util
+//------------------------------------------------------------------------------
+

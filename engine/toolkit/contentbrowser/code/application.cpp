@@ -190,7 +190,7 @@ void Application::SaveModel(const char* filepath)
 			node = loadedModel->GetGraphicsProperty()->getModelInstance()->GetModelNodes()[i];
 			tinyxml2::XMLElement* element = data.NewElement("Node");
 			element->SetAttribute("primitivegroup", node->primitiveGroup);
-			element->SetAttribute("surface", node->surface->GetPath());
+			element->SetAttribute("surface", node->surface->GetPath().AsCharPtr());
 			
 			mesh->InsertEndChild(element);
 		}

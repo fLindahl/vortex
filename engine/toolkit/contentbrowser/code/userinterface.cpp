@@ -213,7 +213,7 @@ namespace Toolkit
 
 								ImGui::Text("Node: %s", nodeName.c_str());
 								
-								ImGui::Text("Surface: %s", node->surface->GetPath().c_str());
+								ImGui::Text("Surface: %s", node->surface->GetPath().AsCharPtr());
 								ImGui::SameLine();
 								ImGui::PushID(i++);
 								if (ImGui::ImageButton((void*)this->browseButtonTextureHandle, ImVec2(16, 16)))

@@ -576,7 +576,7 @@ void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter>
 		}
 		ImGui::SameLine(120);
 		id = "name##" + std::to_string(particleCount);
-		ImGui::InputText(id.c_str(), (char*)emitter->GetEmitterName().c_str(), 32);
+		ImGui::InputText(id.c_str(), (char*)emitter->GetEmitterName().AsCharPtr(), 32);
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::BeginTooltip();

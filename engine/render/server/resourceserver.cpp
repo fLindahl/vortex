@@ -9,71 +9,65 @@
 namespace Render
 {
 
-std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const std::string& meshpath)
+std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const Util::String& meshpath)
 {
 	//Make sure we've not already loaded this model
 	if (!this->HasMeshNamed(meshpath))
 	{
 		std::shared_ptr<MeshResource> nMesh = std::make_shared<MeshResource>();
 
-        std::string fileExtension = meshpath.substr(meshpath.find_last_of("."));
+        Util::String fileExtension = meshpath.GetFileExtension();
 
-        if(fileExtension == ".mesh")
+        if(fileExtension == "mesh")
         {
-            nMesh->loadMeshFromFile(meshpath.c_str());
+            nMesh->loadMeshFromFile(meshpath.AsCharPtr());
         }
         else
         {
-			nMesh->loadMesh(meshpath.c_str());
+			nMesh->loadMesh(meshpath.AsCharPtr());
         }
-		std::pair<const char*, std::shared_ptr<MeshResource>> par(meshpath.c_str(), nMesh);
-		this->meshes.insert(par);
+		this->meshes.Add(meshpath, nMesh);
 
 		return nMesh;
 	}
 	else
 	{
 		//Model is already loaded so we can just return that model.
-		return this->meshes.find(meshpath)->second;
+		return this->meshes[meshpath];
 	}
 }
 
-bool ResourceServer::HasMeshNamed(const std::string& nName)
+bool ResourceServer::HasMeshNamed(const Util::String& nName)
 {
-	//Because unordered_map containers do not allow for duplicate keys, this means that 
-	//count function actually returns 1 if an element with that key exists in the container, and zero otherwise.
-	if (this->meshes.count(nName) > 0)
+	if (this->meshes.Contains(nName))
 		return true;
 	else
 		return false;
 }
 
-std::shared_ptr<TextureResource> ResourceServer::LoadTexture(const char* filepath)
+std::shared_ptr<TextureResource> ResourceServer::LoadTexture(const Util::String& filepath)
 {
 	//Make sure we've not already loaded this texture
 	if (!this->HasTextureNamed(filepath))
 	{
 		std::shared_ptr<TextureResource> texture = std::make_shared<TextureResource>();
-		texture->loadFromFile(filepath);
-		std::pair<const char*, std::shared_ptr<TextureResource>> par(filepath, texture);
+		texture->loadFromFile(filepath.AsCharPtr());
 		texture->name = filepath;
-		this->textures.insert(par);
+		this->textures.Add(filepath, texture);
 
 		return texture;
 	}
 	else
 	{
 		//texture is already loaded so we can just return that texture.
-		return this->textures.find(filepath)->second;
+		return this->textures[filepath];
 	}
 }
 
 
-bool ResourceServer::HasTextureNamed(const std::string& nName)
+bool ResourceServer::HasTextureNamed(const Util::String& nName)
 {
-	//Because unordered_map containers do not allow for duplicate keys, this means that 
-	//count function actually returns 1 if an element with that key exists in the container, and zero otherwise.
-	if (this->textures.count(nName) > 0)
+	if (this->textures.Contains(nName))
 		return true;
 	else
 		return false;
@@ -81,10 +75,10 @@ bool ResourceServer::HasTextureNamed(const std::string& nName)
 
 std::shared_ptr<Material> ResourceServer::GetMaterial(const Util::String& name)
 {
-	if (this->HasMaterialNamed(name.c_str()))
+	if (this->HasMaterialNamed(name.AsCharPtr()))
 	{
 		//HACK: We shouldn't need to cast here
-		return this->materials[std::string(name)];
+		return this->materials[name];
 	}
 	else
 	{
@@ -93,12 +87,12 @@ std::shared_ptr<Material> ResourceServer::GetMaterial(const Util::String& name)
 	}
 }
 
-bool ResourceServer::SetupMaterials(const char *fileName)
+bool ResourceServer::SetupMaterials(const Util::String& fileName)
 {
 	//TODO: should this really be here?
 
 	tinyxml2::XMLDocument data;
-	int result = data.LoadFile(fileName);
+	int result = data.LoadFile(fileName.AsCharPtr());
 	
 
 	if (result != 0)
@@ -173,8 +167,7 @@ bool ResourceServer::SetupMaterials(const char *fileName)
 				}
 			}
 			
-			this->materials.insert(std::make_pair(nameAttr->Value(), mat));
-			RenderDevice::Instance()->AddMaterial(mat.get());
+			this->materials.Add(nameAttr->Value(), mat);
 		}
 
 		if (material->NextSiblingElement() != nullptr)
@@ -191,21 +184,21 @@ bool ResourceServer::SetupMaterials(const char *fileName)
 	return true;
 }
 
-bool ResourceServer::HasMaterialNamed(const std::string &nName)
+bool ResourceServer::HasMaterialNamed(const Util::String &nName)
 {
-	if (this->materials.count(nName) > 0)
+	if (this->materials.Contains(nName))
 		return true;
 	else
 		return false;
 }
 
-std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
+std::shared_ptr<Surface> ResourceServer::LoadSurface(const Util::String& filepath)
 {
     if(this->HasSurfaceNamed(filepath))
         return this->surfaces[filepath];
 
     tinyxml2::XMLDocument data;
-    int result = data.LoadFile(filepath);
+    int result = data.LoadFile(filepath.AsCharPtr());
 
     if (result != 0)
     {
@@ -288,21 +281,21 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const char* filepath)
     return sur;
 }
 
-bool ResourceServer::HasSurfaceNamed(const std::string &nName)
+bool ResourceServer::HasSurfaceNamed(const Util::String &nName)
 {
-    if (this->surfaces.count(nName) > 0)
+    if (this->surfaces.Contains(nName))
         return true;
     else
         return false;
 }
 
-std::shared_ptr<ModelInstance> ResourceServer::LoadModel(const char* filepath)
+std::shared_ptr<ModelInstance> ResourceServer::LoadModel(const Util::String& filepath)
 {
 	if (this->HasModelNamed(filepath))
 		return this->modelInstances[filepath];
 
 	tinyxml2::XMLDocument data;
-	int result = data.LoadFile(filepath);
+	int result = data.LoadFile(filepath.AsCharPtr());
 
 	if (result != 0)
 	{
@@ -323,16 +316,16 @@ std::shared_ptr<ModelInstance> ResourceServer::LoadModel(const char* filepath)
 	std::shared_ptr<ModelInstance> mdl = std::make_shared<ModelInstance>();
 
 	//Append this surface to materials surfacelist
-	this->modelInstances.insert(std::make_pair(filepath,mdl));
+	this->modelInstances.Add(filepath, mdl);
 
-	mdl->name = filepath;
+	mdl->name = filepath.AsCharPtr();
 	
 	// Get all parameters that this surface overrides
 	const tinyxml2::XMLElement* mesh = model->FirstChildElement("Mesh");
 	
 	Util::String meshName = mesh->FirstAttribute()->Value();
 
-	mdl->mesh = this->LoadMesh(meshName.c_str());
+	mdl->mesh = this->LoadMesh(meshName);
 	
 	const tinyxml2::XMLElement* nodeElement = mesh->FirstChildElement("Node");
 
@@ -355,9 +348,9 @@ std::shared_ptr<ModelInstance> ResourceServer::LoadModel(const char* filepath)
 	return mdl;
 }
 
-bool ResourceServer::HasModelNamed(const std::string &nName)
+bool ResourceServer::HasModelNamed(const Util::String &nName)
 {
-	if (this->surfaces.count(nName) > 0)
+	if (this->surfaces.Contains(nName))
 		return true;
 	else
 		return false;

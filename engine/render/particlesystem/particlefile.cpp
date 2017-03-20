@@ -28,7 +28,7 @@ bool ParticleFile::SaveParticle(Util::String name)
 	{
 		ParticleUISettings set = this->emitters[i]->GetParticleUISettings();
 		pEmitter = xmlDoc.NewElement("ParticleEmitter");
-		pEmitter->SetAttribute("name", this->emitters[i]->GetEmitterName());
+		pEmitter->SetAttribute("name", this->emitters[i]->GetEmitterName().AsCharPtr());
 		pSystem->InsertEndChild(pEmitter);
 
 		pElement = xmlDoc.NewElement("Velocity");
@@ -78,7 +78,7 @@ bool ParticleFile::SaveParticle(Util::String name)
 	}
 
 	Util::String saveposition = "resources/particles/" + name + ".particle";
-	XMLError eResult = xmlDoc.SaveFile(saveposition.c_str());
+	XMLError eResult = xmlDoc.SaveFile(saveposition.AsCharPtr());
 	this->emitters.Clear();
 	XMLCheckResult(eResult);
 
@@ -88,7 +88,7 @@ bool ParticleFile::SaveParticle(Util::String name)
 bool ParticleFile::LoadParticle(Util::String path)
 {
 	XMLDocument xmlDoc;
-	XMLError eResult = xmlDoc.LoadFile(path.c_str());
+	XMLError eResult = xmlDoc.LoadFile(path.AsCharPtr());
 	XMLCheckResult(eResult);
 
 	XMLNode * pRoot = xmlDoc.FirstChild();

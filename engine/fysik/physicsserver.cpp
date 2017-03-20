@@ -237,7 +237,7 @@ std::shared_ptr<Physics::BaseCollider> PhysicsServer::LoadCollider(const std::st
 		{
 			std::shared_ptr<SurfaceCollider> coll = std::make_shared<SurfaceCollider>();
 			coll->SetShape(shape);
-			coll->CookMeshData(Render::ResourceServer::Instance()->LoadMesh(meshName));
+			coll->CookMeshData(Render::ResourceServer::Instance()->LoadMesh(meshName.c_str()));
 			return coll;
 		}
 		else

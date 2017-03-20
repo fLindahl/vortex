@@ -7,6 +7,9 @@
 * @author       Fredrik Lindahl
 * @copyright    See LICENCE file
 */
+#include <cstddef>
+#include <cstdint>
+#include "core/debug.h"
 
 #if _MSC_VER
 #define VORTEX_ALIGN16 __declspec(align(16))
@@ -24,7 +27,7 @@
 
 //#include "foundation/memory/memory.h"
 
-#define InvalidIndex -1;
+#define InvalidIndex -1
 
 typedef uint32_t	uint32;
 typedef int32_t		int32;

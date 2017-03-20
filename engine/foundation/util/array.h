@@ -382,10 +382,10 @@ Array<TYPE>::Move(size_t fromIndex, size_t toIndex)
     }
 
     // compute number of elements to move
-    size_t num = this->size - fromIndex;
+    int num = this->size - fromIndex;
 
     // check if array needs to grow
-    size_t neededSize = toIndex + num;
+    int neededSize = toIndex + num;
     while (neededSize > this->capacity)
     {
         this->Grow();
@@ -394,7 +394,7 @@ Array<TYPE>::Move(size_t fromIndex, size_t toIndex)
     if (fromIndex > toIndex)
     {
         // this is a backward move
-        size_t i;
+        int i;
         for (i = 0; i < num; i++)
         {
             this->elements[toIndex + i] = this->elements[fromIndex + i];
@@ -409,7 +409,7 @@ Array<TYPE>::Move(size_t fromIndex, size_t toIndex)
     else
     {
         // this is a forward move
-        size_t i;  // NOTE: this must remain signed for the following loop to work!!!
+        long long i;  // NOTE: this must remain signed for the following loop to work!!!
         for (i = num - 1; i >= 0; --i)
         {
             this->elements[toIndex + i] = this->elements[fromIndex + i];
@@ -881,13 +881,13 @@ Util::Array<TYPE>::SortWithFunc(bool (*func)(const TYPE& lhs, const TYPE& rhs))
 template<class TYPE> size_t
 Array<TYPE>::BinarySearchIndex(const TYPE& elm) const
 {
-    size_t num = this->Size();
+	int num = this->Size();
     if (num > 0)
     {
-		size_t half;
-		size_t lo = 0;
-		size_t hi = num - 1;
-		size_t mid;
+		int half;
+		int lo = 0;
+		int hi = num - 1;
+		int mid;
         while (lo <= hi) 
         {
             if (0 != (half = num/2)) 
@@ -982,7 +982,7 @@ Array<TYPE>::InsertAtEndOfIdenticalRange(size_t startIndex, const TYPE& elm)
 template<class TYPE> size_t
 Array<TYPE>::InsertSorted(const TYPE& elm)
 {
-    size_t num = this->Size();
+    int num = this->Size();
     if (num == 0)
     {
         // array is currently empty
@@ -991,10 +991,10 @@ Array<TYPE>::InsertSorted(const TYPE& elm)
     }
     else
     {
-		size_t half;
-		size_t lo = 0;
-		size_t hi = num - 1;
-		size_t mid;
+		int half;
+		int lo = 0;
+		int hi = num - 1;
+		int mid;
         while (lo <= hi) 
         {
             if (0 != (half = num/2)) 
