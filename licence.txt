@@ -1,7 +1,7 @@
 Vortex Engine is written by the following authors:
 
 Fredrik Lindahl (fredrik-lindahl@outlook.com)
-Anton Grönberg (Aggro)
+Anton GrÃ¶nberg (Aggro)
 Viktor Andersson
 Various others...
 
@@ -12,18 +12,14 @@ licensing terms:
                                 Start Of Vortex Engine Licensing Terms
 ====================================================================================================
 
-Copyright (c) 2016 - 2017, Fredrik Lindahl, Anton Grönberg, Viktor Andersson
+Copyright (c) 2016 - 2017, Fredrik Lindahl, Anton GrÃ¶nberg, Viktor Andersson
 All rights reserved.
 
-Redistribution and use in source forms, with or without modification, are NOT permitted 
-unless the following conditions are met:
+Redistribution and use in source and binary forms, with or without modification, are permitted 
+provided that the following conditions are met:
 
- - Permission is granted by any of the original authors of the engine.
- - The above copyright notice is never to be removed
-
-Redistribution in binary forms are permitted if the following conditions are met:
- 
- - You fulfill the source forms conditions.
+ - Redistributions of source code must retain the above copyright notice, this list of conditions 
+   and the following disclaimer.
  - Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
    and the following disclaimer  in the documentation and/or other materials provided with the 
    distribution.
