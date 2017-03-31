@@ -109,12 +109,6 @@ ExampleApp::Run()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	IO::Console::Instance()->Show();
 
-	IO::Console::Instance()->Print("This is a message!", IO::MESSAGE);
-	IO::Console::Instance()->Print("This is an input!", IO::INPUT);
-	IO::Console::Instance()->Print("This is a warning!", IO::WARNING);
-	IO::Console::Instance()->Print("This is an error!", IO::ERROR);
-	IO::Console::Instance()->Print("This is an exception!", IO::EXCEPTION);
-
 	Ptr<TestClass> test;
 	if (Core::Factory::Instance()->ClassExists("Example::ANonExistingClass"))
 	{
@@ -134,6 +128,12 @@ ExampleApp::Run()
 	}
 
 	Ptr<TestClass> test2 = TestClass::Create();
+
+	IO::Console::Instance()->Print("This is a message!", IO::MESSAGE);
+	IO::Console::Instance()->Print("This is an input!", IO::INPUT);
+	IO::Console::Instance()->Print("This is a warning!", IO::WARNING);
+	IO::Console::Instance()->Print("This is an error!", IO::ERROR);
+	IO::Console::Instance()->Print("This is an exception!", IO::EXCEPTION);
 	
 	while (this->window->IsOpen())
 	{

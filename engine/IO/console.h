@@ -9,6 +9,7 @@
 	@copright	See LICENCE file
 */
 #include "core/singleton.h"
+#include "core/types.h"
 #include "foundation/util/string.h"
 #include "foundation/util/fixedarray.h"
 
@@ -38,6 +39,16 @@ class Console
 {
 __DeclareSingleton(Console)
 public:
+	struct LogEntry
+	{
+		///Using a string for timestamp, so that we can just show it right away
+		Util::String timestamp;
+		///Message type. This will be used for setting the color of the message
+		LogMessageType type;
+		///Message string.
+		Util::String msg;
+	};
+
 	///Update function. Called from main application loop. This also draws the console if necessary
 	void Update();
 
@@ -74,7 +85,7 @@ public:
 	void SaveLog(Util::String filename = "") const;
 
 	///Return a const reference to the entire log content
-	const Util::Array<Util::String>& GetLog() const;
+	const Util::Array<LogEntry>& GetLog() const;
 private:
 
 	bool nativeConsoleOpen;
@@ -83,12 +94,14 @@ private:
 	char inputBuf[INPUTBUFSIZE];
 
 	///Contains the entire log. This can be filtered because we append each message into it's own node in the array.
-	Util::Array<Util::String> log;
+	Util::Array<LogEntry> log;
 
 	///This Array and is used to check if a message has been printed recently.
 	///recentMessages list contains a maximum n messages and a message can only exist in the list for a maximum of x seconds
 	///integer is HashCode and double is time when the message will be removed
 	Util::Array<Util::Pair<int, double>> recentMessages;
+
+	const char* LogEntryTypeAsCharPtr(const LogMessageType& type);
 };
 
 }

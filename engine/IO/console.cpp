@@ -15,11 +15,11 @@
 namespace IO
 {
 
-Console::Console() : 
-	log(),
-	recentMessages(),
-	GUIConsoleOpen(false),
-	nativeConsoleOpen(false)
+Console::Console() :
+		log(),
+		recentMessages(),
+		GUIConsoleOpen(false),
+		nativeConsoleOpen(false)
 {
 	//Empty
 }
@@ -43,7 +43,9 @@ void Console::Update()
 			ImGui::BeginChild("ScrollingRegion", ImVec2(0, -ImGui::GetItemsLineHeightWithSpacing()), false, ImGuiWindowFlags_HorizontalScrollbar);
 			if (ImGui::BeginPopupContextWindow())
 			{
-				if (ImGui::Selectable("Clear")) 
+				if (ImGui::Selectable("Save Log..."))
+					this->SaveLog();
+				if (ImGui::Selectable("Clear"))
 					ClearLog();
 				ImGui::EndPopup();
 			}
@@ -62,29 +64,48 @@ void Console::Update()
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
 			for (int i = 0; i < log.Size(); i++)
 			{
-				const char* item = log[i].AsCharPtr();
-				if (!filter.PassFilter(item))
+				const char* item = log[i].msg.AsCharPtr();
+				const char* timestamp = log[i].timestamp.AsCharPtr();
+
+				//Filter on both time, prefix and entry
+				if (!filter.PassFilter(item) && !filter.PassFilter(timestamp) && !filter.PassFilter(this->LogEntryTypeAsCharPtr(log[i].type)))
 					continue;
 
-				//TODO: A better implementation may store a type per-item. For now just parse the text.
-				ImVec4 col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); 
-				if (strstr(item, "[Error]")) col = ImColor(1.0f, 0.4f, 0.4f, 1.0f);
-				else if (strstr(item, "[Warning]")) col = ImColor(1.0f, 1.0f, 0.4f, 1.0f);
-				else if (strstr(item, "[FATAL ERROR]")) col = ImColor(1.0f, 0.0f, 0.0f, 1.0f);
-				else if (strstr(item, ">>")) col = ImColor(0.4f, 1.0f, 0.4f, 1.0f);
+				ImColor col;
+				switch (log[i].type)
+				{
+				case IO::MESSAGE:
+					col = ImColor(1.0f, 1.0f, 1.0f, 1.0f);
+					break;
+				case IO::INPUT:
+					col = ImColor(0.4f, 1.0f, 0.4f, 1.0f);
+					break;
+				case IO::WARNING:
+					col = ImColor(1.0f, 1.0f, 0.4f, 1.0f);
+					break;
+				case IO::ERROR:
+					col = ImColor(1.0f, 0.4f, 0.4f, 1.0f);
+					break;
+				case IO::EXCEPTION:
+					col = ImColor(1.0f, 0.0f, 0.0f, 1.0f);
+					break;
+				default:
+					break;
+				}
+
+				static const ImColor timeColor = ImColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+				//Start by printing timestamp.
+				ImGui::PushStyleColor(ImGuiCol_Text, timeColor);
+				ImGui::TextUnformatted(timestamp);
+				ImGui::PopStyleColor();
 
 				ImGui::PushStyleColor(ImGuiCol_Text, col);
-
-				//TODO: Wrapping should resume with a tab, so that continuing on a new line does not align with the time stamp, but with the message itself.
-				//		This would make it a lot more readable.
-				//		ex.
-				/*       _______________________________________________________________________
-						|18:23:43 [Message]: This is a long message that will wrap around to the |
-						|					 next line. This makes the message a lot more readab-|
-						|					 le than if this was not the case.					 |
-						|18:24:01 [Message]: This is another message.							 |
-						|________________________________________________________________________|
-				*/
+				ImGui::SameLine();
+				//Print message prefix
+				ImGui::TextUnformatted(this->LogEntryTypeAsCharPtr(log[i].type));
+				ImGui::SameLine();
+				//Print log entry
 				ImGui::TextWrapped(item);
 				ImGui::PopStyleColor();
 			}
@@ -96,10 +117,6 @@ void Console::Update()
 			ImGui::EndChild();
 			ImGui::Separator();
 
-			if (ImGui::SmallButton("Clear Log"))
-				ClearLog();
-
-			ImGui::SameLine();
 			if (ImGui::SmallButton("Auto Scroll"))
 				ScrollToBottom = (ScrollToBottom ? false : true);
 
@@ -130,30 +147,11 @@ void Console::Update()
 void Console::Print(const Util::String& msg, LogMessageType type, bool once)
 {
 	//Get Time and Date
-	Util::String logEntry = Core::SysFunc::GetTimeFormatted() + " ";
+	Console::LogEntry logEntry;
+	logEntry.type = type;
+	logEntry.timestamp = Core::SysFunc::GetTimeFormatted() + " ";
 
-	switch (type)
-	{
-	case IO::MESSAGE:
-		logEntry.Append("[Message]: ");
-		break;
-	case IO::INPUT:
-		logEntry.Append(">> ");
-		break;
-	case IO::WARNING:
-		logEntry.Append("[Warning]: ");
-		break;
-	case IO::ERROR:
-		logEntry.Append("[Error]: ");
-		break;
-	case IO::EXCEPTION:
-		logEntry.Append("[FATAL ERROR]: ");
-		break;
-	default:
-		break;
-	}
-
-	logEntry.Append(msg.AsCharPtr());
+	logEntry.msg.Append(msg.AsCharPtr());
 
 	if (!once)
 	{
@@ -161,7 +159,7 @@ void Console::Print(const Util::String& msg, LogMessageType type, bool once)
 		this->log.Append(logEntry);
 		if (this->nativeConsoleOpen)
 		{
-			std::cout << logEntry.AsCharPtr() << std::endl;
+			std::cout << logEntry.timestamp.AsCharPtr() << this->LogEntryTypeAsCharPtr(type) << logEntry.msg.AsCharPtr() << std::endl;
 		}
 	}
 	else
@@ -194,7 +192,7 @@ void Console::Print(const Util::String& msg, LogMessageType type, bool once)
 		this->log.Append(logEntry);
 		if (this->nativeConsoleOpen)
 		{
-			std::cout << logEntry.AsCharPtr() << std::endl;
+			std::cout << logEntry.timestamp.AsCharPtr() << this->LogEntryTypeAsCharPtr(type) << logEntry.msg.AsCharPtr() << std::endl;
 		}
 
 		if (this->recentMessages.Size() == RECENTMESSAGESCAPACITY)
@@ -277,9 +275,35 @@ void Console::SaveLog(Util::String filename) const
 	//TODO: Implement me!
 }
 
-const Util::Array<Util::String> & Console::GetLog() const
+const Util::Array<Console::LogEntry> & Console::GetLog() const
 {
 	return this->log;
+}
+
+const char* Console::LogEntryTypeAsCharPtr(const LogMessageType& type)
+{
+	//static const prefixes that are appended to messages. Doing this saves a ton of memory.
+	static const Util::String prefix_message =   "[Message]: ";
+	static const Util::String prefix_input =     ">> ";
+	static const Util::String prefix_warning =   "[Warning]: ";
+	static const Util::String prefix_error =     "[ Error ]: ";
+	static const Util::String prefix_exception = "[FATAL ERROR]: ";
+
+	switch (type)
+	{
+	case IO::MESSAGE:
+		return prefix_message.AsCharPtr();
+	case IO::INPUT:
+		return prefix_input.AsCharPtr();
+	case IO::WARNING:
+		return prefix_warning.AsCharPtr();
+	case IO::ERROR:
+		return prefix_error.AsCharPtr();
+	case IO::EXCEPTION:
+		return prefix_exception.AsCharPtr();
+	default:
+		return nullptr;
+	}
 }
 
 }
