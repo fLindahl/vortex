@@ -10,17 +10,24 @@
 #include "application/game/geometryproxyentity.h"
 #include "application/game/cubemapentity.h"
 #include "envmanager.h"
+#include "render/resources/geometryproxy.h"
+
 namespace BaseGameFeature
 {
 
-std::shared_ptr<Render::ModelInstance> SceneManager::LoadOBJScene(const char* filename, const char* mtlfile)
+SceneManager::SceneManager()
+{
+
+}
+
+Ptr<Render::ModelInstance> SceneManager::LoadOBJScene(const char* filename, const char* mtlfile)
 {
 	// Load .mtl file!
-	Util::Array<std::shared_ptr<Render::Surface>> surfaces;
+	Util::Array<Ptr<Render::Surface>> surfaces;
 	surfaces = Render::ResourceServer::Instance()->LoadMTLFile(mtlfile);
 	
 
-	std::shared_ptr<Render::ModelInstance> model = std::make_shared<Render::ModelInstance>();
+	Ptr<Render::ModelInstance> model = Render::ModelInstance::Create();
 	model->SetMesh(filename);
 	//model->SetSurfaceList(surfaces);
 	
@@ -49,7 +56,7 @@ bool SceneManager::LoadXMLScene(const char* filename)
 
 	while (proxy != nullptr)
 	{
-		std::shared_ptr<Game::GeometryProxyEntity> proxyEntity = std::make_shared<Game::GeometryProxyEntity>();
+		Ptr<Game::GeometryProxyEntity> proxyEntity = Game::GeometryProxyEntity::Create();
 		//Set icon
 		proxyEntity->SetModel(Render::ResourceServer::Instance()->LoadModel("resources/models/geometryproxy_icon.mdl"));
 
@@ -73,7 +80,7 @@ bool SceneManager::LoadXMLScene(const char* filename)
 
 		while (probe != nullptr)
 		{
-			std::shared_ptr<Game::CubeMapEntity> envProbeEntity = std::make_shared<Game::CubeMapEntity>();
+			Ptr<Game::CubeMapEntity> envProbeEntity = Game::CubeMapEntity::Create();
 			envProbeEntity->SetModel(Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
 
 			wPos.set_x(probe->FindAttribute("x")->FloatValue());

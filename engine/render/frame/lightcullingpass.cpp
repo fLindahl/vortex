@@ -12,6 +12,8 @@
 namespace Render
 {
 
+__ImplementClass(Render::LightCullingPass, 'LICP', Render::FramePass);
+
 LightCullingPass::LightCullingPass()
 {
 	lightServer = LightServer::Instance();

@@ -1,4 +1,6 @@
 #pragma once
+#include "core/refcounted.h"
+#include "core/singleton.h"
 #include <unordered_map>
 #include "foundation/util/linkedlist.h"
 #include <memory>
@@ -16,25 +18,13 @@ namespace BaseGameFeature
 
 class EntityManager
 {
-private:
-	EntityManager();
+	__DeclareSingleton(EntityManager)
 
 public:
-	static EntityManager* Instance()
-	{
-		static EntityManager instance;
-		return &instance;
-	}
-
-	// C++ 11
-	// Delete the methods we don't want.
-	EntityManager(EntityManager const&) = delete;
-	void operator=(EntityManager const&) = delete;
-
 	//Returns a unique ID
 	uint GetNewEntityID();
 
-	void RegisterEntity(std::shared_ptr<Game::Entity> entity);
+	void RegisterEntity(Ptr<Game::Entity> entity);
 	
 	//Deletes an entity by ID. Unregisters it from gamehandler. 
 	void UnregisterEntity(const int& ID);
@@ -45,13 +35,13 @@ public:
 	//Returns time since last update multiplied with UPDATE_MULTIPLIER
 	double DeltaTime();
 
-	std::shared_ptr<Game::Entity> GetEntityByID(const uint& id);
+	Ptr<Game::Entity> GetEntityByID(const uint& id);
 
 	//Update frequency multiplier for deltaTime, put this to 1.0f if you want normal speed.
 	//float UPDATE_MULTIPLIER;
 
 	//Returns std::map of registered entities.
-	std::unordered_map<int, std::shared_ptr<Game::Entity>>& GetEntityList() { return EntityList; }
+	std::unordered_map<int, Ptr<Game::Entity>>& GetEntityList() { return EntityList; }
 	
 private:
 	//Incrementing index for making sure entities has unique IDs. 
@@ -59,7 +49,7 @@ private:
 	uint entityCounter = 20000; //HACK: Start at 20k because we need to reserve low numbers...
 
 	//Holds all units mapped: unique ID as key and pointer to their baseclass as mapped value
-	std::unordered_map<int, std::shared_ptr<Game::Entity>> EntityList;
+	std::unordered_map<int, Ptr<Game::Entity>> EntityList;
 
 	//Used for calculating DeltaTime
 	//Time variables

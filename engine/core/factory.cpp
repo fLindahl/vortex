@@ -92,7 +92,7 @@ Factory::Register(const Rtti* rtti, const String& className, const FourCC& class
         // when this method Register() is called!
         String errorMsg;
         errorMsg.Format("Class name '%s' has already been registered!", className.AsCharPtr());
-        SysFunc::Error(errorMsg.AsCharPtr());
+        SysFunc::Exception(errorMsg.AsCharPtr());
         return;
     }
 
@@ -105,7 +105,7 @@ Factory::Register(const Rtti* rtti, const String& className, const FourCC& class
         errorMsg.Format("Class fourcc '%s' (name: %s) has already been registered!", 
             classFourCC.AsString().AsCharPtr(),
             className.AsCharPtr());
-        SysFunc::Error(errorMsg.AsCharPtr());
+        SysFunc::Exception(errorMsg.AsCharPtr());
         return;
     }
 
@@ -131,7 +131,7 @@ Factory::Register(const Rtti* rtti, const String& className)
         // when this method Register() is called!
         String errorMsg;
         errorMsg.Format("Class name '%s' has already been registered!", className.AsCharPtr());
-        SysFunc::Error(errorMsg.AsCharPtr());
+        SysFunc::Exception(errorMsg.AsCharPtr());
         return;
     }
 
@@ -198,7 +198,7 @@ Factory::Create(const String& className) const
     {
         String errorMsg;
         errorMsg.Format("Factory::Create('%s'): unknown class name!", className.AsCharPtr());
-        SysFunc::Error(errorMsg.AsCharPtr());
+        SysFunc::Exception(errorMsg.AsCharPtr());
         return 0;
     }
 
@@ -223,7 +223,7 @@ Factory::Create(const FourCC classFourCC) const
     {
         String errorMsg;
         errorMsg.Format("Factory::Create('%s'): unknown class FourCC code!", classFourCC.AsString().AsCharPtr());
-        SysFunc::Error(errorMsg.AsCharPtr());
+        SysFunc::Exception(errorMsg.AsCharPtr());
         return 0;
     }
 

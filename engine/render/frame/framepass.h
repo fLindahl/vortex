@@ -1,15 +1,15 @@
 #pragma once
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
-#include <string>
+#include "core/refcounted.h"
+#include "foundation/util/string.h"
 #include "foundation/util/array.h"
+#include "render/resources/material.h"
 
 namespace Render
-{
-	class Material;
-
-	class FramePass
+{	
+	class FramePass : public Core::RefCounted
 	{
+	__DeclareClass(FramePass);
+
 	public:
 		FramePass();
 		virtual ~FramePass();
@@ -21,7 +21,7 @@ namespace Render
 	protected:
 		friend class RenderDevice;
 		friend class FrameServer;
-		std::string name;
+		Util::String name;
 	};
 
 }

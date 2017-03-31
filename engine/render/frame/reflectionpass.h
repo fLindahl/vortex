@@ -9,6 +9,8 @@ namespace Render
 {
 class ReflectionPass : public FramePass
 {
+	__DeclareClass(ReflectionPass);
+
 public:
 	enum ReflectionQuality
 	{

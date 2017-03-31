@@ -4,6 +4,7 @@
 
 namespace BaseGameFeature
 {
+__ImplementClass(BaseGameFeature::Msg, 'EMSG', Core::RefCounted)
 
 void MsgHandler::RecvMsg(Msg msg)
 {

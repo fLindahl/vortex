@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 #include "foundation/math/plane.h"
 #include "basecollider.h"
 #include "foundation/math/point.h"
@@ -10,6 +11,7 @@ namespace Physics
 
 class SurfaceCollider : public BaseCollider
 {	
+__DeclareClass(SurfaceCollider);
 public:
 	struct ColliderFace
 	{
@@ -24,7 +26,7 @@ public:
 	~SurfaceCollider();
 
 	/// Cook a physics surface collider from mesh data.
-	void CookMeshData(const std::shared_ptr<Render::MeshResource> mesh);
+	void CookMeshData(const Ptr<Render::MeshResource> mesh);
 
 	Util::Array<ColliderFace>& GetFaceList() { return this->faces; }
 

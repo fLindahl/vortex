@@ -120,7 +120,7 @@ bool ParticleFile::LoadParticle(Util::String path)
 
 }
 
-	void ParticleFile::AppendEmitter(std::shared_ptr<Property::ParticleEmitter> emitter)
+	void ParticleFile::AppendEmitter(Ptr<Property::ParticleEmitter> emitter)
 {
 	if (std::find(this->emitters.begin(), this->emitters.end(), emitter) == this->emitters.end())
 		this->emitters.Append(emitter);

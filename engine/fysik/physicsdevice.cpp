@@ -333,7 +333,7 @@ void PhysicsDevice::Solve()
     //--------------
 }
 
-void PhysicsDevice::AddRigidBody(std::shared_ptr<RigidBody> rBody)
+void PhysicsDevice::AddRigidBody(Ptr<RigidBody> rBody)
 {
 	auto it = this->rigidBodies.Find(rBody);
 	if (it == nullptr)
@@ -347,7 +347,7 @@ void PhysicsDevice::AddRigidBody(std::shared_ptr<RigidBody> rBody)
 
 }
 
-void PhysicsDevice::RemoveRigidBody(std::shared_ptr<RigidBody> rBody)
+void PhysicsDevice::RemoveRigidBody(Ptr<RigidBody> rBody)
 {
 	auto it = this->rigidBodies.Find(rBody);
 	if (it != nullptr)

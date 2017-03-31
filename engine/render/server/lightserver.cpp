@@ -179,7 +179,7 @@ void LightServer::RemovePointLight(PointLight* light)
 	this->pointLights.EraseSwap(light);
 }
 
-void LightServer::AddCubeMap(std::shared_ptr<CubeMapNode> node)
+void LightServer::AddCubeMap(Ptr<CubeMapNode> node)
 {
 	if (!this->cubemapNodes.Find(node))
 	{
@@ -187,7 +187,7 @@ void LightServer::AddCubeMap(std::shared_ptr<CubeMapNode> node)
 	}
 }
 
-void LightServer::RemoveCubeMap(std::shared_ptr<CubeMapNode> node)
+void LightServer::RemoveCubeMap(Ptr<CubeMapNode> node)
 {
 	auto it = this->cubemapNodes.Find(node);
 
@@ -197,10 +197,10 @@ void LightServer::RemoveCubeMap(std::shared_ptr<CubeMapNode> node)
 	}
 }
 
-Util::Array<std::shared_ptr<CubeMapNode>>& LightServer::GetClosestCubemapToPoint(const Math::point& point)
+Util::Array<Ptr<CubeMapNode>>& LightServer::GetClosestCubemapToPoint(const Math::point& point)
 {
 	float closestDistance = FLT_MAX;
-	std::shared_ptr<CubeMapNode> closestCubemap = nullptr;
+	Ptr<CubeMapNode> closestCubemap = nullptr;
 
 	float distance;
 

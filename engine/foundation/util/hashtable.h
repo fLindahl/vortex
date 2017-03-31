@@ -165,9 +165,9 @@ VALUETYPE&
 HashTable<KEYTYPE, VALUETYPE>::operator[](const KEYTYPE& key) const
 {
     // get hash code from key, trim to capacity
-    IndexT hashIndex = key.HashCode() % this->hashArray.Size();
+    int hashIndex = key.HashCode() % (int)this->hashArray.Size();
     const Array<Pair<KEYTYPE, VALUETYPE> >& hashElements = this->hashArray[hashIndex];
-    int numHashElements = hashElements.Size();
+    int numHashElements = (int)hashElements.Size();
     if (1 == numHashElements)
     {
         // no hash collissions, just return the only existing element
@@ -209,8 +209,8 @@ template<class KEYTYPE, class VALUETYPE>
 void
 HashTable<KEYTYPE, VALUETYPE>::Clear()
 {
-    index_t i;
-    size_t num = this->hashArray.Size();
+    int i;
+    int num = (int)this->hashArray.Size();
     for (i = 0; i < num; i++)
     {
         this->hashArray[i].Clear();
@@ -235,7 +235,7 @@ template<class KEYTYPE, class VALUETYPE>
 void
 HashTable<KEYTYPE, VALUETYPE>::Add(const Pair<KEYTYPE, VALUETYPE>& kvp)
 {
-    index_t hashIndex = kvp.Key().HashCode() % this->hashArray.Size();
+    int hashIndex = kvp.Key().HashCode() % (int)this->hashArray.Size();
     this->hashArray[hashIndex].InsertSorted(kvp);
     this->size++;
 }
@@ -274,7 +274,7 @@ HashTable<KEYTYPE, VALUETYPE>::Contains(const KEYTYPE& key) const
 {
     if (this->size > 0)
     {
-        index_t hashIndex = key.HashCode() % this->hashArray.Size();
+        int hashIndex = key.HashCode() % (int)this->hashArray.Size();
         Array<Pair<KEYTYPE, VALUETYPE> >& hashElements = this->hashArray[hashIndex];
         index_t hashElementIndex = hashElements.BinarySearchIndex(key);
         return (InvalidIndex != hashElementIndex);

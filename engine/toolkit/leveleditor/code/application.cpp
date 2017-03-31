@@ -16,6 +16,7 @@
 #include "application/properties/particleemitter.h"
 #include "application/basegamefeature/keyhandler.h"
 #include "application/basegamefeature/managers/envmanager.h"
+#include "IO/console.h"
 
 using namespace Display;
 using namespace Render;
@@ -63,6 +64,9 @@ Application::Open()
 	// Initiate everything we need
 	RenderDevice::Instance()->SetPickingEnabled(true);
 
+	IO::Console::Instance()->Show();
+	IO::Console::Instance()->OpenNativeConsole();
+
 	//Always call app::open _AFTER_ initializing a glfwwindow
 	if (this->window->Open() && App::Open())
 	{
@@ -75,13 +79,13 @@ Application::Open()
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Vortex Level Editor");
 
-		//RenderDevice::Instance()->SetRenderResolution(256, 256);
+		RenderDevice::Instance()->SetRenderResolution(1920, 1020);
 
 		//this->rayStart = Math::vec4::zerovector();
 		//this->rayEnd = Math::vec4::zerovector();
 		
 		//Load Sponza
-		this->sponza = std::make_shared<Game::ModelEntity>();
+		this->sponza = Game::ModelEntity::Create();
 		this->sponza->SetModel(ResourceServer::Instance()->LoadModel("resources/models/sponza.mdl"));
 		this->sponza->Activate();
 		Math::mat4 sTransform = Math::mat4::scaling(0.1f, 0.1f, 0.1f);
@@ -207,7 +211,10 @@ Application::Open()
 void Application::RenderUI()
 {
 	if (this->window->IsOpen())
-	{		
+	{	
+		//Updates the console. Always do this first!
+		IO::Console::Instance()->Update();
+
 		UI->Run();		
 	}
 }

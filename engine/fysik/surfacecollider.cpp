@@ -4,6 +4,8 @@
 namespace Physics
 {
 
+__ImplementClass(Physics::SurfaceCollider, 'SCOL', Physics::BaseCollider);
+
 SurfaceCollider::SurfaceCollider()
 {
 
@@ -14,7 +16,7 @@ SurfaceCollider::~SurfaceCollider()
 
 }
 
-void SurfaceCollider::CookMeshData(const std::shared_ptr<Render::MeshResource> mesh)
+void SurfaceCollider::CookMeshData(const Ptr<Render::MeshResource> mesh)
 {
 	float* vertDataBase = (float*)mesh->getMesh();
 	const uint vWidth = mesh->getVertexWidth();

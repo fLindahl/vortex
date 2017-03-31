@@ -6,6 +6,7 @@ namespace Render
 {
 class LightCullingPass : public FramePass
 {
+__DeclareClass(LightCullingPass);
 public:
 	LightCullingPass();
 	~LightCullingPass();
@@ -27,7 +28,7 @@ private:
 	GLuint ubo[1];
 
 	LightServer* lightServer;
-	//std::shared_ptr<ShaderObject> computeShader;
+	//Ptr<ShaderObject> computeShader;
 	GLuint lightCullingProgram;
 
 	GLuint buffer;

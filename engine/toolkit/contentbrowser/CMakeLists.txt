@@ -10,7 +10,7 @@ SET(files_contentbrowser ${contentbrowser_headers} ${contentbrowser_sources})
 SOURCE_GROUP("contentbrowser" FILES ${files_contentbrowser})
 
 ADD_EXECUTABLE(contentbrowser ${files_contentbrowser})
-TARGET_LINK_LIBRARIES(contentbrowser core render fysik nativefiledialog)
-ADD_DEPENDENCIES(contentbrowser core render fysik nativefiledialog)
+TARGET_LINK_LIBRARIES(contentbrowser core render nativefiledialog)
+ADD_DEPENDENCIES(contentbrowser core render nativefiledialog)
 
 SET_TARGET_PROPERTIES(contentbrowser PROPERTIES FOLDER "vortex/toolkit")

@@ -6,6 +6,7 @@
 
 namespace Game
 {
+	__ImplementClass(Game::ModelEntitySpotLight, 'mesl', Game::Entity)
 
 ModelEntitySpotLight::ModelEntitySpotLight() : 
 		Entity(),
@@ -26,14 +27,14 @@ ModelEntitySpotLight::~ModelEntitySpotLight()
 	Render::LightServer::Instance()->RemoveSpotLight(this->lightEntity);
 }
 
-void ModelEntitySpotLight::SetModel(std::shared_ptr<Render::ModelInstance> mdl)
+void ModelEntitySpotLight::SetModel(Ptr<Render::ModelInstance> mdl)
 {
 	this->gProperty->setModelInstance(mdl);
 }
 
 void ModelEntitySpotLight::Activate()
 {
-	this->gProperty->SetOwner(this->shared_from_this());
+	this->gProperty->SetOwner(this);
 	this->gProperty->Activate();
 	Entity::Activate();
 }

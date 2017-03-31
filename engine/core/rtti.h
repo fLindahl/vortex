@@ -115,7 +115,7 @@ Rtti::GetParent() const
 //------------------------------------------------------------------------------
 /**
 */
-inline SizeT
+inline int
 Rtti::GetInstanceSize() const
 {
     return this->instanceSize;

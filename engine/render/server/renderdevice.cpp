@@ -18,8 +18,8 @@
 #include "render/frame/framepass.h"
 #include "render/frame/depthpass.h"
 #include "render/frame/flatgeometrylitpass.h"
-#include "render/frame/reflectionpass.h"
-#include "render/frame/pickingpass.h"
+//#include "render/frame/reflectionpass.h"
+//#include "render/frame/pickingpass.h"
 
 
 namespace Render

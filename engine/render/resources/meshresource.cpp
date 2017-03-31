@@ -10,6 +10,7 @@
 
 namespace Render
 {
+	__ImplementClass(Render::MeshResource, 'MESH', Core::RefCounted);
 	MeshResource::MeshResource()
 	{
 		this->name = "N/A";

@@ -6,6 +6,7 @@
 
 namespace Render
 {
+__ImplementClass(Render::TextureResource, 'TXTR', Core::RefCounted);
 
 TextureResource::TextureResource()
 {

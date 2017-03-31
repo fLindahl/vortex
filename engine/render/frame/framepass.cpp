@@ -5,6 +5,8 @@
 
 namespace Render
 {
+	__ImplementClass(Render::FramePass, 'PASS', Core::RefCounted);
+	
 	FramePass::FramePass()
 	{
 	

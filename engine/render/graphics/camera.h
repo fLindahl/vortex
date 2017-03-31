@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 #include "foundation/math/matrix4.h"
 
 /************************************************************************/
@@ -17,8 +18,9 @@ namespace Render
 namespace Graphics
 {
 
-class Camera
+class Camera : public Core::RefCounted
 {
+__DeclareClass(Camera);
 public:
 	Camera();
 	~Camera() {}

@@ -10,12 +10,12 @@ namespace Edit
 	class AddEntity : public Command
 	{
 	public:
-		std::shared_ptr<Game::CubeMapEntity> entity;
+		Ptr<Game::CubeMapEntity> entity;
 
 	public:
-		AddEntity(const Math::vec4& position, std::shared_ptr<Render::ModelInstance> mdl)
+		AddEntity(const Math::vec4& position, Ptr<Render::ModelInstance> mdl)
 		{
-			this->entity = std::make_shared<Game::CubeMapEntity>();
+			this->entity = Game::CubeMapEntity::Create();
 			this->entity->SetModel(mdl);
 			this->entity->SetTransform(Math::mat4::translation(position));
 		}
@@ -41,12 +41,12 @@ namespace Edit
 	class AddGeometryProxyEntity : public Command
 	{
 	public:
-		std::shared_ptr<Game::GeometryProxyEntity> entity;
+		Ptr<Game::GeometryProxyEntity> entity;
 
 	public:
-		AddGeometryProxyEntity(const Math::vec4& position, std::shared_ptr<Render::ModelInstance> mdl)
+		AddGeometryProxyEntity(const Math::vec4& position, Ptr<Render::ModelInstance> mdl)
 		{
-			this->entity = std::make_shared<Game::GeometryProxyEntity>();
+			this->entity = Game::GeometryProxyEntity::Create();
 			this->entity->SetModel(mdl);
 			this->entity->SetTransform(Math::mat4::translation(position));
 		}
@@ -72,12 +72,12 @@ namespace Edit
     class AddSpotlightEntity : public Command
     {
     public:
-        std::shared_ptr<Game::ModelEntitySpotLight> entity;
+        Ptr<Game::ModelEntitySpotLight> entity;
 
     public:
-        AddSpotlightEntity(const Math::vec4& position, std::shared_ptr<Render::ModelInstance> mdl)
+        AddSpotlightEntity(const Math::vec4& position, Ptr<Render::ModelInstance> mdl)
         {
-            this->entity = std::make_shared<Game::ModelEntitySpotLight>();
+            this->entity = Game::ModelEntitySpotLight::Create();
             this->entity->SetModel(mdl);
             this->entity->SetTransform(Math::mat4::translation(position));
         }
@@ -102,12 +102,12 @@ namespace Edit
     class AddPointlightEntity : public Command
     {
     public:
-        std::shared_ptr<Game::PointLightEntity> entity;
+        Ptr<Game::PointLightEntity> entity;
 
     public:
-        AddPointlightEntity(const Math::vec4& position, std::shared_ptr<Render::ModelInstance> mdl)
+        AddPointlightEntity(const Math::vec4& position, Ptr<Render::ModelInstance> mdl)
         {
-            this->entity = std::make_shared<Game::PointLightEntity>();
+            this->entity = Game::PointLightEntity::Create();
             this->entity->SetModel(mdl);
             this->entity->SetTransform(Math::mat4::translation(position));
         }

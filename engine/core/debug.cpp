@@ -5,6 +5,8 @@
 #include "config.h"
 #include "core/types.h"
 #include "foundation/util/string.h"
+#include "core/sysfunc.h"
+#include "IO/console.h"
 
 //------------------------------------------------------------------------------
 /**
@@ -21,7 +23,7 @@ _exception(const char* exp, const char* file, int line)
 	{
 		Util::String msg;
 		msg.Format("*** VORTEX ASSERTION ***\nexpression: %s\nfile: %s\nline: %d\n", exp, file, line);
-		//Core::SysFunc::Error(msg.AsCharPtr());
+		Core::SysFunc::Exception(msg.AsCharPtr());
 	}
 }
 
@@ -39,8 +41,8 @@ _exception2(const char* exp, const char* msg, const char* file, int line)
 	//else
 	{
 		Util::String fmt;
-		fmt.Format("*** VORTEX ASSERTION ***\nmessage: %s\nexpression: %s\nfile: %s\nline: %d\n", msg, exp, file, line);
-		//Core::SysFunc::Error(fmt.AsCharPtr());
+		fmt.Format("*** VORTEX ASSERTION ***\n\nmessage:\n %s\n\nexpression: %s\nfile: %s\nline: %d\n", msg, exp, file, line);
+		Core::SysFunc::Exception(fmt.AsCharPtr());
 	}
 }
 
@@ -63,30 +65,25 @@ _exception_fmt(const char *	exp, const char *fmt, const char *file, int line, ..
 	//}
 	//else
 	{
-		//Core::SysFunc::Error(format.AsCharPtr());
+		Core::SysFunc::Exception(format.AsCharPtr());
 	}
 }
 
 //------------------------------------------------------------------------------
 /**
-	This function is called when a serious situation is encountered which
-	requires abortion of the application.
+	This function is called when a serious situation is encountered.
+	This function does not abort the application however.
 */
 void __cdecl
 _error(const char* msg, ...)
 {
 	va_list argList;
 	va_start(argList, msg);
-	//if (IO::Console::HasInstance())
-	//{
-	//	IO::Console::Instance()->Error(msg, argList);
-	//}
-	//else
-	{
-		Util::String str;
-		str.FormatArgList(msg, argList);
-		//Core::SysFunc::Error(str.AsCharPtr());
-	}
+	
+	Util::String str;
+	str.FormatArgList(msg, argList);
+	IO::Console::Instance()->Print(str, IO::ERROR);
+	
 	va_end(argList);
 }
 
@@ -100,16 +97,11 @@ _warning(const char* msg, ...)
 {
 	va_list argList;
 	va_start(argList, msg);
-	//if (IO::Console::HasInstance())
-	//{
-	//	IO::Console::Instance()->Warning(msg, argList);
-	//}
-	//else
-	{
-		Util::String str;
-		str.FormatArgList(msg, argList);
-		//Core::SysFunc::MessageBox(str.AsCharPtr());
-	}
+
+	Util::String str;
+	str.FormatArgList(msg, argList);
+	IO::Console::Instance()->Print(str, IO::WARNING);
+
 	va_end(argList);
 }
 
@@ -123,32 +115,27 @@ _confirm(const char* msg, ...)
 {
 	va_list argList;
 	va_start(argList, msg);
-	//if (IO::Console::HasInstance())
-	//{
-	//	IO::Console::Instance()->Confirm(msg, argList);
-	//}
-	//else
-	{
-		Util::String str;
-		str.FormatArgList(msg, argList);
-		//Core::SysFunc::MessageBox(str.AsCharPtr());
-	}
+
+	Util::String str;
+	str.FormatArgList(msg, argList);
+	Core::SysFunc::MessageWindow(str.AsCharPtr());
+
 	va_end(argList);
 }
 
 //------------------------------------------------------------------------------
 /**
-Nebula's printf replacement. Will redirect the text to the console
+Vortex's printf replacement. Will redirect the text to the console
 and/or logfile.
-
-- 27-Nov-98   floh    created
 */
 void __cdecl
 _printf(const char *msg, ...)
 {
 	va_list argList;
 	va_start(argList, msg);
-	//IO::Console::Instance()->Print(msg, argList);
+	Util::String s;
+	s.FormatArgList(msg, argList);
+	IO::Console::Instance()->Print(s, IO::MESSAGE);
 	va_end(argList);
 }
 
@@ -156,12 +143,11 @@ _printf(const char *msg, ...)
 /**
 Put process to sleep.
 
-- 21-Dec-98   floh    created
 */
 void
 _sleep(double sec)
 {
-	//Core::SysFunc::Sleep(sec);
+	Core::SysFunc::Sleep(sec);
 }
 
 //------------------------------------------------------------------------------
@@ -171,7 +157,7 @@ void
 _break()
 {
 #ifndef __WIN32__
-	n_error("Break not implemented\n");
+	_error("Break not implemented\n");
 #else
 	_CrtDbgBreak();
 #endif

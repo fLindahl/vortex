@@ -63,7 +63,7 @@ private:
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
 	
-	std::shared_ptr<Game::ModelEntity> loadedModel;
+	Ptr<Game::ModelEntity> loadedModel;
     
 	BaseGameFeature::KeyHandler* keyhandler;
 

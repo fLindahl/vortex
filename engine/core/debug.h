@@ -1,5 +1,4 @@
 #pragma once
-#include "config.h"
 
 #ifdef __LINUX__
 void _printf(const char*, ...) __attribute__((format(printf,1,2)));

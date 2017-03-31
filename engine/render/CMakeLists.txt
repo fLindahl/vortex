@@ -130,9 +130,9 @@ SOURCE_GROUP("render" FILES ${files_render_render})
 
 SOURCE_GROUP("graphics" FILES ${files_render_graphics})
 
-SOURCE_GROUP("animation" FILES ${files_render_animation})
+#SOURCE_GROUP("animation" FILES ${files_render_animation})
 
-SOURCE_GROUP("character" FILES ${files_render_character})
+#SOURCE_GROUP("character" FILES ${files_render_character})
 
 SOURCE_GROUP("properties" FILES ${files_render_properties})
 
@@ -144,21 +144,21 @@ SOURCE_GROUP("server" FILES ${files_render_server})
 
 SOURCE_GROUP("particlesystem" FILES ${files_render_particlesystem})
 
-SOURCE_GROUP("softwarerender" FILES ${files_render_softwarerender})
+#SOURCE_GROUP("softwarerender" FILES ${files_render_softwarerender})
 
 SOURCE_GROUP("debugrender" FILES ${files_render_debugrender})
 
 SET(files_render
 	${files_render_render}
 	${files_render_graphics}
-	${files_render_animation}
-	${files_render_character}
+	#${files_render_animation}
+	#${files_render_character}
 	${files_render_properties}
 	${files_render_frame}
 	${files_render_resources}
 	${files_render_server}
 	${files_render_particlesystem}
-	${files_render_softwarerender}
+	#${files_render_softwarerender}
 	${files_render_debugrender}
 	)
 
@@ -166,5 +166,5 @@ SET(files_pch ../config.h ../config.cc)
 SOURCE_GROUP("pch" FILES ${files_pch})
 ADD_LIBRARY(render STATIC ${files_render} ${files_pch})
 TARGET_PCH(render ../)	
-ADD_DEPENDENCIES(render glew glfw assimp misc)
-TARGET_LINK_LIBRARIES(render PUBLIC engine exts glew glfw assimp ${OPENGL_LIBS} misc)
+ADD_DEPENDENCIES(render core glew glfw assimp misc)
+TARGET_LINK_LIBRARIES(render PUBLIC core engine exts glew glfw assimp ${OPENGL_LIBS} misc fysik)

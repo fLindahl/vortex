@@ -12,6 +12,7 @@
 
 namespace Render
 {
+	__ImplementClass(Render::DynamicUnlitPass, 'DUPS', Render::DrawPass);
 DynamicUnlitPass::DynamicUnlitPass()
 {
     this->frameBufferObject = 0;

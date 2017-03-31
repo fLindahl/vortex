@@ -5,17 +5,16 @@
  */
 
 #pragma once
+#include "core/singleton.h"
 #include "GL/glew.h"
 #include "foundation/math/point.h"
 #include "foundation/util/array.h"
 #include "foundation/math/math.h"
 #include "foundation/math/vector4.h"
-
-
+#include "render/resources/cubemapnode.h"
 
 namespace Render
 {
-	class CubeMapNode;
 
 	struct VisibleIndex 
 	{
@@ -24,6 +23,8 @@ namespace Render
 
 	class LightServer
 	{
+
+	__DeclareSingleton(LightServer)
 
 	public:
 	enum LightType
@@ -71,19 +72,7 @@ namespace Render
 		//bounding spheres radius away from it's center in the direction of the spotlight 
 	};
 
-	private:
-		LightServer();
-		
 	public:
-		static LightServer* Instance()
-		{
-			static LightServer instance;
-			return &instance;
-		}
-
-		LightServer(const LightServer&) = delete;
-		void operator=(const LightServer&) = delete;
-		
 		void AddPointLight(const PointLight& pLight);
 		void RemovePointLight(PointLight* light);
 		size_t GetNumPointLights() { return this->pointLights.Size(); }
@@ -113,10 +102,10 @@ namespace Render
 		LightServer::SpotLight& CreateSpotLight(Math::point color, Math::point position, Math::vec4 direction, float length, float angle);
 		LightServer::PointLight& CreatePointLight(Math::point color, Math::point position, float radius);
 
-		void AddCubeMap(std::shared_ptr<CubeMapNode> node);
-		void RemoveCubeMap(std::shared_ptr<CubeMapNode> node);
+		void AddCubeMap(Ptr<CubeMapNode> node);
+		void RemoveCubeMap(Ptr<CubeMapNode> node);
 
-		Util::Array<std::shared_ptr<CubeMapNode>>& GetClosestCubemapToPoint(const Math::point& point);
+		Util::Array<Ptr<CubeMapNode>>& GetClosestCubemapToPoint(const Math::point& point);
 		void RegenerateCubemaps();
 
 	private:
@@ -145,9 +134,9 @@ namespace Render
         GLuint tileLights = 512;
 
 		/// Contains all active cubemaps in the scene
-		Util::Array<std::shared_ptr<CubeMapNode>> cubemapNodes;
+		Util::Array<Ptr<CubeMapNode>> cubemapNodes;
 
 		// Contains all currently influencing cubemaps 
-		Util::Array<std::shared_ptr<CubeMapNode>> selectedInfluenceVolumes;
+		Util::Array<Ptr<CubeMapNode>> selectedInfluenceVolumes;
 	};
 }

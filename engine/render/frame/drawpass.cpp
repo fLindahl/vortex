@@ -8,6 +8,9 @@
 
 namespace Render
 {
+
+__ImplementClass(Render::DrawPass, 'DRPS', Render::FramePass);
+
 DrawPass::DrawPass()
 {
     this->frameBufferObject = 0;

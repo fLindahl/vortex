@@ -12,11 +12,12 @@ namespace Game
 
 class ModelEntity : public Entity
 {
+__DeclareClass(ModelEntity)
 public:
 	ModelEntity();
 	~ModelEntity();
 
-	void SetModel(std::shared_ptr<Render::ModelInstance> mdl);
+	void SetModel(Ptr<Render::ModelInstance> mdl);
 
 	///Registers this entity to the physics server
 	void Activate();

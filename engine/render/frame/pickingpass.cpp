@@ -12,6 +12,7 @@
 
 namespace Render
 {
+__ImplementClass(Render::PickingPass, 'PIKP', Render::DrawPass);
 
 PickingPass::PickingPass()
 {
@@ -28,7 +29,7 @@ void PickingPass::Execute()
 	this->BindFrameBuffer();
 
 	GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	_assert(e == GL_FRAMEBUFFER_COMPLETE, "PickingPass Framebuffer Status Error!");
+	_assert2(e == GL_FRAMEBUFFER_COMPLETE, "PickingPass Framebuffer Status Error!");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -114,7 +115,7 @@ void PickingPass::Setup()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	_assert(e == GL_FRAMEBUFFER_COMPLETE, "PickingPass Framebuffer Status Error!");
+	_assert2(e == GL_FRAMEBUFFER_COMPLETE, "PickingPass Framebuffer Status Error!");
 
     FramePass::Setup();
 }

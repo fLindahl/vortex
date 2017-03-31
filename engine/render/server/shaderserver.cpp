@@ -9,6 +9,10 @@
 
 namespace Render
 {
+ShaderServer::ShaderServer()
+{
+
+}
 
 std::string ShaderServer::ReadFromFile(const std::string &filename)
 {
@@ -33,7 +37,7 @@ std::string ShaderServer::ReadFromFile(const std::string &filename)
 	return content;
 }
 
-std::shared_ptr<ShaderObject> ShaderServer::LoadShader(const std::string& shader)
+Ptr<ShaderObject> ShaderServer::LoadShader(const std::string& shader)
 {
 	if (this->HasShaderNamed(shader))
 	{
@@ -80,7 +84,7 @@ bool ShaderServer::SetupShaders(const std::string& file)
 		else // Load shader!
 		{
 			// Create our shader
-			std::shared_ptr<ShaderObject> shd = std::make_shared<ShaderObject>();
+			Ptr<ShaderObject> shd = ShaderObject::Create();
 
 			// Set name
 			shd->SetName(nameAttr->Value());
@@ -154,7 +158,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 
 				if (sVal == "true") { glVal = GL_TRUE; }
 				else if (sVal == "false") { glVal = GL_FALSE; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in CullFace value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in CullFace value!\n"); }
 
 				state.cullface = glVal;
 			}
@@ -165,7 +169,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 
 				if (sVal == "cw") { glVal = GL_CW; }
 				else if (sVal == "ccw") { glVal = GL_CCW; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in FrontFace value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in FrontFace value!\n"); }
 
 				state.frontface = glVal;
 			}
@@ -177,7 +181,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 				if (sVal == "back") { glVal = GL_BACK; }
 				else if (sVal == "front") { glVal = GL_FRONT; }
 				else if (sVal == "front_and_back") { glVal = GL_FRONT_AND_BACK; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in CullMode value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in CullMode value!\n"); }
 
 				state.cullmode = glVal;
 			}
@@ -188,7 +192,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 
 				if (sVal == "true") { glVal = GL_TRUE; }
 				else if (sVal == "false") { glVal = GL_FALSE; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in Blend value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in Blend value!\n"); }
 
 				state.blend = glVal;
 			}
@@ -212,7 +216,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 				else if (sVal == "constant_alpha") { glVal = GL_CONSTANT_ALPHA; }
 				else if (sVal == "one_minus_constant_alpha") { glVal = GL_ONE_MINUS_CONSTANT_ALPHA; }
 				else if (sVal == "src_alpha_saturate") { glVal = GL_SRC_ALPHA_SATURATE; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in BlendSourceFunc value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in BlendSourceFunc value!\n"); }
 
 				state.blendsourcefunc = glVal;
 			}
@@ -235,7 +239,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 				else if (sVal == "one_minus_constant_color") { glVal = GL_ONE_MINUS_CONSTANT_COLOR; }
 				else if (sVal == "constant_alpha") { glVal = GL_CONSTANT_ALPHA; }
 				else if (sVal == "one_minus_constant_alpha") { glVal = GL_ONE_MINUS_CONSTANT_ALPHA; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in BlendSourceFunc value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in BlendSourceFunc value!\n"); }
 
 				state.blenddestinationfunc = glVal;
 			}
@@ -246,7 +250,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 
 				if (sVal == "true") { glVal = GL_TRUE; }
 				else if (sVal == "false") { glVal = GL_FALSE; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in AlphaTest value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in AlphaTest value!\n"); }
 
 				state.alphatest = glVal;
 			}
@@ -263,14 +267,14 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 				else if (sVal == "notequal") { glVal = GL_NOTEQUAL; }
 				else if (sVal == "gequal") { glVal = GL_GEQUAL; }
 				else if (sVal == "always") { glVal = GL_ALWAYS; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in AlphaFunc value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in AlphaFunc value!\n"); }
 
 				state.alphafunc = glVal; 
 			}
 			else if (line.find("AlphaClamp ") != std::string::npos) 
 			{
 				sin >> fVal;
-				_assert((fVal > 0.0f || fVal < 1.0f), "[SHADER LOAD ERROR]: [STATE LOAD]: AlphaClamp value can not be less than 0.0 or greater than 1.0!\n");
+				_assert2((fVal > 0.0f || fVal < 1.0f), "[SHADER LOAD ERROR]: [STATE LOAD]: AlphaClamp value can not be less than 0.0 or greater than 1.0!\n");
 				state.alphaclamp = fVal;
 			}
 			else if (line.find("DepthTest ") != std::string::npos)
@@ -280,7 +284,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 
 				if (sVal == "true") { glVal = GL_TRUE; }
 				else if (sVal == "false") { glVal = GL_FALSE; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthTest value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthTest value!\n"); }
 
 				state.depthtest = glVal; 
 			}
@@ -297,7 +301,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 				else if (sVal == "notequal") { glVal = GL_NOTEQUAL; }
 				else if (sVal == "gequal") { glVal = GL_GEQUAL; }
 				else if (sVal == "always") { glVal = GL_ALWAYS; }
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthFunc value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthFunc value!\n"); }
 
 				state.depthfunc = glVal; 
 			}
@@ -308,7 +312,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 
 				if (sVal == "true") { glVal = GL_TRUE; }
 				else if (sVal == "false") { glVal = GL_FALSE; }				
-				else { _assert(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthWrite value!\n"); }
+				else { _assert2(false, "[SHADER LOAD ERROR]: [STATE LOAD]: Syntax error in DepthWrite value!\n"); }
 
 				state.depthwrite = glVal;
 			}

@@ -6,7 +6,7 @@
 
 namespace Game
 {
-
+	__ImplementClass(Game::PhysicsEntity, 'phen', Game::Entity)
 PhysicsEntity::PhysicsEntity()
 {
 	this->gProperty = new Render::GraphicsProperty();
@@ -17,11 +17,15 @@ PhysicsEntity::~PhysicsEntity()
 	delete this->gProperty;
 }
 
-void PhysicsEntity::SetModel(std::shared_ptr<Render::ModelInstance> mdl)
+Ptr<Physics::SurfaceCollider> PhysicsEntity::GetCollider()
+{
+	return this->collider;
+}
+
+void PhysicsEntity::SetModel(Ptr<Render::ModelInstance> mdl)
 {
 	this->gProperty->setModelInstance(mdl);
-	this->collider = std::dynamic_pointer_cast<Physics::SurfaceCollider>(Physics::PhysicsServer::Instance()->LoadCollider(mdl->GetMesh()->GetName(), Physics::ColliderShape::SURFACE));
-
+	this->collider = Physics::PhysicsServer::Instance()->LoadCollider(mdl->GetMesh()->GetName(), Physics::ColliderShape::SURFACE).downcast<Physics::SurfaceCollider>();
 }
 
 void PhysicsEntity::SetTransform(const Math::mat4& t)
@@ -33,7 +37,7 @@ void PhysicsEntity::SetTransform(const Math::mat4& t)
 void PhysicsEntity::Activate()
 {
 	Physics::PhysicsServer::Instance()->addPhysicsEntity(this);
-	this->gProperty->SetOwner(this->shared_from_this());
+	this->gProperty->SetOwner(this);
 	this->gProperty->Activate();
 	Entity::Activate();
 }

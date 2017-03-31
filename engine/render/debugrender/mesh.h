@@ -12,7 +12,7 @@ struct MeshCommand : public RenderCommand
     Math::vec4 color = Math::vec4(1.0f);
 
 	//Mesh to render
-	std::shared_ptr<Render::MeshResource> mesh;
+	Ptr<Render::MeshResource> mesh;
 	//Primitive group to render. -1 renders all primitivegroups
 	int primitiveGroup = -1;
 };

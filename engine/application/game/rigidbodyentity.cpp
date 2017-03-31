@@ -4,11 +4,12 @@
 
 namespace Game
 {
+	__ImplementClass(Game::RigidBodyEntity, 'rben', Game::PhysicsEntity)
 
 RigidBodyEntity::RigidBodyEntity()
 {
 	this->physicsType = Physics::PhysicsType::Rigidbody;
-	this->rigidBody = std::make_shared<Physics::RigidBody>();
+	this->rigidBody = Physics::RigidBody::Create();
 }
 
 RigidBodyEntity::~RigidBodyEntity()
@@ -36,7 +37,7 @@ void RigidBodyEntity::Activate()
 	{
 		if (!this->rigidBody->initialized)
 		{
-			this->rigidBody->initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider, 1.0f), this);
+			this->rigidBody->initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider.downcast<Physics::BaseCollider>(), 1.0f), this);
 		}
 		Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
 		PhysicsEntity::Activate();
@@ -52,7 +53,7 @@ void RigidBodyEntity::Deactivate()
 	}
 }
 
-void RigidBodyEntity::SetRigidBody(std::shared_ptr<Physics::RigidBody> r)
+void RigidBodyEntity::SetRigidBody(Ptr<Physics::RigidBody> r)
 {
     this->rigidBody = r;
 }

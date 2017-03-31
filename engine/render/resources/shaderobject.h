@@ -19,8 +19,9 @@ enum ShaderObjectType
 };
 
 
-class ShaderObject
+class ShaderObject : public Core::RefCounted
 {
+__DeclareClass(ShaderObject);
 public:
 	ShaderObject();
 	~ShaderObject();

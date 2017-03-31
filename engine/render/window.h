@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <nanovg.h>
 #include "render/server/renderdevice.h"
+#include "core/types.h"
 
 namespace Display
 {
@@ -118,8 +119,8 @@ namespace Display
 	inline void
 	Window::SetSize(int32 width, int32 height)
 	{
-		Render::RenderDevice::Instance()->SetRenderResolution(width, height);
-		Render::RenderDevice::Instance()->SetWindowResolution(width, height);
+		//Render::RenderDevice::Instance()->SetRenderResolution(width, height);
+		//Render::RenderDevice::Instance()->SetWindowResolution(width, height);
 		this->width = width;
 		this->height = height;
 		if (nullptr != this->window) this->Resize();

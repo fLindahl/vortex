@@ -6,11 +6,12 @@
 
 namespace Game
 {
+__ImplementClass(Game::CubeMapEntity, 'cbme', Game::ModelEntity)
 
 CubeMapEntity::CubeMapEntity() : ModelEntity()
 {
 	//Call baseclass first
-	this->cubemap = std::make_shared<Render::CubeMapNode>();
+	this->cubemap = Render::CubeMapNode::Create();
 }
 	
 CubeMapEntity::~CubeMapEntity()
@@ -49,6 +50,16 @@ GLuint CubeMapEntity::GetCubeMapSampler()
 bool CubeMapEntity::IsLoaded()
 {
 	return this->cubemap->IsLoaded();
+}
+
+Ptr<Render::CubeMapNode> CubeMapEntity::GetCubeMapNode()
+{
+	return this->cubemap;
+}
+
+void CubeMapEntity::SetGeometryProxy(const Ptr<Render::GeometryProxy>& proxy)
+{
+	this->cubemap->SetGeometryProxy(proxy);
 }
 
 void CubeMapEntity::Update()

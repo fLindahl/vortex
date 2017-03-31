@@ -11,6 +11,8 @@
 
 namespace Render
 {
+__ImplementClass(Render::FlatGeometryLitPass, 'FGLP', Render::DrawPass);
+
 FlatGeometryLitPass::FlatGeometryLitPass()
 {
     this->frameBufferObject = 0;
@@ -32,9 +34,9 @@ void FlatGeometryLitPass::Execute()
 	DrawPass::Execute();
 
 	//Generate Mip maps
-	glBindTexture(GL_TEXTURE_2D, this->buffer);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	//glBindTexture(GL_TEXTURE_2D, this->buffer);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0);
 
     FramePass::Execute();
 }
@@ -46,10 +48,10 @@ void FlatGeometryLitPass::Setup()
 	glGenTextures(1, &this->buffer);
 	glBindTexture(GL_TEXTURE_2D, this->buffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 10);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 10);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
@@ -87,7 +89,7 @@ void FlatGeometryLitPass::Setup()
 	glDrawBuffers(3, &drawbuffers[0]);
 
 	GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	_assert(e == GL_FRAMEBUFFER_COMPLETE, "FlatGeometryLit Framebuffer Status Error!");
+	_assert2(e == GL_FRAMEBUFFER_COMPLETE, "FlatGeometryLit Framebuffer Status Error!");
 	//GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

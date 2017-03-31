@@ -21,6 +21,7 @@
 
 #include "application/basegamefeature/managers/scenemanager.h"
 
+#include "IO/console.h"
 
 #define CONSOLE_BUFFER_SIZE 8096
 
@@ -90,6 +91,7 @@ namespace Toolkit
 			{
 				if (ImGui::BeginMenu("Show"))
 				{
+					if (ImGui::MenuItem("GUI Console", NULL, NULL)) { IO::Console::Instance()->Show(); }
 					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
 					if (ImGui::MenuItem("Shader Debugger", NULL, &showShaderDebugger)) {}
 					ImGui::EndMenu();
@@ -520,17 +522,17 @@ namespace Toolkit
 
 			ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings);
 			{
-				Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->GetSSRSettings();
-
-				ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
-				ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
-				ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
-				ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
-				ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
-
-				const char* items[] = { "ULTRA", "HIGH", "MEDIUM", "LOW"};
-
-				ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 4);
+				//Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->GetSSRSettings();
+				//
+				//ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
+				//ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
+				//ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
+				//ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
+				//ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
+				//
+				//const char* items[] = { "ULTRA", "HIGH", "MEDIUM", "LOW"};
+				//
+				//ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 4);
 			}
 			ImGui::EndDock();
 			
@@ -549,7 +551,7 @@ namespace Toolkit
 
             if (ImGui::Button("Add Point Light", { 125, 40 }))
             {
-                std::shared_ptr<Edit::AddPointlightEntity> command = std::make_shared<Edit::AddPointlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
+				std::shared_ptr<Edit::AddPointlightEntity> command = std::make_shared<Edit::AddPointlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
                 commandManager->DoCommand(command);
             }
 			ImGui::EndDock();
@@ -557,7 +559,7 @@ namespace Toolkit
 	}
 
 
-void UserInterface::ParticlesSettings(std::shared_ptr<Property::ParticleEmitter> emitter)
+void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 {
 	std::string id = "Particle "+std::to_string(particleCount);
 	if (ImGui::CollapsingHeader(id.c_str()))

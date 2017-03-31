@@ -12,6 +12,7 @@ namespace Game
 {
 class GeometryProxyEntity : public ModelEntity
 {
+__DeclareClass(GeometryProxyEntity);
 public:
 	GeometryProxyEntity();
 	~GeometryProxyEntity();
@@ -24,9 +25,9 @@ public:
 	Math::vec4 GetScale();
 	void SetScale(Math::vec4 scale);
 	
-	std::shared_ptr<Render::GeometryProxy> GetGeometryProxy() { return this->proxy; }
+	Ptr<Render::GeometryProxy> GetGeometryProxy();
 
 protected:
-	std::shared_ptr<Render::GeometryProxy> proxy;
+	Ptr<Render::GeometryProxy> proxy;
 };
 }

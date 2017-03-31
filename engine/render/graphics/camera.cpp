@@ -5,6 +5,7 @@
 
 namespace Graphics
 {
+__ImplementClass(Graphics::Camera, 'CAMB', Core::RefCounted);
 
 Camera::Camera() : 
 	aspectRatio(0.0f),

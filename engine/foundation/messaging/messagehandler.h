@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 #include <ctime>
 #include <string>
 #include <vector>
@@ -19,13 +20,18 @@ enum MsgType
 	NEEDCOALWORKER
 };
 
-struct Msg
+class Msg : public Core::RefCounted
 {
+	__DeclareClass(Msg)
+public:
+	Msg() { timeStamp = clock(); }
+	~Msg() {}
+
 	MsgType message;
 	int recipientID;
 	int senderID;
 	float delay; // seconds to delay this message
-	clock_t timeStamp = clock();
+	clock_t timeStamp;
 	bool operator==(const Msg &RHS);
 	bool operator<(const Msg &RHS) const;
 };
@@ -51,8 +57,7 @@ public:
 private:
 	// Private constructor
 	// Prevents duplicate singletons
-	MsgHandler()
-	{}
+	MsgHandler() {}
 
 	// Sorted list of all current messages
 	std::priority_queue<Msg> msgQueue;

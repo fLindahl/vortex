@@ -25,16 +25,17 @@ void DebugServer::ImGuiDebugBar()
 		if (ImGui::BeginMenu("Debug"))
 		{
 			ImGui::MenuItem("Show Framebuffer:");
+			ImGui::Separator();
 
 			if (ImGui::MenuItem("FlatGeometryLit Color")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer()); }
 			if (ImGui::MenuItem("Depth")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetDepthPass()->GetBuffer()); }
 			if (ImGui::MenuItem("Linear Depth")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetDepthPass()->GetLinearDepthBuffer()); }
-			if (ImGui::MenuItem("Reflection Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionBuffer()); }
+			//if (ImGui::MenuItem("Reflection Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionBuffer()); }
 			if (ImGui::MenuItem("Picking")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->pickingPass->GetBuffer()); }
 			if (ImGui::MenuItem("Light Tiles")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(dynamic_cast<Render::LightCullingPass*>(Render::FrameServer::Instance()->GetLightCullingPass().get())->GetBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Normals")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetNormalBuffer()); }
 			if (ImGui::MenuItem("FlatGeometryLit Specular")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetSpecularBuffer()); }
-			if (ImGui::MenuItem("Shadow Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetShadowMap()->GetBuffer());}
+			//if (ImGui::MenuItem("Shadow Map")) { Render::RenderDevice::Instance()->SetFinalColorBuffer(Render::FrameServer::Instance()->GetShadowMap()->GetBuffer());}
 			ImGui::Separator();
 			ImGui::EndMenu();
 		}

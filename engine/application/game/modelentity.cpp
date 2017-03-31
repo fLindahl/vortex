@@ -5,6 +5,7 @@
 
 namespace Game
 {
+	__ImplementClass(Game::ModelEntity, 'mdle', Game::Entity)
 
 ModelEntity::ModelEntity() : Entity()
 {
@@ -17,15 +18,14 @@ ModelEntity::~ModelEntity()
 	delete this->gProperty;
 }
 
-void ModelEntity::SetModel(std::shared_ptr<Render::ModelInstance> mdl)
+void ModelEntity::SetModel(Ptr<Render::ModelInstance> mdl)
 {
-	this->gProperty->setModelInstance(mdl);
-	
+	this->gProperty->setModelInstance(mdl);	
 }
 
 void ModelEntity::Activate()
 {
-	this->gProperty->SetOwner(this->shared_from_this());
+	this->gProperty->SetOwner(this);
 	this->gProperty->Activate();
 	Entity::Activate();
 }

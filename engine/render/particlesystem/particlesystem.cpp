@@ -72,7 +72,7 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 	return buf;
 }
 
-void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff)
+void ParticleSystem::GetEmitterBuffer(index_t bufferSize, Ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff)
 {
 	Util::Array<ParticleState> arr;
 	arr.Reserve(this->particleArray.Size() - (eBuff.endIndex - eBuff.startIndex) + bufferSize);
@@ -178,7 +178,7 @@ void ParticleSystem::DrawParticleSystem()
 	glUseProgram(0);
 }
 
-void ParticleSystem::UpdateParticlePosition(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticlePosition(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -213,7 +213,7 @@ void ParticleSystem::UpdateParticlePosition(std::shared_ptr<Property::ParticleEm
 
 }
 
-void ParticleSystem::UpdateParticleVelocity(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random)
+void ParticleSystem::UpdateParticleVelocity(Ptr<Property::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -304,7 +304,7 @@ void ParticleSystem::UpdateParticleVelocity(std::shared_ptr<Property::ParticleEm
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void ParticleSystem::UpdateParticleRotation(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticleRotation(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -338,7 +338,7 @@ void ParticleSystem::UpdateParticleRotation(std::shared_ptr<Property::ParticleEm
 
 }
 
-void ParticleSystem::UpdateParticleAcceleration(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticleAcceleration(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -378,7 +378,7 @@ void ParticleSystem::UpdateParticleAcceleration(std::shared_ptr<Property::Partic
 
 }
 
-void ParticleSystem::UpdateParticleLifetime(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max, bool random)
+void ParticleSystem::UpdateParticleLifetime(Ptr<Property::ParticleEmitter> owner, float min, float max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -412,7 +412,7 @@ void ParticleSystem::UpdateParticleLifetime(std::shared_ptr<Property::ParticleEm
 
 }
 
-void ParticleSystem::UpdateParticleColor(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticleColor(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -447,7 +447,7 @@ void ParticleSystem::UpdateParticleColor(std::shared_ptr<Property::ParticleEmitt
 	
 }
 
-void ParticleSystem::UpdateParticleSize(std::shared_ptr<Property::ParticleEmitter> owner, float start, float end)
+void ParticleSystem::UpdateParticleSize(Ptr<Property::ParticleEmitter> owner, float start, float end)
 {
 	owner->GetRenderBuffer().startSize = Math::vec4(start);
 	owner->GetRenderBuffer().endSize = Math::vec4(end);
@@ -456,7 +456,7 @@ void ParticleSystem::UpdateParticleSize(std::shared_ptr<Property::ParticleEmitte
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(owner->GetRenderBuffer()), &owner->GetRenderBuffer(), GL_STATIC_DRAW);
 }
 
-std::shared_ptr<Render::ShaderObject> ParticleSystem::GetParticleShaderObject()
+Ptr<Render::ShaderObject> ParticleSystem::GetParticleShaderObject()
 {
 	return this->sh;
 }

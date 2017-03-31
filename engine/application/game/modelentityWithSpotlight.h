@@ -20,11 +20,12 @@ namespace Game
 
 class ModelEntitySpotLight : public Entity
 {
+	__DeclareClass(ModelEntitySpotLight)
 public:
 	ModelEntitySpotLight();
 	~ModelEntitySpotLight();
 
-	void SetModel(std::shared_ptr<Render::ModelInstance> mdl);
+	void SetModel(Ptr<Render::ModelInstance> mdl);
 
 	///Registers this entity to the physics server
 	void Activate();

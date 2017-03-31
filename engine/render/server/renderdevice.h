@@ -5,7 +5,8 @@
  *
  * Handles all rendering
  */
-
+#include "core/refcounted.h"
+#include "core/singleton.h"
 #include <unordered_map>
 #include "foundation/math/matrix4.h"
 #include "foundation/util/array.h"
@@ -25,9 +26,9 @@ namespace Render
 
     class RenderDevice
     {
-    private:
-		RenderDevice();
-        
+		__DeclareSingleton(RenderDevice)
+
+    private:        
         struct UniformBufferBlock
         {
             Math::mat4 View;
@@ -47,33 +48,29 @@ namespace Render
         //Uniform Buffer Object
         GLuint ubo[1];
 
-    public:
-        static RenderDevice* Instance()
-        {
-            static RenderDevice instance;
-            return &instance;
-        }
-
-        // C++ 11
-        // Delete the methods we don't want.
-        RenderDevice(RenderDevice const&) = delete;
-        void operator=(RenderDevice const&) = delete;
-
+	public:
+		///Returns render resolution
 		const Resolution& GetRenderResolution() const { return this->renderResolution; }
+		///Returns window resolution
 		const Resolution& GetWindowResolution() const { return this->windowResolution; }
+
+		///Update Render Resolution. This is separate from window resolution.
 		void SetRenderResolution(const Resolution& res);
 		void SetRenderResolution(const int& x, const int& y);
 
+		///Update window resolution. NOTE: This is usually done automatically
 		void SetWindowResolution(const int& x, const int& y);
 
-		//void AddMaterial(Material* obj) { this->materials.Append(obj); }
-        
+		///Set uniform buffer from camera
 		void SetUniformBuffer(const Graphics::Camera* camera);
+
+		///Render the frame
 		void Render(bool drawToScreen = true);
 
-		//Render to a specified texture. Remember that you might need to set render resolution before doing this!
+		///Render to a specified texture. Remember that you might need to set render resolution before doing this!
 		void RenderToTexture(const GLuint& outFrameBuffer, const Graphics::Camera& camera);
 
+		///Start up the render device.
 		void Initialize();
 
 		void SetFinalColorBuffer(GLuint cbuffer) { this->finalColorBuffer = cbuffer; }
@@ -94,7 +91,5 @@ namespace Render
 
 		GLuint finalColorBuffer = 0;
 		
-        //contains all the shader objects that we've loaded
-        //Util::Array<Material*> materials;
     };
 }

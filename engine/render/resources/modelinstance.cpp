@@ -7,6 +7,8 @@
 namespace Render
 {
 
+__ImplementClass(Render::ModelInstance, 'MDLI', Core::RefCounted);
+
 ///////////////////////////////////////////////////////////////////
 
 ModelNode::~ModelNode()
@@ -38,7 +40,7 @@ ModelInstance::~ModelInstance()
 	//}
 }
 
-//const Util::Array<std::shared_ptr<Surface>>& ModelInstance::GetSurfaces()
+//const Util::Array<Ptr<Surface>>& ModelInstance::GetSurfaces()
 //{
 	//return this->surfaces;
 //}
@@ -57,7 +59,7 @@ ModelInstance::~ModelInstance()
 	//}	
 //}
 
-//void ModelInstance::SetSurfaceList(Util::Array<std::shared_ptr<Surface>> list)
+//void ModelInstance::SetSurfaceList(Util::Array<Ptr<Surface>> list)
 //{
 //	for (size_t i = 0; i < this->modelNodes.Size(); ++i)
 //	{
@@ -65,7 +67,7 @@ ModelInstance::~ModelInstance()
 //	}
 //}
 
-std::shared_ptr<MeshResource> ModelInstance::GetMesh()
+Ptr<MeshResource> ModelInstance::GetMesh()
 {
 	return this->mesh;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 #include "GL/glew.h"
 #include "foundation/math/vector4.h"
 #include "foundation/util/array.h"
@@ -80,24 +81,24 @@ public:
 	}
 
 	EmitterBuffer GetEmitterBuffer(index_t bufferSize, Property::ParticleEmitter& owner);
-	void GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff);
+	void GetEmitterBuffer(index_t bufferSize, Ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff);
 
 	void DrawParticleSystem();
 
-	void UpdateParticlePosition(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random = false);
-	void UpdateParticleVelocity(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random = false);
-	void UpdateParticleRotation(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random = false);
-	void UpdateParticleAcceleration(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max = Math::vec4(), bool random = false);
-	void UpdateParticleLifetime(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max = 0, bool random = false);
-	void UpdateParticleColor(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max = Math::vec4(), bool random = false);
-	void UpdateParticleSize(std::shared_ptr<Property::ParticleEmitter> owner, float start, float end);
+	void UpdateParticlePosition(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random = false);
+	void UpdateParticleVelocity(Ptr<Property::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random = false);
+	void UpdateParticleRotation(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random = false);
+	void UpdateParticleAcceleration(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max = Math::vec4(), bool random = false);
+	void UpdateParticleLifetime(Ptr<Property::ParticleEmitter> owner, float min, float max = 0, bool random = false);
+	void UpdateParticleColor(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max = Math::vec4(), bool random = false);
+	void UpdateParticleSize(Ptr<Property::ParticleEmitter> owner, float start, float end);
 
 	Util::Array<ParticleState>& GetParticleArray(){ return this->particleArray; }
 	GLuint GetParticleBuffer() const { return particleBuffer; }
 	GLuint GetParticleStartBuffer() const { return particleStartBuffer; }
 	Util::Array<Property::ParticleEmitter*>& GetParticleEmitters(){ return this->emitters; }
-	std::shared_ptr<Render::MeshResource> GetMesh() const { return this->mesh; }
-	std::shared_ptr<Render::ShaderObject> GetParticleShaderObject();
+	Ptr<Render::MeshResource> GetMesh() const { return this->mesh; }
+	Ptr<Render::ShaderObject> GetParticleShaderObject();
 
 private:
 	ParticleSystem();
@@ -107,14 +108,14 @@ private:
 	GLuint particleBuffer;
 	GLuint particleStartBuffer;
 
-	std::shared_ptr<Render::MeshResource> mesh;
+	Ptr<Render::MeshResource> mesh;
 
 	Util::Array<ParticleState> particleArray;
 	Util::Array<ParticleState> particleStartSettings;
 
 	Util::Array<Property::ParticleEmitter*> emitters;
 
-	std::shared_ptr<Render::ShaderObject> sh;
+	Ptr<Render::ShaderObject> sh;
 
 };
 }

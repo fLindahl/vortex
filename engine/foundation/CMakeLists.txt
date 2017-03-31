@@ -50,7 +50,7 @@ IF(WIN32)
 		)
 ELSE(WIN32)
 	SET(files_foundation_memory_OS
-		memory/linux/linuxmemory.h
+		m1emory/linux/linuxmemory.h
 		memory/linux/linuxmemoryconfig.h
 		memory/linux/linuxmemoryconfig.cpp
 		)
@@ -68,7 +68,7 @@ SOURCE_GROUP("memory" FILES ${files_foundation_memory_base})
 
 SET(files_pch ../config.h ../config.cc)
 SOURCE_GROUP("pch" FILES ${files_pch})
-ADD_LIBRARY(foundation STATIC ${files_foundation_math} ${files_foundation_util} ${files_foundation_messaging} ${files_foundation_memory_base} ${files_pch})
+ADD_LIBRARY(foundation STATIC ${files_foundation_math} ${files_foundation_util} ${files_foundation_memory_base} ${files_foundation_messaging} ${files_pch})
 TARGET_PCH(foundation ../)
-ADD_DEPENDENCIES(foundation glew misc)
-TARGET_LINK_LIBRARIES(foundation PUBLIC engine exts glew misc)
+ADD_DEPENDENCIES(foundation glew misc core)
+TARGET_LINK_LIBRARIES(foundation PUBLIC engine exts glew misc core)

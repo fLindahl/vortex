@@ -29,12 +29,12 @@ public:
 
 	bool SaveParticle(Util::String name);
 	bool LoadParticle(Util::String path);
-	void AppendEmitter(std::shared_ptr<Property::ParticleEmitter> emitter);
+	void AppendEmitter(Ptr<Property::ParticleEmitter> emitter);
 
 private:
 	ParticleFile();
 
-	Util::Array<std::shared_ptr<Property::ParticleEmitter>> emitters;
+	Util::Array<Ptr<Property::ParticleEmitter>> emitters;
 };
 }
 

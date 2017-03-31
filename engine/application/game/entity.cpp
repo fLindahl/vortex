@@ -1,8 +1,10 @@
 #include "config.h"
 #include "entity.h"
+#include "application\game\baseproperty.h"
 
 namespace Game
 {
+__ImplementClass(Game::Entity, 'NTTY', Core::RefCounted);
 
 Entity::Entity()
 {
@@ -29,12 +31,12 @@ void Entity::Update()
 
 }
 
-void Entity::HandleMsg(std::shared_ptr<BaseGameFeature::Msg> msg)
+void Entity::HandleMsg(Ptr<BaseGameFeature::Msg> msg)
 {
 
 }
 
-void Entity::SendMsg(std::shared_ptr<BaseGameFeature::Msg> msg)
+void Entity::SendMsg(Ptr<BaseGameFeature::Msg> msg)
 {
 	//MsgHandler::getInstance()->RecvMsg(msg);
 }
@@ -59,15 +61,15 @@ Math::mat4 Entity::GetTransform()
     return this->transform;
 }
 
-void Entity::AddProperty(std::shared_ptr<Game::BaseProperty> p)
+void Entity::AddProperty(Ptr<Game::BaseProperty> p)
 {
     this->properties.Append(p);
-    p->owner = this->shared_from_this();
+    p->owner = this;
 }
 
 void Entity::Activate()
 {
-	BaseGameFeature::EntityManager::Instance()->RegisterEntity(this->shared_from_this());
+	BaseGameFeature::EntityManager::Instance()->RegisterEntity(this);
 	this->active = true;
 }
 

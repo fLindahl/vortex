@@ -110,7 +110,7 @@ private:
 	//Currently in-use diffusecolors
 	Math::Vector3 diffuse1, diffuse2, diffuse3;
 
-	std::shared_ptr<MeshResource> mesh;
+	Ptr<MeshResource> mesh;
 	Util::Array<Color> pixels;
 	Util::Array<GLfloat> depthBuffer;
 };

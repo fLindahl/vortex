@@ -5,6 +5,8 @@
 
 namespace Render
 {
+__ImplementClass(Render::GraphicsProperty, 'GPPR', Game::BaseProperty);
+
 GraphicsProperty::GraphicsProperty()
 {
 
@@ -18,12 +20,12 @@ GraphicsProperty::~GraphicsProperty()
 	}
 }
 
-std::shared_ptr<Render::ModelInstance> GraphicsProperty::getModelInstance() const
+Ptr<Render::ModelInstance> GraphicsProperty::getModelInstance() const
 {
 	return this->modelInstance;
 }
 
-void GraphicsProperty::setModelInstance(std::shared_ptr<Render::ModelInstance> inModelInstance)
+void GraphicsProperty::setModelInstance(const Ptr<Render::ModelInstance>& inModelInstance)
 {
 	if (this->modelInstance != nullptr)
 	{

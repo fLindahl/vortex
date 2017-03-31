@@ -7,6 +7,8 @@ namespace Render
 {
 	class ShadowMap : public DrawPass
 	{
+
+	__DeclareClass(ShadowMap);
 	public:
 		ShadowMap();
 		~ShadowMap();

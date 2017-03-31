@@ -1,13 +1,14 @@
 #pragma once
+#include "core/refcounted.h"
 #include "foundation/messaging/messagehandler.h"
-//#include "entity.h"
+#include "entity.h"
 
 namespace Game
 {
-class Entity;
 
-class BaseProperty
+class BaseProperty : public Core::RefCounted
 {
+__DeclareClass(BaseProperty);
 public:
     BaseProperty() {}
     virtual ~BaseProperty() {}
@@ -20,14 +21,14 @@ public:
 	virtual void Activate() { active = true; }
 	virtual void Deactivate() { active = false; }
 
-	void SetOwner(std::shared_ptr<Entity> o) { this->owner = o; }
-	std::shared_ptr<Entity> GetOwner() { return this->owner; }
+	void SetOwner(Ptr<Entity> o) { this->owner = o; }
+	Ptr<Entity> GetOwner() { return this->owner; }
 
 protected:
 	bool active = false;
     friend class Entity;
 
-    std::shared_ptr<Entity> owner;
+    Ptr<Entity> owner;
 };
 
 }

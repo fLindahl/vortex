@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 #include "application/game/rigidbodyentity.h"
 #include "application/game/baseproperty.h"
 #include "surfacecollider.h"
@@ -25,8 +26,9 @@ struct BodyState
 	Math::mat4 invInertiaTensorWorld;
 };
 
-class RigidBody
+class RigidBody : public Core::RefCounted
 {
+__DeclareClass(RigidBody);
 public:
     RigidBody();
     ~RigidBody();
@@ -35,7 +37,7 @@ public:
     void applyForceAtPoint(const Math::vec4& dir, const float& magnitude, const Math::point& worldPos);
 
     //void setGraphicsProperty(Render::GraphicsProperty* gp) {this->gProperty = gp;}
-    void setCollider(std::shared_ptr<Physics::SurfaceCollider> coll);
+    void setCollider(Ptr<Physics::SurfaceCollider> coll);
 
 	Math::mat4 getTransform() { return this->currentState.transform; }
 	Math::point getCenterOfMass() { return this->massCenter; }
@@ -91,7 +93,7 @@ private:
     //Math::vector torque;
 
     Game::RigidBodyEntity* owner;
-    std::shared_ptr<Physics::BaseCollider> collider;
+    Ptr<Physics::BaseCollider> collider;
 };
 
 }

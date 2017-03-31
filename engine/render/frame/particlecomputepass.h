@@ -7,6 +7,8 @@ namespace Render
 {
 class ParticleComputePass : public FramePass
 {
+__DeclareClass(ParticleComputePass);
+
 public:
 	ParticleComputePass();
 	~ParticleComputePass();
@@ -17,7 +19,7 @@ public:
 
 private:
 
-	//std::shared_ptr<ShaderObject> computeShader;
+	//Ptr<ShaderObject> computeShader;
 	GLuint particleComputeProgram;
 
 	

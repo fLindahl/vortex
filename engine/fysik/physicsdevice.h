@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 #include "rigidbody.h"
 #include "foundation/util/array.h"
 #include <map>
@@ -68,8 +69,8 @@ public:
     PhysicsDevice(PhysicsDevice const&) = delete;
     void operator=(PhysicsDevice const&) = delete;
 
-    void AddRigidBody(std::shared_ptr<RigidBody> rBody);
-	void RemoveRigidBody(std::shared_ptr<RigidBody> rBody);
+    void AddRigidBody(Ptr<RigidBody> rBody);
+	void RemoveRigidBody(Ptr<RigidBody> rBody);
 
     void Solve();
 
@@ -92,7 +93,7 @@ private:
 
 	void CollideEntities(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, const PhysicsCollision& collData);
 
-    Util::Array<std::shared_ptr<RigidBody>> rigidBodies;
+    Util::Array<Ptr<RigidBody>> rigidBodies;
 
     // Potentially Colliding Entities
     Util::Array<std::pair<Game::PhysicsEntity*, Game::PhysicsEntity*>> PCEntities;

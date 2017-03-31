@@ -134,11 +134,11 @@ void Application::DoPicking()
 		int pixely = (mouse_pos_in_dock.y / dockSize.y) * Render::RenderDevice::Instance()->GetRenderResolution().y;
 
 		//glBindTexture(GL_TEXTURE_2D, texture);
-		GLuint frame = Render::FrameServer::Instance()->GetPickingPass()->GetFrameBufferObject();
+		//GLuint frame = Render::FrameServer::Instance()->GetPickingPass()->GetFrameBufferObject();
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, frame);
+		//glBindFramebuffer(GL_READ_FRAMEBUFFER, frame);
 		//glReadPixels(pixelx, pixely, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, (GLvoid*)&SelectedID);
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		//glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 		if (SelectedID != 0)
 		{

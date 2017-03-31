@@ -6,6 +6,7 @@
 namespace Physics
 {
 
+__ImplementClass(Physics::RigidBody, 'RGBD', Core::RefCounted);
 RigidBody::RigidBody() 
 {
 	this->currentState.orientation = Math::quaternion::identity();
@@ -42,7 +43,7 @@ void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTenso
     this->calculateDerivedQuantities(this->currentState);
 }
 
-void RigidBody::setCollider(std::shared_ptr<Physics::SurfaceCollider> coll)
+void RigidBody::setCollider(Ptr<Physics::SurfaceCollider> coll)
 {
     this->collider = coll;
 }

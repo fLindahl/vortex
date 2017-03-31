@@ -9,6 +9,7 @@
 #include <nanovg.h>
 #define NANOVG_GL3_IMPLEMENTATION 1
 #include "nanovg_gl.h"
+#include "IO/console.h"
 
 namespace Display
 {
@@ -48,13 +49,15 @@ namespace Display
 		switch (type)
 		{
 		case GL_DEBUG_TYPE_ERROR:
+			IO::Console::Instance()->Print(msg.c_str(), IO::ERROR, true);
+			break;
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			printf("Error: %s\n", msg.c_str());
+			IO::Console::Instance()->Print(msg.c_str(), IO::ERROR, true);
 			break;
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			printf("Performance issue: %s\n", msg.c_str());
+			IO::Console::Instance()->Print(Util::String("Performance issue: ") + Util::String(msg.c_str()), IO::WARNING, true);
 			break;
-		default:		// Portability, Deprecated, Other
+		default:		// Portability, Deprecated, Other. No need to print these for now.
 			break;
 		}
 	}
@@ -150,8 +153,6 @@ namespace Display
 	Window::StaticWindowResizeCallback(GLFWwindow* win, int32 x, int32 y)
 	{
 		Window* window = (Window*)glfwGetWindowUserPointer(win);
-		//window->SetSize(x, y);
-		//Render::RenderDevice::Instance()->SetRenderResolution(x, y);
 		Render::RenderDevice::Instance()->SetWindowResolution(x, y);
 		window->width = x;
 		window->height = y;
@@ -214,7 +215,7 @@ namespace Display
 			assert(res == GLEW_OK);
 			if (!(GLEW_VERSION_4_3))
 			{
-				printf("[WARNING]: OpenGL 4.3+ is not supported on this hardware!\n");
+				IO::Console::Instance()->Print("OpenGL 4.3+ is not supported on this hardware!", IO::EXCEPTION);
 				glfwDestroyWindow(this->window);
 				this->window = nullptr;
 				return false;
@@ -303,6 +304,7 @@ namespace Display
 	{
 		if (this->window)
 		{
+			//Render::RenderDevice::Instance()->Render();
 			if (nullptr != this->nanoFunc)
 			{
 				int32 fbWidth, fbHeight;

@@ -16,6 +16,7 @@ namespace Property
 
 class ParticleEmitter : public Game::BaseProperty
 {
+	__DeclareClass(ParticleEmitter)
 public:
 	ParticleEmitter();
 	~ParticleEmitter();
@@ -34,7 +35,7 @@ public:
 
 	Particles::ParticleState& GetState(){ return state; }
 
-	std::shared_ptr<Render::TextureResource>& GetEmitterTexture(){ return this->texture; }
+	Ptr<Render::TextureResource>& GetEmitterTexture(){ return this->texture; }
 
 	Math::mat4 GetModelMatrix();
 
@@ -59,7 +60,7 @@ private:
 	//The uniform render buffer
 	Particles::ParticleRenderingBuffer renderBuff;
 
-	std::shared_ptr<Render::TextureResource> texture;
+	Ptr<Render::TextureResource> texture;
 
 	//Saved Settings
 	Particles::ParticleUISettings pSet;

@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 
 namespace Render
 {
@@ -10,7 +11,7 @@ public:
 	MeshBuilder();
 	~MeshBuilder();
 
-	static bool ExportMesh(std::shared_ptr<MeshResource> mesh, const char* filepath);
+	static bool ExportMesh(Ptr<MeshResource> mesh, const char* filepath);
 
 private:
 

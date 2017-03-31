@@ -20,6 +20,7 @@ SET(files_application_game
 	game/modelentity.h
 	game/modelentity.cpp
 	game/baseproperty.h
+	game/baseproperty.cpp
 	game/rigidbodyentity.h
 	game/staticentity.h
 	game/rigidbodyentity.cpp
@@ -64,5 +65,5 @@ SET(files_pch ../config.h ../config.cc)
 SOURCE_GROUP("pch" FILES ${files_pch})
 ADD_LIBRARY(application STATIC ${files_application} ${files_pch})
 TARGET_PCH(application ../)	
-ADD_DEPENDENCIES(application render glew misc)
-TARGET_LINK_LIBRARIES(application PUBLIC engine foundation render exts glew misc)
+ADD_DEPENDENCIES(application core render glew misc)
+TARGET_LINK_LIBRARIES(application PUBLIC engine core foundation render exts glew misc)

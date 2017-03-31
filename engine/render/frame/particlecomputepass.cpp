@@ -11,6 +11,8 @@
 
 namespace Render
 {
+__ImplementClass(Render::ParticleComputePass, 'PCPS', Render::FramePass);
+
 ParticleComputePass::ParticleComputePass()
 {
 	

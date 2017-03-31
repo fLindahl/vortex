@@ -6,6 +6,7 @@
 
 namespace Render
 {
+	__ImplementClass(Render::Material, 'MATE', Core::RefCounted)
 	Material::Material()
 	{
 
@@ -29,9 +30,9 @@ namespace Render
 		this->name = n;
 	}
 
-	std::shared_ptr<ShaderObject> Material::GetShader(const std::string& pass)
+	Ptr<ShaderObject> Material::GetShader(const Util::String& pass)
 	{
-		return this->framepasses[Util::String(pass.c_str())];
+		return this->framepasses[Util::String(pass.AsCharPtr())];
 	}
 
 	Util::String Material::GetName()
@@ -39,7 +40,7 @@ namespace Render
 		return this->name;
 	}
 
-	Util::Array<std::shared_ptr<TextureResource>>& Material::TextureList()
+	Util::Array<Ptr<TextureResource>>& Material::TextureList()
 	{
 		return this->textures;
 	}
@@ -82,7 +83,7 @@ namespace Render
 		}
 	}
 
-	Util::Array<std::shared_ptr<Surface>>& Material::SurfaceList()
+	Util::Array<Ptr<Surface>>& Material::SurfaceList()
 	{
 		return this->surfaces;
 	}
@@ -91,7 +92,7 @@ namespace Render
 	{
 		if (FrameServer::Instance()->HasPassNamed(pass.AsCharPtr()))
 		{
-			auto drawpass = std::dynamic_pointer_cast<DrawPass>(FrameServer::Instance()->GetFramePass(pass.AsCharPtr()));
+			auto drawpass = FrameServer::Instance()->GetFramePass(pass.AsCharPtr()).downcast<DrawPass>();
 			
 			//Make sure we can actually cast
 			assert(drawpass != nullptr);
@@ -126,7 +127,7 @@ namespace Render
 		}
 		else
 		{
-			_assert(false, "ERROR: Texture type name does not exist in semantics!");
+			_assert2(false, "ERROR: Texture type name does not exist in semantics!");
 			return TextureType::AlbedoMap;
 		}
 	}

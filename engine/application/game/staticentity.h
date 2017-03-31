@@ -7,6 +7,7 @@ namespace Game
 {
 class StaticEntity : public PhysicsEntity
 {
+	__DeclareClass(StaticEntity)
 public:
     StaticEntity();
     ~StaticEntity();

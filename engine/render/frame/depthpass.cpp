@@ -10,6 +10,7 @@
 
 namespace Render
 {
+__ImplementClass(Render::DepthPass, 'DPTH', Render::DrawPass);
 
 DepthPass::DepthPass()
 {
@@ -95,7 +96,7 @@ void DepthPass::Setup()
 	glDrawBuffers(1, &drawbuffers[0]);
 
 	GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	_assert(e == GL_FRAMEBUFFER_COMPLETE, "Depth Framebuffer Status Error!");
+	_assert2(e == GL_FRAMEBUFFER_COMPLETE, "Depth Framebuffer Status Error!");
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

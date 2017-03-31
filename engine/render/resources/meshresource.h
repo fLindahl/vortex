@@ -31,8 +31,10 @@ namespace Render
 		//Util::Array<VertexComponent> vertexComponents;
 	};
 
-class MeshResource
+
+class MeshResource : public Core::RefCounted
 {
+__DeclareClass(MeshResource);
 public:
 	MeshResource();
 	~MeshResource();

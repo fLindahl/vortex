@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 #include <memory>
 #include "foundation/math/bbox.h"
 #include "fysik/surfacecollider.h"
@@ -13,6 +14,7 @@ class ShaderObject;
 
 class GraphicsProperty : public Game::BaseProperty
 {
+__DeclareClass(GraphicsProperty);
 public:
 	GraphicsProperty();
 	~GraphicsProperty();
@@ -22,8 +24,8 @@ public:
 	void Activate();
 	void Deactivate();
 
-	std::shared_ptr<Render::ModelInstance> getModelInstance() const;
-	void setModelInstance(std::shared_ptr<Render::ModelInstance> inModelInstance);
+	Ptr<Render::ModelInstance> getModelInstance() const;
+	void setModelInstance(const Ptr<Render::ModelInstance>& inModelInstance);
 	
 	const Math::mat4& getModelMatrix() const;
 	const Math::mat4& getInvModelMatrix() const;
@@ -34,7 +36,7 @@ public:
 private:
 	Math::bbox bbox;
 
-	std::shared_ptr<Render::ModelInstance> modelInstance;
+	Ptr<Render::ModelInstance> modelInstance;
 	Math::mat4 modelMat;
 	Math::mat4 invMat;
 };

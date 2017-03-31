@@ -13,7 +13,8 @@ Contains all compiled shaders and is used to load, store and retrieve them.
 #include <utility>
 #include <map>
 #include <unordered_map>
-
+#include "core/refcounted.h"
+#include "core/singleton.h"
 
 namespace Render
 {
@@ -22,27 +23,13 @@ class ShaderObject;
 
 class ShaderServer
 {
-private:
-	ShaderServer()
-	{
-	}
-
+	__DeclareSingleton(ShaderServer)
 public:
-	static ShaderServer* Instance()
-	{
-		static ShaderServer instance;
-		return &instance;
-	}
-
-	// C++ 11
-	// Delete the methods we don't want.
-	ShaderServer(ShaderServer const&) = delete;
-	void operator=(ShaderServer const&) = delete;
 
 	//Loads an XML file and sets up all programs and objects
 	bool SetupShaders(const std::string& file);
 
-	std::shared_ptr<ShaderObject> LoadShader(const std::string& shader);
+	Ptr<ShaderObject> LoadShader(const std::string& shader);
 
 	//Loads individual shader programs
 	GLuint LoadVertexShader(const std::string& file);
@@ -77,7 +64,7 @@ private:
 
 	//Contains all shaderobjects currently compiled.
 	//Key is a name of shader, and value is a pointer to the shaderobject	
-	std::map<std::string, std::shared_ptr<ShaderObject> > shaderObjects;
+	std::map<std::string, Ptr<ShaderObject> > shaderObjects;
 };
 
 }

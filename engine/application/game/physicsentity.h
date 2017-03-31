@@ -25,14 +25,15 @@ namespace Game
 
 class PhysicsEntity : public Entity
 {
+	__DeclareClass(PhysicsEntity)
 public:
 	PhysicsEntity();
 	~PhysicsEntity();
 
-    //void SetCollider(std::shared_ptr<Physics::SurfaceCollider> coll) { this->collider = coll; }
-    std::shared_ptr<Physics::SurfaceCollider> GetCollider() { return this->collider; }
+    //void SetCollider(Ptr<Physics::SurfaceCollider> coll) { this->collider = coll; }
+	Ptr<Physics::SurfaceCollider> GetCollider();
 
-	void SetModel(std::shared_ptr<Render::ModelInstance> mdl);
+	void SetModel(Ptr<Render::ModelInstance> mdl);
 
 	///Registers this entity to the physics server
 	void Activate();
@@ -49,7 +50,7 @@ public:
 protected:
 	Physics::PhysicsType physicsType;
     Render::GraphicsProperty* gProperty;
-    std::shared_ptr<Physics::SurfaceCollider> collider;
+    Ptr<Physics::SurfaceCollider> collider;
 
 };
 }

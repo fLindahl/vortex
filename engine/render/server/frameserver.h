@@ -1,10 +1,17 @@
 #pragma once
+#include "core/singleton.h"
 #include <memory>
 #include <map>
 #include "GL/glew.h"
 #include "foundation/util/array.h"
+#include "render/frame/depthpass.h"
+#include "render/frame/drawpass.h"
+#include "render/frame/framepass.h"
+#include "render/frame/flatgeometrylitpass.h"
+#include "render/frame/particlecomputepass.h"
 #include "render/frame/shadowmap.h"
 #include "render/frame/reflectionpass.h"
+#include "render/frame/pickingpass.h"
 #include "render/frame/dynamicunlitpass.h"
 
 namespace Debug { class DebugServer; }
@@ -12,46 +19,26 @@ namespace Debug { class DebugServer; }
 namespace Render
 {
 
-class FramePass;
-class DepthPass;
-class DrawPass;
-class FlatGeometryLitPass;
-class PickingPass;
-class ReflectionPass;
-class ShadowMap; ///SWARLEY
-class ParticleComputePass;
-
 class FrameServer
 {
-private:
-	FrameServer();
-
+	__DeclareSingleton(FrameServer)
 public:
-	static FrameServer* Instance()
-	{
-		static FrameServer instance;
-		return &instance;
-	}
-
-	FrameServer(FrameServer const&) = delete;
-	void operator=(FrameServer const&) = delete;
-
 	///Temporary. Sets up the most common framepasses such as depthbuffer, lightculling and more.
 	void SetupFramePasses();
 
 	void UpdateResolutions();
 
-	std::shared_ptr<FramePass> GetFramePass(const std::string& name);
+	Ptr<FramePass> GetFramePass(const Util::String& name);
 
-	bool HasPassNamed(const std::string& name);
+	bool HasPassNamed(const Util::String& name);
 
-	std::shared_ptr<DepthPass> GetDepthPass();
-	std::shared_ptr<FramePass> GetLightCullingPass();
-	std::shared_ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
-	std::shared_ptr<ReflectionPass> GetReflectionPass();
-	std::shared_ptr<PickingPass> GetPickingPass();
-	std::shared_ptr<ShadowMap> GetShadowMap();
-	std::shared_ptr<ParticleComputePass> GetParticleComputePass();
+	Ptr<DepthPass> GetDepthPass();
+	Ptr<FramePass> GetLightCullingPass();
+	Ptr<FlatGeometryLitPass> GetFlatGeometryLitPass();
+	//Ptr<ReflectionPass> GetReflectionPass();
+	Ptr<PickingPass> GetPickingPass();
+	//Ptr<ShadowMap> GetShadowMap();
+	Ptr<ParticleComputePass> GetParticleComputePass();
 
 
 private:
@@ -62,35 +49,34 @@ private:
 
 	//Contains all Framepasses.
 	//Key must be unique to each Pass. the key is the pass name
-	std::map<std::string, std::shared_ptr<FramePass>> framePassByName;
+	Util::Dictionary<Util::String, Ptr<FramePass>> framePassByName;
 
-	Util::Array<std::shared_ptr<FramePass>> framePasses;
+	Util::Array<Ptr<FramePass>> framePasses;
 	
 	/// Early depth testing
-	std::shared_ptr<DepthPass> Depth;
+	Ptr<DepthPass> Depth;
 	
 	/// Used for lightculling as part of tiled forward rendering.
-	std::shared_ptr<FramePass> lightCullingPass;
-
-	//Used for particle computing
-	std::shared_ptr<ParticleComputePass> particleComputePass;
-
-	//GLuint lightCullingProgram;
-
-	std::shared_ptr<PickingPass> pickingPass;
+	Ptr<FramePass> lightCullingPass;
 
 	/// For lit objects
-	std::shared_ptr<FlatGeometryLitPass> FlatGeometryLit;
+	Ptr<FlatGeometryLitPass> FlatGeometryLit;
 
+	//Used for particle computing
+	Ptr<ParticleComputePass> particleComputePass;
+	
+	
+	Ptr<PickingPass> pickingPass;
+	
 	/// For computing reflections
-	std::shared_ptr<ReflectionPass> reflectionPass;
-
-	///SWARLEY
-	std::shared_ptr<ShadowMap> shadowmap;
+	//Ptr<ReflectionPass> reflectionPass;
+	
+	/// Shadows
+	//Ptr<ShadowMap> shadowmap;
 	
 	/// For icons etc.
 	/// Objects rendered in this pass are not shown in reflections
-	std::shared_ptr<DynamicUnlitPass> dynamicUnlitPass;
+	 Ptr<DynamicUnlitPass> dynamicUnlitPass;
 
 };
 

@@ -5,6 +5,8 @@
 
 namespace Property
 {
+__ImplementClass(Property::ParticleEmitter, 'emit', Game::BaseProperty)
+
 ParticleEmitter::ParticleEmitter()
 {
 	glGenBuffers(1, this->ubo);

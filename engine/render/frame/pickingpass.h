@@ -7,6 +7,7 @@ class ShaderObject;
 
 class PickingPass : public DrawPass
 {
+__DeclareClass(PickingPass);
 public:
 	PickingPass();
 	~PickingPass();

@@ -4,6 +4,7 @@
 //------------------------------------------------------------------------------
 #include "config.h"
 #include "app.h"
+
 #include "render/server/renderdevice.h"
 #include "render/server/frameserver.h"
 #include "render/server/shaderserver.h"
@@ -60,7 +61,7 @@ App::Open()
 void
 App::Run()
 {
-	// override in subclass
+	// Override in subclass
 }
 
 //------------------------------------------------------------------------------

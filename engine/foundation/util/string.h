@@ -3,7 +3,7 @@
 /**
     @class Util::String
 
-    Nebula3's universal string class. An empty string object is always 32
+    Universal string class based on Nebula3's String Class. An empty string object is always 32
     bytes big. The string class tries to avoid costly heap allocations
     with the following tactics:
 
@@ -20,8 +20,7 @@
     offers methods to convert basic Nebula3 datatypes from and to string,
     and a group of methods which manipulate filename strings.
 
-    (C) 2006 RadonLabs GmbH
-    (C) 2013-2016 Individual contributors, see LICENCE file
+    @copyright	See LICENCE file
 */
 
 #include "core/types.h"
@@ -173,7 +172,7 @@ public:
     void SetMat4(const Math::mat4& v);
     
     /// generic setter
-    template<typename T> void Set(const T& t);
+    //template<typename T> void Set(const T& t);
 
     /// append int value
     void AppendInt(int val);
@@ -188,7 +187,7 @@ public:
     void AppendMat4(const Math::mat4& v);
 
     /// generic append
-    template<typename T> void Append(const T& t);
+    //template<typename T> void Append(const T& t);
 
     /// return contents as character pointer
     const char* AsCharPtr() const;
@@ -211,7 +210,7 @@ public:
     //Util::Blob AsBlob() const;
 
     /// convert to "anything"
-    template<typename T> T As() const;
+    //template<typename T> T As() const;
 
     /// return true if the content is a valid integer
     bool IsValidInt() const;
@@ -245,7 +244,7 @@ public:
     //static String FromBlob(const Util::Blob & b);
 	
     /// convert from "anything"
-    template<typename T> static String From(const T& t);
+    //template<typename T> static String From(const T& t);
 
     /// get filename extension without dot
     String GetFileExtension() const;

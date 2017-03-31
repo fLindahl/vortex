@@ -48,7 +48,7 @@ private:
 /**
     Implementation macro for default memory pool sizes. Put this into the source file.
 */
-#if _DEBUG
+#if THREAD_DEBUG
 #define __ImplementClass(type, fourcc, baseType) \
     Core::Rtti type::RTTI(#type, fourcc, type::FactoryCreator, &baseType::RTTI, sizeof(type)); \
     Core::Rtti* type::GetRtti() const { return &this->RTTI; } \
@@ -78,9 +78,26 @@ private:
     Core::RefCounted* type::FactoryCreator() { return type::Create(); } \
     type* type::Create() \
     { \
-        return n_new(type); \
+        return new(type); \
     }\
     bool type::RegisterWithFactory() \
+    { \
+        Core::SysFunc::Setup(); \
+        if (!Core::Factory::Instance()->ClassExists(#type)) \
+        { \
+            Core::Factory::Instance()->Register(&type::RTTI, #type, fourcc); \
+        } \
+        return true; \
+    }
+	#define __ImplementClassInline(type, fourcc, baseType) \
+    Core::Rtti type::RTTI(#type, fourcc, type::FactoryCreator, &baseType::RTTI, sizeof(type)); \
+    inline Core::Rtti* type::GetRtti() const { return &this->RTTI; } \
+    inline Core::RefCounted* type::FactoryCreator() { return type::Create(); } \
+    inline type* type::Create() \
+    { \
+        return new(type); \
+    }\
+    inline bool type::RegisterWithFactory() \
     { \
         Core::SysFunc::Setup(); \
         if (!Core::Factory::Instance()->ClassExists(#type)) \
@@ -102,7 +119,7 @@ private:
 /**
     Type implementation of topmost type in inheritance hierarchy (source file).
 */
-#if _DEBUG
+#if THREAD_DEBUG
 #define __ImplementRootClass(type, fourcc) \
     Core::Rtti type::RTTI(#type, fourcc, type::FactoryCreator, 0, sizeof(type)); \
     Core::Rtti* type::GetRtti() const { return &this->RTTI; } \
@@ -131,7 +148,7 @@ private:
     Core::RefCounted* type::FactoryCreator() { return type::Create(); } \
     type* type::Create() \
     { \
-        return n_new(type); \
+        return new(type); \
     }\
     bool type::RegisterWithFactory() \
     { \

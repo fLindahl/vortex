@@ -40,7 +40,7 @@ namespace Toolkit
 		void ExecShortCuts();
 		void ShowFileMenu();
 
-		void ParticlesSettings(std::shared_ptr<Property::ParticleEmitter> emitter);
+		void ParticlesSettings(Ptr<Property::ParticleEmitter> emitter);
 		
 		double prevFPSTime;
 		double currentFPS;

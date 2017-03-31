@@ -12,6 +12,8 @@ namespace Game
 {
 class CubeMapEntity : public ModelEntity
 {
+__DeclareClass(CubeMapEntity)
+
 public:
 	CubeMapEntity();
 	~CubeMapEntity();
@@ -29,9 +31,9 @@ public:
 
 	bool IsLoaded();
 
-	std::shared_ptr<Render::CubeMapNode> GetCubeMapNode() { return this->cubemap; }
-	void SetGeometryProxy(std::shared_ptr<Render::GeometryProxy> proxy) { this->cubemap->SetGeometryProxy(proxy); }
+	Ptr<Render::CubeMapNode> GetCubeMapNode();
+	void SetGeometryProxy(const Ptr<Render::GeometryProxy>& proxy);
 protected:
-	std::shared_ptr<Render::CubeMapNode> cubemap;
+	Ptr<Render::CubeMapNode> cubemap;
 };
 }

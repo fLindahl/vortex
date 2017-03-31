@@ -305,7 +305,7 @@ template<class KEYTYPE, class VALUETYPE>
 VALUETYPE&
 Dictionary<KEYTYPE, VALUETYPE>::operator[](const KEYTYPE& key)
 {
-    int keyValuePairIndex = this->FindIndex(key);
+    int keyValuePairIndex = (int)this->FindIndex(key);
     return this->keyValuePairs[keyValuePairIndex].Value();
 }
 
@@ -316,7 +316,7 @@ template<class KEYTYPE, class VALUETYPE>
 const VALUETYPE&
 Dictionary<KEYTYPE, VALUETYPE>::operator[](const KEYTYPE& key) const
 {
-    int keyValuePairIndex = this->FindIndex(key);
+    int keyValuePairIndex = (int)this->FindIndex(key);
     return this->keyValuePairs[keyValuePairIndex].Value();
 }
 

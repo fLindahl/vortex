@@ -22,11 +22,11 @@
 #include "core/types.h"
 #include "core/rtti.h"
 #include "core/factory.h"
-#include "threading/interlocked.h"
+//#include "threading/interlocked.h"
 #include "core/refcountedlist.h"
 
 #if _DEBUG
-#include "threading/criticalsection.h"
+//#include "threading/criticalsection.h"
 #include "foundation/util/dictionary.h"
 #endif
 
@@ -35,7 +35,7 @@ namespace Core
 {
 class RefCounted
 {
-    __DeclareClass(RefCounted);
+    __DeclareClass(RefCounted)
 public:
     /// constructor
     RefCounted();
@@ -64,18 +64,18 @@ public:
     /// dump refcounting leaks, call at end of application (NEBULA3_DEBUG builds only!)
     static void DumpRefCountingLeaks();
 
-    #if NEBULA3_DEBUG
-    struct Stats
-    {
-        Util::String className;
-        Util::FourCC classFourCC;
-        SizeT numObjects;
-        SizeT overallRefCount;
-        SizeT instanceSize;
-    };
-    /// get overall statistics
-    static Util::Dictionary<Util::String,Stats> GetOverallStats();
-    #endif
+    //#if _DEBUG
+    //struct Stats
+    //{
+    //    Util::String className;
+    //    Util::FourCC classFourCC;
+    //    SizeT numObjects;
+    //    SizeT overallRefCount;
+    //    SizeT instanceSize;
+    //};
+    ///// get overall statistics
+    //static Util::Dictionary<Util::String,Stats> GetOverallStats();
+    //#endif
 
 protected:
     /// destructor (called when refcount reaches zero)
@@ -84,19 +84,19 @@ protected:
 private:
     volatile int refCount;
 
-    #if NEBULA3_DEBUG
-protected:
-        static ThreadLocal bool isInCreate;
-        static Threading::CriticalSection criticalSection;
-private:        
-        static RefCountedList list;
-        RefCountedList::Iterator listIterator;
-        bool destroyed;
-
-public:
-		/// register debug name
-		void SetDebugName(const Util::String& name);
-    #endif
+//    #if _DEBUG
+//protected:
+//        static ThreadLocal bool isInCreate;
+//        static Threading::CriticalSection criticalSection;
+//private:        
+//        static RefCountedList list;
+//        RefCountedList::Iterator listIterator;
+//        bool destroyed;
+//
+//public:
+//		/// register debug name
+//		void SetDebugName(const Util::String& name);
+//    #endif
 };
 
 //------------------------------------------------------------------------------
@@ -106,11 +106,11 @@ inline
 RefCounted::RefCounted() : 
     refCount(0)
 {
-    #if NEBULA3_DEBUG
-    n_assert2(this->isInCreate, "RefCounted objects must be created with Create()!");
-    this->listIterator = list.AddBack(this);
-    this->destroyed = false;
-    #endif
+    //#if _DEBUG
+    //n_assert2(this->isInCreate, "RefCounted objects must be created with Create()!");
+    //this->listIterator = list.AddBack(this);
+    //this->destroyed = false;
+    //#endif
 }
 
 //------------------------------------------------------------------------------
@@ -120,7 +120,8 @@ RefCounted::RefCounted() :
 inline void
 RefCounted::AddRef()
 {
-    Threading::Interlocked::Increment(this->refCount);
+    //Threading::Interlocked::Increment(this->refCount);
+	this->refCount++;
 }
 
 //------------------------------------------------------------------------------
@@ -130,7 +131,7 @@ RefCounted::AddRef()
 inline void
 RefCounted::Release()
 {
-    if (0 == Threading::Interlocked::Decrement(this->refCount))
+    if (0 == --this->refCount)//Threading::Interlocked::Decrement(this->refCount))
     {
         delete(this);
     }
@@ -220,16 +221,16 @@ RefCounted::GetClassFourCC() const
     return this->GetRtti()->GetFourCC();
 }
 
-#if NEBULA3_DEBUG
-//------------------------------------------------------------------------------
-/**
-*/
-inline void
-RefCounted::SetDebugName(const Util::String& name)
-{
-	list.SetDebugName(this, name);
-}
-#endif
+//#if _DEBUG
+////------------------------------------------------------------------------------
+///**
+//*/
+//inline void
+//RefCounted::SetDebugName(const Util::String& name)
+//{
+//	list.SetDebugName(this, name);
+//}
+//#endif
 
 } // namespace Core
 //------------------------------------------------------------------------------

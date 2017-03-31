@@ -5,6 +5,8 @@ namespace Render
 {
 class DepthPass : public DrawPass
 {
+	__DeclareClass(DepthPass);
+
 public:
     DepthPass();
     ~DepthPass();

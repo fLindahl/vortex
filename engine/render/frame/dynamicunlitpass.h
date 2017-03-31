@@ -5,6 +5,8 @@ namespace Render
 {
 class DynamicUnlitPass : public DrawPass
 {
+	__DeclareClass(DynamicUnlitPass);
+
 public:
 	DynamicUnlitPass();
 	~DynamicUnlitPass();

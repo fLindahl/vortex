@@ -12,9 +12,13 @@
 #include "render/server/lightserver.h"
 #include "foundation/math/math.h"
 #include "render/server/resourceserver.h"
+#include "render/resources/cubemapnode.h"
+#include "render/resources/geometryproxy.h"
 
 namespace Render
 {
+
+__ImplementClass(Render::ReflectionPass, 'REFP', Render::FramePass);
 
 #define TILE_SIZE 32
 
@@ -223,7 +227,7 @@ void ReflectionPass::Execute()
 		currentProgram = this->CubemapProgram;
 		break;
 	default:
-		_assert(false, "No valid reflection quality selected!");
+		_assert2(false, "No valid reflection quality selected!");
 		break;
 	}
 

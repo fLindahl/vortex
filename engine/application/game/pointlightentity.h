@@ -19,11 +19,12 @@ namespace Game
 {
 class PointLightEntity : public Entity
 {
+	__DeclareClass(PointLightEntity)
 public:
     PointLightEntity();
     ~PointLightEntity();
 
-    void SetModel(std::shared_ptr<Render::ModelInstance> mdl);
+    void SetModel(Ptr<Render::ModelInstance> mdl);
 
     void Activate();
     void Deactivate();

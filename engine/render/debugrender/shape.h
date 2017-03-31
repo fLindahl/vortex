@@ -44,7 +44,7 @@ namespace Debug
 		DebugShape shape;
 
 		///Shader that this renderer uses
-		std::shared_ptr<Render::ShaderObject> shader;
+		Ptr<Render::ShaderObject> shader;
 
 		GLuint vao[1];
 		GLuint ib[1];

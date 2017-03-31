@@ -1,4 +1,5 @@
 #pragma once
+#include "core/singleton.h"
 #include "render/window.h"
 
 namespace BaseGameFeature
@@ -6,24 +7,9 @@ namespace BaseGameFeature
 
 	class KeyHandler
 	{
-	private:
-		KeyHandler()
-		{
-		
-		}
-
+		__DeclareSingleton(KeyHandler)
+	
 	public:
-		static KeyHandler* Instance()
-		{
-			static KeyHandler instance;
-			return &instance;
-		}
-
-		// C++ 11
-		// Delete the methods we don't want.
-		KeyHandler(KeyHandler const&) = delete;
-		void operator=(KeyHandler const&) = delete;
-
 		void Init(Display::Window* display);
 
 	//private:

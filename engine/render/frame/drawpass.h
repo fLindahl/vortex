@@ -9,12 +9,14 @@ A base class for all passes that need to render something to screen or to a fram
 #pragma once
 #include "framepass.h"
 
-
-
 namespace Render
 {
+
 class DrawPass : public FramePass
 {
+
+__DeclareClass(DrawPass)
+
 public:
     DrawPass();
     ~DrawPass();

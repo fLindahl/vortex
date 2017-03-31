@@ -1,15 +1,17 @@
 #pragma once
+#include "core/refcounted.h"
 #include "foundation/util/array.h"
 #include "physicsserver.h"
 
 namespace Physics
 {
 
-class BaseCollider
+class BaseCollider : public Core::RefCounted
 {
+__DeclareClass(BaseCollider);
 public:
     BaseCollider();
-    virtual ~BaseCollider();
+	virtual ~BaseCollider();
 
 	const Math::bbox& getbbox() { return this->colliderbbox; }
 

@@ -616,7 +616,7 @@ namespace Math
 		mat4::translate(vec4 const &t)
 	{
 #if _DEBUG
-		_assert(t.w() == 0, "w component not 0, use vector for translation not a point!");
+		_assert2(t.w() == 0, "w component not 0, use vector for translation not a point!");
 #endif
 		this->mat.r[3] = (vec4(this->mat.r[3]) + t).vec;
 	}

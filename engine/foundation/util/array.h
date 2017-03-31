@@ -382,10 +382,10 @@ Array<TYPE>::Move(size_t fromIndex, size_t toIndex)
     }
 
     // compute number of elements to move
-    int num = this->size - fromIndex;
+    int num = (int)this->size - fromIndex;
 
     // check if array needs to grow
-    int neededSize = toIndex + num;
+    int neededSize = (int)toIndex + num;
     while (neededSize > this->capacity)
     {
         this->Grow();
@@ -401,7 +401,7 @@ Array<TYPE>::Move(size_t fromIndex, size_t toIndex)
         }
 
         // destroy remaining elements
-        for (i = (fromIndex + i) - 1; i < this->size; i++)
+        for (i = ((int)fromIndex + i) - 1; i < (int)this->size; i++)
         {
             this->Destroy(&(this->elements[i]));
         }
@@ -881,7 +881,7 @@ Util::Array<TYPE>::SortWithFunc(bool (*func)(const TYPE& lhs, const TYPE& rhs))
 template<class TYPE> size_t
 Array<TYPE>::BinarySearchIndex(const TYPE& elm) const
 {
-	int num = this->Size();
+	int num = (int)this->Size();
     if (num > 0)
     {
 		int half;
@@ -982,7 +982,7 @@ Array<TYPE>::InsertAtEndOfIdenticalRange(size_t startIndex, const TYPE& elm)
 template<class TYPE> size_t
 Array<TYPE>::InsertSorted(const TYPE& elm)
 {
-    int num = this->Size();
+    int num = (int)this->Size();
     if (num == 0)
     {
         // array is currently empty

@@ -6,7 +6,7 @@ namespace Game
 {
 ParticleEntity::ParticleEntity()
 {
-	this->emitter = std::make_shared<Property::ParticleEmitter>();
+	this->emitter = Property::ParticleEmitter::Create();
 }
 
 ParticleEntity::~ParticleEntity()
@@ -15,7 +15,7 @@ ParticleEntity::~ParticleEntity()
 
 void ParticleEntity::Activate()
 {
-	this->AddProperty(this->emitter);
+	this->AddProperty(this->emitter.downcast<BaseProperty>());
 	this->emitter->Activate();
 	Entity::Activate();
 }

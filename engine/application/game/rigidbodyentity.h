@@ -10,6 +10,8 @@ namespace Game
 {
 class RigidBodyEntity : public PhysicsEntity
 {
+
+	__DeclareClass(RigidBodyEntity)
 public:
     RigidBodyEntity();
     ~RigidBodyEntity();
@@ -23,11 +25,11 @@ public:
 
     void SetTransform(const Math::mat4& t);
 
-    std::shared_ptr<Physics::RigidBody> GetRigidBody() { return this->rigidBody; }
-    void SetRigidBody(std::shared_ptr<Physics::RigidBody> r);
+    Ptr<Physics::RigidBody> GetRigidBody() { return this->rigidBody; }
+    void SetRigidBody(Ptr<Physics::RigidBody> r);
 
 private:
-    std::shared_ptr<Physics::RigidBody> rigidBody;
+    Ptr<Physics::RigidBody> rigidBody;
 
 };
 }	

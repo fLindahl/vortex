@@ -18,10 +18,10 @@ public:
 
 	void SetTransform(const Math::mat4& t);
 	
-	std::shared_ptr<Property::ParticleEmitter>& GetEmitter(){ return this->emitter; }
+	Ptr<Property::ParticleEmitter>& GetEmitter(){ return this->emitter; }
 
 protected:
 	
-	std::shared_ptr<Property::ParticleEmitter> emitter;
+	Ptr<Property::ParticleEmitter> emitter;
 };
 }

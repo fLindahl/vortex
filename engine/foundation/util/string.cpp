@@ -1,7 +1,6 @@
 //------------------------------------------------------------------------------
-//  string.cc
-//  (C) 2006 RadonLabs GmbH
-//  (C) 2013-2016 Individual contributors, see LICENCE file
+//  @file		string.cc
+//  @copyright	See LICENCE file
 //------------------------------------------------------------------------------
 #include "config.h"
 #include "string.h"
@@ -157,7 +156,8 @@ String::AppendRange(const char* append, size_t length)
         {
             // need to re-allocate
             this->Realloc(newLength + newLength / 2);
-			Memory::Copy(this->localBuffer + this->strLen, append, length);
+			//NOTE: This was localbuffer earlier, but i'm pretty sure it is supposed to be heapbuffer. I changed it and everything seems to work right now atleast.
+			Memory::Copy(this->heapBuffer + this->strLen, append, length);
             this->heapBuffer[newLength] = 0;
         }
         this->strLen = newLength;
@@ -407,7 +407,7 @@ String::TrimRight(const String& charSet)
     if (this->IsValid())
     {
         size_t charSetLen = charSet.strLen;
-        int thisIndex = this->strLen - 1;   // NOTE: may not be unsigned (thus not index_t!)
+        int thisIndex = (int)this->strLen - 1;   // NOTE: may not be unsigned (thus not index_t!)
         bool stopped = false;
         while (!stopped && (thisIndex >= 0))
         {
@@ -1041,7 +1041,7 @@ int
 String::StrLen(const char* str)
 {
     assert(str);
-    return strlen(str);
+    return (int)strlen(str);
 }
 
 //------------------------------------------------------------------------------

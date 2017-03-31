@@ -3,7 +3,7 @@
  * Physics::PhysicsServer
  * A singleton for various functionality that we want for our physics engine, such as raytracing, collision queries etc.
  */
-
+#include "core/refcounted.h"
 #include "application/game/physicsentity.h"
 #include "foundation/util/array.h"
 #include "application/game/entity.h"
@@ -74,12 +74,12 @@ public:
     //bool Raycast(Util::Array<PhysicsHit>& out, const Math::vec4& position, const Math::vec4& direction /*, const ExcludeSet& exclude*/);
 
 
-    static Math::mat4 CalculateInertiaTensor(std::shared_ptr<BaseCollider> collider, const float& mass);
+    static Math::mat4 CalculateInertiaTensor(Ptr<BaseCollider> collider, const float& mass);
 
 	///Loads a collider based on mesh name and collider type.
 	///Note: If a collider has already been cooked from this mesh, it will never cook it again, eventhough you ask for a different shaped collider.
 	///TODO: we should split it into multiple lists with different shapes so that we can load them separately.
-	std::shared_ptr<Physics::BaseCollider> LoadCollider(const std::string& meshName, const Physics::ColliderShape& shape);
+	Ptr<Physics::BaseCollider> LoadCollider(const std::string& meshName, const Physics::ColliderShape& shape);
 
 private:
     friend class PhysicsDevice;
@@ -92,7 +92,7 @@ private:
 	//TODO: these need to be smartpointers!
     Util::Array<Game::PhysicsEntity*> physicsEntities;
 
-	std::map<std::string, std::shared_ptr<Physics::BaseCollider>> collidersByMeshName;
+	std::map<std::string, Ptr<Physics::BaseCollider>> collidersByMeshName;
 };
 
 }

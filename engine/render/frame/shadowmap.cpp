@@ -10,6 +10,8 @@
 
 namespace Render
 {
+	__ImplementClass(Render::ShadowMap, 'SHDW', Render::DrawPass);
+
 	ShadowMap::ShadowMap()
 	{
 		this->frameBufferObject = 0;
@@ -93,7 +95,7 @@ namespace Render
 
 		//failsafe, check if buffer is alright otherwise stop
 		GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		_assert(e == GL_FRAMEBUFFER_COMPLETE, "Shadow Map Framebuffer Status Error!");
+		_assert2(e == GL_FRAMEBUFFER_COMPLETE, "Shadow Map Framebuffer Status Error!");
 
 		FramePass::Setup();
 	}
@@ -141,7 +143,7 @@ namespace Render
 
 		glActiveTexture(GL_TEXTURE9);
 		glUniform1i(glGetUniformLocation(currentProgram, "ShadowMap"), 0);
-		glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());
+		//glBindTexture(GL_TEXTURE_2D, FrameServer::Instance()->GetShadowMap()->GetBuffer());
 
 		//Unbind Depth FrameBufferObject
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -155,9 +155,9 @@ void Application::NewModel()
 		this->loadedModel->Deactivate();
 	}
 
-	this->loadedModel = std::make_shared<Game::ModelEntity>();
+	this->loadedModel = Game::ModelEntity::Create();
 
-	//std::shared_ptr<Render::ModelInstance> mdlInst = std::make_shared<Render::ModelInstance>();
+	//Ptr<Render::ModelInstance> mdlInst = std::make_shared<Render::ModelInstance>();
 	//mdlInst->SetMesh("resources/meshes/cube.obj");
 
 	auto mdlInst = ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl");

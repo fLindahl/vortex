@@ -8,13 +8,17 @@
 
 namespace Render
 {
+ResourceServer::ResourceServer()
+{
 
-std::shared_ptr<MeshResource> ResourceServer::LoadMesh(const Util::String& meshpath)
+}
+
+Ptr<MeshResource> ResourceServer::LoadMesh(const Util::String& meshpath)
 {
 	//Make sure we've not already loaded this model
 	if (!this->HasMeshNamed(meshpath))
 	{
-		std::shared_ptr<MeshResource> nMesh = std::make_shared<MeshResource>();
+		Ptr<MeshResource> nMesh = MeshResource::Create();
 
         Util::String fileExtension = meshpath.GetFileExtension();
 
@@ -45,12 +49,12 @@ bool ResourceServer::HasMeshNamed(const Util::String& nName)
 		return false;
 }
 
-std::shared_ptr<TextureResource> ResourceServer::LoadTexture(const Util::String& filepath)
+Ptr<TextureResource> ResourceServer::LoadTexture(const Util::String& filepath)
 {
 	//Make sure we've not already loaded this texture
 	if (!this->HasTextureNamed(filepath))
 	{
-		std::shared_ptr<TextureResource> texture = std::make_shared<TextureResource>();
+		Ptr<TextureResource> texture = TextureResource::Create();
 		texture->loadFromFile(filepath.AsCharPtr());
 		texture->name = filepath;
 		this->textures.Add(filepath, texture);
@@ -73,7 +77,7 @@ bool ResourceServer::HasTextureNamed(const Util::String& nName)
 		return false;
 }
 
-std::shared_ptr<Material> ResourceServer::GetMaterial(const Util::String& name)
+Ptr<Material> ResourceServer::GetMaterial(const Util::String& name)
 {
 	if (this->HasMaterialNamed(name.AsCharPtr()))
 	{
@@ -109,7 +113,7 @@ bool ResourceServer::SetupMaterials(const Util::String& fileName)
 	tinyxml2::XMLElement* materials = data.RootElement()->FirstChildElement();
 	tinyxml2::XMLElement* material = materials->FirstChildElement();
 
-	while (true)
+	while (material != nullptr)
 	{
 		const tinyxml2::XMLAttribute* nameAttr = material->FirstAttribute();
 
@@ -121,26 +125,17 @@ bool ResourceServer::SetupMaterials(const Util::String& fileName)
 		else // Load material!
 		{
 			// Create our material
-			std::shared_ptr<Material> mat = std::make_shared<Material>();
+			Ptr<Material> mat = Material::Create();
 
 			// Set name
 			mat->SetName(nameAttr->Value());
 
 			// Get which frame pass we render in
 			const tinyxml2::XMLElement* pass = material->FirstChildElement("Pass");
-			while (true)
+			while (pass != nullptr)
 			{
 				mat->SetFramePass(pass->FindAttribute("name")->Value(), pass->FindAttribute("shader")->Value());
-
-				if (pass->NextSiblingElement("Pass") != nullptr)
-				{
-					pass = pass->NextSiblingElement("Pass");
-				}
-				else
-				{
-					// out of passes
-					break;
-				}
+				pass = pass->NextSiblingElement("Pass");				
 			}
 
 			// Load shader
@@ -148,7 +143,7 @@ bool ResourceServer::SetupMaterials(const Util::String& fileName)
 
 			// Get all parameters that this material contains
 			const tinyxml2::XMLElement* param = material->FirstChildElement("Param");
-			while (true)
+			while (param != nullptr)
 			{
 				Util::String type = param->FindAttribute("type")->Value();
 								
@@ -156,29 +151,14 @@ bool ResourceServer::SetupMaterials(const Util::String& fileName)
 				
 				mat->AddParameter(param->FindAttribute("name")->Value(), var);
 				
-				if (param->NextSiblingElement("Param") != nullptr)
-				{
-					param = param->NextSiblingElement("Param");
-				}
-				else
-				{
-					// out of parameters
-					break;
-				}
+				param = param->NextSiblingElement("Param");
+				
 			}
 			
 			this->materials.Add(nameAttr->Value(), mat);
 		}
 
-		if (material->NextSiblingElement() != nullptr)
-		{
-			material = material->NextSiblingElement();
-		}
-		else
-		{
-			// end of materials
-			break;
-		}
+		material = material->NextSiblingElement();
 	}
 
 	return true;
@@ -192,7 +172,7 @@ bool ResourceServer::HasMaterialNamed(const Util::String &nName)
 		return false;
 }
 
-std::shared_ptr<Surface> ResourceServer::LoadSurface(const Util::String& filepath)
+Ptr<Surface> ResourceServer::LoadSurface(const Util::String& filepath)
 {
     if(this->HasSurfaceNamed(filepath))
         return this->surfaces[filepath];
@@ -203,7 +183,7 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const Util::String& filepat
     if (result != 0)
     {
 #ifdef DEBUG
-		_assert(false, "ERROR: Could not load surface file!");
+		_assert2(false, "ERROR: Could not load surface file!");
 #endif // DEBUG
 
         return false;
@@ -213,7 +193,7 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const Util::String& filepat
 
     const tinyxml2::XMLAttribute* materialTemplate = surface->FirstAttribute();
 
-    std::shared_ptr<Surface> sur = nullptr;
+    Ptr<Surface> sur = nullptr;
 
     //First we check if the specified material is loaded.
     if (!this->HasMaterialNamed(materialTemplate->Value()))
@@ -224,10 +204,10 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const Util::String& filepat
     else // Load surface!
     {
         // get material
-        std::shared_ptr<Material> mat = this->GetMaterial(materialTemplate->Value());
+        Ptr<Material> mat = this->GetMaterial(materialTemplate->Value());
 
         // create our surface
-        sur = std::make_shared<Surface>();
+        sur = Surface::Create();
 
 		//Append this surface to materials surfacelist
 		mat->surfaces.Append(sur);
@@ -269,7 +249,7 @@ std::shared_ptr<Surface> ResourceServer::LoadSurface(const Util::String& filepat
 
 		for (int i = 0; i < mat->textures.Size(); ++i)
 		{
-			std::shared_ptr<TextureResource> tex = mat->textures[i];
+			Ptr<TextureResource> tex = mat->textures[i];
 			if (sur->texturesByType.count(mat->TextureParamTypes[i]) == 0)
 			{
 				sur->textures.Append(tex);
@@ -289,7 +269,7 @@ bool ResourceServer::HasSurfaceNamed(const Util::String &nName)
         return false;
 }
 
-std::shared_ptr<ModelInstance> ResourceServer::LoadModel(const Util::String& filepath)
+Ptr<ModelInstance> ResourceServer::LoadModel(const Util::String& filepath)
 {
 	if (this->HasModelNamed(filepath))
 		return this->modelInstances[filepath];
@@ -302,7 +282,7 @@ std::shared_ptr<ModelInstance> ResourceServer::LoadModel(const Util::String& fil
 		printf("ERROR: Could not load .mdl file!");
 
 #ifdef DEBUG
-		assert(false);
+		_assert(false);
 #endif // DEBUG
 
 		return false;
@@ -313,7 +293,7 @@ std::shared_ptr<ModelInstance> ResourceServer::LoadModel(const Util::String& fil
 	const tinyxml2::XMLAttribute* name = model->FirstAttribute();
 
 	// create our surface
-	std::shared_ptr<ModelInstance> mdl = std::make_shared<ModelInstance>();
+	Ptr<ModelInstance> mdl = ModelInstance::Create();
 
 	//Append this surface to materials surfacelist
 	this->modelInstances.Add(filepath, mdl);
@@ -356,7 +336,7 @@ bool ResourceServer::HasModelNamed(const Util::String &nName)
 		return false;
 }
 
-Util::Array<std::shared_ptr<Render::Surface>> ResourceServer::LoadMTLFile(const char* filepath)
+Util::Array<Ptr<Render::Surface>> ResourceServer::LoadMTLFile(const char* filepath)
 {
 	//Load surfaces/textures/materials
 	FILE * file = fopen(filepath, "r");
@@ -366,7 +346,7 @@ Util::Array<std::shared_ptr<Render::Surface>> ResourceServer::LoadMTLFile(const 
 		fclose(file);
 	}
 
-	Util::Array<std::shared_ptr<Render::Surface>> surfaces;
+	Util::Array<Ptr<Render::Surface>> surfaces;
 
 	const std::string directory = "resources/surfaces/sponza/";
 

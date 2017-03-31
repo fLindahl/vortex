@@ -6,12 +6,12 @@
 			<Pass name="SpotLightShadow" shader="shadow"/>
 			<Pass name="PointLightShadow" shader="shadow"/>
 			<Pass name="GlobalShadow" shader="shadow"/>
+			<Pass name="ShadowMap" shader="shadowMap"/>
 			-->
 			
-			<Pass name="Depth" shader="depthStatic"/>
 			<Pass name="Picking" shader="picking"/>
+			<Pass name="Depth" shader="depthStatic"/>
 			<Pass name="FlatGeometryLit" shader="defaultLit"/>
-			<Pass name="ShadowMap" shader="shadowMap"/>
 			
 			
             <!-- material textures -->
@@ -29,12 +29,13 @@
 			<Pass name="SpotLightShadow" shader="shadow"/>
 			<Pass name="PointLightShadow" shader="shadow"/>
 			<Pass name="GlobalShadow" shader="shadow"/>
+			
+			<Pass name="ShadowMap" shader="shadowMap"/>
 			-->
 			
-			<Pass name="Depth" shader="depthStatic"/>
 			<Pass name="Picking" shader="picking"/>
+			<Pass name="Depth" shader="depthStatic"/>
 			<Pass name="FlatGeometryLit" shader="defaultLitAlphaCutout"/>
-			<Pass name="ShadowMap" shader="shadowMap"/>
 			
 			
             <!-- material textures -->
@@ -66,8 +67,10 @@
         </Material>
 		
         <Material name="Icon" desc="Icon that always faces the camera">
+			
 			<Pass name="Picking" shader="pickingBillboard"/>
 			<Pass name="DynamicUnlit" shader="icon"/>
+			
 			
 			<!-- material textures -->
             <Param name="AlbedoMap" type="string" defaultValue="resources/textures/placeholder.png"/>

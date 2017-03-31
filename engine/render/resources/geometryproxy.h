@@ -7,18 +7,21 @@ ex. Parallax corrected cubemaps use these proxies to find an approximative inter
 ---------------*/
 
 #pragma once
+#include "core/refcounted.h"
 #include "GL/glew.h"
 #include <memory>
 #include "foundation/math/matrix4.h"
 #include "foundation/util/array.h"
+//#include "cubemapnode.h"
 
 namespace Render
 {
 
 class CubeMapNode;
 
-class GeometryProxy : public std::enable_shared_from_this<GeometryProxy>
+class GeometryProxy : public Core::RefCounted
 {
+__DeclareClass(GeometryProxy);
 public:
 	
 	GeometryProxy();
@@ -30,8 +33,8 @@ public:
 
 	Math::mat4& Transform() { return this->transform; }
 
-	const Util::Array<std::shared_ptr<CubeMapNode>>& GetConnectedCubemaps() const { return this->connectedCubemaps; }
-	void ConnectCubemap(std::shared_ptr<CubeMapNode> cubemap) {this->connectedCubemaps.Append(cubemap);}
+	const Util::Array<Ptr<CubeMapNode>>& GetConnectedCubemaps() const;
+	void ConnectCubemap(Ptr<CubeMapNode> cubemap);
 private:
 	bool isActive;
 
@@ -39,6 +42,6 @@ private:
 	Math::mat4 transform;
 
 	//Contains pointers to each environmentprobe that is connected to this proxy
-	Util::Array<std::shared_ptr<CubeMapNode>> connectedCubemaps;
+	Util::Array<Ptr<CubeMapNode>> connectedCubemaps;
 };
 }

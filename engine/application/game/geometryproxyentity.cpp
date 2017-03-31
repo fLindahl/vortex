@@ -9,6 +9,8 @@
 namespace Game
 {
 
+__ImplementClass(Game::GeometryProxyEntity, 'gepe', Game::ModelEntity)
+
 GeometryProxyEntity::GeometryProxyEntity () : ModelEntity()
 {
 	//Call baseclass first
@@ -53,6 +55,11 @@ void GeometryProxyEntity::SetScale(Math::vec4 scale)
 	this->proxy->Transform().row0()[0] = scale.x();
 	this->proxy->Transform().row1()[1] = scale.y();
 	this->proxy->Transform().row2()[2] = scale.z();
+}
+
+Ptr<Render::GeometryProxy> GeometryProxyEntity::GetGeometryProxy()
+{
+	return this->proxy;
 }
 
 }

@@ -3,6 +3,7 @@
 #include <foundation/math/bbox.h>
 #include "foundation/util/array.h"
 #include <string>
+#include "core/refcounted.h"
 
 namespace Util
 {
@@ -29,13 +30,15 @@ struct ModelNode
 	ModelInstance* modelInstance;
 };
 
-class ModelInstance
+class ModelInstance : public Core::RefCounted
 {
+	__DeclareClass(ModelInstance);
+
 public:
 	ModelInstance();
 	~ModelInstance();
 	
-	std::shared_ptr<MeshResource> GetMesh();
+	Ptr<MeshResource> GetMesh();
 
 	///only call this if you know what you're doing!
 	void SetMesh(const char* file);
@@ -44,11 +47,11 @@ public:
 	void RemoveGraphicsProperty(GraphicsProperty* gp);
 
 	//void SetMaterial(const Util::String& name);
-	//std::shared_ptr<Material> GetMaterial();
+	//Ptr<Material> GetMaterial();
 
 	//void SetSurface(const Util::String& name);
-	//void SetSurfaceList(Util::Array<std::shared_ptr<Surface>> list);
-	//const Util::Array<std::shared_ptr<Surface>>& GetSurfaces();
+	//void SetSurfaceList(Util::Array<Ptr<Surface>> list);
+	//const Util::Array<Ptr<Surface>>& GetSurfaces();
 
 	const Util::Array<ModelNode*>& GetModelNodes() { return this->modelNodes; }
 
@@ -63,10 +66,10 @@ private:
 
 	Util::Array<ModelNode*> modelNodes;
 
-	std::shared_ptr<MeshResource> mesh;
+	Ptr<MeshResource> mesh;
 
-	//Util::Array<std::shared_ptr<Surface>> surfaces;
-	//std::shared_ptr<Material> material;
+	//Util::Array<Ptr<Surface>> surfaces;
+	//Ptr<Material> material;
 
 	Util::Array<GraphicsProperty*> graphicsProperties;
 };

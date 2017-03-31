@@ -1,21 +1,25 @@
 //------------------------------------------------------------------------------
-//  sysfunc.cc
-//  (C) 2006 Radon Labs GmbH
-//  (C) 2013-2016 Individual contributors, see AUTHORS file
+//  @file		sysfunc.cc
+//  @copyright	See LICENCE file
 //------------------------------------------------------------------------------
-#include "stdneb.h"
-#include "core/win32/win32sysfunc.h"
+#include "config.h"
+#include "core/windows/win32sysfunc.h"
 #include "core/refcounted.h"
-#include "debug/minidump.h"
-#include "util/blob.h"
-#include "util/guid.h"
-#include "net/socket/socket.h"
-#include "debug/minidump.h"
-#include "threading/thread.h"
-#include "util/globalstringatomtable.h"
-#include "util/localstringatomtable.h"  
-#include "system/systeminfo.h"
-#include "debug/win32/win32stacktrace.h"
+//#include "debug/minidump.h"
+//#include "foundation/util/blob.h"
+//#include "foundation/util/guid.h"
+//#include "net/socket/socket.h"
+//#include "debug/minidump.h"
+//#include "threading/thread.h"
+//#include "util/globalstringatomtable.h"
+//#include "util/localstringatomtable.h"  
+//#include "system/systeminfo.h"
+//#include "debug/win32/win32stacktrace.h"
+#include "IO/console.h"
+#include <iomanip>
+#include <ctime>
+#include <process.h>
+#include <windows.h>
 
 namespace Win32
 {
@@ -23,12 +27,7 @@ using namespace Util;
 
 bool volatile SysFunc::SetupCalled = false;
 const Core::ExitHandler* SysFunc::ExitHandlers = 0;
-System::SystemInfo SysFunc::systemInfo;
-
-Util::GlobalStringAtomTable* globalStringAtomTable = 0;
-#if NEBULA3_ENABLE_THREADLOCAL_STRINGATOM_TABLES
-    Util::LocalStringAtomTable* localStringAtomTable = 0;
-#endif
+//System::SystemInfo SysFunc::systemInfo;
 
 //------------------------------------------------------------------------------
 /**
@@ -42,30 +41,9 @@ SysFunc::Setup()
 {
     if (!SetupCalled)
     {
-        SetupCalled = true;
-        #if !__MAYA__
-        Threading::Thread::SetMyThreadName("MainThread");
-        #endif
-        Memory::SetupHeaps();
-        Memory::Heap::Setup();
-        Blob::Setup();
-        #if !__MAYA__
-        Net::Socket::InitNetwork();
-        Debug::MiniDump::Setup();
-        #endif   
-
-        globalStringAtomTable = n_new(Util::GlobalStringAtomTable);
-        #if NEBULA3_ENABLE_THREADLOCAL_STRINGATOM_TABLES
-            localStringAtomTable = n_new(Util::LocalStringAtomTable);
-        #endif    
-
-#if __USE_XNA
-        // check CPU for SSE/SSE2 support for XNA-Math
-        if (!XMVerifyCPUSupport())
-        {
-            n_error("no SSE/SSE2 support on this CPU. XNA-Math was compiled with SSE/SSE2 support\n");
-        }
-#endif
+        //Memory::SetupHeaps();
+        //Memory::Heap::Setup();
+		//Blob::Setup();
     }
 }
 
@@ -80,15 +58,9 @@ SysFunc::Setup()
 void
 SysFunc::Exit(int exitCode)
 {
-    // delete string atom tables
-    n_delete(globalStringAtomTable);
-    #if NEBULA3_ENABLE_THREADLOCAL_STRINGATOM_TABLES
-        n_delete(localStringAtomTable);
-    #endif
-
     // first produce a RefCount leak report
-    #if NEBULA3_DEBUG
-    Core::RefCounted::DumpRefCountingLeaks();
+    #if _DEBUG
+		Core::RefCounted::DumpRefCountingLeaks();
     #endif
 
     // call exit handlers
@@ -104,20 +76,14 @@ SysFunc::Exit(int exitCode)
     _cexit();
 
     // call static shutdown methods
-    Blob::Shutdown();
+    //Blob::Shutdown();
 
     // shutdown global factory object
     Core::Factory::Destroy();
 
-    // delete the memory pools
-    #if NEBULA3_OBJECTS_USE_MEMORYPOOL        
-    n_delete(Memory::ObjectPoolAllocator);
-    Memory::ObjectPoolAllocator = 0;
-    #endif
-
     // report mem leaks
-    #if NEBULA3_MEMORY_ADVANCED_DEBUGGING
-    Memory::DumpMemoryLeaks();
+    #if VORTEX_MEMORY_ADVANCED_DEBUGGING
+		Memory::DumpMemoryLeaks();
     #endif   
 
     // finally terminate the process
@@ -129,30 +95,29 @@ SysFunc::Exit(int exitCode)
     This displays a Win32 error message box and quits the program
 */
 void
-SysFunc::Error(const char* error)
+SysFunc::Exception(const char* error)
 {
-    #ifdef _DEBUG
+#ifdef _DEBUG
     OutputDebugString(error);	
-    #endif
-    /*
-    HWND hwnd = FindWindow(NEBULA3_WINDOW_CLASS, NULL);
-    if (hwnd)
-    {
-        ShowWindow(hwnd, SW_MINIMIZE);
-    }
-    */	
-	Util::Array<Util::String> stacktrace = Win32StackTrace::GenerateStackTrace();
+#endif
+    
+	/*
+		Callstack
+	*/
+	//Util::Array<Util::String> stacktrace = Win32StackTrace::GenerateStackTrace();
 	Util::String format;
-	for (int i = 7; i < Math::n_min(17,stacktrace.Size()); i++)
-	{
-		format.Append(stacktrace[i]);
-		format.Append("\n");
-	}
+	//for (int i = 7; i < Math::min(17,stacktrace.Size()); i++)
+	//{
+	//	format.Append(stacktrace[i]);
+	//	format.Append("\n");
+	//}
 	format.Format("%s\nCallstack:\n%s", error, format.AsCharPtr());
-	::MessageBox(NULL, format.AsCharPtr(), "NEBULA T SYSTEM ERROR", MB_OK | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
-    #if !__MAYA__
-    Debug::MiniDump::WriteMiniDump();
-    #endif
+
+	format.Append("\nMore information can be found in the generated .log file.\n");
+
+	MessageBox(NULL, format.AsCharPtr(), "VORTEX SYSTEM ERROR", MB_OK | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
+
+	IO::Console::Instance()->Print(error, IO::EXCEPTION);
     abort();
 }
 
@@ -161,18 +126,14 @@ SysFunc::Error(const char* error)
     This displays a Win32 message box
 */
 void
-SysFunc::MessageBox(const char* msg)
+SysFunc::MessageWindow(const char* msg)
 {
-    #ifdef _DEBUG
-    OutputDebugString(msg);
-    #endif
-    HWND hwnd = FindWindow(NEBULA3_WINDOW_CLASS, NULL);
-    if (hwnd)
-    {
-        ShowWindow(hwnd, SW_MINIMIZE);
-    }
-    ::MessageBox(NULL, msg, "NEBULA TRIFID MESSAGE", MB_OK|MB_APPLMODAL|MB_SETFOREGROUND|MB_TOPMOST|MB_ICONINFORMATION);
-}
+	int result = MessageBox(NULL,
+							msg,
+							"Vortex Message",
+							MB_OK | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONINFORMATION
+							);
+}	
 
 //------------------------------------------------------------------------------
 /**
@@ -182,7 +143,43 @@ void
 SysFunc::Sleep(double sec)
 {
     int milliSecs = int(sec * 1000.0);
-    ::Sleep(milliSecs);
+	//Windows-specific sleep
+	Sleep(milliSecs);
+}
+
+Util::String SysFunc::GetTimeFormatted()
+{
+	Util::String str;
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+	
+	if (tm.tm_hour >= 10)
+		str.AppendInt(tm.tm_hour);
+	else
+	{
+		str.AppendInt(0);
+		str.AppendInt(tm.tm_hour);
+	}
+	str.Append(":");
+	
+	if (tm.tm_min >= 10)
+		str.AppendInt(tm.tm_min);
+	else
+	{
+		str.AppendInt(0);
+		str.AppendInt(tm.tm_min);
+	}
+	str.Append(":");
+
+	if (tm.tm_sec >= 10)
+		str.AppendInt(tm.tm_sec);
+	else
+	{
+		str.AppendInt(0);
+		str.AppendInt(tm.tm_sec);
+	}
+
+	return str;
 }
 
 //------------------------------------------------------------------------------
@@ -192,6 +189,7 @@ SysFunc::Sleep(double sec)
 void
 SysFunc::DebugOut(const char* msg)
 {
+	IO::Console::Instance()->Print(msg);
     OutputDebugString(msg);
 }
 
@@ -214,11 +212,11 @@ SysFunc::RegisterExitHandler(const Core::ExitHandler* exitHandler)
 //------------------------------------------------------------------------------
 /**
 */
-const System::SystemInfo*
-SysFunc::GetSystemInfo()
-{
-    return &SysFunc::systemInfo;
-}
+//const System::SystemInfo*
+//SysFunc::GetSystemInfo()
+//{
+//    return &SysFunc::systemInfo;
+//}
 
 
 } // namespace Win32

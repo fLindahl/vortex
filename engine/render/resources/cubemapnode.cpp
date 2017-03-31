@@ -1,9 +1,11 @@
 #include "config.h"
 #include "cubemapnode.h"
 #include "render/server/lightserver.h"
+#include "render/resources/geometryproxy.h"
 
 namespace Render
 {
+__ImplementClass(Render::CubeMapNode, 'CUBM', Core::RefCounted);
 
 CubeMapNode::CubeMapNode() :
 		isLoaded(false),
@@ -47,7 +49,7 @@ void CubeMapNode::Activate()
 {
 	if (!this->isActive)
 	{
-		LightServer::Instance()->AddCubeMap(this->shared_from_this());
+		LightServer::Instance()->AddCubeMap(this);
 		this->isActive = true;
 	}
 }
@@ -56,7 +58,7 @@ void CubeMapNode::Deactivate()
 {
 	if (this->isActive)
 	{
-		LightServer::Instance()->RemoveCubeMap(this->shared_from_this());
+		LightServer::Instance()->RemoveCubeMap(this);
 		this->isActive = false;
 	}
 }
@@ -171,7 +173,7 @@ void CubeMapNode::RenderTexture(const GLuint& framebuffer, CubeFace face, Graphi
 	glDrawBuffers(1, &drawbuffers[0]);
 
 	GLenum e = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	_assert(e == GL_FRAMEBUFFER_COMPLETE, "Cubemap Framebuffer Status Error!");
+	_assert2(e == GL_FRAMEBUFFER_COMPLETE, "Cubemap Framebuffer Status Error!");
 
 	//Render to the given framebuffer / texture
 	RenderDevice::Instance()->RenderToTexture(framebuffer, camera);
@@ -191,6 +193,17 @@ void CubeMapNode::CalculateInfluenceWeights(const Math::point& pos)
 {
 	Math::vector dir = pos - this->position;
 	this->NDF = (dir.length() - this->innerScale.x()) / (this->outerScale.x() - this->innerScale.x());
+}
+
+void CubeMapNode::SetGeometryProxy(const Ptr<Render::GeometryProxy>& proxy)
+{
+	this->proxy = proxy; 
+	proxy->ConnectCubemap(this);
+}
+
+Ptr<Render::GeometryProxy> CubeMapNode::GetGeometryProxy()
+{
+	return this->proxy;
 }
 
 }

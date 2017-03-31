@@ -5,6 +5,8 @@
 
 namespace Game
 {
+	__ImplementClass(Game::PointLightEntity, 'plen', Game::Entity)
+
 PointLightEntity::PointLightEntity() :
 		Entity()
 {
@@ -18,14 +20,14 @@ PointLightEntity::~PointLightEntity()
     Render::LightServer::Instance()->RemovePointLight(this->lightEntity);
 }
 
-void PointLightEntity::SetModel(std::shared_ptr<Render::ModelInstance> mdl)
+void PointLightEntity::SetModel(Ptr<Render::ModelInstance> mdl)
 {
     this->gProperty->setModelInstance(mdl);
 }
 
 void PointLightEntity::Activate()
 {
-    this->gProperty->SetOwner(this->shared_from_this());
+    this->gProperty->SetOwner(this);
     this->gProperty->Activate();
     Entity::Activate();
 }

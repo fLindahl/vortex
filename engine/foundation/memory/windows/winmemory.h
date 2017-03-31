@@ -12,7 +12,6 @@
 
 @see        linuxmemoryconfig.h
 */
-#include "config.h"
 #include "core/types.h"
 #include "core/debug.h"
 #include "foundation/memory/linux/linuxmemoryconfig.h"

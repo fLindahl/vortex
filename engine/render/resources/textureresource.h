@@ -8,8 +8,9 @@
 namespace Render
 {
 
-class TextureResource
+class TextureResource : public Core::RefCounted
 {
+__DeclareClass(TextureResource);
 public:
 	TextureResource();
 	~TextureResource();
@@ -26,7 +27,7 @@ private:
 
 	Util::String name;
 
-	std::shared_ptr<ShaderObject> shader;
+	Ptr<ShaderObject> shader;
 
 	GLuint texture;
 };

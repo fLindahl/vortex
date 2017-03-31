@@ -73,35 +73,35 @@ private:
 	// show some nanovg stuff
 	void RenderNano(NVGcontext * vg);
 	
-	std::shared_ptr<Render::ModelInstance> modelInstance;
-	std::shared_ptr<Render::ModelInstance> modelInstanceScene;
+	Ptr<Render::ModelInstance> modelInstance;
+	Ptr<Render::ModelInstance> modelInstanceScene;
 	
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity1;
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity2;
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity3;
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity4;
-	std::shared_ptr<Game::RigidBodyEntity> rigidBodyEntity5;
+	Ptr<Game::RigidBodyEntity> rigidBodyEntity1;
+	Ptr<Game::RigidBodyEntity> rigidBodyEntity2;
+	Ptr<Game::RigidBodyEntity> rigidBodyEntity3;
+	Ptr<Game::RigidBodyEntity> rigidBodyEntity4;
+	Ptr<Game::RigidBodyEntity> rigidBodyEntity5;
 
-	std::shared_ptr<Game::StaticEntity> SceneEntity1;
-    std::shared_ptr<Game::StaticEntity> SceneEntity2;
-    std::shared_ptr<Game::StaticEntity> SceneEntity3;
-    std::shared_ptr<Game::StaticEntity> SceneEntity4;
-    std::shared_ptr<Game::StaticEntity> SceneEntity5;
-    std::shared_ptr<Game::StaticEntity> SceneEntity6;
-	std::shared_ptr<Game::StaticEntity> SceneEntity7;
+	Ptr<Game::StaticEntity> SceneEntity1;
+    Ptr<Game::StaticEntity> SceneEntity2;
+    Ptr<Game::StaticEntity> SceneEntity3;
+    Ptr<Game::StaticEntity> SceneEntity4;
+    Ptr<Game::StaticEntity> SceneEntity5;
+    Ptr<Game::StaticEntity> SceneEntity6;
+	Ptr<Game::StaticEntity> SceneEntity7;
 
-	std::shared_ptr<Game::ModelEntity> sponza;
-	std::shared_ptr<Game::ParticleEntity> billboard;
-	std::shared_ptr<Game::ParticleEntity> billboard2;
+	Ptr<Game::ModelEntity> sponza;
+	Ptr<Game::ParticleEntity> billboard;
+	Ptr<Game::ParticleEntity> billboard2;
 
-	std::shared_ptr<Game::ModelEntity> wall1;
-	std::shared_ptr<Game::ModelEntity> wall2;
-	std::shared_ptr<Game::ModelEntity> wall3;
-	std::shared_ptr<Game::ModelEntity> wall4;
-	std::shared_ptr<Game::ModelEntity> floor;
-	std::shared_ptr<Game::ModelEntity> ceiling;
+	Ptr<Game::ModelEntity> wall1;
+	Ptr<Game::ModelEntity> wall2;
+	Ptr<Game::ModelEntity> wall3;
+	Ptr<Game::ModelEntity> wall4;
+	Ptr<Game::ModelEntity> floor;
+	Ptr<Game::ModelEntity> ceiling;
 	
-	Util::Array<std::shared_ptr<Game::ParticleEntity>> particleList;
+	Util::Array<Ptr<Game::ParticleEntity>> particleList;
 
 	//Particles::ParticleSettings pSettings;
 

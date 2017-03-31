@@ -6,6 +6,10 @@
 
 namespace BaseGameFeature
 {
+EnvManager::EnvManager()
+{
+
+}
 
 Math::line EnvManager::ComputeMouseWorldRay(const double& cursorX, const double& cursorY, const float& length, const float& viewPortSizeX, const float& viewPortSizeY)
 {
@@ -30,14 +34,15 @@ Math::line EnvManager::ComputeMouseWorldRay(const double& cursorX, const double&
 	return Math::line(rayWorldPos, rayDirection, length);
 }
 
-std::shared_ptr<Render::GeometryProxy> EnvManager::NewGeometryProxy(Math::mat4 transform)
+const Ptr<Render::GeometryProxy>& EnvManager::NewGeometryProxy(Math::mat4 transform)
 {
-	std::shared_ptr<Render::GeometryProxy> proxy = std::make_shared<Render::GeometryProxy>(transform);
+	Ptr<Render::GeometryProxy> proxy = Render::GeometryProxy::Create();
+	proxy->Transform() = transform;
 	proxy->Activate();
 
 	this->geometryProxies.Append(proxy);
 
-	return proxy;
+	return this->geometryProxies.Back();
 }
 
 void EnvManager::RenderGeometryProxies()

@@ -6,6 +6,7 @@
 
 namespace Render
 {
+	__ImplementClass(Render::ShaderObject, 'SHDO', Core::RefCounted);
 
 	ShaderObject::ShaderObject()
 	{

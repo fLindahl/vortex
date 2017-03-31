@@ -212,7 +212,7 @@ void DebugRenderer::DrawCircle(const Math::mat4& transform,
 
 }
 
-	void DebugRenderer::DrawMesh(std::shared_ptr<Render::MeshResource> mesh,
+	void DebugRenderer::DrawMesh(Ptr<Render::MeshResource> mesh,
 							 const Math::mat4& transform, 
 							 const Math::vec4& color,
 							 const RenderMode& renderModes,

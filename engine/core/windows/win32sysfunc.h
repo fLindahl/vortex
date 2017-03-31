@@ -9,6 +9,8 @@
 */
 #include "core/types.h"
 #include "core/exithandler.h"
+#include "foundation/util/string.h"
+
 namespace System
 {
     class SystemInfo;
@@ -25,15 +27,17 @@ public:
     /// exit process, and to proper cleanup, memleak reporting, etc...
     static void Exit(int exitCode);
     /// display an error message box
-    static void Error(const char* error);
+    static void Exception(const char* error);
     /// display a message box which needs to be confirmed by the user
-    static void MessageBox(const char* msg);
+    static void MessageWindow(const char* msg);
     /// print a message on the debug console
     static void DebugOut(const char* msg);
     /// sleep for a specified amount of seconds
     static void Sleep(double sec);
     /// get system info 
-    static const System::SystemInfo* GetSystemInfo();
+    //static const System::SystemInfo* GetSystemInfo();
+	/// get system time as a string with format "hh:mm:ss"
+	static Util::String GetTimeFormatted();
 
 private:
     friend class Core::ExitHandler;
@@ -42,7 +46,7 @@ private:
 
     static bool volatile SetupCalled;
     static const Core::ExitHandler* ExitHandlers;     // forward linked list of exit handlers
-    static System::SystemInfo systemInfo;
+    //static System::SystemInfo systemInfo;
 };
 
 } // namespace Win32

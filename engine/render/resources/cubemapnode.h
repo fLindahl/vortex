@@ -1,4 +1,5 @@
 #pragma once
+#include "core/refcounted.h"
 #include "foundation/math/point.h"
 #include "GL/glew.h"
 #include <memory>
@@ -8,9 +9,12 @@
 
 namespace Render
 {
+//class GeometryProxy;
 
-class CubeMapNode : public std::enable_shared_from_this<CubeMapNode>
+class CubeMapNode : public Core::RefCounted
 {
+__DeclareClass(CubeMapNode);
+
 public:
 	enum CubemapShape
 	{
@@ -44,8 +48,8 @@ public:
 
 	float GetBlendFactor() { return this->blendFactor; }
 
-	void SetGeometryProxy(std::shared_ptr<Render::GeometryProxy> proxy) { this->proxy = proxy; proxy->ConnectCubemap( this->shared_from_this()); }
-	std::shared_ptr<Render::GeometryProxy> GetGeometryProxy() { return this->proxy; }
+	void SetGeometryProxy(const Ptr<Render::GeometryProxy>& proxy);
+	Ptr<Render::GeometryProxy> GetGeometryProxy();
 
 private:
 	friend class LightServer;
@@ -66,7 +70,7 @@ private:
 	bool isActive;
 
 	//Used for approximating level geometry to correct reflection vector's intersection with the cubemap (parallax correction)
-	std::shared_ptr<Render::GeometryProxy> proxy;
+	Ptr<Render::GeometryProxy> proxy;
 
 	//Cubemaps worldspace position
 	Math::point position;

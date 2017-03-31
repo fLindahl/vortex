@@ -20,6 +20,8 @@
 #endif
 #endif
 
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 #include <stdint.h>
 #include <atomic>
 #include <xmmintrin.h>
@@ -35,7 +37,7 @@
 
 #ifdef __WIN32__
 #pragma warning ( disable : 4091)
-#pragma warning off (10358)     // illegal or unsupported __attribute__
+//#pragma warning ( disable : 10358)     // illegal or unsupported __attribute__
 #endif
 
 #ifdef __WIN32__

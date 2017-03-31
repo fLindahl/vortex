@@ -1,15 +1,16 @@
 #pragma once
 #include <memory>
+#include "config.h"
 #include "shaderobject.h"
 #include "textureresource.h"
 #include "foundation/util/array.h"
 #include <map>
 #include "foundation/util/variable.h"
 //#include "foundation/util/string.h"
+#include "render/resources/surface.h"
 
 namespace Render
 {
-class Surface;
 
 //TODO: This should also denote location in shader, but isn't currently. We assume everything is in this order in the material list.
 enum TextureType
@@ -26,8 +27,9 @@ struct MaterialParameter
 	Util::Variable var;
 };
 
-class Material
+class Material : public Core::RefCounted
 {
+	__DeclareClass(Material);
 public:
 	Material();
 	~Material();
@@ -39,14 +41,14 @@ public:
 	Util::String GetName();
 
 	///returns shader from specified pass
-	std::shared_ptr<ShaderObject> GetShader(const std::string& pass);
+	Ptr<ShaderObject> GetShader(const Util::String& pass);
 
-    Util::Array<std::shared_ptr<TextureResource>>& TextureList();
+    Util::Array<Ptr<TextureResource>>& TextureList();
 
 	MaterialParameter* GetParameterByName(const Util::String& name);
 	void AddParameter(const Util::String& name, const Util::Variable& variable);
 	
-    Util::Array<std::shared_ptr<Surface>>& SurfaceList();
+    Util::Array<Ptr<Surface>>& SurfaceList();
 
 	void SetFramePass(const Util::String& pass, const Util::String& shader);
 	//std::string GetFramePasses();
@@ -68,10 +70,10 @@ private:
 	Util::String name;
 
 	/// What framepasses are we rendering this material in and with what shader?
-	std::map<Util::String, std::shared_ptr<ShaderObject>> framepasses;
+	std::map<Util::String, Ptr<ShaderObject>> framepasses;
 
 	/// loaded textures
-	Util::Array<std::shared_ptr<TextureResource>> textures;
+	Util::Array<Ptr<TextureResource>> textures;
 	/// This is adjacent with textures array. e.g. textures[1]'s type == TextureParamTypes[1].
 	Util::Array<TextureType> TextureParamTypes;
 	
@@ -79,7 +81,7 @@ private:
 	Util::Array<MaterialParameter*> parameters;
 
 	/// all surfaces that currently use this material
-	Util::Array<std::shared_ptr<Surface>> surfaces;
+	Util::Array<Ptr<Surface>> surfaces;
 };
 
 }

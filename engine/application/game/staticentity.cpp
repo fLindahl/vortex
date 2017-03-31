@@ -4,6 +4,7 @@
 
 namespace Game
 {
+	__ImplementClass(Game::StaticEntity, 'sten', Game::PhysicsEntity)
 StaticEntity::StaticEntity()
 {
 	this->physicsType = Physics::PhysicsType::Static;

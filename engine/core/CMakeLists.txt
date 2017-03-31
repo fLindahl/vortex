@@ -4,15 +4,15 @@
 	
 IF(WIN32)
 	SET(files_core_OS
-		#windows/win32singleton.h
-		#windows/win32sysfunc.h
-		#windows/win32sysfunc.cpp
+		windows/win32singleton.h
+		windows/win32sysfunc.h
+		windows/win32sysfunc.cpp
 		)
 ELSE(WIN32)
 	SET(files_core_OS
-		#linux/linuxsingleton.h
-		#linux/linuxsysfunc.h
-		#linux/linuxsysfunc.cpp
+		linux/linuxsingleton.h
+		linux/linuxsysfunc.h
+		linux/linuxsysfunc.cpp
 		)
 ENDIF(WIN32)
 
@@ -23,8 +23,8 @@ SET(files_core
 	ptr.h
 	debug.h
 	debug.cpp
-	#exithandler.h
-	#exithandler.cpp
+	exithandler.h
+	exithandler.cpp
 	factory.h
 	factory.cpp
 	refcounted.h
@@ -35,7 +35,7 @@ SET(files_core
 	rtti.cpp
 	rttimacros.h
 	singleton.h
-	#sysfunc.h
+	sysfunc.h
 	weakptr.h
 	${files_core_OS}
 	)
@@ -47,4 +47,4 @@ SOURCE_GROUP("pch" FILES ${files_pch})
 ADD_LIBRARY(core STATIC ${files_core} ${files_pch})
 TARGET_PCH(core ../)
 ADD_DEPENDENCIES(core glew misc)
-TARGET_LINK_LIBRARIES(core PUBLIC engine exts glew misc)
+TARGET_LINK_LIBRARIES(core PUBLIC engine exts glew misc foundation IO)

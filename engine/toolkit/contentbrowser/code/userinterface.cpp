@@ -49,7 +49,7 @@ namespace Toolkit
 		else
 		{
 			//could not open directory
-			_assert(false, "Could not open directory!");
+			_assert2(false, "Could not open directory!");
 			return;
 		}
 
@@ -269,7 +269,7 @@ namespace Toolkit
 				}
 				this->selectedNode = nullptr;
 
-				this->application->loadedModel = std::make_shared<Game::ModelEntity>();
+				this->application->loadedModel = Game::ModelEntity::Create();
 				this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
 				this->application->loadedModel->SetTransform(Math::mat4::scaling(0.01f, 0.01f, 0.01f));
 				this->application->loadedModel->Activate();

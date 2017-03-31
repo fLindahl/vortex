@@ -1,8 +1,10 @@
 #include "config.h"
 #include "geometryproxy.h"
+#include "cubemapnode.h"
 
 namespace Render
 {
+__ImplementClass(Render::GeometryProxy, 'GEOP', Core::RefCounted);
 
 GeometryProxy::GeometryProxy() :
 		isActive(false)
@@ -38,6 +40,14 @@ void GeometryProxy::Deactivate()
 	}
 }
 
+const Util::Array<Ptr<CubeMapNode>>& GeometryProxy::GetConnectedCubemaps() const
+{ 
+	return this->connectedCubemaps; 
+}
 
+void GeometryProxy::ConnectCubemap(Ptr<CubeMapNode> cubemap) 
+{ 
+	this->connectedCubemaps.Append(cubemap);
+}
 
 }

@@ -4,6 +4,7 @@
 
 namespace Render
 {
+__ImplementClass(Render::Surface, 'SURF', Core::RefCounted)
 
 Surface::Surface()
 {
@@ -24,7 +25,7 @@ void Surface::AddParameter(const Util::String& name, const Util::Variable& varia
     {
 		//HACK: Since we're loading a string, we're probably loading a texture
         //This should probably be done in some other way
-		std::shared_ptr<TextureResource> tex = ResourceServer::Instance()->LoadTexture(*variable.GetString());
+		Ptr<TextureResource> tex = ResourceServer::Instance()->LoadTexture(*variable.GetString());
 		this->textures.Append(tex);
 		this->texturesByType.insert(std::make_pair(Material::TextureTypeFromString(name.AsCharPtr()), tex));
     }
@@ -49,7 +50,7 @@ bool Surface::RemoveModelNode(ModelNode* node)
 	return false;
 }
 
-Util::Array<std::shared_ptr<TextureResource>>& Surface::TextureList()
+Util::Array<Ptr<TextureResource>>& Surface::TextureList()
 {
     return this->textures;
 }
@@ -59,7 +60,7 @@ MaterialParameter* Surface::GetParameterByName(const Util::String &name)
 	return this->parametersByName[name];
 }
 
-std::shared_ptr<Material> Surface::GetMaterial()
+Ptr<Material> Surface::GetMaterial()
 {
     return this->material;
 }

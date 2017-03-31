@@ -1,10 +1,15 @@
 #pragma once
+#include "config.h"
 #include "material.h"
 
 namespace Render
 {
-	class Surface
+	struct MaterialParameter;
+	enum TextureType;
+
+	class Surface : public Core::RefCounted
 	{
+	__DeclareClass(Surface);
 	public:
 		Surface();
 		~Surface();
@@ -17,7 +22,7 @@ namespace Render
 		Util::String GetPath() { return this->filePath; }
 
 		///Get surface material
-		std::shared_ptr<Material> GetMaterial();
+		Ptr<Material> GetMaterial();
 
 		///Appends a modelnode to this surface. Only use if you know what you're doing!
 		void AppendModelNode(ModelNode* node) { this->modelNodes.Append(node); }
@@ -25,11 +30,11 @@ namespace Render
 		bool RemoveModelNode(ModelNode* node);
 		
 		///Get texture list
-		Util::Array<std::shared_ptr<TextureResource>>& TextureList();
+		Util::Array<Ptr<TextureResource>>& TextureList();
 
-		MaterialParameter* GetParameterByName(const Util::String& name);
+		Render::MaterialParameter* GetParameterByName(const Util::String& name);
 
-		Util::Array<MaterialParameter*>& ParameterList() { return this->parameters; }
+		Util::Array<Render::MaterialParameter*>& ParameterList() { return this->parameters; }
 
 		Util::Array<ModelNode*>& GetModelNodes() { return this->modelNodes; }
 
@@ -42,19 +47,19 @@ namespace Render
 		Util::String filePath;
 
 		/// surface material
-		std::shared_ptr<Material> material;
+		Ptr<Material> material;
 
 		
 		/// loaded textures
-		std::map<TextureType, std::shared_ptr<TextureResource>> texturesByType;
-		Util::Array<std::shared_ptr<TextureResource>> textures;
+		std::map<Render::TextureType, Ptr<TextureResource>> texturesByType;
+		Util::Array<Ptr<TextureResource>> textures;
 
 		std::map<Util::String, MaterialParameter*> parametersByName;
 		Util::Array<MaterialParameter*> parameters;
 
 		//TODO: Implement surface instances
 		// all instances of this surface
-		//Util::Array<std::shared_ptr<SurfaceInstance>> surfaceInstances;
+		//Util::Array<Ptr<SurfaceInstance>> surfaceInstances;
 
 		///Contains all modelinstances that point to this surface and the primitivegroup that uses it.
 		Util::Array<ModelNode*> modelNodes;

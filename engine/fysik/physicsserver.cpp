@@ -139,7 +139,7 @@ bool PhysicsServer::isPointWithinBounds(const Math::point& p,
     return false;
 }
 
-Math::mat4 PhysicsServer::CalculateInertiaTensor(std::shared_ptr<BaseCollider> collider, const float& mass)
+Math::mat4 PhysicsServer::CalculateInertiaTensor(Ptr<BaseCollider> collider, const float& mass)
 {
     switch (collider->GetShape())
     {
@@ -223,7 +223,7 @@ void PhysicsServer::removePhysicsEntity(Game::PhysicsEntity *p)
 	}
 }
 
-std::shared_ptr<Physics::BaseCollider> PhysicsServer::LoadCollider(const std::string& meshName, const Physics::ColliderShape& shape)
+Ptr<Physics::BaseCollider> PhysicsServer::LoadCollider(const std::string& meshName, const Physics::ColliderShape& shape)
 {
 	if (this->collidersByMeshName.count(meshName) > 0)
 	{
@@ -235,7 +235,7 @@ std::shared_ptr<Physics::BaseCollider> PhysicsServer::LoadCollider(const std::st
 		//We need to create a physics collider and cook the mesh
 		if (shape == Physics::ColliderShape::SURFACE)
 		{
-			std::shared_ptr<SurfaceCollider> coll = std::make_shared<SurfaceCollider>();
+			Ptr<SurfaceCollider> coll = SurfaceCollider::Create();
 			coll->SetShape(shape);
 			coll->CookMeshData(Render::ResourceServer::Instance()->LoadMesh(meshName.c_str()));
 			return coll;
