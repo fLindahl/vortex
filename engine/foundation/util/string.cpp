@@ -149,7 +149,7 @@ String::AppendRange(const char* append, size_t length)
         else if (newLength < this->heapBufferSize)
         {
             // the result fits into the existing buffer
-			Memory::Copy(this->localBuffer + this->strLen, append, length);
+			Memory::Copy(this->heapBuffer + this->strLen, append, length);
             this->heapBuffer[newLength] = 0;
         }
         else

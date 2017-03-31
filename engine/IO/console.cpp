@@ -8,6 +8,8 @@
 #include "imgui.h"
 #include "callbacks.h"
 #include "core/sysfunc.h"
+//#include <iomanip>
+#include <ctime>
 
 #define RECENTMESSAGESCAPACITY 24
 #define MAXLIFETIME 60.0
@@ -272,7 +274,46 @@ void Console::ClearLog()
 
 void Console::SaveLog(Util::String filename) const
 {
-	//TODO: Implement me!
+	if(filename.IsEmpty())
+	{
+		auto t = std::time(nullptr);
+		auto tm = *std::localtime(&t);
+		filename = "console_";
+		filename.AppendInt(tm.tm_year - 100);
+		filename.Append("-");
+		filename.AppendInt(tm.tm_mon);
+		filename.Append("-");
+		filename.AppendInt(tm.tm_mday);
+		filename.Append("_");
+		filename.AppendInt(tm.tm_hour);
+		filename.Append("-");
+		filename.AppendInt(tm.tm_min);
+		filename.Append("-");
+		filename.AppendInt(tm.tm_sec);
+		filename.Append(".log");
+	}
+	else
+	{
+		if(!filename.CheckFileExtension("log"))
+		{
+			_warning("Log file-extension is not \".log\"!");
+			_printf("Changing log file-extension to \".log\"...");
+			filename.ChangeFileExtension("log");		
+		}
+	}
+	
+	std::ofstream file;
+	file.open(filename.AsCharPtr());
+	
+	for (size_t i = 0; i < this->log.Size(); i++)
+	{
+		file << this->log[i].timestamp.AsCharPtr() << this->LogEntryTypeAsCharPtr(this->log[i].type) << this->log[i].msg.AsCharPtr() << std::endl;
+	}	
+	file.close();
+
+	_printf("Created log %s", filename.AsCharPtr());
+	
+	return;
 }
 
 const Util::Array<Console::LogEntry> & Console::GetLog() const
@@ -280,7 +321,7 @@ const Util::Array<Console::LogEntry> & Console::GetLog() const
 	return this->log;
 }
 
-const char* Console::LogEntryTypeAsCharPtr(const LogMessageType& type)
+const char* Console::LogEntryTypeAsCharPtr(const LogMessageType& type) const
 {
 	//static const prefixes that are appended to messages. Doing this saves a ton of memory.
 	static const Util::String prefix_message =   "[Message]: ";

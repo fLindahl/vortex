@@ -58,7 +58,7 @@ _exception_fmt(const char *	exp, const char *fmt, const char *file, int line, ..
 	va_start(argList, line);
 	msg.FormatArgList(fmt, argList);
 	va_end(argList);
-	Util::String format = Util::String::Sprintf("*** VORTEX ASSERTION ***\nmessage: %s\nfile : %s\nline : %d\nexpression : %s\n", msg.AsCharPtr(), file, line, exp);
+	Util::String format = Util::String::Sprintf("*** VORTEX ASSERTION ***\n\nmessage:\n %s\n\nfile : %s\nline : %d\nexpression : %s\n", msg.AsCharPtr(), file, line, exp);
 	//if (IO::Console::HasInstance())
 	//{
 	//	n_error(format.AsCharPtr());
