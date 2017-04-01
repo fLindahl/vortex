@@ -1,7 +1,6 @@
 //------------------------------------------------------------------------------
 //  factory.cc
-//  (C) 2006 Radon Labs GmbH
-//  (C) 2013-2016 Individual contributors, see AUTHORS file
+//  @copyright	See LICENSE file
 //------------------------------------------------------------------------------
 #include "config.h"
 #include "core/factory.h"

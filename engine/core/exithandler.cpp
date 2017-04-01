@@ -1,7 +1,6 @@
 //------------------------------------------------------------------------------
-//  exithandler.cc
-//  (C) 2008 Radon Labs GmbH
-//  (C) 2013-2016 Individual contributors, see AUTHORS file
+//  exithandler.cpp
+//	@copyright	See LICENSE file
 //------------------------------------------------------------------------------
 #include "config.h"
 #include "core/exithandler.h"

@@ -27,9 +27,6 @@ SET(files_foundation_util
 	util/variable.h
 	util/string.h
 	util/string.cpp
-	util/linkedlist.h
-	util/queue.h
-	util/stack.h
 	util/hashtable.h
 	util/dictionary.h
 	util/pair.h

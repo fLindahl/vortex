@@ -10,7 +10,7 @@
 
 //------------------------------------------------------------------------------
 /**
-This function is called by n_assert() when the assertion fails.
+This function is called by _assert() when the assertion fails.
 */
 void
 _exception(const char* exp, const char* file, int line)
@@ -29,7 +29,7 @@ _exception(const char* exp, const char* file, int line)
 
 //------------------------------------------------------------------------------
 /**
-This function is called by n_assert2() when the assertion fails.
+This function is called by _assert2() when the assertion fails.
 */
 void
 _exception2(const char* exp, const char* msg, const char* file, int line)
@@ -49,6 +49,7 @@ _exception2(const char* exp, const char* msg, const char* file, int line)
 
 //------------------------------------------------------------------------------
 /**
+	Formatted exception function
 */
 void
 _exception_fmt(const char *	exp, const char *fmt, const char *file, int line, ...)
@@ -59,20 +60,14 @@ _exception_fmt(const char *	exp, const char *fmt, const char *file, int line, ..
 	msg.FormatArgList(fmt, argList);
 	va_end(argList);
 	Util::String format = Util::String::Sprintf("*** VORTEX ASSERTION ***\n\nmessage:\n %s\n\nfile : %s\nline : %d\nexpression : %s\n", msg.AsCharPtr(), file, line, exp);
-	//if (IO::Console::HasInstance())
-	//{
-	//	n_error(format.AsCharPtr());
-	//}
-	//else
-	{
-		Core::SysFunc::Exception(format.AsCharPtr());
-	}
+	Core::SysFunc::Exception(format.AsCharPtr());
+
 }
 
 //------------------------------------------------------------------------------
 /**
 	This function is called when a serious situation is encountered.
-	This function does not abort the application however.
+	This function does not abort the application.
 */
 void __cdecl
 _error(const char* msg, ...)
@@ -89,8 +84,8 @@ _error(const char* msg, ...)
 
 //------------------------------------------------------------------------------
 /**
-This function is called when a warning should be issued which doesn't
-require abortion of the application.
+	This function is called when a warning should be issued which doesn't
+	require abortion of the application.
 */
 void __cdecl
 _warning(const char* msg, ...)
@@ -107,8 +102,8 @@ _warning(const char* msg, ...)
 
 //------------------------------------------------------------------------------
 /**
-This function is called when a message should be displayed to the
-user which requires a confirmation (usually displayed as a MessageBox).
+	This function is called when a message should be displayed to the
+	user which requires a confirmation (usually displayed as a MessageBox).
 */
 void __cdecl
 _confirm(const char* msg, ...)
@@ -125,8 +120,8 @@ _confirm(const char* msg, ...)
 
 //------------------------------------------------------------------------------
 /**
-Vortex's printf replacement. Will redirect the text to the console
-and/or logfile.
+	Vortex's printf replacement. Will redirect the text to the console
+	and/or logfile.
 */
 void __cdecl
 _printf(const char *msg, ...)
@@ -141,8 +136,7 @@ _printf(const char *msg, ...)
 
 //------------------------------------------------------------------------------
 /**
-Put process to sleep.
-
+	Put process to sleep.
 */
 void
 _sleep(double sec)
@@ -152,6 +146,7 @@ _sleep(double sec)
 
 //------------------------------------------------------------------------------
 /**
+	Places a breakpoint that the debugger will stop at
 */
 void
 _break()

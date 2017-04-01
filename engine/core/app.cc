@@ -38,19 +38,11 @@ App::~App()
 bool
 App::Open()
 {
-	assert(!this->isOpen);
+	_assert(!this->isOpen);
 	this->isOpen = true;
 
 	//Init RenderDevice
 	Render::RenderDevice::Instance()->Initialize();
-	//Setup shaders before framepasses and materials!
-	Render::ShaderServer::Instance()->SetupShaders("resources/shaders/shaders.xml");
-	//Setup framepasses before materials
-	Render::FrameServer::Instance()->SetupFramePasses();
-	//Load all materials
-	Render::ResourceServer::Instance()->SetupMaterials("resources/materials/default.xml");
-	//Init debugrenderer. Always do this AFTER setting up shaders!
-	Debug::DebugRenderer::Instance()->Initialize();
 
 	return true;
 }
@@ -70,7 +62,7 @@ App::Run()
 void
 App::Close()
 {
-	assert(this->isOpen);
+	_assert(this->isOpen);
 	this->isOpen = false;
 }
 

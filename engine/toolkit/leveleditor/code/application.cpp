@@ -261,6 +261,9 @@ Application::Run()
 			BaseGameFeature::EnvManager::Instance()->RenderGeometryProxies();
 		}
 
+		for (int i = 0; i < 20; i++)
+			_printf("SPAM SPAM SPAM SPAM");
+
 		RenderDevice::Instance()->Render(false);
 
 		this->window->SwapBuffers();

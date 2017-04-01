@@ -1,4 +1,11 @@
 #pragma once
+/**
+	@file		debug.h
+	
+	This file contains a number of useful debugging functions, print functions, etc.
+
+	@copyright	See LICENSE file
+*/
 
 #ifdef __LINUX__
 void _printf(const char*, ...) __attribute__((format(printf,1,2)));

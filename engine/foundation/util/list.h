@@ -7,8 +7,7 @@
     place in memory, dynamic arrays are often the better choice, unless 
     insert/remove performance is more important then traversal performance.
     
-    (C) 2006 Radon Labs GmbH
-    (C) 2013-2016 Individual contributors, see AUTHORS file
+    @copyright	See LICENSE file
 */    
 #include "core/types.h"
 
@@ -477,7 +476,7 @@ template<class TYPE>
 typename List<TYPE>::Iterator
 List<TYPE>::AddAfter(Iterator iter, const TYPE& e)
 {
-    Node* node = n_new(Node(e));
+    Node* node = new(Node(e));
     if (0 == iter.GetNode())
     {
         #if VORTEX_BOUNDSCHECKS
@@ -510,7 +509,7 @@ template<class TYPE>
 typename List<TYPE>::Iterator
 List<TYPE>::AddBefore(Iterator iter, const TYPE& e)
 {
-    Node *node = n_new(Node(e));
+    Node *node = new(Node(e));
     if (0 == iter.GetNode())
     {
         #if VORTEX_BOUNDSCHECKS
