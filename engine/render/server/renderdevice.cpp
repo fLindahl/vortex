@@ -138,7 +138,9 @@ void RenderDevice::RenderToTexture(const GLuint& outFrameBuffer, const Graphics:
 
 	for (auto pass : FrameServer::Instance()->framePasses)
 	{
-		pass->Execute();
+		//TEMPORARY: skip dynamic unlit pass so that we don't generate cubemaps with icons
+		if (pass->name != "DynamicUnlit")
+			pass->Execute();
 	}
 		
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, outFrameBuffer);

@@ -32,30 +32,29 @@ public:
 	void Update();
 
 	void SetTransform(const Math::mat4& t);
-	void SetSpotLightPosition(const Math::mat4& t);
-    void SetSpotLightLength(const float& length);
-    void SetSpotLightAngle(const float& angle);
-    void SetSpotLightDirection(const Math::vec4& direction);
-    void SetSpotLightColor(const Math::vec4& color);
 
-	float& GetSpotLightLength(){ return this->lightEntity->length; }
-	float& GetSpotLightAngle(){ return this->lightEntity->angle; }
-	Math::vec4& GetSpotLightDirection(){ return this->lightEntity->coneDirection; }
-	Math::vec4& GetSpotLightColor(){ return this->lightEntity->color; }
+	const float& GetSpotLightLength(){ return this->length; }
+	void SetSpotLightLength(const float& length);
+	
+	const float& GetSpotLightAngle(){ return this->angle; }
+    void SetSpotLightAngle(const float& angle);
+
+	const Math::vec4& GetSpotLightDirection(){ return this->transform.get_zaxis(); }
+    //void SetSpotLightDirection(const Math::vec4& direction);
+	
+	Math::vec4 GetSpotLightColor(){ return Math::vec4(this->lightEntity->colorAndCenterOffset.x(), this->lightEntity->colorAndCenterOffset.y(), this->lightEntity->colorAndCenterOffset.z(), 1.0f); }
+    void SetSpotLightColor(const Math::vec4& color);
 
     Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty; }
 
     Render::LightServer::SpotLight* GetSpotLightEnity(){ return this->lightEntity; } const
     void SetSpotLightEnity(Render::LightServer::SpotLight* sLight){ this->lightEntity = sLight; }
 
-    void SetLightIndex(const uint& index){ this->lightIndex = index; }
-    int GetLightIndex(){ return this->lightIndex; }
-
-    Render::LightServer::LightType& GetLightType(){ return this->lightEntity->lightType; }
-
 protected:
+	//entitys transform is the position and orientation of the light
+	float length;
+	float angle;
 
-	uint lightIndex;
     Render::LightServer::SpotLight* lightEntity;
     Render::GraphicsProperty* gProperty;
 };

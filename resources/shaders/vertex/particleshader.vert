@@ -68,6 +68,7 @@ void main()
 	vec3 particlePos = pSettings.settings[index].pos.xyz;
 	vec3 vertexPos = camRight*p.x + camUp*p.y;
 	
+	
 	vec4 wPos = vec4(particlePos+vertexPos , 1);
 	
 	// position in world space

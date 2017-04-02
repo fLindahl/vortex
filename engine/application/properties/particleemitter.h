@@ -37,14 +37,14 @@ public:
 	void UpdateUniformBuffer();
 	void BindUniformBuffer();
 	void UpdateTexture(const char* texturePath);
+	
+	Math::mat4 GetModelMatrix();
 
 	GLuint& GetNumberOfParticles(){ return numOfParticles; }
 
 	Particles::ParticleState& GetState(){ return state; }
 
 	std::shared_ptr<Render::TextureResource>& GetEmitterTexture(){ return this->texture; }
-
-	Math::mat4 GetModelMatrix();
 
 	GLuint* GetUniformBuffer(){ return this->ubo; }
 	Particles::EmitterBuffer& GetEmitterBuffer(){ return this->buff; }

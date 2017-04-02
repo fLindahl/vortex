@@ -1,7 +1,7 @@
 <Vortex>
     <ParticleSystem>
         <ParticleEmitter name="Water1">
-            <Texture path="D:\Programming\vortex\resources\textures\particles\particle_spritesheet_smoke3.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
+            <Texture path="resources/textures/particles/particle_spritesheet_smoke3.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
             <Velocity vel="1.1160001" vel2="1.23" random="true"/>
             <Acceleration acc="0.000000 -1.294000 0.000000" acc2="0.000000 -0.867000 0.000000" random="true"/>
             <Lifetime life="1.6800001" life2="2.345" random="true"/>
@@ -13,7 +13,7 @@
             </EmitterShapes>
         </ParticleEmitter>
         <ParticleEmitter name="Water2">
-            <Texture path="D:\Programming\vortex\resources\textures\particles\particle_spritesheet_smoke2.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
+            <Texture path="D:/Programming/vortex/resources/textures/particles/particle_spritesheet_smoke2.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
             <Velocity vel="0.565" vel2="0.91400003" random="true"/>
             <Acceleration acc="0.000000 -0.348000 0.000000" acc2="0.000000 -0.561000 0.000000" random="true"/>
             <Lifetime life="1.9900001" life2="3.0460002" random="true"/>

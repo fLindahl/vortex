@@ -24,7 +24,7 @@ ParticleComputePass::~ParticleComputePass()
 void ParticleComputePass::Setup()
 {
 	// Setup light culling compute shader program
-
+	glGenQueries(1, query);
 	Particles::ParticleSystem::Instance()->GetParticleShaderObject() = Render::ShaderServer::Instance()->LoadShader("defaultUnLitBillboard");
 
 	this->particleComputeProgram = ShaderServer::Instance()->LoadShader("ParticleCompute")->GetProgram();
@@ -34,7 +34,7 @@ void ParticleComputePass::Setup()
 
 void ParticleComputePass::Execute()
 {
-
+	glBeginQuery(GL_TIME_ELAPSED, query[0]);
 	// Particle compute shader
 	glUseProgram(this->particleComputeProgram);
 
@@ -64,6 +64,10 @@ void ParticleComputePass::Execute()
 
 	glUseProgram(0);
 	
+	glEndQuery(GL_TIME_ELAPSED);
+	GLint64 data;
+	glGetQueryObjecti64v(query[0], GL_QUERY_RESULT, &data);
+//	printf("Time particle pass: %f\n", (GLfloat) data * 0.000001f);
 	FramePass::Execute();
 }
 }

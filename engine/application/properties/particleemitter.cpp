@@ -84,7 +84,7 @@ void ParticleEmitter::UpdateTexture(const char* texturePath)
 	this->texPath = texturePath;
 }
 
-	Math::mat4 ParticleEmitter::GetModelMatrix()
+Math::mat4 ParticleEmitter::GetModelMatrix()
 {
 	return this->owner->GetTransform();
 }

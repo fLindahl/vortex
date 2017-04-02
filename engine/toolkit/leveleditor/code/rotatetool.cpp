@@ -1,5 +1,10 @@
 #include "rotatetool.h"
 #include "foundation/math/math.h"
+#include "imgui.h"
+#include "application/basegamefeature/managers/envmanager.h"
+#include "render/debugrender/debugrenderer.h"
+#include "foundation/math/quaternion.h"
+#include "foundation/math/matrix4.h"
 
 namespace Tools
 {
@@ -12,6 +17,7 @@ RotateTool::RotateTool() :
 	this->startDragMatrix = Math::mat4::identity();
 	this->lastStartDragDeltaMatrix = Math::mat4::identity();
 	type = ToolType::ROTATE;
+	this->currentHandle = NONE;
 }
 	
 RotateTool::~RotateTool()
@@ -80,8 +86,9 @@ start the rotation mode.
 */
 void RotateTool::LeftDown()
 {
+
 	BaseTool::LeftDown();
-	/*
+
 	// store copy of delta matrix
 	this->lastStartDragDeltaMatrix = this->deltaMatrix;
 
@@ -90,11 +97,20 @@ void RotateTool::LeftDown()
 	this->zDragStart = this->zAxis;
 
 	// get mouse position on screen
-	const float2& mousePos = Input::InputServer::Instance()->GetDefaultMouse()->GetScreenPosition();
+	ImVec2 dockPos = ImGui::GetWindowPos();
+	ImGuiStyle& style = ImGui::GetStyle();
+	dockPos.x += style.WindowPadding.x;
+	dockPos.y += style.WindowPadding.y;
+	ImVec2 mousePos = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
+
+	ImVec2 dockSize = ImGui::GetWindowSize();
+
 
 	// get mouse ray
 	const float rayLength = 5000.0f;
-	Math::line worldMouseRay = envQueryManager->ComputeMouseWorldRay(mousePos, rayLength, defaultView);
+	Math::line worldMouseRay = BaseGameFeature::EnvManager::Instance()->ComputeMouseWorldRay(mousePos.x, mousePos.y, rayLength, dockSize.x, dockSize.y);
+
+	this->currentHandle = GetMouseHandle(worldMouseRay);
 
 	// define picking sphere radius
 	float radius(this->handleDistance * this->handleScale);
@@ -109,7 +125,7 @@ void RotateTool::LeftDown()
 
 	// calculate start drag orientation
 	this->startDragOrientation = this->ComputeDragVector(worldMouseRay, this->currentHandle);
-	*/
+	
 }
 
 //------------------------------------------------------------------------------
@@ -120,14 +136,21 @@ delta rotation matrix.
 void RotateTool::Drag()
 {
 	BaseTool::Drag();
-	/*
-	const float2& mousePos = Input::InputServer::Instance()->GetDefaultMouse()->GetScreenPosition();
+
+	// get mouse position on screen
+	ImVec2 dockPos = ImGui::GetWindowPos();
+	ImGuiStyle& style = ImGui::GetStyle();
+	dockPos.x += style.WindowPadding.x;
+	dockPos.y += style.WindowPadding.y;
+	ImVec2 mousePos = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
+
+	ImVec2 dockSize = ImGui::GetWindowSize();
 
 	// get mouse ray
 	const float rayLength = 5000.0f;
-	Math::line worldMouseRay = envQueryManager->ComputeMouseWorldRay(mousePos, rayLength, defaultView);
-	Math::vector currentDragVec = this->ComputeDragVector(worldMouseRay, this->currentHandle);
+	Math::line worldMouseRay = BaseGameFeature::EnvManager::Instance()->ComputeMouseWorldRay(mousePos.x, mousePos.y, rayLength, dockSize.x, dockSize.y);
 
+	Math::vector currentDragVec = this->ComputeDragVector(worldMouseRay, this->currentHandle);
 
 	//float angleDiff = n_acos(Math::vector::dot3(currentDragVec, this->startDragOrientation));
 	//Math::vector cross = Math::vector::cross3(currentDragVec, this->startDragOrientation);
@@ -165,7 +188,6 @@ void RotateTool::Drag()
 
 		this->deltaMatrix = Math::mat4::rotationaxis(this->viewAxis, angleDiff);
 	}
-	*/
 }
 
 //------------------------------------------------------------------------------
@@ -189,6 +211,7 @@ This is called when the user finished dragging a feature
 void
 RotateTool::LeftUp()
 {
+	this->currentHandle = TransformHandle::NONE;
 	BaseTool::LeftUp();
 }
 
@@ -199,7 +222,7 @@ Renders the rotation handles, which can be dragged
 void
 RotateTool::Render()
 {
-	/*
+	
 	// The following part is needed to get a mouse over visualization
 	// for the handles. For thta calculations like in StartDrag() are
 	// required.
@@ -208,13 +231,23 @@ RotateTool::Render()
 	float radius(this->handleDistance * this->handleScale);
 
 	// get mouse position on screen
-	const float2& mousePos = Input::InputServer::Instance()->GetDefaultMouse()->GetScreenPosition();
+	ImVec2 dockPos = ImGui::GetWindowPos();
+	ImGuiStyle& style = ImGui::GetStyle();
+	dockPos.x += style.WindowPadding.x;
+	dockPos.y += style.WindowPadding.y;
+	ImVec2 mousePos = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
+
+	ImVec2 dockSize = ImGui::GetWindowSize();
 
 	// get mouse ray
 	const float rayLength = 5000.0f;
-	Math::line worldMouseRay = envQueryManager->ComputeMouseWorldRay(mousePos, rayLength, defaultView);
+	Math::line worldMouseRay = BaseGameFeature::EnvManager::Instance()->ComputeMouseWorldRay(mousePos.x, mousePos.y, rayLength, dockSize.x, dockSize.y);
+
 	TransformHandle mode = NONE;
-	if (!this->isInDragMode) mode = this->GetMouseHandle(worldMouseRay);
+	if (!this->leftMouse)
+	{
+		mode = this->GetMouseHandle(worldMouseRay);
+	}
 
 	// get collision Math::point of ray with sphere
 	Math::point collisionPoint = GetSphereIntersectionPoint(worldMouseRay, this->origin, radius);
@@ -228,15 +261,13 @@ RotateTool::Render()
 	Math::vec4 color;
 	const int lineCount = 40;
 	Math::vector help;
-	CoreGraphics::RenderShape::RenderShapeVertex handlePoints[lineCount * 2];
 	Math::vector circleVector;
 	Math::vector planeNormal;
 	index_t i;
 	Math::line intersectionLine;
-	planeNormal = Math::vector(this->viewPlane.a(), this->viewPlane.b(), this->viewPlane.c());
-
+	
 	// compute and draw x handle points    
-	planeNormal = Math::vector(this->xPlane.a(), this->xPlane.b(), this->xPlane.c());
+	planeNormal = this->xPlane.n();
 	PlaneIntersect(this->viewPlane, this->xPlane, intersectionLine);
 	circleVector = intersectionLine.vec();
 	circleVector = Math::vector::normalize(circleVector);
@@ -250,7 +281,7 @@ RotateTool::Render()
 	{
 		color = Math::vec4(.8f, 0, 0, 1);
 	}
-
+	/*
 	for (i = 0; i < (lineCount * 2) - 1; i += 2)
 	{
 		help.set(circleVector.x(), circleVector.y(), circleVector.z());
@@ -264,14 +295,17 @@ RotateTool::Render()
 		handlePoints[i].color = color;
 		handlePoints[i + 1].color = color;
 	}
-
+	*/
 	// draw X axis
+	Debug::DebugRenderer::Instance()->DrawCircle(this->origin, Math::quaternion::rotationyawpitchroll(1.57075f, 0.0f, 1.57075f), circleVector.length(), color, (Debug::RenderMode)(Debug::RenderMode::AlwaysOnTop | Debug::RenderMode::WireFrame), 2.0f);
+	/*
 	Debug::DebugShapeRenderer::Instance()->DrawPrimitives(Math::mat4::identity(),
 		CoreGraphics::PrimitiveTopology::LineList,
 		lineCount,
 		handlePoints,
 		color,
 		CoreGraphics::RenderShape::AlwaysOnTop);
+	*/
 
 	// compute and draw y handle points    
 	PlaneIntersect(this->viewPlane, this->yPlane, intersectionLine);
@@ -288,7 +322,7 @@ RotateTool::Render()
 	{
 		color = Math::vec4(0, .8f, 0, 1);
 	}
-
+	/*
 	for (i = 0; i<(lineCount * 2) - 1; i += 2)
 	{
 		help = circleVector;
@@ -302,7 +336,7 @@ RotateTool::Render()
 		handlePoints[i].color = color;
 		handlePoints[i + 1].color = color;
 	}
-
+	
 	// draw Y axis
 	Debug::DebugShapeRenderer::Instance()->DrawPrimitives(Math::mat4::identity(),
 		CoreGraphics::PrimitiveTopology::LineList,
@@ -310,6 +344,9 @@ RotateTool::Render()
 		handlePoints,
 		color,
 		CoreGraphics::RenderShape::AlwaysOnTop);
+	*/
+
+	Debug::DebugRenderer::Instance()->DrawCircle(this->origin, Math::quaternion::identity(), circleVector.length(), color, (Debug::RenderMode)(Debug::RenderMode::AlwaysOnTop | Debug::RenderMode::WireFrame), 2.0f);
 
 	// compute and draw z handle points    
 	PlaneIntersect(this->viewPlane, this->zPlane, intersectionLine);
@@ -325,7 +362,7 @@ RotateTool::Render()
 	{
 		color = Math::vec4(0, 0, .8f, 1);
 	}
-
+	/*
 	for (i = 0; i<(lineCount * 2) - 1; i += 2)
 	{
 		help = circleVector;
@@ -347,9 +384,12 @@ RotateTool::Render()
 		handlePoints,
 		color,
 		CoreGraphics::RenderShape::AlwaysOnTop);
+	*/
+
+	Debug::DebugRenderer::Instance()->DrawCircle(this->origin, Math::quaternion::rotationyawpitchroll(0.0f, 1.57075f, 0.0f), circleVector.length(), color, (Debug::RenderMode)(Debug::RenderMode::AlwaysOnTop | Debug::RenderMode::WireFrame), 2.0f);
 
 	// draw outer circle
-	Math::vector normal = Math::vector(this->viewPlane.a(), this->viewPlane.b(), this->viewPlane.c());
+	Math::vector normal = this->viewPlane.n();
 	circleVector = FindOrtho(normal);
 	circleVector = Math::vector::normalize(circleVector);
 	circleVector *= this->handleDistance * this->handleScale * this->outerCircleScale;
@@ -363,6 +403,7 @@ RotateTool::Render()
 		color = Math::vec4(.5f, .5f, 1.0f, 1.0f);
 	}
 
+	/*
 	for (i = 0; i<(lineCount * 2) - 1; i += 2)
 	{
 		help = circleVector;
@@ -384,8 +425,11 @@ RotateTool::Render()
 		handlePoints,
 		color,
 		CoreGraphics::RenderShape::AlwaysOnTop);
-
 	*/
+
+	Debug::DebugRenderer::Instance()->DrawCircle(this->origin, Math::mat4::rotationmatrix(Graphics::MainCamera::Instance()->getView()), circleVector.length(), color, (Debug::RenderMode)(Debug::RenderMode::AlwaysOnTop | Debug::RenderMode::WireFrame), 2.0f);
+
+	
 }
 
 // ------------------------------------------------------------------------------
@@ -395,17 +439,20 @@ Computes different variables, that are used for picking and rendering handles.
 void
 RotateTool::UpdateHandlePositions()
 {
-	/*
-	this->DecomposeInitialMatrix();
+	
+	Math::quaternion quat;
+	Math::vector decomposedTranslation;
+	Math::vector decomposedScale;
+	Math::mat4 decomposedRotation;
 
-	Ptr<BaseGameFeature::EnvQueryManager> envQueryManager = BaseGameFeature::EnvQueryManager::Instance();
+	this->initialMatrix.decompose(decomposedScale, quat, decomposedTranslation);
+	decomposedRotation = Math::mat4::rotationquaternion(quat);
 
 	// compute the scale factor
 	Math::vector cameraPosition;
 	float distanceToView;
 
-	n_assert(cameraEntity.isvalid());
-	const Math::mat4 camTrans = cameraEntity->GetMatrix44(Attr::Transform);
+	const Math::mat4 camTrans = Graphics::MainCamera::Instance()->getView();
 	cameraPosition = camTrans.get_position();
 
 	// calculate scale of handles relative to the distance to the camera
@@ -419,19 +466,19 @@ RotateTool::UpdateHandlePositions()
 	this->xAxis = Math::mat4::transform(Math::vector(1, 0, 0), this->deltaMatrix);
 	this->yAxis = Math::mat4::transform(Math::vector(0, 1, 0), this->deltaMatrix);
 	this->zAxis = Math::mat4::transform(Math::vector(0, 0, 1), this->deltaMatrix);
-	this->origin = (this->decomposedTranslation);
+	this->origin = (decomposedTranslation);
 
 	// create orthogonal planes to the feature axis
-	this->xPlane.setup_from_points(this->origin, this->origin + Math::point(this->yAxis), this->origin + Math::point(this->zAxis));
-	this->yPlane.setup_from_points(this->origin, this->origin + Math::point(this->xAxis), this->origin + Math::point(this->zAxis));
-	this->zPlane.setup_from_points(this->origin, this->origin + Math::point(this->xAxis), this->origin + Math::point(this->yAxis));
+	this->xPlane.constructFromPoints(this->origin, this->origin + Math::point(this->yAxis), this->origin + Math::point(this->zAxis));
+	this->yPlane.constructFromPoints(this->origin, this->origin + Math::point(this->xAxis), this->origin + Math::point(this->zAxis));
+	this->zPlane.constructFromPoints(this->origin, this->origin + Math::point(this->xAxis), this->origin + Math::point(this->yAxis));
 
 	// calculate view Math::plane
 	Math::vector forward(0, 0, -1);
 	forward = Math::mat4::transform(forward, camTrans);
-	this->viewPlane.setup_from_point_and_normal(this->origin, forward);
+	this->viewPlane = Math::plane(this->origin, forward);
 	this->viewAxis = this->viewPlane.n();
-	*/
+	
 }
 
 // ------------------------------------------------------------------------------
@@ -443,7 +490,7 @@ Math::vector
 RotateTool::GetSphereIntersectionPoint(const Math::line& ray, const Math::vector& location, float radius)
 {
 	Math::vector collisionPoint;
-	/*
+	
 
 	float distanceRayLoc(ray.distance(location));
 
@@ -470,7 +517,7 @@ RotateTool::GetSphereIntersectionPoint(const Math::line& ray, const Math::vector
 		collisionPoint = (location + (closestPoint - location) * radius);
 	}
 
-	*/
+	
 	return collisionPoint;
 }
 
@@ -490,9 +537,9 @@ RotateTool::RotateVector(Math::vector& i_v, Math::vector& axis, float angle)
 bool
 RotateTool::PlaneIntersect(Math::plane& p1, Math::plane &p2, Math::line& l)
 {
-	/*
-	Math::vector n0(p1.a(), p1.b(), p1.c());
-	Math::vector n1(p2.a(), p2.b(), p2.c());
+	
+	Math::vector n0(p1.n().x(), p1.n().y(), p1.n().z());
+	Math::vector n1(p2.n().x(), p2.n().y(), p2.n().z());
 	float n00 = Math::vector::dot3(n0, n0);
 	float n01 = Math::vector::dot3(n0, n1);
 	float n11 = Math::vector::dot3(n1, n1);
@@ -508,10 +555,10 @@ RotateTool::PlaneIntersect(Math::plane& p1, Math::plane &p2, Math::line& l)
 		float c0 = (n11 * p1.d() - n01 * p2.d())* inv_det;
 		float c1 = (n00 * p2.d() - n01 * p1.d())* inv_det;
 		l.m = Math::vector::cross3(n0, n1);
-		l.b = n0 * c0 + n1 * c1;
+		l.p = n0 * c0 + n1 * c1;
 		return true;
 	}
-	*/
+	
 	//remove!
 	return false;
 }
@@ -521,15 +568,21 @@ RotateTool::PlaneIntersect(Math::plane& p1, Math::plane &p2, Math::line& l)
 */
 void RotateTool::GetAnglesFromMat(const Math::mat4& i_m, float& x, float& y, float& z)
 {
-	/*
+	
 	//extract rotation from matrix
-	quaternion _q = Math::mat4::rotationmatrix(i_m);
+	Math::quaternion _q = Math::mat4::rotationmatrix(i_m);
 	Math::mat4 m = Math::mat4::rotationquaternion(_q);
 
 	z = atan2(m.getrow1().x(), m.getrow0().x());
 	y = atan2(-m.getrow2().x(), sqrt(pow(m.getrow2().y(), 2) + pow(m.getrow2().z(), 2)));
 	x = atan2(m.getrow2().y(), m.getrow2().z());
-	*/
+	
+}
+
+void RotateTool::UpdateTransform(const Math::mat4& transform)
+{
+	this->initialMatrix = transform;
+	this->deltaMatrix = Math::mat4::identity();
 }
 
 }

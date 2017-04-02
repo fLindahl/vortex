@@ -1,6 +1,8 @@
 #pragma once
-#include "tinyxml2.h"
 #include <string>
+
+#include "tinyxml2.h"
+#include "json/src/json.hpp"
 #include "application/properties/particleemitter.h"
 
 #ifndef XMLCheckResult
@@ -8,6 +10,7 @@
 #endif
 
 using namespace tinyxml2;
+using json = nlohmann::json;
 
 /***********************
  * Save and load function for particle system.
@@ -40,6 +43,9 @@ public:
 
 private:
 	ParticleFile();
+
+	void WriteToFile(Util::String filename, json j);
+	json LoadFromFile(Util::String path);
 
 	Util::Array<std::shared_ptr<Property::ParticleEmitter>> emitters;
 };

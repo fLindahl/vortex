@@ -102,7 +102,7 @@ public:
 
 	void DrawParticleSystem();
 
-	void UpdateParticlePosition(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random = false);
+	void UpdateParticlePosition(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, float radius, EmitterShapes shape);
 	void UpdateParticleVelocity(std::shared_ptr<Property::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random = false);
 	void UpdateParticleRotation(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random = false);
 	void UpdateParticleAcceleration(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max = Math::vec4(), bool random = false);

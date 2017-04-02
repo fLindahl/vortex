@@ -8,7 +8,7 @@ namespace Render
 CubeMapNode::CubeMapNode() :
 		isLoaded(false),
 		isActive(false),
-		resolution({ 128, 128 }),
+		resolution({ 512, 512 }),
 		mipLevels(6),
 		shape(SPHERE),
 		innerScale(0.5f,0.5f,0.5f),
@@ -17,13 +17,15 @@ CubeMapNode::CubeMapNode() :
 	glGenTextures(1, &this->cubeSampler);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeSampler);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, mipLevels);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	for (size_t i = 0; i < 6; i++)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, this->resolution.x, this->resolution.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, this->resolution.x, this->resolution.y, 0, GL_RGB, GL_FLOAT, NULL);
 
 	this->isLoaded = true;
+
+	this->proxy = nullptr;
 }
 
 CubeMapNode::~CubeMapNode()
@@ -101,6 +103,10 @@ void CubeMapNode::GenerateCubeMap()
 	this->RenderTexture(temporaryFrameBuffer, CubeFace::BACK, camera);
 	this->RenderTexture(temporaryFrameBuffer, CubeFace::FRONT, camera);
 
+	glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubeSampler);
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
 	//Delete FrameBuffer
 	glDeleteFramebuffers(1, &temporaryFrameBuffer);
 
@@ -123,27 +129,27 @@ void CubeMapNode::RenderTexture(const GLuint& framebuffer, CubeFace face, Graphi
 
 	switch (face)
 	{
-	case Render::CubeMapNode::RIGHT:
+	case Render::CubeMapNode::LEFT:
 		rotx = -1.57075f;
 		roty = 0;
 		break;
-	case Render::CubeMapNode::LEFT:
+	case Render::CubeMapNode::RIGHT:
 		rotx = 1.57075f;
 		roty = 0;
 		break;
 	case Render::CubeMapNode::BOTTOM:
-		rotx = 3.1415f;
-		roty = -1.57075f;
-		break;
-	case Render::CubeMapNode::TOP:
-		rotx = 3.1415f;
+		rotx = 0;
 		roty = 1.57075f;
 		break;
-	case Render::CubeMapNode::FRONT:
+	case Render::CubeMapNode::TOP:
+		rotx = 0;
+		roty = -1.57075f;
+		break;
+	case Render::CubeMapNode::BACK:
 		rotx = 0;
 		roty = 0;
 		break;
-	case Render::CubeMapNode::BACK:
+	case Render::CubeMapNode::FRONT:
 		rotx = 3.1415f;
 		roty = 0;
 		break;

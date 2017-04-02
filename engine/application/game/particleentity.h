@@ -21,6 +21,8 @@ public:
 	void LoadEmitters(Util::String path);
 
 	void SetTransform(const Math::mat4& t);
+
+	void UpdatePosition(const Math::mat4 &t);
 	
 	Util::Array<std::shared_ptr<Property::ParticleEmitter>>& GetEmitters(){ return this->emitters; }
 

@@ -1,0 +1,7 @@
+<Vortex>
+	<Surface material="Static">
+		<!-- Textures -->
+		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/cton.tga"/>		
+		<!-- Specific Parameters -->
+	</Surface>
+</Vortex>

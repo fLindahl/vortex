@@ -17,6 +17,7 @@ namespace Tools
 	class BaseTool;
 	class SelectTool;
 	class TranslateTool;
+	class RotateTool;
 }
 
 namespace Toolkit
@@ -53,6 +54,7 @@ namespace Toolkit
 		
 		Tools::SelectTool* selectTool;
 		Tools::TranslateTool* translateTool;
+		Tools::RotateTool* rotateTool;
 
 		///Texture Handles
 		//Toolbar

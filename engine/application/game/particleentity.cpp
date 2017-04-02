@@ -53,4 +53,13 @@ void ParticleEntity::SetTransform(const Math::mat4 &t)
 {
 	Entity::SetTransform(t);
 }
+
+void ParticleEntity::UpdatePosition(const Math::mat4 &t)
+{
+	SetTransform(t);
+	for (size_t i = 0; i < this->emitters.Size(); i++)
+	{
+		Particles::ParticleSystem::Instance()->UpdateParticlePosition(this->emitters[i], t.get_position(), this->emitters[i]->GetParticleUISettings().radius, this->emitters[i]->GetParticleUISettings().shapes);
+	}
+}
 }

@@ -34,6 +34,10 @@ SET(files_application_game
 	game/particleentity.cpp
 	game/staticentity.cpp 
 	game/physicsentity.cpp
+	game/geometryproxyentity.h
+	game/geometryproxyentity.cpp
+	game/pointlightentity.cpp 
+	game/pointlightentity.h
 	)
 	
 SET(files_application_properties
@@ -56,9 +60,9 @@ SET(files_application
 	${files_application_properties}
 	)
 
-SET(files_pch ../config.h ../config.cc game/pointlightentity.cpp game/pointlightentity.h)
+SET(files_pch ../config.h ../config.cc)
 SOURCE_GROUP("pch" FILES ${files_pch})
 ADD_LIBRARY(application STATIC ${files_application} ${files_pch})
 TARGET_PCH(application ../)	
-ADD_DEPENDENCIES(application glew misc)
-TARGET_LINK_LIBRARIES(application PUBLIC engine foundation exts glew misc)
+ADD_DEPENDENCIES(application render glew misc)
+TARGET_LINK_LIBRARIES(application PUBLIC engine foundation render exts glew misc)

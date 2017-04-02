@@ -1,9 +1,14 @@
 #include "config.h"
+#include <iostream>
+#include <fstream>
+
 #include "particlefile.h"
 #include "render/particlesystem/particlesystem.h"
 
+
 namespace Particles
 {
+
 ParticleFile::ParticleFile()
 {
 }
@@ -32,7 +37,28 @@ bool ParticleFile::SaveParticle(Util::String name)
 		pSystem->InsertEndChild(pEmitter);
 
 		pElement = xmlDoc.NewElement("Texture");
-		pElement->SetAttribute("path", this->emitters[i]->GetTexturePath().c_str());
+
+		Util::Array<Util::String> absPath = Util::String::Tokenize(this->emitters[i]->GetTexturePath(), "/");
+		bool followingVals = false;
+		Util::String path;
+		for (int i = 0; i < absPath.Size(); i++)
+		{
+			if (absPath[i] == "resources")
+			{
+				followingVals = true;
+			}
+			
+			if (followingVals && (i != absPath.Size() - 1))
+			{
+				path += absPath[i] + "/";
+			}
+			else if (followingVals && (i == absPath.Size() - 1))
+			{
+				path += absPath[i];
+			}
+		}
+
+		pElement->SetAttribute("path", path.c_str());
 		pElement->SetAttribute("framesPerRow", set.framesPerRow);
 		pElement->SetAttribute("numberOfFrames", set.numberOfFrames);
 		pElement->SetAttribute("spritesheet", set.spriteSheetTex);
@@ -88,6 +114,8 @@ bool ParticleFile::SaveParticle(Util::String name)
 	XMLError eResult = xmlDoc.SaveFile(saveposition.c_str());
 	this->emitters.Clear();
 	XMLCheckResult(eResult);
+
+	json saveValues;
 
 	return true;
 }
@@ -191,9 +219,24 @@ Util::Array<FileSettings> ParticleFile::LoadParticle(Util::String path)
 
 }
 
-	void ParticleFile::AppendEmitter(std::shared_ptr<Property::ParticleEmitter> emitter)
+void ParticleFile::AppendEmitter(std::shared_ptr<Property::ParticleEmitter> emitter)
 {
 	if (std::find(this->emitters.begin(), this->emitters.end(), emitter) == this->emitters.end())
 		this->emitters.Append(emitter);
 }
+
+
+void ParticleFile::WriteToFile(Util::String filename, json j)
+{
+	std::ofstream fout("resources/particles/" + filename + ".particle");
+	fout << j.dump();
+}
+
+json ParticleFile::LoadFromFile(Util::String path)
+{
+	std::ifstream ifs(path);
+	json j = json::parse(ifs);
+	return j;
+}
+
 }

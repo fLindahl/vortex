@@ -1,5 +1,5 @@
 <Vortex>
-	<Surface material="Static">
+	<Surface material="StaticAlphaCutout">
 		<!-- Textures -->
 		<Param name="AlbedoMap" type="string" value="resources/textures/sponza/sponza_thorn_diff.tga"/>
 		<Param name="NormalMap" type="string" value="resources/textures/sponza/sponza_thorn_ddn.tga"/>

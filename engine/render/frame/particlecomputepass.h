@@ -20,7 +20,7 @@ private:
 	//std::shared_ptr<ShaderObject> computeShader;
 	GLuint particleComputeProgram;
 
-	
+	GLuint query[1];
 
 };
 

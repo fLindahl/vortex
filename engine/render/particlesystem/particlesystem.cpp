@@ -60,11 +60,11 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 
 	// Bind particle buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleStartBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	return buf;
@@ -176,11 +176,11 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 
 	// Bind particle buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleStartBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	return buf;
@@ -249,11 +249,11 @@ void ParticleSystem::GetEmitterBuffer(index_t bufferSize, std::shared_ptr<Proper
 
 	// Bind particle buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleStartBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	
@@ -286,7 +286,7 @@ void ParticleSystem::DrawParticleSystem()
 	glUseProgram(0);
 }
 
-void ParticleSystem::UpdateParticlePosition(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticlePosition(std::shared_ptr<Property::ParticleEmitter> owner, Math::vec4 min, float radius, EmitterShapes shape)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -299,23 +299,31 @@ void ParticleSystem::UpdateParticlePosition(std::shared_ptr<Property::ParticleEm
 		printf("Size is: %i", size / sizeof(ParticleState));
 		printf("Error: %i", glGetError());
 	}
-	
-	if (random)
+	Math::vec4 calcPos(0.0f, 0.0f, 0.0f, 1.0f);
+	for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 	{
-		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
+		if (shape == CONE)
 		{
-			
-			particles[i].pos = Math::vec4(Math::randFloat(min[0], max[0]), Math::randFloat(min[1], max[1]), Math::randFloat(min[2], max[2]), 1.0f);
+			calcPos = min;
 		}
-	}
-	else
-	{
-		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
+		else if (shape == SPHERE)
 		{
-			particles[i].pos = min;
+			Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+			Math::RandomPointInSphere(radius, pos, (float)PI * 2);
+			pos = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - min);
+			calcPos = min + (pos*radius);
 		}
+		else if (shape == HEMISPHERE)
+		{
+			Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+			Math::RandomPointInSphere(radius, pos, (float)PI);
+			pos = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - min);
+			calcPos = min + (pos*radius);
+		}
+		particles[i].pos = calcPos;
 	}
-	owner->GetState().pos = min;
+
+	owner->GetState().pos = calcPos;
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 

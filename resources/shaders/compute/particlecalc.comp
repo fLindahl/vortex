@@ -54,13 +54,11 @@ void main()
 		float lerp = pSettings.settings[gid].accLife.w / startSettings.settings[gid].accLife.w;
 		
 		vec4 clipPos = ViewProjection*p;
-		
-		//clipPos /= clipPos.w;
+
 		vec2 coord = ((clipPos.xy / clipPos.w) + 1) / 2;
 		if(coord.x >= 0.0 && coord.x <= 1.0 && coord.y <= 1.0 && coord.y >= 0.0)
 		{		
 			float depth = -texelFetch(depthMap,ivec2(coord*ScreenSize),0).r;
-			//vec4 depthWorldPos = vec4(clipPos.xy, depth, 1.0)*InvViewProjection;//WorldPosFromDepth(coord,depth);
 			
 			vec3 partPosInView = (View*p).xyz;
 			

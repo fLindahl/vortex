@@ -12,6 +12,7 @@ class ReflectionPass : public FramePass
 public:
 	enum ReflectionQuality
 	{
+		ULTRA,
 		HIGH,
 		MEDIUM,
 		LOW
@@ -27,7 +28,7 @@ public:
 		GLuint workGroups[2];	
 		GLfloat padding; //TODO: padding might not be needed here
 	};
-
+	
 	ReflectionPass();
 	~ReflectionPass();
 
@@ -39,11 +40,25 @@ public:
 
 	GLuint GetReflectionBuffer() { return this->reflectionBuffer; }
 
+	GLuint GetFrameBuffer() { return this->frameBufferObject; }
+
 	SSRSettings& GetSSRSettings() { return this->uniformBlock; }
 
 	ReflectionQuality& GetReflectionQuality() { return this->quality; }
 
 private:
+	GLuint numCubemaps;
+	struct CubemapData
+	{		
+		Math::mat4 geometryproxy;
+		Math::point cubemapposition;
+		GLfloat blendfactor;
+	};
+
+	GLuint frameBufferObject;
+
+	Util::Array<CubemapData> cubemapData;
+
 	ReflectionQuality quality;
 
 	SSRSettings uniformBlock;
@@ -51,10 +66,18 @@ private:
 	//Uniform Buffer Object
 	GLuint ubo[1];
 
+	GLuint cubemapUBO[1];
+
+	GLuint SSSRraycastpass;
+	GLuint SSSRresolvepass;
+	GLuint raycastBuffer;
+
 	GLuint SSRComputeProgram;
 	GLuint CubemapProgram;
 	GLuint PCCubemapProgram;
 	GLuint reflectionBuffer;
+
+	GLuint queries[1];
 };
 
 }

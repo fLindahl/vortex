@@ -49,6 +49,8 @@ private:
 
 	bool shutdown = false;
 
+	bool renderGeoProxies;
+
 	void CameraMovement();
 	
 	void DoPicking();
@@ -92,13 +94,17 @@ private:
 	std::shared_ptr<Game::ParticleEntity> billboard;
 	std::shared_ptr<Game::ParticleEntity> billboard2;
 	std::shared_ptr<Game::ParticleEntity> billboard3;
+	std::shared_ptr<Game::ParticleEntity> wisp;
+	std::shared_ptr<Game::PointLightEntity> wispLight;
+	std::shared_ptr<Game::PointLightEntity> fireLight;
+	std::shared_ptr<Game::PointLightEntity> sparkLight;
 
-	std::shared_ptr<Game::StaticEntity> wall1;
-	std::shared_ptr<Game::StaticEntity> wall2;
-	std::shared_ptr<Game::StaticEntity> wall3;
-	std::shared_ptr<Game::StaticEntity> wall4;
-	std::shared_ptr<Game::StaticEntity> floor;
-	std::shared_ptr<Game::StaticEntity> ceiling;
+	std::shared_ptr<Game::ModelEntity> wall1;
+	std::shared_ptr<Game::ModelEntity> wall2;
+	std::shared_ptr<Game::ModelEntity> wall3;
+	std::shared_ptr<Game::ModelEntity> wall4;
+	std::shared_ptr<Game::ModelEntity> floor;
+	std::shared_ptr<Game::ModelEntity> ceiling;
 	
 	Util::Array<std::shared_ptr<Property::ParticleEmitter>> particleList;
 
