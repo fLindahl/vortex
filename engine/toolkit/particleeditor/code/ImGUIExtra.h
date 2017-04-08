@@ -2,7 +2,7 @@
 
 namespace ImGui
 {
-	
+
 static inline void SetupImGuiStyle(bool bStyleDark_, float alpha_)
 {
 	ImGuiStyle& style = ImGui::GetStyle();

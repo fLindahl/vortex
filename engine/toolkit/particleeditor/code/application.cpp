@@ -7,6 +7,7 @@
 #include <cstring>
 #include "imgui.h"
 #include "IO/console.h"
+#include "ImGUIExtra.h"
 
 using namespace Display;
 
@@ -52,7 +53,7 @@ Application::Open()
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Particle Editor");
 
-		SetupImGuiStyle(true, 1.0f);
+		ImGui::SetupImGuiStyle(true, 1.0f);
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
