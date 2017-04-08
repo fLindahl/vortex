@@ -14,10 +14,14 @@ ShaderServer::ShaderServer()
 
 }
 
-std::string ShaderServer::ReadFromFile(const std::string &filename)
+//----------------------------------
+/**
+	Reads a shaderfile and returns it's content as a string.
+*/
+Util::String ShaderServer::ReadFromFile(const Util::String &filename)
 {
-	std::string content;
-	std::ifstream fileStream(filename, std::ios::in);
+	Util::String content;
+	std::ifstream fileStream(filename.AsCharPtr(), std::ios::in);
 
 	if (!fileStream.is_open())
 	{
@@ -25,19 +29,23 @@ std::string ShaderServer::ReadFromFile(const std::string &filename)
 		return "";
 	}
 
+	//TODO: We shouldn't need to use std::string here.
 	std::string line = "";
 	while (!fileStream.eof())
 	{
 		std::getline(fileStream, line);
-		content.append(line + "\n");
+		content.Append(line.c_str() + Util::String("\n"));
 	}
 
-	content.append("\0");
+	content.Append("\0");
 	fileStream.close();
 	return content;
 }
 
-Ptr<ShaderObject> ShaderServer::LoadShader(const std::string& shader)
+//--------------------------------------------
+/**
+*/
+Ptr<ShaderObject> ShaderServer::LoadShader(const Util::String& shader)
 {
 	if (this->HasShaderNamed(shader))
 	{
@@ -51,10 +59,15 @@ Ptr<ShaderObject> ShaderServer::LoadShader(const std::string& shader)
 	}
 }
 
-bool ShaderServer::SetupShaders(const std::string& file)
+//-------------------------------------
+/**
+	Sets up shaders based on a shader object declaration file.
+	NOTE: This should only be done once per file, and this is fairly slow to do so it's better to do this before running the actual application
+*/
+bool ShaderServer::SetupShaders(const Util::String& file)
 {
 	tinyxml2::XMLDocument data;
-	int result = data.LoadFile(file.c_str());
+	int result = data.LoadFile(file.AsCharPtr());
 	
 	if (result != 0)
 	{
@@ -69,6 +82,9 @@ bool ShaderServer::SetupShaders(const std::string& file)
 
 	tinyxml2::XMLElement* shaders = data.RootElement()->FirstChildElement();
 	tinyxml2::XMLElement* shader = shaders->FirstChildElement();
+
+	//Faster insertion
+	this->shaderObjects.BeginBulkAdd();
 
 	while (shader != nullptr)
 	{
@@ -118,21 +134,28 @@ bool ShaderServer::SetupShaders(const std::string& file)
 
 			shd->LinkShaders();
 
-			this->shaderObjects.insert(std::make_pair(nameAttr->Value(), shd));
+			this->shaderObjects.Add(nameAttr->Value(), shd);
 		}
 
 		shader = shader->NextSiblingElement();		
 	}
 
+	this->shaderObjects.EndBulkAdd();
+
 	return true;
 }
 
-RenderState ShaderServer::LoadRenderState(const std::string& file)
+//---------------------------------------------
+/**
+	Loads a renderstate file and adds it to the gobal renderstate list.
+	TODO: This really needs some serious cleanup...
+*/
+RenderState ShaderServer::LoadRenderState(const Util::String& file)
 {
 	//Make sure we've not already loaded this render state
 	if (!this->HasRenderStateLoaded(file))
 	{
-		if (file.substr(file.find_last_of(".")) != ".state")
+		if (!file.CheckFileExtension("state"))
 		{
 			printf("[SHADER LOAD ERROR]: File is not a .state file!");
 			assert(false);
@@ -141,7 +164,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 
 		RenderState state;
 
-		std::ifstream fin(file);
+		std::ifstream fin(file.AsCharPtr());
 		std::string line;
 		std::istringstream sin;
 		
@@ -320,7 +343,7 @@ RenderState ShaderServer::LoadRenderState(const std::string& file)
 			sin.clear();
 		}
 
-		this->renderStates.insert(std::make_pair<>(file, state));
+		this->renderStates.Add(file, state);
 		return state;
 	}
 	else
