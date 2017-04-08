@@ -26,6 +26,7 @@ public:
 	bool Open();
 	/// run app
 	void Run();
+
 private:	
 	bool shutdown;
 
