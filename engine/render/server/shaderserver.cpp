@@ -25,7 +25,7 @@ Util::String ShaderServer::ReadFromFile(const Util::String &filename)
 
 	if (!fileStream.is_open())
 	{
-		printf("[SHADER LOAD ERROR]: Could not load file from directory.");
+		_error("[SHADER LOAD ERROR]: Could not load file from directory.");
 		return "";
 	}
 
@@ -53,8 +53,8 @@ Ptr<ShaderObject> ShaderServer::LoadShader(const Util::String& shader)
 	}
 	else
 	{
-		printf("[SHADER LOAD ERROR]: Could not retrieve shader!");
-		assert(false);
+		_error("[SHADER LOAD ERROR]: Could not retrieve shader!");
+		_assert(false);
 		return nullptr;
 	}
 }
@@ -71,10 +71,10 @@ bool ShaderServer::SetupShaders(const Util::String& file)
 	
 	if (result != 0)
 	{
-		printf("ERROR: Could not load shaders file!");
+		_error("Could not load shaders file!");
 
 #ifdef DEBUG
-		assert(false);
+		_assert(false);
 #endif // DEBUG		
 
 		return false;
@@ -95,7 +95,7 @@ bool ShaderServer::SetupShaders(const Util::String& file)
 
 		if (this->HasShaderNamed(nameAttr->Value()))
 		{
-			printf("WARNING: Duplicate shader loaded: \" %s \". Using previously loaded shader...", nameAttr->Value());
+			_warning("Duplicate shader loaded: \" %s \". Using previously loaded shader...", nameAttr->Value());
 		}
 		else // Load shader!
 		{
@@ -157,8 +157,8 @@ RenderState ShaderServer::LoadRenderState(const Util::String& file)
 	{
 		if (!file.CheckFileExtension("state"))
 		{
-			printf("[SHADER LOAD ERROR]: File is not a .state file!");
-			assert(false);
+			_error("[SHADER LOAD ERROR]: File is not a .state file!");
+			_assert(false);
 			return RenderState();
 		}
 
@@ -353,27 +353,24 @@ RenderState ShaderServer::LoadRenderState(const Util::String& file)
 	}
 }
 
-bool ShaderServer::HasRenderStateLoaded(const std::string& nName)
+bool ShaderServer::HasRenderStateLoaded(const Util::String& nName)
 {
-	if (this->renderStates.count(nName) > 0)
-		return true;
-	else
-		return false;
+	return this->renderStates.Contains(nName);
 }
 
-GLuint ShaderServer::LoadVertexShader(const std::string& file)
+GLuint ShaderServer::LoadVertexShader(const Util::String& file)
 {
 	//Make sure we've not already loaded this shader
 	if (!this->HasShaderProgramLoaded(file))
 	{
-		if (file.substr(file.find_last_of(".")) != ".vert")
+		if (!file.CheckFileExtension("vert"))
 		{
-			printf("[SHADER LOAD ERROR]: File is not a .vert file!");
+			_error("[SHADER LOAD ERROR]: File is not a .vert file!");
 			return false;
 		}
 
-		std::string content = ReadFromFile(file);
-		if (content.empty())
+		Util::String content = ReadFromFile(file);
+		if (content.IsEmpty())
 		{
 			return false;
 		}
@@ -382,11 +379,11 @@ GLuint ShaderServer::LoadVertexShader(const std::string& file)
 		content = VertexShaderHeader + content;
 		content = ShaderHeader + content;
 
-		const char* vs = content.c_str();
+		const char* vs = content.AsCharPtr();
 
 		// setup vertex shader
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		GLint length = (GLint)content.length();
+		GLint length = (GLint)content.Length();
 		glShaderSource(vertexShader, 1, &vs, &length);
 		glCompileShader(vertexShader);
 
@@ -397,17 +394,16 @@ GLuint ShaderServer::LoadVertexShader(const std::string& file)
 		{
 			char* buf = new char[shaderLogSize];
 			glGetShaderInfoLog(vertexShader, shaderLogSize, NULL, buf);
-			printf("[VERTEX SHADER COMPILE ERROR]: %s", buf);
+			_error("[VERTEX SHADER COMPILE ERROR]: %s", buf);
 			delete[] buf;
 
 		#ifdef _DEBUG
-			assert(false);
+			_assert(false);
 		#endif
 		}
 
 		//Insert to our shader list
-		std::pair<std::string, GLuint> par(file, vertexShader);
-		this->shaders.insert(par);
+		this->shaders.Add(file, vertexShader);
 
 		return vertexShader;
 
@@ -415,23 +411,23 @@ GLuint ShaderServer::LoadVertexShader(const std::string& file)
 	else
 	{
 		//Shader is already loaded so we can just return it.
-		return this->shaders.find(file)->second;
+		return this->shaders[file];
 	}
 }
 
-GLuint ShaderServer::LoadFragmentShader(const std::string& file)
+GLuint ShaderServer::LoadFragmentShader(const Util::String& file)
 {
 	//Make sure we've not already loaded this shader
 	if (!this->HasShaderProgramLoaded(file))
 	{
-		if (file.substr(file.find_last_of(".")) != ".frag")
+		if (!file.CheckFileExtension("frag"))
 		{
-			printf("[SHADER LOAD ERROR]: File is not a .frag file!");
+			_error("[SHADER LOAD ERROR]: File is not a .frag file!");
 			return false;
 		}
 
-		std::string content = ReadFromFile(file);
-		if (content.empty())
+		Util::String content = ReadFromFile(file);
+		if (content.IsEmpty())
 		{
 			return false;
 		}
@@ -440,11 +436,11 @@ GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 		content = FragmentShaderHeader + content;
 		content = ShaderHeader + content;
 
-		const char* fs = content.c_str();
+		const char* fs = content.AsCharPtr();
 	
 		// setup fragment shader
 		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		GLint length = (GLint)content.length();
+		GLint length = (GLint)content.Length();
 		glShaderSource(fragmentShader, 1, &fs, &length);
 		glCompileShader(fragmentShader);
 
@@ -455,40 +451,39 @@ GLuint ShaderServer::LoadFragmentShader(const std::string& file)
 		{
 			char* buf = new char[shaderLogSize];
 			glGetShaderInfoLog(fragmentShader, shaderLogSize, NULL, buf);
-			printf("[FRAGMENT SHADER COMPILE ERROR]: %s", buf);
+			_error("[FRAGMENT SHADER COMPILE ERROR]: %s", buf);
 			delete[] buf;
 
 		#ifdef _DEBUG
-			assert(false);
+			_assert(false);
 		#endif
 		}
 
 		//Insert to our shader list
-		std::pair<std::string, GLuint> par(file, fragmentShader);
-		this->shaders.insert(par);
+		this->shaders.Add(file, fragmentShader);
 
 		return fragmentShader;
 	}
 	else
 	{
 		//Shader is already loaded so we can just return it.
-		return this->shaders.find(file)->second;
+		return this->shaders[file];
 	}
 }
 
-GLuint ShaderServer::LoadComputeShader(const std::string& file)
+GLuint ShaderServer::LoadComputeShader(const Util::String& file)
 {
 	//Make sure we've not already loaded this shader
 	if (!this->HasShaderProgramLoaded(file))
 	{
-		if (file.substr(file.find_last_of(".")) != ".comp")
+		if (!file.CheckFileExtension("comp"))
 		{
-			printf("[COMPUTE SHADER LOAD ERROR]: File is not a .comp file!");
+			_error("[COMPUTE SHADER LOAD ERROR]: File is not a .comp file!");
 			return false;
 		}
 
-		std::string content = ReadFromFile(file);
-		if (content.empty())
+		Util::String content = ReadFromFile(file);
+		if (content.IsEmpty())
 		{
 			return false;
 		}
@@ -496,11 +491,11 @@ GLuint ShaderServer::LoadComputeShader(const std::string& file)
 		// Attach header
 		content = ShaderHeader + content;
 
-		const char* fs = content.c_str();
+		const char* fs = content.AsCharPtr();
 
 		// setup compute shader
 		GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
-		GLint length = (GLint)content.length();
+		GLint length = (GLint)content.Length();
 		glShaderSource(computeShader, 1, &fs, &length);
 		glCompileShader(computeShader);
 
@@ -511,103 +506,95 @@ GLuint ShaderServer::LoadComputeShader(const std::string& file)
 		{
 			char* buf = new char[shaderLogSize];
 			glGetShaderInfoLog(computeShader, shaderLogSize, NULL, buf);
-			printf("[COMPUTE SHADER COMPILE ERROR]: %s", buf);
+			_error("[COMPUTE SHADER COMPILE ERROR]: %s", buf);
 			delete[] buf;
 
 #ifdef _DEBUG
-			assert(false);
+			_assert(false);
 #endif
 		}
 
 		//Insert to our shader list
-		std::pair<std::string, GLuint> par(file, computeShader);
-		this->shaders.insert(par);
+		this->shaders.Add(file, computeShader);
 
 		return computeShader;
 	}
 	else
 	{
 		//Shader is already loaded so we can just return it.
-		return this->shaders.find(file)->second;
+		return this->shaders[file];
 	}
 }
 
-bool ShaderServer::HasShaderProgramLoaded(const std::string& file)
+bool ShaderServer::HasShaderProgramLoaded(const Util::String& file)
 {
-	if (this->shaders.count(file) > 0)
-		return true;
-	else
-		return false;
+	return this->shaders.Contains(file);
 }
 
-bool ShaderServer::HasShaderNamed(const std::string& nName)
+bool ShaderServer::HasShaderNamed(const Util::String& nName)
 {
-	if (this->shaderObjects.count(nName) > 0)
-		return true;
-	else
-		return false;
+	return this->shaderObjects.Contains(nName);
 }
 
 void ShaderServer::ReloadShaders()
 {
-	printf("\n");
-	printf("======================================\n");
-	printf("ShaderServer::ReloadShaders()\n");
-	printf("\n");
+	_printf("======================================");
+	_printf("ShaderServer::ReloadShaders()");
 
 	//First Update all the individual shaders
-	for (auto shader : this->shaders)
+	for (int i = 0; i < this->shaders.Size(); ++i)
 	{
-		std::string fileName = shader.first;
+		auto shader = this->shaders.KeyValuePairAtIndex(i);
 
-		std::string content = ReadFromFile(fileName);
+		Util::String fileName = shader.Key();
 
-		std::string extension = fileName.substr(fileName.find_last_of("."));
+		Util::String content = ReadFromFile(fileName);
+
+		Util::String extension = fileName.GetFileExtension();
 
 		// Attach header
-		if (extension == ".comp")
+		if (extension == "comp")
 		{
-			printf("[COMPUTE SHADER RELOAD]: %s\n", fileName.c_str());
+			_printf("[COMPUTE SHADER RELOAD]: %s", fileName.AsCharPtr());
 		}
-		else if (extension == ".vert")
+		else if (extension == "vert")
 		{
-			printf("[VERTEX SHADER RELOAD]: %s\n", fileName.c_str());
+			_printf("[VERTEX SHADER RELOAD]: %s", fileName.AsCharPtr());
 			content = VertexShaderHeader + content;
 		}
-		else if (extension == ".frag")
+		else if (extension == "frag")
 		{
-			printf("[FRAGMENT SHADER RELOAD]: %s\n", fileName.c_str());
+			_printf("[FRAGMENT SHADER RELOAD]: %s", fileName.AsCharPtr());
 			content = FragmentShaderHeader + content;
 		}
 
 		content = ShaderHeader + content;
 
-		const char* cstr = content.c_str();
-		GLint length = (GLint)content.length();
-		glShaderSource(shader.second, 1, &cstr, &length);
-		glCompileShader(shader.second);
+		const char* cstr = content.AsCharPtr();
+		GLint length = (GLint)content.Length();
+		glShaderSource(shader.Value(), 1, &cstr, &length);
+		glCompileShader(shader.Value());
 
 		// get error log
 		GLint shaderLogSize;
-		glGetShaderiv(shader.second, GL_INFO_LOG_LENGTH, &shaderLogSize);
+		glGetShaderiv(shader.Value(), GL_INFO_LOG_LENGTH, &shaderLogSize);
 		if (shaderLogSize > 0)
 		{
 			char* buf = new char[shaderLogSize];
-			glGetShaderInfoLog(shader.second, shaderLogSize, NULL, buf);
-			printf("[COMPILE ERROR]: %s\n\n\n", buf);
+			glGetShaderInfoLog(shader.Value(), shaderLogSize, NULL, buf);
+			_error("[COMPILE ERROR]: %s", buf);
 			delete[] buf;
 		}
 	}
 
-	printf("\n");
-
-	for (auto pair : this->shaderObjects)
+	for (int i = 0; i < this->shaderObjects.Size(); ++i)
 	{
-		auto object = pair.second;
+		auto pair = this->shaderObjects.KeyValuePairAtIndex(i);
 
-		printf("[SHADER OBJECT LINKER]: %s\n", pair.first.c_str());
-		object->LinkShaders();
+		_printf("[SHADER OBJECT LINKER]: %s", pair.Key().AsCharPtr());
+		pair.Value()->LinkShaders();
 	}
+	
 
 
 }

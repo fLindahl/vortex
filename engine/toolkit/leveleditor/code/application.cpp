@@ -72,6 +72,10 @@ Application::Open()
 	{
 		keyhandler = BaseGameFeature::KeyHandler::Instance();
 		keyhandler->Init(this->window);
+
+		//Init RenderDevice
+		Render::RenderDevice::Instance()->Initialize();
+
 		//Setup UI
 		this->UI = new UserInterface(this);
 		
@@ -260,9 +264,6 @@ Application::Run()
 		{
 			BaseGameFeature::EnvManager::Instance()->RenderGeometryProxies();
 		}
-
-		for (int i = 0; i < 20; i++)
-			_printf("SPAM SPAM SPAM SPAM");
 
 		RenderDevice::Instance()->Render(false);
 

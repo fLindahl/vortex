@@ -52,7 +52,10 @@ ExampleApp::Open()
 	{
 		keyhandler = BaseGameFeature::KeyHandler::Instance();
 		keyhandler->Init(this->window);
-	
+		
+		//Init RenderDevice
+		Render::RenderDevice::Instance()->Initialize();
+
 		//Never set resolution before initializing rendering and framepasses
 		this->window->SetSize(1600, 900);
 		this->window->SetTitle("Vortex Engine Test Environment");

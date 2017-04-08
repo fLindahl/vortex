@@ -41,9 +41,6 @@ App::Open()
 	_assert(!this->isOpen);
 	this->isOpen = true;
 
-	//Init RenderDevice
-	Render::RenderDevice::Instance()->Initialize();
-
 	return true;
 }
 

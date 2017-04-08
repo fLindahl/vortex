@@ -59,6 +59,9 @@ Application::Open()
 		keyhandler = BaseGameFeature::KeyHandler::Instance();
 		keyhandler->Init(this->window);
 
+		//Init RenderDevice
+		Render::RenderDevice::Instance()->Initialize();
+
 		//Setup UI
 		this->UI = new UserInterface(this);
 
