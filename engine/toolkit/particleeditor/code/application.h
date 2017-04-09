@@ -11,6 +11,7 @@
 #include "imgui_dock.h"
 #include "undo.h"
 #include "commands.h"
+#include "userinterface.h"
 
 namespace ParticleEditor
 {
@@ -27,8 +28,14 @@ public:
 	/// run app
 	void Run();
 
+	void Shutdown(bool val){ shutdown = val; };
+
+	Display::Window* GetWindow(){ return window; };
+
 private:	
 	bool shutdown;
+
+	std::shared_ptr<UserInterface> UI;
 
 	/// ImGui functions
 	void RenderUI();

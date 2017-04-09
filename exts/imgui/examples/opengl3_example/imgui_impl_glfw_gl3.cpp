@@ -10,7 +10,7 @@
 #include "imgui_impl_glfw_gl3.h"
 
 // GL3W/GLFW
-#include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
+#include <GL/glew.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
 #undef APIENTRY
@@ -325,6 +325,12 @@ bool    ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks)
     io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
     io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
     io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+	io.KeyMap[ImGuiKey_Q] = GLFW_KEY_Q;
+	io.KeyMap[ImGuiKey_W] = GLFW_KEY_W;
+	io.KeyMap[ImGuiKey_E] = GLFW_KEY_E;
+	io.KeyMap[ImGuiKey_R] = GLFW_KEY_R;
+	io.KeyMap[ImGuiKey_S] = GLFW_KEY_S;
+	io.KeyMap[ImGuiKey_D] = GLFW_KEY_D;
 
     io.RenderDrawListsFn = ImGui_ImplGlfwGL3_RenderDrawLists;       // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
     io.SetClipboardTextFn = ImGui_ImplGlfwGL3_SetClipboardText;

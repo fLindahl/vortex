@@ -43,12 +43,16 @@ Application::Open()
 	IO::Console::Instance()->Show();
 	IO::Console::Instance()->OpenNativeConsole();
 
+	
+
 	//Always call app::open _AFTER_ initializing a glfwwindow
 	if (this->window->Open() && App::Open())
 	{
 		keyhandler = BaseGameFeature::KeyHandler::Instance();
 		keyhandler->Init(this->window);
 		
+		UI = std::make_shared<UserInterface>(std::shared_ptr<ParticleEditor::Application>(this));
+
 		//Never set resolution before initializing rendering and framepasses
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Particle Editor");
@@ -79,6 +83,7 @@ void Application::RenderUI()
 		IO::Console::Instance()->Update();
 
 		//Imgui code goes here!
+		UI->Run();
 	}
 }
 

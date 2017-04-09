@@ -34,7 +34,7 @@ bool ParticleFile::SaveParticle(Util::String name)
 		pElement = xmlDoc.NewElement("Velocity");
 		pElement->SetAttribute("vel", set.vel);
 		pElement->SetAttribute("vel2", set.vel2);
-		pElement->SetAttribute("random", set.vecRand);
+		pElement->SetAttribute("random", set.velRand);
 		pEmitter->InsertEndChild(pElement);
 	
 		pElement = xmlDoc.NewElement("Acceleration");

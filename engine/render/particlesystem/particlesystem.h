@@ -49,15 +49,21 @@ struct ParticleUISettings
 
 	float radius = 1.0f;
 
-	bool vecRand = false;
+	bool velRand = false;
 	bool accRand = false;
 	bool colorRand = false;
 	bool lifeTimeRand = false;
+	bool spriteSheetTex = false;
 
 	float startSize = 0.05f;
 	float endSize = 0.05f;
 
+	int framesPerRow = 1;
+	int numberOfFrames = 1;
+
 	EmitterShapes shapes = CONE;
+
+	std::string texName = "";
 
 };
 
