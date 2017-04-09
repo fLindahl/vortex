@@ -1,13 +1,19 @@
 #include "UserInterface.h"
 #include "application.h"
 #include "IO/console.h"
+#include "nfd.h"
 #include "render/server/resourceserver.h"
 #include "imgui_internal.h"
+#include "toolkit/contentbrowser/code/application.h"
 
 UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 {
 	this->application = app;
 	this->commandManager = Edit::CommandManager::Instance();
+
+	activeEmitter = 0;
+	openPopup = false;
+	texturePopup = false;
 
 	newEmittIcon = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/particleeditor/resources/textures/add.png");
 
@@ -15,13 +21,14 @@ UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 	gridTexture = Render::ResourceServer::Instance()->LoadTexture("resources/textures/whiteBackground.tga");
 
 	ParticleEditor::EmittersUI em = ParticleEditor::EmittersUI(std::shared_ptr<UserInterface>(this), emUI.Size());
+	em.ev.active = true;
 	emUI.Append(em);
 
 	for (int i = 0; i < 4; i++)
 	{
-		col[i] = 1.f;
+		edSet.col[i] = 1.f;
 	}
-	col[3] = 0.1f;
+	edSet.col[3] = 0.f;
 	
 	ImGui::LoadDock("engine/toolkit/particleeditor/layout/default.layout");
 }
@@ -66,9 +73,7 @@ void UserInterface::Run()
 
 		ImGui::EndMainMenuBar();
 	}
-
-	//DrawGeneralSettings();
-
+	ModalWindows();
 }
 
 
@@ -92,7 +97,7 @@ void UserInterface::ShowFileMenu()
 	if (ImGui::MenuItem("New")) {}
 	if (ImGui::MenuItem("Open", "Ctrl+O"))
 	{
-
+		openPopup = true;
 	}
 	if (ImGui::MenuItem("Save", "Ctrl+S")) {}
 	if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S")) {}
@@ -129,48 +134,32 @@ void UserInterface::DrawDocks()
 {
 	ImGui::RootDock(ImVec2(0.0f, 16.0f), ImVec2((float)application->GetWindow()->GetWidth(), (float)application->GetWindow()->GetHeight() - 16.0f));
 	{
-		ImGui::BeginDock("General Settings", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		ImGui::BeginDock("General Settings", NULL, ImGuiWindowFlags_NoSavedSettings);
 		{
-			
+			DrawGeneralSettings();
 		}
 		ImGui::EndDock();
-		ImGui::BeginDock("Emitters", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		ImGui::BeginDock("Emitters", NULL, ImGuiWindowFlags_NoSavedSettings);
 		{
-			
-			for (int i = 0; i < emUI.Size(); i++)
-			{
-				emUI[i].DrawEmitter();
-			}
-
-			ImGui::Separator();
-			ImGui::BeginChild("##c");
-			{
-				ImGui::SameLine(ImGui::GetWindowWidth() - 30);
-				if (ImGui::ImageButton((void*)newEmittIcon->GetHandle(), ImVec2(20, 20)))
-				{
-					AddNewEmitter();
-				}		
-			}
-			ImGui::EndChild();
-			
+			DrawEmitters();
 		}
 		ImGui::EndDock();
-		ImGui::BeginDock("Render", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		ImGui::BeginDock("Render", NULL, ImGuiWindowFlags_NoSavedSettings);
 		{
-
+			DrawRender();
 		}
 		ImGui::EndDock();
-		ImGui::BeginDock("Emitter Settings", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		ImGui::BeginDock("Emitter Settings", NULL, ImGuiWindowFlags_NoSavedSettings);
 		{
-
+			DrawEmitterSettings();
 		}
 		ImGui::EndDock();
-		ImGui::BeginDock("Texture", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		ImGui::BeginDock("Texture", NULL, ImGuiWindowFlags_NoSavedSettings);
 		{
 			ImGui::SameLine(10);
 			ImGui::Image((void*)gridTexture->GetHandle(), 
 				ImVec2(ImGui::GetWindowContentRegionWidth()-5, ImGui::GetWindowContentRegionWidth() - 10),
-				ImVec2(0, 0), ImVec2(1, 1), ImVec4(col[0], col[1], col[2], col[3]));
+				ImVec2(0, 0), ImVec2(1, 1), ImVec4(edSet.col[0], edSet.col[1], edSet.col[2], edSet.col[3]));
 			ImGui::SameLine(10);
 			ImGui::Image((void*)emitterTexture->GetHandle(), 
 				ImVec2(ImGui::GetWindowContentRegionWidth() - 10, ImGui::GetWindowContentRegionWidth() - 10));
@@ -178,7 +167,7 @@ void UserInterface::DrawDocks()
 			if(ImGui::TreeNode("Texture Preview"))
 			{
 				ImGui::Text("Background Color:");
-				ImGui::ColorEdit4("##backgroundCol", col);
+				ImGui::ColorEdit4("##backgroundCol", edSet.col);
 
 				ImGui::TreePop();
 			}
@@ -188,6 +177,48 @@ void UserInterface::DrawDocks()
 		ImGui::EndDock();
 	}
 
+}
+
+void UserInterface::ModalWindows()
+{
+	if (this->openPopup){ ImGui::OpenPopup("OpenFile"); }
+	
+	if (ImGui::BeginPopupModal("OpenFile", &this->openPopup))
+	{
+		nfdchar_t* outpath;
+		nfdresult_t result = NFD_OpenDialog("particle", NULL, &outpath);
+
+		if (result == NFD_OKAY)
+		{
+			printf("path: %s\n", outpath);
+			//if (this->application->loadedModel != nullptr)
+			//{
+			//	this->application->loadedModel->Deactivate();
+			//}
+			//this->selectedNode = nullptr;
+
+			//this->application->loadedModel = Game::ModelEntity::Create();
+			//this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
+			//this->application->loadedModel->SetTransform(Math::mat4::scaling(0.01f, 0.01f, 0.01f));
+			//this->application->loadedModel->Activate();
+
+			this->openPopup = false;
+			free(outpath);
+		}
+		else if (result == NFD_CANCEL)
+		{
+			this->openPopup = false;
+		}
+		else
+		{
+			printf("Error: %s\n", NFD_GetError());
+			assert(false);
+			this->openPopup = false;
+		}
+
+		ImGui::EndPopup();
+	}
+	
 }
 
 void UserInterface::DrawTextureSettings()
@@ -223,14 +254,89 @@ void UserInterface::DrawTextureSettings()
 
 void UserInterface::DrawGeneralSettings()
 {
-	if (ImGui::CollapsingHeader("General Settings", ImGuiTreeNodeFlags_DefaultOpen))
+	ImGui::BeginChild("##GenSet", ImVec2(ImGui::GetWindowWidth() - 20, ImGui::GetWindowHeight()-40), true);
 	{
-		
+		ImGui::Text("Time Scale:");
+		ImGui::SameLine();
+		ImGui::DragFloat("##TimeScale", &edSet.timeScale, 0.01f, 0.01f, 10.f);
 	}
-	if (ImGui::CollapsingHeader("Emitters", ImGuiTreeNodeFlags_DefaultOpen))
+	ImGui::EndChild();
+}
+
+void UserInterface::DrawEmitters()
+{
+	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (emUI.Size() <= 8 ? emUI.Size() : 8)), false);
 	{
+		for (int i = 0; i < emUI.Size(); i++)
+		{
+			emUI[i].DrawEmitter();
+		}
+	}
+	ImGui::EndChild();
+	ImGui::Separator();
+	ImGui::BeginChild("##cem", ImVec2(ImGui::GetWindowWidth() - 20, 40));
+	{
+		ImGui::SameLine(ImGui::GetWindowWidth() - 30);
+		if (ImGui::ImageButton((void*)newEmittIcon->GetHandle(), ImVec2(20, 20)))
+		{
+			AddNewEmitter();
+		}
+	}
+	ImGui::EndChild();
+}
+
+void UserInterface::DrawRender()
+{
+	ImGui::SameLine(15);
+	ImGui::BeginChild("##render", ImVec2(ImGui::GetWindowWidth() - 30, ImGui::GetWindowHeight() - 40), true);
+	{
+		const char* pMeshItems[] = { "Billboard", "Mesh" };
+		static int pMeshItemsPos = 0;
+		ImGui::Text("Particle:"); 
+		ImGui::SameLine(160); 
+		ImGui::Combo("##pMeshCombo", &pMeshItemsPos, pMeshItems, IM_ARRAYSIZE(pMeshItems));
+
+		ImGui::Text("Texture:");
+		ImGui::SameLine(160);
+		ImGui::InputText("##texture", (char*)emUI[activeEmitter].settings.texName.c_str(), 512, ImGuiInputTextFlags_ReadOnly);
+		//ImGui::ImageButton();
+
+		const char* pBlendItems[] = { "Additive", "Alpha", "Multiply" };
+		static int pBlendItemsPos = 0;
+		ImGui::Text("Blend type:");
+		ImGui::SameLine(160);
+		ImGui::Combo("##pBlendCombo", &pBlendItemsPos, pBlendItems, IM_ARRAYSIZE(pBlendItems));
+
+		ImGui::Separator();
+	
+		const char* pColorItems[] = { "Solid", "???", "???" };
+		static int pColorItemsPos = 0;
+		ImGui::Text("Start Color:");
+		ImGui::SameLine(160);
+		ImGui::Combo("##pColorCombo", &pColorItemsPos, pColorItems, IM_ARRAYSIZE(pColorItems));
+
+		GLuint texId = 0;
+		ImGui::Text("Color:");
+		ImGui::SameLine(160);
+		ImGui::ColorButton(ImVec4(edSet.col[0], edSet.col[1], edSet.col[2], edSet.col[3]), ImVec2(415, 0));
+
+		ImGui::Separator();
 
 	}
+	ImGui::EndChild();
+}
+
+void UserInterface::DrawEmitterSettings()
+{
+	ImGui::SameLine(15);
+	ImGui::BeginChild("##emitterSettings", ImVec2(ImGui::GetWindowWidth() - 30, ImGui::GetWindowHeight() - 40), true);
+	{
+		/*ImGui::Begin("ColorPicker##test");
+		float c[4];
+		ImGui::ColorPicker4("##ColorPick", c);
+		ImGui::End();*/
+	}
+	ImGui::EndChild();
 }
 
 void UserInterface::AddNewEmitter()

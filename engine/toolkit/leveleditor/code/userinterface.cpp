@@ -597,7 +597,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 			{
 				ImGui::Text("Randomize"); ImGui::SameLine(120);
 				id = "##vb" + std::to_string(particleCount);
-				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().vecRand);
+				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().velRand);
 				ImGui::Text("Min"); ImGui::SameLine(100);
 				id = "##v1" + std::to_string(particleCount);
 				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().vel, 0, 30, "%.3f", 5))
@@ -610,7 +610,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 					}
 					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
 				}
-				if (emitter->GetParticleUISettings().vecRand)
+				if (emitter->GetParticleUISettings().velRand)
 				{
 					ImGui::Text("Max"); ImGui::SameLine(100);
 					id = "##v2" + std::to_string(particleCount);

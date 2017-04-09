@@ -5,6 +5,12 @@
 
 namespace ParticleEditor{ class Application; }
 
+struct EditorSettings
+{
+	float timeScale = 1;
+	float col[4];
+};
+
 class UserInterface
 {
 public:
@@ -21,11 +27,16 @@ private:
 	void ExecuteShortcuts();
 	void ShowFileMenu();
 	void DrawDocks();
+	void ModalWindows();
 
 	void DrawTextureSettings();
 	void DrawGeneralSettings();
+	void DrawEmitters();
+	void DrawRender();
+	void DrawEmitterSettings();
 
-	
+	bool openPopup;
+	bool texturePopup;
 
 	Ptr<Render::TextureResource> newEmittIcon;
 
@@ -37,6 +48,8 @@ private:
 
 	Util::Array<ParticleEditor::EmittersUI> emUI;
 
-	float col[4];
+	int activeEmitter;
+
+	EditorSettings edSet;
 };
 

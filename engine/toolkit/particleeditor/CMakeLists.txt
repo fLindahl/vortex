@@ -11,7 +11,8 @@ SET(files_particleeditor ${particleeditor_headers} ${particleeditor_sources} cod
 SOURCE_GROUP("particleeditor" FILES ${files_particleeditor})
 
 ADD_EXECUTABLE(particleeditor ${files_particleeditor})
-TARGET_LINK_LIBRARIES(particleeditor core render)
-ADD_DEPENDENCIES(particleeditor core render)
+
+TARGET_LINK_LIBRARIES(particleeditor core render nativefiledialog)
+ADD_DEPENDENCIES(particleeditor core render nativefiledialog)
 
 SET_TARGET_PROPERTIES(particleeditor PROPERTIES FOLDER "vortex/toolkit")

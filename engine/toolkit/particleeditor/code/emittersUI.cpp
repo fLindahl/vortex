@@ -33,14 +33,11 @@ EmittersUI::~EmittersUI()
 void EmittersUI::DrawEmitter()
 {
 	std::string n = "##emitterframe" + std::to_string(id);
-	ImGui::BeginChild(n.c_str(), ImVec2(ImGui::GetWindowContentRegionWidth() - 5, 40), true);
+	ImGui::BeginChild(n.c_str(), ImVec2(ImGui::GetWindowContentRegionWidth(), 40), true);
 	{
 		if (ev.active)
 		{
-			if (ImGui::ImageButton((void*)activeIcon->GetHandle(), ImVec2(15, 15)))
-			{
-				ev.active = false;
-			}
+			ImGui::ImageButton((void*)activeIcon->GetHandle(), ImVec2(15, 15));
 		}
 		else
 		{
