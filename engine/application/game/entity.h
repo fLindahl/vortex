@@ -5,12 +5,14 @@
 #include "application/basegamefeature/managers/entitymanager.h"
 #include "foundation/messaging/messagehandler.h"
 #include "foundation/math/vector4.h"
-#include "render/server/lightserver.h"
+#include "entitymessages.h"
 
 namespace Game
 {
 	class BaseProperty;
 }
+
+#define __SendMsg(OBJ, MSG) OBJ->HandleMessage(MSG.downcast<Messaging::Message>())
 
 namespace Game
 {
@@ -31,11 +33,10 @@ public:
 	virtual void FixedUpdate();
 	virtual void Update();
 
-	virtual void HandleMsg(Ptr<BaseGameFeature::Msg> msg);
-	virtual void SendMsg(Ptr<BaseGameFeature::Msg> msg);
-	virtual void SendMsg(const int& recipientID, const BaseGameFeature::MsgType& message, const float& delay);
-
-    void AddProperty(Ptr<Game::BaseProperty> p);
+	virtual void HandleMessage(const Ptr<Messaging::Message>& msg);
+	
+    void AddProperty(const Ptr<Game::BaseProperty>& p);
+	void RemoveProperty(const Ptr<Game::BaseProperty>& p);
 
 	virtual Math::mat4 GetTransform();
 	virtual void SetTransform(const Math::mat4& nTransform);

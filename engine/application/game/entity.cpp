@@ -31,29 +31,23 @@ void Entity::Update()
 
 }
 
-void Entity::HandleMsg(Ptr<BaseGameFeature::Msg> msg)
+void Entity::HandleMessage(const Ptr<Messaging::Message>& msg)
 {
-
+	for (int i = 0; i < this->properties.Size(); i++)
+	{
+		auto prop = this->properties[i];
+		prop->HandleMessage(msg);
+	}
 }
 
-void Entity::SendMsg(Ptr<BaseGameFeature::Msg> msg)
-{
-	//MsgHandler::getInstance()->RecvMsg(msg);
-}
-
-void Entity::SendMsg(const int& recipientID, const BaseGameFeature::MsgType& message, const float& delay)
-{
-	BaseGameFeature::Msg newMsg;
-	newMsg.recipientID = recipientID;
-	newMsg.senderID = this->getID();
-	newMsg.message = message;
-	newMsg.delay = delay;
-
-	//MsgHandler::getInstance()->RecvMsg(newMsg);
-}
 void Entity::SetTransform(const Math::mat4& nTransform)
 {
     this->transform = nTransform;
+
+	Ptr<Msg::SetTransform> setMsg = Msg::SetTransform::Create();
+	setMsg->Set(this->transform);
+
+	this->HandleMessage(setMsg.downcast<Messaging::Message>());
 }
 
 Math::mat4 Entity::GetTransform()
@@ -61,10 +55,16 @@ Math::mat4 Entity::GetTransform()
     return this->transform;
 }
 
-void Entity::AddProperty(Ptr<Game::BaseProperty> p)
+void Entity::AddProperty(const Ptr<Game::BaseProperty>& p)
 {
     this->properties.Append(p);
     p->owner = this;
+}
+
+void Entity::RemoveProperty(const Ptr<Game::BaseProperty>& p)
+{
+	index_t index = this->properties.FindIndex(p);
+	this->properties.RemoveIndexSwap(index);
 }
 
 void Entity::Activate()

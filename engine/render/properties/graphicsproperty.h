@@ -24,6 +24,8 @@ public:
 	void Activate();
 	void Deactivate();
 
+	void HandleMessage(const Ptr<Messaging::Message>& msg);
+
 	Ptr<Render::ModelInstance> getModelInstance() const;
 	void setModelInstance(const Ptr<Render::ModelInstance>& inModelInstance);
 	

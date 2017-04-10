@@ -100,10 +100,10 @@ Application::Open()
 		BaseGameFeature::SceneManager::Instance()->LoadXMLScene("resources/scenes/sponza.xml");
 
 		//spawn in a cube somewhere
-		//this->wall1 = std::make_shared<Game::StaticEntity>();
-		//this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
-		//this->wall1->Activate();
-		//this->wall1->SetTransform(Math::mat4::translation(-1.0f, 0.5f, 0.0f));
+		this->wall1 = Game::ModelEntity::Create();
+		this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+		this->wall1->Activate();
+		this->wall1->SetTransform(Math::mat4::translation(-1.0f, 0.5f, 0.0f));
 
 		
 		//this->wall1 = std::make_shared<Game::ModelEntity>();
@@ -202,11 +202,6 @@ Application::Open()
 			  this->RenderUI();
 		  });
 
-		this->window->SetNanoVGRender([this](NVGcontext * vg)
-		  {
-			  this->RenderNano(vg);
-		  });
-		
 		return true;
 	}
 	return false;
@@ -221,12 +216,6 @@ void Application::RenderUI()
 
 		UI->Run();		
 	}
-}
-
-void Application::RenderNano(NVGcontext * vg)
-{
-	nvgSave(vg);
-	nvgRestore(vg);
 }
 
 //------------------------------------------------------------------------------
@@ -264,6 +253,12 @@ Application::Run()
 		{
 			BaseGameFeature::EnvManager::Instance()->RenderGeometryProxies();
 		}
+
+		Math::mat4 t = this->wall1->GetTransform();
+		a += 0.01f;
+		t.translate(Math::vector(0.0f, sin(a) * 0.01f, 0.0f));
+
+		this->wall1->SetTransform(t);
 
 		RenderDevice::Instance()->Render(false);
 

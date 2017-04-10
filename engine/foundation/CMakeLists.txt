@@ -37,6 +37,9 @@ SET(files_foundation_util
 SET(files_foundation_messaging
 	messaging/messagehandler.h
 	messaging/messagehandler.cpp
+	messaging/message.h
+	messaging/message.cpp
+	messaging/messagetype.h
 	)
 
 IF(WIN32)

@@ -16,8 +16,8 @@ public:
     virtual void FixedUpdate() {}
     virtual void Update() {}
 
-    //void HandleMsg(const BaseGameFeature::Msg& msg);
-	
+	virtual void HandleMessage(const Ptr<Messaging::Message>& msg) {}
+
 	virtual void Activate() { active = true; }
 	virtual void Deactivate() { active = false; }
 

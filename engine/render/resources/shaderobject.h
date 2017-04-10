@@ -42,6 +42,8 @@ public:
 
 	void EnableRenderState();
 	
+	void AddShader(const GLuint& in);
+	void LinkShaders();
 private:
 	ShaderObjectType type;
 
@@ -49,10 +51,7 @@ private:
 
 	void SetRenderState(const RenderState& state);
 
-	void AddShader(const GLuint& in);
 	const Util::Array<GLuint>& GetShaders() { return this->shaders; }
-
-	void LinkShaders();
 
 	Util::String name;
 

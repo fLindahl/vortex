@@ -92,11 +92,6 @@ Application::Open()
 		  {
 			  this->RenderUI();
 		  });
-
-		this->window->SetNanoVGRender([this](NVGcontext * vg)
-		  {
-			  this->RenderNano(vg);
-		  });
 		
 		return true;
 	}
@@ -111,11 +106,6 @@ void Application::RenderUI()
 	}
 }
 
-void Application::RenderNano(NVGcontext * vg)
-{
-	nvgSave(vg);
-	nvgRestore(vg);
-}
 
 //------------------------------------------------------------------------------
 /**

@@ -6,6 +6,9 @@
 #include "exampleapp.h"
 #include "imgui.h"
 #include "IO/console.h"
+#include "render/server/renderdevice.h"
+#include "application/game/modelentity.h"
+#include "render/server/resourceserver.h"
 
 namespace Example
 {
@@ -56,22 +59,26 @@ ExampleApp::Open()
 		//Init RenderDevice
 		Render::RenderDevice::Instance()->Initialize();
 
+		//Init resize callback for renderdevice.
+		//Do this before setting window size.
+		this->window->SetWindowResizeFunction([this](int32 x, int32 y)
+		{
+			this->ResizeWindow(x, y);
+		});
+
 		//Never set resolution before initializing rendering and framepasses
-		this->window->SetSize(1600, 900);
+		this->window->SetSize(500, 500);
 		this->window->SetTitle("Vortex Engine Test Environment");
 
-		Render::RenderDevice::Instance()->SetRenderResolution(1600, 900);
-
+		
         // set ui rendering function
 		this->window->SetUiRender([this]()
-		  {
-			  this->RenderUI();
-		  });
+		{
+			this->RenderUI();
+		});
 
-		this->window->SetNanoVGRender([this](NVGcontext * vg)
-		  {
-			  this->RenderNano(vg);
-		  });
+		Render::RenderDevice::Instance()->SetWindowResolution(500, 500);
+		Render::RenderDevice::Instance()->SetRenderResolution(800, 600);
 
 		return true;
 	}
@@ -87,19 +94,10 @@ void ExampleApp::RenderUI()
 	}
 }
 
-void ExampleApp::RenderNano(NVGcontext * vg)
+
+void ExampleApp::ResizeWindow(int32 x, int32 y)
 {
-	nvgSave(vg);
-	/*
-	nvgBeginPath(vg);
-	nvgCircle(vg,600, 100, 50);
-	NVGpaint paint;
-	paint = nvgLinearGradient(vg, 600, 100, 650, 150, nvgRGBA(255, 0, 0, 255), nvgRGBA(0, 255, 0, 255));
-	nvgFillPaint(vg, paint);
-	nvgFill(vg);
-	*/
-	
-	nvgRestore(vg);
+	Render::RenderDevice::Instance()->SetWindowResolution(x, y);
 }
 
 //------------------------------------------------------------------------------
@@ -110,6 +108,7 @@ ExampleApp::Run()
 {
 	// set clear color to gray
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	IO::Console::Instance()->OpenNativeConsole();
 	IO::Console::Instance()->Show();
 
 	Ptr<TestClass> test;
@@ -137,17 +136,19 @@ ExampleApp::Run()
 	IO::Console::Instance()->Print("This is a warning!", IO::WARNING);
 	IO::Console::Instance()->Print("This is an error!", IO::ERROR);
 	IO::Console::Instance()->Print("This is an exception!", IO::EXCEPTION);
-	
+
 	while (this->window->IsOpen())
 	{
 		//Do this before anything else
+		this->window->MakeCurrent();
 		//This polls for events
 		this->window->Update();
-			
+		
+		//Render the scene
 		Render::RenderDevice::Instance()->Render();
 
 		//Present Screen
-		this->window->SwapBuffers();
+		this->window->SwapBuffers();	
 	}
 }
 

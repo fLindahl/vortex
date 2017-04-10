@@ -50,9 +50,6 @@ void EntityManager::Update()
 		}
 	}
 	
-	// update the messagehandler
-	MsgHandler::Instance()->Update();
-
 	for (std::unordered_map<int, Ptr<Game::Entity>>::iterator it = this->EntityList.begin(); it != EntityList.end(); it++)
 	{
 		Ptr<Game::Entity> entity = it->second;

@@ -54,14 +54,14 @@ void LightCullingPass::Execute()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, lightServer->GetVisiblePointLightIndicesBuffer());
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 12, lightServer->GetVisibleSpotLightIndicesBuffer());
 
-	const GLint location = glGetUniformLocation(this->lightCullingProgram, "lightImage");
-	if (location == -1)
-	{
-		printf("Could not locate uniform location for texture in Light Culling");
-	}
-
-	glUniform1i(location, 0);
-	glBindImageTexture(0, this->buffer, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+	//const GLint location = glGetUniformLocation(this->lightCullingProgram, "lightImage");
+	//if (location == -1)
+	//{
+	//	_error("Could not locate uniform location for texture in Light Culling");
+	//}
+	//
+	//glUniform1i(location, 0);
+	//glBindImageTexture(0, this->buffer, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
 
 	// Dispatch the compute shader, using the workgroup values calculated earlier

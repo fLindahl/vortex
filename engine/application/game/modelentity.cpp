@@ -10,12 +10,13 @@ namespace Game
 ModelEntity::ModelEntity() : Entity()
 {
 	//Calls baseclass first
-	this->gProperty = new Render::GraphicsProperty();
+	this->gProperty = Render::GraphicsProperty::Create();
+	this->AddProperty(this->gProperty.downcast<Game::BaseProperty>());
 }
 	
 ModelEntity::~ModelEntity()
 {
-	delete this->gProperty;
+	
 }
 
 void ModelEntity::SetModel(Ptr<Render::ModelInstance> mdl)
@@ -34,12 +35,6 @@ void ModelEntity::Deactivate()
 {
 	this->gProperty->Deactivate();
 	Entity::Deactivate();
-}
-
-void ModelEntity::SetTransform(const Math::mat4 &t)
-{
-	Entity::SetTransform(t);
-	this->gProperty->setModelMatrix(t);
 }
 
 }

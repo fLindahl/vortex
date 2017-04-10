@@ -24,11 +24,6 @@ ADD_SUBDIRECTORY(assimp-3.3.1)
 SET_TARGET_PROPERTIES(assimp PROPERTIES FOLDER "exts/assimp")
 TARGET_INCLUDE_DIRECTORIES(exts INTERFACE assimp-3.3.1/include)
 
-ADD_LIBRARY(nanovg STATIC nanovg/src/nanovg.c nanovg/src/nanovg.h nanovg/src/nanovg_gl.h nanovg/src/nanovg_gl_utils.h)
-TARGET_LINK_LIBRARIES(nanovg PUBLIC exts)
-TARGET_INCLUDE_DIRECTORIES(nanovg PUBLIC nanovg/src)
-SET_TARGET_PROPERTIES(nanovg PROPERTIES FOLDER "exts/nanovg")
-
 ADD_LIBRARY(imgui STATIC imgui/imconfig.h imgui/imgui.cpp imgui/imgui_demo.cpp imgui/imgui_draw.cpp 
 			imgui/imgui.h imgui/imgui_internal.h 
 			imgui/stb_rect_pack.h imgui/stb_textedit.h imgui/stb_truetype.h 
@@ -76,4 +71,4 @@ TARGET_LINK_LIBRARIES(nativefiledialog PUBLIC exts ${GTK3_LIBRARIES})
 TARGET_INCLUDE_DIRECTORIES(nativefiledialog PUBLIC nativefiledialog nativefiledialog/src/include)
 SET_TARGET_PROPERTIES(nativefiledialog PROPERTIES FOLDER "exts/nativefiledialog")
 			
-TARGET_LINK_LIBRARIES(exts INTERFACE imgui nanovg)
+TARGET_LINK_LIBRARIES(exts INTERFACE imgui)
