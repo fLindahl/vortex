@@ -60,8 +60,8 @@ bool ParticleFile::SaveParticle(Util::String name)
 		pEmitter->InsertEndChild(pElement);
 
 		pElement = xmlDoc.NewElement("Size");
-		pElement->SetAttribute("startSize", set.startSize);
-		pElement->SetAttribute("endSize", set.endSize);
+		pElement->SetAttribute("startSize", set.size[0]);
+		pElement->SetAttribute("endSize", set.size[1]);
 		pEmitter->InsertEndChild(pElement);
 
 		pElement = xmlDoc.NewElement("ParticleAmount");

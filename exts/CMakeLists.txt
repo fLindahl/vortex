@@ -38,6 +38,8 @@ ADD_LIBRARY(imgui STATIC imgui/imconfig.h imgui/imgui.cpp imgui/imgui_demo.cpp i
 			imgui/imgui_dock.inl
 			imgui/imgui_user.h
 			imgui/imgui_user.inl
+			imgui/imgui_color_gradient.h
+			imgui/imgui_color_gradient.cpp
 			)
 
 TARGET_LINK_LIBRARIES(imgui PUBLIC exts)

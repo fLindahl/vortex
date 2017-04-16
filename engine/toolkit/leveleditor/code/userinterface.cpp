@@ -563,8 +563,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 {
 	std::string id = "Particle "+std::to_string(particleCount);
 	if (ImGui::CollapsingHeader(id.c_str()))
-	{
-		
+	{	
 		id = "Append Emitter##" + std::to_string(particleCount);
 		if (ImGui::Button(id.c_str()))
 		{

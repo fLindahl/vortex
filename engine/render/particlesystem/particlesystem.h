@@ -39,6 +39,12 @@ struct ParticleRenderingBuffer
 
 struct ParticleUISettings
 {
+	ParticleUISettings()
+	{
+		size[0] = 0.05f;
+		size[1] = 0.05f;
+	}
+
 	float vel = 1.0f;
 	Math::vec4 acc = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 	Math::vec4 color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -54,9 +60,9 @@ struct ParticleUISettings
 	bool colorRand = false;
 	bool lifeTimeRand = false;
 	bool spriteSheetTex = false;
+	bool sizeOverTime = false;
 
-	float startSize = 0.05f;
-	float endSize = 0.05f;
+	float size[2];
 
 	int framesPerRow = 1;
 	int numberOfFrames = 1;

@@ -9,12 +9,14 @@ EmittersUI::EmittersUI()
 {
 }
 
-EmittersUI::EmittersUI(std::shared_ptr<UserInterface> ui, int id)
+EmittersUI::EmittersUI(UserInterface* ui, int id)
 {
 	this->ui = ui;
 	this->id = id;
 
 	name = "New Emitter";
+
+	//gradient = ImGradient();
 
 	dupIcon = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/particleeditor/resources/textures/copy.png");
 	deleteIcon = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/particleeditor/resources/textures/delete.png");
@@ -35,8 +37,10 @@ void EmittersUI::DrawEmitter()
 	std::string n = "##emitterframe" + std::to_string(id);
 	ImGui::BeginChild(n.c_str(), ImVec2(ImGui::GetWindowContentRegionWidth(), 40), true);
 	{
+		
 		if (ev.active)
 		{
+			
 			ImGui::ImageButton((void*)activeIcon->GetHandle(), ImVec2(15, 15));
 		}
 		else
@@ -47,7 +51,10 @@ void EmittersUI::DrawEmitter()
 				ui->UpdateActiveEmitter(this->id);
 			}
 		}
+		ui->Tooltip("Set this emitter to active");
+
 		ImGui::SameLine();
+
 		n = "##name" + std::to_string(id);
 		ImGui::InputText(n.c_str(), (char*)ev.name.c_str(), 512);
 
@@ -66,19 +73,24 @@ void EmittersUI::DrawEmitter()
 				ev.visible = true;
 			}
 		}
+		ui->Tooltip("Set this emitters visibility");
+
 		
 		ImGui::SameLine(ImGui::GetWindowWidth() - 80);
 		if (ImGui::ImageButton((void*)dupIcon->GetHandle(), ImVec2(20, 20)))
 		{
-			ui->DuplicateEmitter(*this);
+			ui->DuplicateEmitter(std::make_shared<ParticleEditor::EmittersUI>(*this));
 		}
+		ui->Tooltip("Duplicate this emitter");
 		ImGui::SameLine();
 		if (ImGui::ImageButton((void*)deleteIcon->GetHandle(), ImVec2(20, 20)))
 		{
-
+			ui->RemoveEmitter(this->id);
 		}
+		ui->Tooltip("Delete this emitter");
 	}
 	ImGui::EndChild();
 }
+
 }
 

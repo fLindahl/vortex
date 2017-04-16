@@ -6,23 +6,30 @@
 #include "imgui_internal.h"
 #include "toolkit/contentbrowser/code/application.h"
 
+
 UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 {
 	this->application = app;
 	this->commandManager = Edit::CommandManager::Instance();
 
 	activeEmitter = 0;
+	emitterCount = 0;
+
 	openPopup = false;
 	texturePopup = false;
+	colorPicker = false;
 
 	newEmittIcon = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/particleeditor/resources/textures/add.png");
+	openIcon = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/particleeditor/resources/textures/open.png");
 
 	emitterTexture = Render::ResourceServer::Instance()->LoadTexture("resources/textures/particles/particle_spritesheet_smoke2.tga");
-	gridTexture = Render::ResourceServer::Instance()->LoadTexture("resources/textures/whiteBackground.tga");
+	whiteTexture = Render::ResourceServer::Instance()->LoadTexture("resources/textures/whiteBackground.tga");
+	gridTexture = Render::ResourceServer::Instance()->LoadTexture("resources/textures/grid.png");
 
-	ParticleEditor::EmittersUI em = ParticleEditor::EmittersUI(std::shared_ptr<UserInterface>(this), emUI.Size());
-	em.ev.active = true;
-	emUI.Append(em);
+	std::shared_ptr<ParticleEditor::EmittersUI> em = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
+	em->ev.active = true;
+	emUI[emitterCount] = em;
+	emitterCount++;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -157,7 +164,7 @@ void UserInterface::DrawDocks()
 		ImGui::BeginDock("Texture", NULL, ImGuiWindowFlags_NoSavedSettings);
 		{
 			ImGui::SameLine(10);
-			ImGui::Image((void*)gridTexture->GetHandle(), 
+			ImGui::Image((void*)whiteTexture->GetHandle(),
 				ImVec2(ImGui::GetWindowContentRegionWidth()-5, ImGui::GetWindowContentRegionWidth() - 10),
 				ImVec2(0, 0), ImVec2(1, 1), ImVec4(edSet.col[0], edSet.col[1], edSet.col[2], edSet.col[3]));
 			ImGui::SameLine(10);
@@ -182,7 +189,8 @@ void UserInterface::DrawDocks()
 void UserInterface::ModalWindows()
 {
 	if (this->openPopup){ ImGui::OpenPopup("OpenFile"); }
-	
+	if (this->texturePopup){ ImGui::OpenPopup("OpenTexture"); }
+
 	if (ImGui::BeginPopupModal("OpenFile", &this->openPopup))
 	{
 		nfdchar_t* outpath;
@@ -218,6 +226,52 @@ void UserInterface::ModalWindows()
 
 		ImGui::EndPopup();
 	}
+
+	if (ImGui::BeginPopupModal("OpenTexture", &this->texturePopup))
+	{
+		nfdchar_t* outpath;
+		nfdresult_t result = NFD_OpenDialog("tga,png;jpg,jpeg", NULL, &outpath);
+
+		if (result == NFD_OKAY)
+		{
+			printf("path: %s\n", outpath);
+			//if (this->application->loadedModel != nullptr)
+			//{
+			//	this->application->loadedModel->Deactivate();
+			//}
+			//this->selectedNode = nullptr;
+			Util::String s = outpath;
+			Util::Array<Util::String> path;
+#ifdef _WIN32
+			s.Tokenize("\\", path);
+#else
+			s.Tokenize("/", path);
+#endif
+			s = path[path.Size() - 2] +"/" + path[path.Size() - 1];
+			emUI[activeEmitter]->ev.texture = s.AsCharPtr();
+			emUI[activeEmitter]->settings.texName = outpath;
+			emitterTexture = Render::ResourceServer::Instance()->LoadTexture(outpath);
+			//this->application->loadedModel = Game::ModelEntity::Create();
+			//this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
+			//this->application->loadedModel->SetTransform(Math::mat4::scaling(0.01f, 0.01f, 0.01f));
+			//this->application->loadedModel->Activate();
+
+			this->texturePopup = false;
+			free(outpath);
+		}
+		else if (result == NFD_CANCEL)
+		{
+			this->texturePopup = false;
+		}
+		else
+		{
+			printf("Error: %s\n", NFD_GetError());
+			assert(false);
+			this->texturePopup = false;
+		}
+
+		ImGui::EndPopup();
+	}
 	
 }
 
@@ -226,14 +280,14 @@ void UserInterface::DrawTextureSettings()
 	ImGui::BeginChild("##backgroundtex", ImVec2(ImGui::GetWindowContentRegionWidth(), 150), true);
 	{
 		ImGui::Text("SpriteSheet"); ImGui::SameLine(140);
-		if (ImGui::Checkbox("##texsheet", &emUI[0].settings.spriteSheetTex))
+		if (ImGui::Checkbox("##texsheet", &emUI[activeEmitter]->settings.spriteSheetTex))
 		{
 			//emitter->GetRenderBuffer().textureAnimation[3] = int(emitter->GetParticleUISettings().spriteSheetTex);
 			//emitter->UpdateUniformBuffer();
 		}
 		ImGui::Text("Frames per row"); ImGui::SameLine(140);
 		ImGui::PushItemWidth(80);
-		if (ImGui::InputInt("##fpr1", &emUI[0].settings.framesPerRow, 0, 255, ImGuiInputTextFlags_EnterReturnsTrue))
+		if (ImGui::InputInt("##fpr1", &emUI[activeEmitter]->settings.framesPerRow, 0, 255, ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			//emitter->GetRenderBuffer().textureAnimation[0] = emitter->GetParticleUISettings().framesPerRow;
 			//emitter->UpdateUniformBuffer();
@@ -242,7 +296,7 @@ void UserInterface::DrawTextureSettings()
 
 		ImGui::Text("Total frames"); ImGui::SameLine(140);
 		ImGui::PushItemWidth(80);
-		if (ImGui::InputInt("##tnf2", &emUI[0].settings.numberOfFrames, 0, 255, ImGuiInputTextFlags_EnterReturnsTrue))
+		if (ImGui::InputInt("##tnf2", &emUI[activeEmitter]->settings.numberOfFrames, 0, 255, ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			//emitter->GetRenderBuffer().textureAnimation[1] = emitter->GetParticleUISettings().numberOfFrames;
 			//emitter->UpdateUniformBuffer();
@@ -256,8 +310,14 @@ void UserInterface::DrawGeneralSettings()
 {
 	ImGui::BeginChild("##GenSet", ImVec2(ImGui::GetWindowWidth() - 20, ImGui::GetWindowHeight()-40), true);
 	{
+		const char* pTypeItems[] = { "Continuous", "One shot" };
+		static int pTypeItemsPos = 0;
+		ImGui::Text("Type:");
+		ImGui::SameLine(160);
+		ImGui::Combo("##pTypeCombo", &pTypeItemsPos, pTypeItems, IM_ARRAYSIZE(pTypeItems));
+
 		ImGui::Text("Time Scale:");
-		ImGui::SameLine();
+		ImGui::SameLine(160);
 		ImGui::DragFloat("##TimeScale", &edSet.timeScale, 0.01f, 0.01f, 10.f);
 	}
 	ImGui::EndChild();
@@ -265,21 +325,32 @@ void UserInterface::DrawGeneralSettings()
 
 void UserInterface::DrawEmitters()
 {
-	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (emUI.Size() <= 8 ? emUI.Size() : 8)), false);
+	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (emUI.size() <= 8 ? emUI.size() : 8)), false);
 	{
-		for (int i = 0; i < emUI.Size(); i++)
+		for (int i = 0; i < emitterCount; i++)
 		{
-			emUI[i].DrawEmitter();
+			if (emUI.find(i) != emUI.end())
+				emUI.at(i)->DrawEmitter();
 		}
 	}
 	ImGui::EndChild();
+
 	ImGui::Separator();
-	ImGui::BeginChild("##cem", ImVec2(ImGui::GetWindowWidth() - 20, 40));
+
+	ImGui::BeginChild("##cem", ImVec2(ImGui::GetContentRegionAvailWidth(), 40));
 	{
-		ImGui::SameLine(ImGui::GetWindowWidth() - 30);
+		ImGui::SameLine(ImGui::GetContentRegionAvailWidth() - 40);
 		if (ImGui::ImageButton((void*)newEmittIcon->GetHandle(), ImVec2(20, 20)))
 		{
 			AddNewEmitter();
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			{
+				ImGui::Text("Create new emitter");
+			}
+			ImGui::EndTooltip();
 		}
 	}
 	ImGui::EndChild();
@@ -288,7 +359,7 @@ void UserInterface::DrawEmitters()
 void UserInterface::DrawRender()
 {
 	ImGui::SameLine(15);
-	ImGui::BeginChild("##render", ImVec2(ImGui::GetWindowWidth() - 30, ImGui::GetWindowHeight() - 40), true);
+	ImGui::BeginChild("##render", ImVec2(ImGui::GetWindowWidth() - 30, ImGui::GetWindowHeight() - 30), true);
 	{
 		const char* pMeshItems[] = { "Billboard", "Mesh" };
 		static int pMeshItemsPos = 0;
@@ -298,8 +369,14 @@ void UserInterface::DrawRender()
 
 		ImGui::Text("Texture:");
 		ImGui::SameLine(160);
-		ImGui::InputText("##texture", (char*)emUI[activeEmitter].settings.texName.c_str(), 512, ImGuiInputTextFlags_ReadOnly);
-		//ImGui::ImageButton();
+		ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - 100);
+		ImGui::InputText("##texture", (char*)emUI[activeEmitter]->ev.texture.c_str(), 512, ImGuiInputTextFlags_ReadOnly);
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		if(ImGui::ImageButton((void*) openIcon->GetHandle(), ImVec2(18.f,15.f)))
+		{
+			this->texturePopup = true;
+		}
 
 		const char* pBlendItems[] = { "Additive", "Alpha", "Multiply" };
 		static int pBlendItemsPos = 0;
@@ -307,20 +384,81 @@ void UserInterface::DrawRender()
 		ImGui::SameLine(160);
 		ImGui::Combo("##pBlendCombo", &pBlendItemsPos, pBlendItems, IM_ARRAYSIZE(pBlendItems));
 
+		ImGui::NewLine();
 		ImGui::Separator();
-	
-		const char* pColorItems[] = { "Solid", "???", "???" };
+		ImGui::NewLine();
+
+		const char* pColorItems[] = { "Solid", "Fade" };
 		static int pColorItemsPos = 0;
-		ImGui::Text("Start Color:");
+		ImGui::Text("Color Setting:");
 		ImGui::SameLine(160);
 		ImGui::Combo("##pColorCombo", &pColorItemsPos, pColorItems, IM_ARRAYSIZE(pColorItems));
 
-		GLuint texId = 0;
-		ImGui::Text("Color:");
-		ImGui::SameLine(160);
-		ImGui::ColorButton(ImVec4(edSet.col[0], edSet.col[1], edSet.col[2], edSet.col[3]), ImVec2(415, 0));
+		if (pColorItemsPos == 0)
+		{			
+			ImGui::Text("Color:");
+			ImGui::SameLine(160);
+			if (ImGui::ColorButton(ImVec4(emUI[activeEmitter]->settings.color[0], emUI[activeEmitter]->settings.color[1], emUI[activeEmitter]->settings.color[2], emUI[activeEmitter]->settings.color[3]), ImVec2(415, 0)))
+			{
+				colorPicker = true;
+			}
 
+			if (colorPicker)
+			{
+				ImGui::Begin("Color Picker", &this->colorPicker, ImGuiWindowFlags_ShowBorders);
+				{
+					ImGui::ColorPicker4("##SolidColorPick", (float*)&emUI[activeEmitter]->settings.color, ImGuiColorEditFlags_Alpha);
+				}
+				ImGui::End();
+			}
+		}
+		else if (pColorItemsPos == 1)
+		{
+			ImGui::Text("Color:");
+			ImGui::SameLine(160);
+			if (ImGui::GradientButton(&emUI[activeEmitter]->gradient, gridTexture->GetHandle()))
+			{
+				colorPicker = true;
+			}
+
+			if (colorPicker)
+			{
+				ImGui::Begin("Color Picker", &this->colorPicker, ImGuiWindowFlags_ShowBorders);
+				{
+					ImGui::GradientEditor(&emUI[activeEmitter]->gradient, emUI[activeEmitter]->draggingMark, emUI[activeEmitter]->selectedMark, gridTexture->GetHandle());
+				}
+				ImGui::End();
+			}
+					
+		}
+
+		ImGui::NewLine();
 		ImGui::Separator();
+		ImGui::NewLine();
+
+		ImGui::Text("Size over time:");
+		ImGui::SameLine(160);
+		ImGui::Checkbox("##sizeovertime", &emUI[activeEmitter]->settings.sizeOverTime);
+		
+		if (emUI[activeEmitter]->settings.sizeOverTime)
+		{
+			ImGui::Text("Size:");
+			ImGui::SameLine(160);
+			ImGui::DragFloat2("##endSize", emUI[activeEmitter]->settings.size, 0.01f, 0.01f, 10.f);
+			Tooltip("Set start and end size of the particle");
+		}
+		else
+		{
+			ImGui::Text("Size:");
+			ImGui::SameLine(160);
+			ImGui::DragFloat("##startSize", &emUI[activeEmitter]->settings.size[0], 0.01f, 0.01f, 10.f);
+			Tooltip("Set the size of the particle");
+		}
+
+		ImGui::Text("Max Particles:");
+		ImGui::SameLine(160);
+		ImGui::InputInt("##maxParticles", &emUI[activeEmitter]->settings.numParticles, 1, 100, ImGuiInputTextFlags_EnterReturnsTrue);
+		
 
 	}
 	ImGui::EndChild();
@@ -331,37 +469,143 @@ void UserInterface::DrawEmitterSettings()
 	ImGui::SameLine(15);
 	ImGui::BeginChild("##emitterSettings", ImVec2(ImGui::GetWindowWidth() - 30, ImGui::GetWindowHeight() - 40), true);
 	{
-		/*ImGui::Begin("ColorPicker##test");
-		float c[4];
-		ImGui::ColorPicker4("##ColorPick", c);
-		ImGui::End();*/
+		ImGui::NewLine();
+
+		ImGui::Text("Local:");
+		ImGui::SameLine(160);
+		ImGui::Checkbox("##locEmitt", &edSet.local);
+
+		ImGui::Text("Collision:");
+		ImGui::SameLine(160);
+		ImGui::Checkbox("##collision", &edSet.collision);
+
+		ImGui::NewLine();
+		ImGui::Separator();
+		ImGui::NewLine();
+
+		const char* items[] = { "Cone", "Sphere", "Hemisphere" };
+		static int item2 = 0;
+		ImGui::Text("Emitter Shape:"); 
+		ImGui::SameLine(160);
+		if (ImGui::Combo("##cbs", &item2, items, IM_ARRAYSIZE(items)))
+		{
+			emUI[activeEmitter]->settings.shapes = (Particles::EmitterShapes)item2;
+		}
+
+		if (emUI[activeEmitter]->settings.shapes == Particles::CONE)
+		{
+			ImGui::Text("Cone Radius:"); 
+			ImGui::SameLine(160);
+			ImGui::SliderFloat("##cRadius", &emUI[activeEmitter]->settings.radius, 0.001, 10, "%.3f", 5);
+		}
+		else if (emUI[activeEmitter]->settings.shapes == Particles::SPHERE)
+		{
+			ImGui::Text("Sphere Radius:"); 
+			ImGui::SameLine(160);
+			ImGui::SliderFloat("##sRadius", &emUI[activeEmitter]->settings.radius, 0.001, 10, "%.3f", 5);
+		}
+		else if (emUI[activeEmitter]->settings.shapes == Particles::HEMISPHERE)
+		{
+			ImGui::Text("Hemisphere Radius:"); 
+			ImGui::SameLine(160);
+			ImGui::SliderFloat("##hsRadius", &emUI[activeEmitter]->settings.radius, 0.001, 10, "%.3f", 5);
+		}
+
+		ImGui::NewLine();
+		ImGui::Separator();
+		ImGui::NewLine();
+
+		ImGui::Text("Random lifetime:");
+		ImGui::SameLine(160);
+		ImGui::Checkbox("##lifeRand", &emUI[activeEmitter]->settings.lifeTimeRand);
+
+		if (!emUI[activeEmitter]->settings.lifeTimeRand)
+		{
+			ImGui::Text("Lifetime:");
+			ImGui::SameLine(160);
+			ImGui::SliderFloat("##lifeMin", &emUI[activeEmitter]->settings.acc[3], 0.001, 100, "%.3f", 5);
+		}
+		else
+		{
+			ImGui::Text("Lifetime Min:");
+			ImGui::SameLine(160);
+			ImGui::SliderFloat("##lifeMin", &emUI[activeEmitter]->settings.acc[3], 0.001, 100, "%.3f", 5);
+
+			ImGui::Text("Lifetime Max:");
+			ImGui::SameLine(160);
+			ImGui::SliderFloat("##lifeMax", &emUI[activeEmitter]->settings.acc2[3], 0.001, 100, "%.3f", 5);
+		}
+
+		ImGui::NewLine();
+		ImGui::Separator();
+		ImGui::NewLine();
+
+
+
 	}
 	ImGui::EndChild();
 }
 
 void UserInterface::AddNewEmitter()
 {
-	ParticleEditor::EmittersUI tempEm(std::shared_ptr<UserInterface>(this), emUI.Size());
-	emUI.Append(tempEm);
+	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
+	emUI[emitterCount] = tempEm;
+	emitterCount++;
 }
 
 
-void UserInterface::DuplicateEmitter(ParticleEditor::EmittersUI newEmitter)
+void UserInterface::DuplicateEmitter(std::shared_ptr<ParticleEditor::EmittersUI> newEmitter)
 {
-	ParticleEditor::EmittersUI tempEm(std::shared_ptr<UserInterface>(this),emUI.Size());
-	tempEm.ev = newEmitter.ev;
-	tempEm.ev.active = false;
-	emUI.Append(tempEm);
+	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
+	tempEm->ev = newEmitter->ev;
+	tempEm->ev.active = false;
+	emUI[emitterCount] = tempEm;
+	emitterCount++;
+}
+
+void UserInterface::RemoveEmitter(int id)
+{
+	//if (emUI.size() > 1)
+	//{
+	//	bool found = false;
+	//	if (emUI.find(id) != emUI.end())
+	//	{
+	//		emUI.erase(id);
+
+	//		found = true;
+	//		
+	//	}
+
+	//	if (found)
+	//	{
+	//		for (int i = id + 1; i < emitterCount; i++)
+	//			emUI[i]->id -= 1;
+
+	//		emitterCount--;
+	//	}
+	//}
+	
 }
 
 void UserInterface::UpdateActiveEmitter(int id)
 {
-	for (int i = 0; i < emUI.Size(); i++)
+	for (int i = 0; i < emUI.size(); i++)
 	{
-		if (i == id)
-			continue;
-
-		emUI[i].ev.active = false;
+		if (i != id)
+			emUI[i]->ev.active = false;
 	}
+	activeEmitter = id;
 	//emUI[id] use to set the values in the editor
+}
+
+void UserInterface::Tooltip(std::string text)
+{
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		{
+			ImGui::Text(text.c_str());
+		}
+		ImGui::EndTooltip();
+	}
 }

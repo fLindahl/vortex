@@ -3,6 +3,7 @@
 #include <memory>
 #include "render/particlesystem/particlesystem.h"
 #include "core/ptr.h"
+#include "imgui_color_gradient.h"
 
 class UserInterface;
 namespace Render{ class TextureResource; }
@@ -15,9 +16,12 @@ struct EmitterValues
 		name = "New Emitter";
 	}
 	std::string name;
+	std::string texture;
+
 	bool visible = true;
 
 	bool active = false;
+	
 };
 
 namespace ParticleEditor
@@ -26,7 +30,7 @@ class EmittersUI
 {
 public:
 	EmittersUI();
-	EmittersUI(std::shared_ptr<UserInterface> ui, int id);
+	EmittersUI(UserInterface* ui, int id);
 	~EmittersUI();
 
 	void DrawEmitter();
@@ -34,8 +38,14 @@ public:
 	EmitterValues ev;
 	Particles::ParticleUISettings settings;
 
+	int id;
+
+	ImGradient gradient;
+
+	ImGradientMark* draggingMark = nullptr;
+	ImGradientMark* selectedMark = nullptr;
 private:
-	std::shared_ptr<UserInterface> ui;
+	UserInterface* ui;
 
 	Ptr<Render::TextureResource> dupIcon;
 	Ptr<Render::TextureResource> deleteIcon;
@@ -47,7 +57,6 @@ private:
 	Ptr<Render::TextureResource> inactiveIcon;
 	
 	char* name;
-	int id;
 };	
 }
 
