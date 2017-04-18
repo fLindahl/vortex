@@ -6,7 +6,6 @@
 #include "imgui_internal.h"
 #include "toolkit/contentbrowser/code/application.h"
 
-
 UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 {
 	this->application = app;
@@ -16,6 +15,8 @@ UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 	emitterCount = 0;
 
 	openPopup = false;
+	saveAsPopup = false;
+
 	texturePopup = false;
 	colorPicker = false;
 
@@ -26,7 +27,7 @@ UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 	whiteTexture = Render::ResourceServer::Instance()->LoadTexture("resources/textures/whiteBackground.tga");
 	gridTexture = Render::ResourceServer::Instance()->LoadTexture("resources/textures/grid.png");
 
-	std::shared_ptr<ParticleEditor::EmittersUI> em = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
+	std::shared_ptr<ParticleEditor::EmittersUI> em = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount, true);
 	em->ev.active = true;
 	emUI[emitterCount] = em;
 	emitterCount++;
@@ -86,14 +87,17 @@ void UserInterface::Run()
 
 void UserInterface::ExecuteShortcuts()
 {
-	if ((ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Y))) ||
-		(ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeyShift && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Z))))
+	if ((ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_O))))
 	{
-		commandManager->Redo();
+		openPopup = true;
 	}
-	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Z)))
+	else if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeyShift && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_S)))
 	{
-		commandManager->Undo();
+		
+	}
+	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_N)))
+	{
+		
 	}
 }
 
@@ -107,7 +111,10 @@ void UserInterface::ShowFileMenu()
 		openPopup = true;
 	}
 	if (ImGui::MenuItem("Save", "Ctrl+S")) {}
-	if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S")) {}
+	if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S"))
+	{
+		this->saveAsPopup = true;
+	}
 
 	ImGui::Separator();
 
@@ -189,6 +196,7 @@ void UserInterface::DrawDocks()
 void UserInterface::ModalWindows()
 {
 	if (this->openPopup){ ImGui::OpenPopup("OpenFile"); }
+	if (this->saveAsPopup){ ImGui::OpenPopup("SaveAsFile"); }
 	if (this->texturePopup){ ImGui::OpenPopup("OpenTexture"); }
 
 	if (ImGui::BeginPopupModal("OpenFile", &this->openPopup))
@@ -199,26 +207,34 @@ void UserInterface::ModalWindows()
 		if (result == NFD_OKAY)
 		{
 			printf("path: %s\n", outpath);
-			//if (this->application->loadedModel != nullptr)
-			//{
-			//	this->application->loadedModel->Deactivate();
-			//}
-			//this->selectedNode = nullptr;
+			
+			IO::Console::Instance()->Print("NFD opened succesfully", IO::INPUT);
 
-			//this->application->loadedModel = Game::ModelEntity::Create();
-			//this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
-			//this->application->loadedModel->SetTransform(Math::mat4::scaling(0.01f, 0.01f, 0.01f));
-			//this->application->loadedModel->Activate();
+			Util::String s = outpath;
+			Util::Array<Util::String> path;
+#ifdef _WIN32
+			s.Tokenize("\\", path);
+#else
+			s.Tokenize("/", path);
+#endif
+			s = path[path.Size() - 1];
+
+			Util::String title = "Particle Editor - " + s;
+			application->GetWindow()->SetTitle(title.AsCharPtr());
+
+			LoadSettings(Particles::ParticleFile::Instance()->LoadParticle(outpath));
 
 			this->openPopup = false;
 			free(outpath);
 		}
 		else if (result == NFD_CANCEL)
 		{
+			IO::Console::Instance()->Print("User canceled nfd", IO::INPUT);
 			this->openPopup = false;
 		}
 		else
 		{
+			IO::Console::Instance()->Print("nfd failed to open", IO::ERROR);
 			printf("Error: %s\n", NFD_GetError());
 			assert(false);
 			this->openPopup = false;
@@ -226,7 +242,45 @@ void UserInterface::ModalWindows()
 
 		ImGui::EndPopup();
 	}
+	if (ImGui::BeginPopupModal("SaveAsFile", &this->saveAsPopup))
+	{
+		nfdchar_t* outpath;
+		nfdresult_t result = NFD_SaveDialog("particle", NULL, &outpath);
 
+		if (result == NFD_OKAY)
+		{
+			printf("path: %s\n", outpath);
+			IO::Console::Instance()->Print("NFD opened succesfully", IO::INPUT);
+
+			Util::String s = outpath;
+			Util::Array<Util::String> path;
+#ifdef _WIN32
+			s.Tokenize("\\", path);
+#else
+			s.Tokenize("/", path);
+#endif
+			s = path[path.Size() - 1]+".particle";
+
+			Util::String title = "Particle Editor - " + s;
+			application->GetWindow()->SetTitle(title.AsCharPtr());
+			this->saveAsPopup = false;
+			free(outpath);
+		}
+		else if (result == NFD_CANCEL)
+		{
+			IO::Console::Instance()->Print("User canceled nfd", IO::INPUT);
+			this->saveAsPopup = false;
+		}
+		else
+		{
+			IO::Console::Instance()->Print("nfd failed to open", IO::ERROR);
+			printf("Error: %s\n", NFD_GetError());
+			assert(false);
+			this->openPopup = false;
+		}
+
+		ImGui::EndPopup();
+	}
 	if (ImGui::BeginPopupModal("OpenTexture", &this->texturePopup))
 	{
 		nfdchar_t* outpath;
@@ -273,6 +327,14 @@ void UserInterface::ModalWindows()
 		ImGui::EndPopup();
 	}
 	
+}
+
+void UserInterface::LoadSettings(Util::Array<Particles::FileSettings> file)
+{
+	for (auto itr : file)
+	{
+		AddNewEmitter(itr);
+	}
 }
 
 void UserInterface::DrawTextureSettings()
@@ -325,7 +387,7 @@ void UserInterface::DrawGeneralSettings()
 
 void UserInterface::DrawEmitters()
 {
-	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (emUI.size() <= 8 ? emUI.size() : 8)), false);
+	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (emUI.size() <= 8 ? emUI.size()-1 : 8)+5), false);
 	{
 		for (int i = 0; i < emitterCount; i++)
 		{
@@ -540,7 +602,49 @@ void UserInterface::DrawEmitterSettings()
 		ImGui::Separator();
 		ImGui::NewLine();
 
+		ImGui::Text("Random Velocity:");
+		ImGui::SameLine(160);
+		ImGui::Checkbox("##velRand", &emUI[activeEmitter]->settings.velRand);
 
+		if (!emUI[activeEmitter]->settings.velRand)
+		{
+			ImGui::Text("Velocity:");
+			ImGui::SameLine(160);
+			ImGui::DragFloat("##velMin", &emUI[activeEmitter]->settings.vel, 0.01, 0.001, 1000, "%.3f");
+		}
+		else
+		{
+			ImGui::Text("Velocity Min:");
+			ImGui::SameLine(160);
+			ImGui::DragFloat("##velMin", &emUI[activeEmitter]->settings.vel, 0.01, 0.001, 1000, "%.3f");
+
+			ImGui::Text("Velocity Max:");
+			ImGui::SameLine(160);
+			ImGui::DragFloat("##velMax", &emUI[activeEmitter]->settings.vel2, 0.01, 0.001, 1000, "%.3f");
+		}
+
+		ImGui::NewLine();
+
+		ImGui::Text("Random Acceleration:");
+		ImGui::SameLine(160);
+		ImGui::Checkbox("##accRand", &emUI[activeEmitter]->settings.accRand);
+
+		if (!emUI[activeEmitter]->settings.accRand)
+		{
+			ImGui::Text("Acceleration:");
+			ImGui::SameLine(160);
+			ImGui::DragFloat3("##accMin", (float*)&emUI[activeEmitter]->settings.acc, 0.01f, -50.f, 50.f, "%.3f", 5);
+		}
+		else
+		{
+			ImGui::Text("Acceleration Min:");
+			ImGui::SameLine(160);
+			ImGui::DragFloat3("##accMin", (float*)&emUI[activeEmitter]->settings.acc, 0.01f, -50, 50, "%.3f", 5);
+
+			ImGui::Text("Acceleration Max:");
+			ImGui::SameLine(160);
+			ImGui::DragFloat3("##accMax", (float*)&emUI[activeEmitter]->settings.acc2, 0.01f, -50.f, 50.f, "%.3f", 5);
+		}
 
 	}
 	ImGui::EndChild();
@@ -553,6 +657,14 @@ void UserInterface::AddNewEmitter()
 	emitterCount++;
 }
 
+void UserInterface::AddNewEmitter(Particles::FileSettings set)
+{
+	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
+	tempEm->settings = set.set;
+	tempEm->ev.name = set.name.AsCharPtr();
+	emUI[emitterCount] = tempEm;
+	emitterCount++;
+}
 
 void UserInterface::DuplicateEmitter(std::shared_ptr<ParticleEditor::EmittersUI> newEmitter)
 {

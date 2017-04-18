@@ -30,7 +30,7 @@ class EmittersUI
 {
 public:
 	EmittersUI();
-	EmittersUI(UserInterface* ui, int id);
+	EmittersUI(UserInterface* ui, int id, bool dummy = false);
 	~EmittersUI();
 
 	void DrawEmitter();
@@ -57,6 +57,8 @@ private:
 	Ptr<Render::TextureResource> inactiveIcon;
 	
 	char* name;
+
+	bool dummy;
 };	
 }
 

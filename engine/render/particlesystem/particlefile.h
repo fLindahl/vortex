@@ -15,6 +15,13 @@ using namespace tinyxml2;
  ***********************/
 namespace Particles
 {	
+struct FileSettings
+{
+	ParticleUISettings set;
+	Util::String name;
+	Util::String texPath;
+};
+
 class ParticleFile
 {
 public:
@@ -28,13 +35,13 @@ public:
 	~ParticleFile();
 
 	bool SaveParticle(Util::String name);
-	bool LoadParticle(Util::String path);
-	void AppendEmitter(Ptr<Property::ParticleEmitter> emitter);
+	Util::Array<FileSettings> LoadParticle(Util::String path);
+	void AppendEmitter(Ptr<Game::ParticleEmitter> emitter);
 
 private:
 	ParticleFile();
 
-	Util::Array<Ptr<Property::ParticleEmitter>> emitters;
+	Util::Array<Ptr<Game::ParticleEmitter>> emitters;
 };
 }
 

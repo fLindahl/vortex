@@ -3,6 +3,7 @@
 #include "commands.h"
 #include "emittersUI.h"
 #include "imgui_color_gradient.h"
+#include "render/particlesystem/particlefile.h"
 
 namespace ParticleEditor{ class Application; }
 
@@ -23,6 +24,8 @@ public:
 
 	void Run();
 	void AddNewEmitter();
+	void AddNewEmitter(Particles::FileSettings set);
+
 	void DuplicateEmitter(std::shared_ptr<ParticleEditor::EmittersUI> newEmitter);
 
 	void RemoveEmitter(int id);
@@ -36,6 +39,7 @@ private:
 	void ShowFileMenu();
 	void DrawDocks();
 	void ModalWindows();
+	void LoadSettings(Util::Array<Particles::FileSettings> file);
 
 	void DrawTextureSettings();
 	void DrawGeneralSettings();
@@ -44,6 +48,8 @@ private:
 	void DrawEmitterSettings();
 
 	bool openPopup;
+	bool saveAsPopup;
+
 	bool texturePopup;
 	bool colorPicker;
 

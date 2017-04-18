@@ -9,11 +9,11 @@ EmittersUI::EmittersUI()
 {
 }
 
-EmittersUI::EmittersUI(UserInterface* ui, int id)
+EmittersUI::EmittersUI(UserInterface* ui, int id, bool dummy)
 {
 	this->ui = ui;
 	this->id = id;
-
+	this->dummy = dummy;
 	name = "New Emitter";
 
 	//gradient = ImGradient();
@@ -34,62 +34,66 @@ EmittersUI::~EmittersUI()
 
 void EmittersUI::DrawEmitter()
 {
-	std::string n = "##emitterframe" + std::to_string(id);
-	ImGui::BeginChild(n.c_str(), ImVec2(ImGui::GetWindowContentRegionWidth(), 40), true);
+	if (!dummy)
 	{
 		
-		if (ev.active)
+		std::string n = "##emitterframe" + std::to_string(id);
+		ImGui::BeginChild(n.c_str(), ImVec2(ImGui::GetWindowContentRegionWidth(), 40), true);
 		{
+		
+			if (ev.active)
+			{
 			
-			ImGui::ImageButton((void*)activeIcon->GetHandle(), ImVec2(15, 15));
-		}
-		else
-		{
-			if (ImGui::ImageButton((void*)inactiveIcon->GetHandle(), ImVec2(15, 15)))
-			{
-				ev.active = true;
-				ui->UpdateActiveEmitter(this->id);
+				ImGui::ImageButton((void*)activeIcon->GetHandle(), ImVec2(15, 15));
 			}
-		}
-		ui->Tooltip("Set this emitter to active");
-
-		ImGui::SameLine();
-
-		n = "##name" + std::to_string(id);
-		ImGui::InputText(n.c_str(), (char*)ev.name.c_str(), 512);
-
-		ImGui::SameLine(ImGui::GetWindowWidth() - 115);
-		if (ev.visible)
-		{
-			if (ImGui::ImageButton((void*)visibleIcon->GetHandle(), ImVec2(20, 20)))
+			else
 			{
-				ev.visible = false;
+				if (ImGui::ImageButton((void*)inactiveIcon->GetHandle(), ImVec2(15, 15)))
+				{
+					ev.active = true;
+					ui->UpdateActiveEmitter(this->id);
+				}
 			}
-		}
-		else
-		{
-			if (ImGui::ImageButton((void*)notVisibleIcon->GetHandle(), ImVec2(20, 20)))
+			ui->Tooltip("Set this emitter to active");
+
+			ImGui::SameLine();
+
+			n = "##name" + std::to_string(id);
+			ImGui::InputText(n.c_str(), (char*)ev.name.c_str(), 512);
+
+			ImGui::SameLine(ImGui::GetWindowWidth() - 115);
+			if (ev.visible)
 			{
-				ev.visible = true;
+				if (ImGui::ImageButton((void*)visibleIcon->GetHandle(), ImVec2(20, 20)))
+				{
+					ev.visible = false;
+				}
 			}
-		}
-		ui->Tooltip("Set this emitters visibility");
+			else
+			{
+				if (ImGui::ImageButton((void*)notVisibleIcon->GetHandle(), ImVec2(20, 20)))
+				{
+					ev.visible = true;
+				}
+			}
+			ui->Tooltip("Set this emitters visibility");
 
 		
-		ImGui::SameLine(ImGui::GetWindowWidth() - 80);
-		if (ImGui::ImageButton((void*)dupIcon->GetHandle(), ImVec2(20, 20)))
-		{
-			ui->DuplicateEmitter(std::make_shared<ParticleEditor::EmittersUI>(*this));
+			ImGui::SameLine(ImGui::GetWindowWidth() - 80);
+			if (ImGui::ImageButton((void*)dupIcon->GetHandle(), ImVec2(20, 20)))
+			{
+				ui->DuplicateEmitter(std::make_shared<ParticleEditor::EmittersUI>(*this));
+			}
+			ui->Tooltip("Duplicate this emitter");
+			ImGui::SameLine();
+			if (ImGui::ImageButton((void*)deleteIcon->GetHandle(), ImVec2(20, 20)))
+			{
+				ui->RemoveEmitter(this->id);
+			}
+			ui->Tooltip("Delete this emitter");
 		}
-		ui->Tooltip("Duplicate this emitter");
-		ImGui::SameLine();
-		if (ImGui::ImageButton((void*)deleteIcon->GetHandle(), ImVec2(20, 20)))
-		{
-			ui->RemoveEmitter(this->id);
-		}
-		ui->Tooltip("Delete this emitter");
+		ImGui::EndChild();
 	}
-	ImGui::EndChild();
 }
 
 }

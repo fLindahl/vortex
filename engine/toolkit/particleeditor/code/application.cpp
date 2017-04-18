@@ -39,10 +39,11 @@ Application::Open()
 {
 	this->window = new Display::Window;
 
+#ifdef _DEBUG
 	//Open Console
 	IO::Console::Instance()->Show();
 	IO::Console::Instance()->OpenNativeConsole();
-
+#endif
 	
 
 	//Always call app::open _AFTER_ initializing a glfwwindow

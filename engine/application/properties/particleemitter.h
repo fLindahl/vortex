@@ -11,12 +11,18 @@ namespace Render
 	class TextureResource;
 }
 
-namespace Property
+namespace Particles
+{
+	struct FileSettings;
+	class ParticleFile;
+}
+
+namespace Game
 {
 
 class ParticleEmitter : public Game::BaseProperty
 {
-	__DeclareClass(ParticleEmitter)
+__DeclareClass(ParticleEmitter);
 public:
 	ParticleEmitter();
 	~ParticleEmitter();
@@ -28,8 +34,12 @@ public:
 	void Deactivate();
 
 	void CreateEmitter(GLuint numOfParticles, const char* texturepath);
+	void CreateEmitter(Particles::FileSettings& set);
 	void UpdateUniformBuffer();
 	void BindUniformBuffer();
+	void UpdateTexture(const char* texturePath);
+	
+	Math::mat4 GetModelMatrix();
 
 	GLuint& GetNumberOfParticles(){ return numOfParticles; }
 
@@ -37,13 +47,12 @@ public:
 
 	Ptr<Render::TextureResource>& GetEmitterTexture(){ return this->texture; }
 
-	Math::mat4 GetModelMatrix();
-
 	GLuint* GetUniformBuffer(){ return this->ubo; }
 	Particles::EmitterBuffer& GetEmitterBuffer(){ return this->buff; }
 	Particles::ParticleRenderingBuffer& GetRenderBuffer(){ return this->renderBuff; }
 	Particles::ParticleUISettings& GetParticleUISettings(){ return this->pSet; }
 	Util::String& GetEmitterName(){ return this->name; }
+	Util::String& GetTexturePath(){ return this->texPath; }
 
 private:
 	//uniformBuffer
@@ -60,6 +69,7 @@ private:
 	//The uniform render buffer
 	Particles::ParticleRenderingBuffer renderBuff;
 
+	//Texture
 	Ptr<Render::TextureResource> texture;
 
 	//Saved Settings
@@ -67,6 +77,9 @@ private:
 
 	//Name of the emitter
 	Util::String name = "Name";
+
+	//Texture path
+	Util::String texPath;
 
 };
 }
