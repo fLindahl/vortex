@@ -6,6 +6,8 @@ SET(files_IO
 	console.h
 	console.cpp
 	callbacks.h
+	serialization.cpp
+	serialization.h
 	)
 
 SOURCE_GROUP("IO" FILES ${files_IO})

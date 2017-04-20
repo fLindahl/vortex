@@ -33,11 +33,20 @@ void Entity::Update()
 
 void Entity::HandleMessage(const Ptr<Messaging::Message>& msg)
 {
+	if (msg->GetType() == Msg::SetTransform::Type)
+	{
+		const Ptr<Msg::SetTransform>& m = msg.downcast<Msg::SetTransform>();
+		this->transform = m->Get();
+	}
+
+	//Have all the properties handle the same messge
 	for (int i = 0; i < this->properties.Size(); i++)
 	{
 		auto prop = this->properties[i];
 		prop->HandleMessage(msg);
 	}
+
+	
 }
 
 void Entity::SetTransform(const Math::mat4& nTransform)

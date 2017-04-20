@@ -11,6 +11,7 @@
 #include "application/game/cubemapentity.h"
 #include "envmanager.h"
 #include "render/resources/geometryproxy.h"
+#include "entitymanager.h"
 
 namespace BaseGameFeature
 {
@@ -143,6 +144,14 @@ bool SceneManager::SaveXMLScene(const char* filename)
 		}
 
 		pRoot->InsertFirstChild(proxy);
+	}
+
+	auto entities = BaseGameFeature::EntityManager::Instance()->GetEntityList();
+
+	for (auto pair : entities)
+	{
+		const Ptr<Game::Entity>& entity = pair.second;
+		//entity->Serialize(data);
 	}
 
 	tinyxml2::XMLError eResult = data.SaveFile(filename);
