@@ -7,7 +7,7 @@ PROJECT(particleeditor)
 FILE(GLOB particleeditor_headers code/*.h code/tools/*.h)
 FILE(GLOB particleeditor_sources code/*.cpp code/tools/*.cpp)
 
-SET(files_particleeditor ${particleeditor_headers} ${particleeditor_sources} code/particleeditor.rc)
+SET(files_particleeditor ${particleeditor_headers} ${particleeditor_sources})
 SOURCE_GROUP("particleeditor" FILES ${files_particleeditor})
 
 ADD_EXECUTABLE(particleeditor ${files_particleeditor})
