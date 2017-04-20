@@ -12,11 +12,10 @@ struct EmitterValues
 {
 	EmitterValues()
 	{
-		name.reserve(512);
+		name.Reserve(512);
 		name = "New Emitter";
 	}
-	std::string name;
-	std::string texture;
+	Util::String name;
 
 	bool visible = true;
 

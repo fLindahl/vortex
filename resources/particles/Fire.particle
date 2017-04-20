@@ -1,0 +1,40 @@
+<Vortex>
+    <ParticleSystem>
+        <ParticleEmitter name="Fire">
+            <Texture path="resources/textures/particles/tex_vfx-ult_particle_sprite_fire.png" framesPerRow="0" numberOfFrames="0" spritesheet="false"/>
+            <Velocity vel="0.109" vel2="0.13700001" random="true"/>
+            <Acceleration acc="0.000000 0.114000 0.000000" acc2="0.000000 0.348000 0.000000" random="true"/>
+            <Lifetime life="1.6800001" life2="2.345" random="true"/>
+            <Color color="0.803493 0.042104 0.000000 0.109170" color2="0.266376 0.097710 0.000000 0.122271" random="true"/>
+            <Size startSize="0.74400002" endSize="0.57900006"/>
+            <ParticleAmount num="600"/>
+            <EmitterShapes shape="2">
+                <Radius radius="0.093000002"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+        <ParticleEmitter name="Sparks">
+            <Texture path="resources/textures/particles/capsule2.tga" framesPerRow="0" numberOfFrames="0" spritesheet="false"/>
+            <Velocity vel="0.038000003" vel2="0.072000004" random="true"/>
+            <Acceleration acc="0.000000 0.114000 0.000000" acc2="0.000000 0.206000 0.000000" random="true"/>
+            <Lifetime life="1.9900001" life2="3.0460002" random="true"/>
+            <Color color="1.000000 0.471616 0.000000 0.816594" color2="0.947598 0.322763 0.000000 0.772926" random="true"/>
+            <Size startSize="0.018999999" endSize="0.018999999"/>
+            <ParticleAmount num="20"/>
+            <EmitterShapes shape="2">
+                <Radius radius="0.156"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+        <ParticleEmitter name="Smoke">
+            <Texture path="resources/textures/particles/particle_spritesheet_smoke2.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
+            <Velocity vel="0.0090000005" vel2="0.032000002" random="true"/>
+            <Acceleration acc="0.000000 0.206000 0.000000" acc2="0.000000 1.000000 0.000000" random="false"/>
+            <Lifetime life="4.6000004" life2="5.100002" random="true"/>
+            <Color color="0.34117 0.29412 0.27059 0.443137" color2="0.34117 0.3176 0.30588 0.435294" random="true"/>
+            <Size startSize="0.65400001" endSize="1.100007"/>
+            <ParticleAmount num="25"/>
+            <EmitterShapes shape="2">
+                <Radius radius="0.14400001"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+    </ParticleSystem>
+</Vortex>

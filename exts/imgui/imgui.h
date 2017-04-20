@@ -581,14 +581,14 @@ enum ImGuiKey_
     ImGuiKey_X,         // for text edit CTRL+X: cut
     ImGuiKey_Y,         // for text edit CTRL+Y: redo
     ImGuiKey_Z,         // for text edit CTRL+Z: undo
-	ImGuiKey_O,			// for open file dialog
-	ImGuiKey_N,			// for new file
 	ImGuiKey_Q,			
 	ImGuiKey_W,			
 	ImGuiKey_E,			
 	ImGuiKey_R,			
 	ImGuiKey_S,			
-	ImGuiKey_D,			
+	ImGuiKey_D,
+	ImGuiKey_O,			// for open file dialog
+	ImGuiKey_N,			// for new file
     ImGuiKey_COUNT
 };
 

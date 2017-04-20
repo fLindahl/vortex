@@ -78,7 +78,7 @@ struct ParticleUISettings
 
 	EmitterShapes shapes = CONE;
 
-	std::string texName = "";
+	Util::String texName = "";
 
 };
 

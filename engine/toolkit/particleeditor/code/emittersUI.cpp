@@ -59,7 +59,7 @@ void EmittersUI::DrawEmitter()
 			ImGui::SameLine();
 
 			n = "##name" + std::to_string(id);
-			ImGui::InputText(n.c_str(), (char*)ev.name.c_str(), 512);
+			ImGui::InputText(n.c_str(), (char*)ev.name.AsCharPtr(), 512);
 
 			ImGui::SameLine(ImGui::GetWindowWidth() - 115);
 			if (ev.visible)

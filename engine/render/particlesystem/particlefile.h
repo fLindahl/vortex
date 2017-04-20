@@ -9,6 +9,8 @@
 
 using namespace tinyxml2;
 
+namespace ParticleEditor{ class EmittersUI; }
+
 /***********************
  * Save and load function for particle system.
  * Singleton
@@ -35,6 +37,7 @@ public:
 	~ParticleFile();
 
 	bool SaveParticle(Util::String name);
+	bool SaveParticle(Util::String name, Util::Array<std::shared_ptr<ParticleEditor::EmittersUI>> ems);
 	Util::Array<FileSettings> LoadParticle(Util::String path);
 	void AppendEmitter(Ptr<Game::ParticleEmitter> emitter);
 

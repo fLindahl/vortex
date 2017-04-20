@@ -16,9 +16,14 @@ UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 
 	openPopup = false;
 	saveAsPopup = false;
+	saveAsCheck = true;
+
+	isSaved = false;
 
 	texturePopup = false;
 	colorPicker = false;
+
+	filename = "";
 
 	newEmittIcon = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/particleeditor/resources/textures/add.png");
 	openIcon = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/particleeditor/resources/textures/open.png");
@@ -29,7 +34,7 @@ UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 
 	std::shared_ptr<ParticleEditor::EmittersUI> em = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount, true);
 	em->ev.active = true;
-	emUI[emitterCount] = em;
+	emUI.Append(em);
 	emitterCount++;
 
 	for (int i = 0; i < 4; i++)
@@ -81,6 +86,7 @@ void UserInterface::Run()
 
 		ImGui::EndMainMenuBar();
 	}
+	ExecuteShortcuts();
 	ModalWindows();
 }
 
@@ -89,11 +95,15 @@ void UserInterface::ExecuteShortcuts()
 {
 	if ((ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_O))))
 	{
-		openPopup = true;
+		this->openPopup = true;
+	}
+	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_S)))
+	{
+		this->saveAsCheck = false;
 	}
 	else if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeyShift && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_S)))
 	{
-		
+		this->saveAsPopup = true;
 	}
 	else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_N)))
 	{
@@ -101,16 +111,17 @@ void UserInterface::ExecuteShortcuts()
 	}
 }
 
-
 void UserInterface::ShowFileMenu()
 {
-
 	if (ImGui::MenuItem("New")) {}
 	if (ImGui::MenuItem("Open", "Ctrl+O"))
 	{
 		openPopup = true;
 	}
-	if (ImGui::MenuItem("Save", "Ctrl+S")) {}
+	if (ImGui::MenuItem("Save", "Ctrl+S"))
+	{
+		this->saveAsCheck = false;
+	}
 	if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S"))
 	{
 		this->saveAsPopup = true;
@@ -196,6 +207,18 @@ void UserInterface::DrawDocks()
 void UserInterface::ModalWindows()
 {
 	if (this->openPopup){ ImGui::OpenPopup("OpenFile"); }
+	if (!this->saveAsCheck)
+	{
+		if (this->isSaved)
+		{
+			Particles::ParticleFile::Instance()->SaveParticle(filename, emUI);
+			this->saveAsCheck = true;
+		}
+		else
+		{
+			this->saveAsPopup = true;
+		}
+	}
 	if (this->saveAsPopup){ ImGui::OpenPopup("SaveAsFile"); }
 	if (this->texturePopup){ ImGui::OpenPopup("OpenTexture"); }
 
@@ -208,22 +231,22 @@ void UserInterface::ModalWindows()
 		{
 			printf("path: %s\n", outpath);
 			
+			for (int i = emUI.Size() - 1; i >= 1; i--)
+				RemoveEmitter(i);
+
 			IO::Console::Instance()->Print("NFD opened succesfully", IO::INPUT);
 
 			Util::String s = outpath;
 			Util::Array<Util::String> path;
-#ifdef _WIN32
-			s.Tokenize("\\", path);
-#else
-			s.Tokenize("/", path);
-#endif
-			s = path[path.Size() - 1];
 
-			Util::String title = "Particle Editor - " + s;
+			s.ConvertBackslashes();
+			filename = s.ExtractFileName();
+			Util::String title = "Particle Editor - " + s.ExtractFileName();
 			application->GetWindow()->SetTitle(title.AsCharPtr());
 
-			LoadSettings(Particles::ParticleFile::Instance()->LoadParticle(outpath));
+			LoadSettings(Particles::ParticleFile::Instance()->LoadParticle(s));
 
+			this->isSaved = true;
 			this->openPopup = false;
 			free(outpath);
 		}
@@ -254,21 +277,24 @@ void UserInterface::ModalWindows()
 
 			Util::String s = outpath;
 			Util::Array<Util::String> path;
-#ifdef _WIN32
-			s.Tokenize("\\", path);
-#else
-			s.Tokenize("/", path);
-#endif
-			s = path[path.Size() - 1]+".particle";
-
-			Util::String title = "Particle Editor - " + s;
+			
+			s.ConvertBackslashes();
+			
+			filename = s.ExtractFileName();
+			Util::String title = "Particle Editor - " + s.ExtractFileName();
 			application->GetWindow()->SetTitle(title.AsCharPtr());
+
+			Particles::ParticleFile::Instance()->SaveParticle(filename, emUI);
+
+			this->isSaved = true;
+			this->saveAsCheck = true;
 			this->saveAsPopup = false;
 			free(outpath);
 		}
 		else if (result == NFD_CANCEL)
 		{
 			IO::Console::Instance()->Print("User canceled nfd", IO::INPUT);
+			this->saveAsCheck = true;
 			this->saveAsPopup = false;
 		}
 		else
@@ -276,6 +302,7 @@ void UserInterface::ModalWindows()
 			IO::Console::Instance()->Print("nfd failed to open", IO::ERROR);
 			printf("Error: %s\n", NFD_GetError());
 			assert(false);
+			this->saveAsCheck = true;
 			this->openPopup = false;
 		}
 
@@ -289,26 +316,13 @@ void UserInterface::ModalWindows()
 		if (result == NFD_OKAY)
 		{
 			printf("path: %s\n", outpath);
-			//if (this->application->loadedModel != nullptr)
-			//{
-			//	this->application->loadedModel->Deactivate();
-			//}
-			//this->selectedNode = nullptr;
+
 			Util::String s = outpath;
 			Util::Array<Util::String> path;
-#ifdef _WIN32
-			s.Tokenize("\\", path);
-#else
-			s.Tokenize("/", path);
-#endif
-			s = path[path.Size() - 2] +"/" + path[path.Size() - 1];
-			emUI[activeEmitter]->ev.texture = s.AsCharPtr();
-			emUI[activeEmitter]->settings.texName = outpath;
+			s.ConvertBackslashes();
+			emUI[activeEmitter]->settings.texName = s.ExtractToEnd(s.FindStringIndex("resources")).AsCharPtr();
+			
 			emitterTexture = Render::ResourceServer::Instance()->LoadTexture(outpath);
-			//this->application->loadedModel = Game::ModelEntity::Create();
-			//this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
-			//this->application->loadedModel->SetTransform(Math::mat4::scaling(0.01f, 0.01f, 0.01f));
-			//this->application->loadedModel->Activate();
 
 			this->texturePopup = false;
 			free(outpath);
@@ -387,12 +401,11 @@ void UserInterface::DrawGeneralSettings()
 
 void UserInterface::DrawEmitters()
 {
-	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (emUI.size() <= 8 ? emUI.size()-1 : 8)+5), false);
+	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (emUI.Size() <= 8 ? emUI.Size()-1 : 8)+5), false);
 	{
-		for (int i = 0; i < emitterCount; i++)
+		for (int i = 0; i < emUI.Size(); i++)
 		{
-			if (emUI.find(i) != emUI.end())
-				emUI.at(i)->DrawEmitter();
+			emUI[i]->DrawEmitter();
 		}
 	}
 	ImGui::EndChild();
@@ -432,7 +445,23 @@ void UserInterface::DrawRender()
 		ImGui::Text("Texture:");
 		ImGui::SameLine(160);
 		ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - 100);
-		ImGui::InputText("##texture", (char*)emUI[activeEmitter]->ev.texture.c_str(), 512, ImGuiInputTextFlags_ReadOnly);
+
+		if (emUI[activeEmitter]->settings.texName != "")
+		{
+			Util::String s = emUI[activeEmitter]->settings.texName.AsCharPtr();
+			Util::Array<Util::String> path;
+
+			s.Tokenize("/", path);
+
+			s = path[path.Size() - 2] + "/" + path[path.Size() - 1];
+
+			ImGui::InputText("##texture", (char*) s.AsCharPtr(), 256, ImGuiInputTextFlags_ReadOnly);
+		}
+		else
+		{
+			ImGui::InputText("##texture", (char*)emUI[activeEmitter]->settings.texName.AsCharPtr(), 512, ImGuiInputTextFlags_ReadOnly);
+		}
+		
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		if(ImGui::ImageButton((void*) openIcon->GetHandle(), ImVec2(18.f,15.f)))
@@ -653,7 +682,7 @@ void UserInterface::DrawEmitterSettings()
 void UserInterface::AddNewEmitter()
 {
 	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
-	emUI[emitterCount] = tempEm;
+	emUI.Append(tempEm);
 	emitterCount++;
 }
 
@@ -661,52 +690,55 @@ void UserInterface::AddNewEmitter(Particles::FileSettings set)
 {
 	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
 	tempEm->settings = set.set;
+	tempEm->settings.texName = set.texPath.AsCharPtr();
 	tempEm->ev.name = set.name.AsCharPtr();
-	emUI[emitterCount] = tempEm;
+	emUI.Append(tempEm);
 	emitterCount++;
 }
 
 void UserInterface::DuplicateEmitter(std::shared_ptr<ParticleEditor::EmittersUI> newEmitter)
 {
+	//TODO: Fix the problem with pointer deletion when things are copied
 	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
 	tempEm->ev = newEmitter->ev;
+	tempEm->settings = newEmitter->settings;
 	tempEm->ev.active = false;
-	emUI[emitterCount] = tempEm;
+	emUI.Append(tempEm);
 	emitterCount++;
 }
 
 void UserInterface::RemoveEmitter(int id)
 {
-	//if (emUI.size() > 1)
-	//{
-	//	bool found = false;
-	//	if (emUI.find(id) != emUI.end())
-	//	{
-	//		emUI.erase(id);
+	if (emUI.Size() > 1)
+	{
+		emUI.RemoveIndex(id);
+		
+		for (int i = id; i < emUI.Size(); i++)
+		{
+			emUI[i]->id = emUI.FindIndex(emUI[i]);			
+		}
 
-	//		found = true;
-	//		
-	//	}
-
-	//	if (found)
-	//	{
-	//		for (int i = id + 1; i < emitterCount; i++)
-	//			emUI[i]->id -= 1;
-
-	//		emitterCount--;
-	//	}
-	//}
+		emitterCount--;
+	}
 	
 }
 
 void UserInterface::UpdateActiveEmitter(int id)
 {
-	for (int i = 0; i < emUI.size(); i++)
+	for (int i = 0; i < emUI.Size(); i++)
 	{
 		if (i != id)
 			emUI[i]->ev.active = false;
 	}
+
 	activeEmitter = id;
+
+	if (emUI[activeEmitter]->settings.texName != "")
+	{
+		Util::String s = emUI[activeEmitter]->settings.texName.AsCharPtr();
+		emitterTexture = Render::ResourceServer::Instance()->LoadTexture(s);
+	}
+
 	//emUI[id] use to set the values in the editor
 }
 

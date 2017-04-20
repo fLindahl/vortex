@@ -1,0 +1,28 @@
+<Vortex>
+    <ParticleSystem>
+        <ParticleEmitter name="Water1">
+            <Texture path="resources/textures/particles/particle_spritesheet_smoke3.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
+            <Velocity vel="1.1160001" vel2="1.23" random="true"/>
+            <Acceleration acc="0.000000 -1.294000 0.000000" acc2="0.000000 -0.867000 0.000000" random="true"/>
+            <Lifetime life="1.6800001" life2="2.345" random="true"/>
+            <Color color="0.160784 0.243137 0.529412 0.203922" color2="0.282353 0.423529 0.650980 0.219608" random="true"/>
+            <Size startSize="0.14" endSize="0.52200001"/>
+            <ParticleAmount num="300"/>
+            <EmitterShapes shape="0">
+                <Radius radius="0.44400004"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+        <ParticleEmitter name="Water2">
+            <Texture path="resources/textures/particles/particle_spritesheet_smoke2.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
+            <Velocity vel="0.565" vel2="0.91400003" random="true"/>
+            <Acceleration acc="0.000000 -0.348000 0.000000" acc2="0.000000 -0.561000 0.000000" random="true"/>
+            <Lifetime life="1.9900001" life2="3.0460002" random="true"/>
+            <Color color="0.191377 0.407575 0.842795 0.323144" color2="0.259206 0.316950 0.860262 0.275109" random="true"/>
+            <Size startSize="0.052000001" endSize="0.64100003"/>
+            <ParticleAmount num="20"/>
+            <EmitterShapes shape="0">
+                <Radius radius="0.25100002"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+    </ParticleSystem>
+</Vortex>

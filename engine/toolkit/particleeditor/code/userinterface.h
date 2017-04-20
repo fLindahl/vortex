@@ -49,6 +49,9 @@ private:
 
 	bool openPopup;
 	bool saveAsPopup;
+	bool saveAsCheck;
+
+	bool isSaved;
 
 	bool texturePopup;
 	bool colorPicker;
@@ -63,11 +66,12 @@ private:
 	Edit::CommandManager* commandManager;
 	std::shared_ptr<ParticleEditor::Application> application;
 
-	std::map<int, std::shared_ptr<ParticleEditor::EmittersUI>> emUI;
+	Util::Array<std::shared_ptr<ParticleEditor::EmittersUI>> emUI;
 
 	int activeEmitter;
-
 	int emitterCount;
+
+	Util::String filename;
 
 	EditorSettings edSet;
 };
