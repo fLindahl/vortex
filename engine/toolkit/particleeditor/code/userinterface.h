@@ -47,6 +47,8 @@ private:
 	void DrawRender();
 	void DrawEmitterSettings();
 
+	void EmptyEmitters();
+
 	bool openPopup;
 	bool saveAsPopup;
 	bool saveAsCheck;
@@ -66,10 +68,11 @@ private:
 	Edit::CommandManager* commandManager;
 	std::shared_ptr<ParticleEditor::Application> application;
 
-	Util::Array<std::shared_ptr<ParticleEditor::EmittersUI>> emUI;
+	std::unordered_map<int, std::shared_ptr<ParticleEditor::EmittersUI>> emUI;
 
 	int activeEmitter;
 	int emitterCount;
+	int activeEmittersCount;
 
 	Util::String filename;
 

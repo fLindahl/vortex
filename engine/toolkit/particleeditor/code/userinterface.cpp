@@ -13,6 +13,7 @@ UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 
 	activeEmitter = 0;
 	emitterCount = 0;
+	activeEmittersCount = 0;
 
 	openPopup = false;
 	saveAsPopup = false;
@@ -34,7 +35,8 @@ UserInterface::UserInterface(std::shared_ptr<ParticleEditor::Application> app)
 
 	std::shared_ptr<ParticleEditor::EmittersUI> em = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount, true);
 	em->ev.active = true;
-	emUI.Append(em);
+	em->ev.name = "dummy";
+	emUI[emitterCount] = em;
 	emitterCount++;
 
 	for (int i = 0; i < 4; i++)
@@ -231,8 +233,7 @@ void UserInterface::ModalWindows()
 		{
 			printf("path: %s\n", outpath);
 			
-			for (int i = emUI.Size() - 1; i >= 1; i--)
-				RemoveEmitter(i);
+			EmptyEmitters();
 
 			IO::Console::Instance()->Print("NFD opened succesfully", IO::INPUT);
 
@@ -279,7 +280,12 @@ void UserInterface::ModalWindows()
 			Util::Array<Util::String> path;
 			
 			s.ConvertBackslashes();
-			
+
+			if (!s.CheckFileExtension("particle"))
+			{
+				s = s + ".particle";
+			}
+
 			filename = s.ExtractFileName();
 			Util::String title = "Particle Editor - " + s.ExtractFileName();
 			application->GetWindow()->SetTitle(title.AsCharPtr());
@@ -401,12 +407,14 @@ void UserInterface::DrawGeneralSettings()
 
 void UserInterface::DrawEmitters()
 {
-	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (emUI.Size() <= 8 ? emUI.Size()-1 : 8)+5), false);
+	ImGui::BeginChild("##es", ImVec2(ImGui::GetWindowWidth() - 20, 45 * (activeEmittersCount <= 8 ? activeEmittersCount : 8) + 5), false);
 	{
-		for (int i = 0; i < emUI.Size(); i++)
+		for (int i = 0; i < emitterCount; i++)
 		{
-			emUI[i]->DrawEmitter();
+			if (emUI.find(i) != emUI.end())
+				emUI[i]->DrawEmitter();
 		}
+		
 	}
 	ImGui::EndChild();
 
@@ -429,6 +437,9 @@ void UserInterface::DrawEmitters()
 		}
 	}
 	ImGui::EndChild();
+
+	ImVec2 dockSize(ImGui::GetContentRegionAvailWidth() - 20, ImGui::GetContentRegionAvailWidth() - 20);
+	ImGui::Image((void*)Render::RenderDevice::Instance()->GetFinalColorBuffer(), dockSize);
 }
 
 void UserInterface::DrawRender()
@@ -679,11 +690,24 @@ void UserInterface::DrawEmitterSettings()
 	ImGui::EndChild();
 }
 
+void UserInterface::EmptyEmitters()
+{
+	emUI.clear();
+	emitterCount = 0;
+	activeEmittersCount = 0;
+	std::shared_ptr<ParticleEditor::EmittersUI> em = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount, true);
+	em->ev.active = true;
+	em->ev.name = "dummy";
+	emUI[emitterCount] = em;
+	emitterCount++;
+}
+
 void UserInterface::AddNewEmitter()
 {
 	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
-	emUI.Append(tempEm);
+	emUI[emitterCount] = tempEm;
 	emitterCount++;
+	activeEmittersCount++;
 }
 
 void UserInterface::AddNewEmitter(Particles::FileSettings set)
@@ -692,43 +716,46 @@ void UserInterface::AddNewEmitter(Particles::FileSettings set)
 	tempEm->settings = set.set;
 	tempEm->settings.texName = set.texPath.AsCharPtr();
 	tempEm->ev.name = set.name.AsCharPtr();
-	emUI.Append(tempEm);
+	emUI[emitterCount] = tempEm;
 	emitterCount++;
+	activeEmittersCount++;
 }
 
 void UserInterface::DuplicateEmitter(std::shared_ptr<ParticleEditor::EmittersUI> newEmitter)
 {
 	//TODO: Fix the problem with pointer deletion when things are copied
-	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(this, emitterCount);
-	tempEm->ev = newEmitter->ev;
-	tempEm->settings = newEmitter->settings;
+	std::shared_ptr<ParticleEditor::EmittersUI> tempEm = std::make_shared<ParticleEditor::EmittersUI>(*newEmitter);
+	tempEm->id = emitterCount;
 	tempEm->ev.active = false;
-	emUI.Append(tempEm);
+	emUI[emitterCount] = tempEm;
 	emitterCount++;
+	activeEmittersCount++;
 }
 
 void UserInterface::RemoveEmitter(int id)
 {
-	if (emUI.Size() > 1)
+	if (emUI.size() > 1)
 	{
-		emUI.RemoveIndex(id);
-		
-		for (int i = id; i < emUI.Size(); i++)
+		if (activeEmitter == id)
 		{
-			emUI[i]->id = emUI.FindIndex(emUI[i]);			
+			activeEmitter = 0;
 		}
-
-		emitterCount--;
+		emUI.erase(id);
+		activeEmittersCount--;
 	}
-	
+
 }
 
 void UserInterface::UpdateActiveEmitter(int id)
 {
-	for (int i = 0; i < emUI.Size(); i++)
+	for (int i = 0; i < emitterCount; i++)
 	{
-		if (i != id)
-			emUI[i]->ev.active = false;
+		if (emUI.find(i) != emUI.end())
+		{
+			if (i != id)
+				emUI[i]->ev.active = false;
+		}
+		
 	}
 
 	activeEmitter = id;

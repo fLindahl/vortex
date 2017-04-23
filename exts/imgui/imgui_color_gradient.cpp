@@ -20,12 +20,18 @@ ImGradient::ImGradient()
 
 ImGradient::ImGradient(const ImGradient& copy)
 {
-	m_marks = copy.m_marks;
+	m_marks.clear();
 	
-	for (int i = 0; i < 768; i++)
+	for(auto &mark : copy.m_marks)
+	{
+		ImGradientMark* temp = new ImGradientMark(*mark);
+		m_marks.push_back(temp);
+	}
+
+	for (int i = 0; i < 1024; i++)
 	{
 		m_cachedValues[i] = copy.m_cachedValues[i];
-	}	
+	}
 }
 
 ImGradient::~ImGradient()

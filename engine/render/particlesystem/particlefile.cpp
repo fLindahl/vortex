@@ -93,7 +93,7 @@ bool ParticleFile::SaveParticle(Util::String name)
 	return true;
 }
 
-bool ParticleFile::SaveParticle(Util::String name, Util::Array<std::shared_ptr<ParticleEditor::EmittersUI>> ems)
+bool ParticleFile::SaveParticle(Util::String name,std::unordered_map<int, std::shared_ptr<ParticleEditor::EmittersUI>> ems)
 {
 	XMLDocument xmlDoc;
 	XMLNode* pRoot = xmlDoc.NewElement("Vortex");
@@ -105,8 +105,10 @@ bool ParticleFile::SaveParticle(Util::String name, Util::Array<std::shared_ptr<P
 	XMLElement* pElement;
 	XMLElement* pShapeElements;
 	std::string s;
-	for (size_t i = 0; i < ems.Size(); i++)
+	for (size_t i = 0; i < ems.size(); i++)
 	{
+		if (ems[i]->GetDummy())
+			continue;
 		ParticleUISettings set = ems[i]->settings;
 		pEmitter = xmlDoc.NewElement("ParticleEmitter");
 		pEmitter->SetAttribute("name", ems[i]->ev.name.AsCharPtr());

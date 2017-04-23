@@ -37,7 +37,7 @@ public:
 	~ParticleFile();
 
 	bool SaveParticle(Util::String name);
-	bool SaveParticle(Util::String name, Util::Array<std::shared_ptr<ParticleEditor::EmittersUI>> ems);
+	bool SaveParticle(Util::String name, std::unordered_map<int, std::shared_ptr<ParticleEditor::EmittersUI>> ems);
 	Util::Array<FileSettings> LoadParticle(Util::String path);
 	void AppendEmitter(Ptr<Game::ParticleEmitter> emitter);
 

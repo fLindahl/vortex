@@ -12,6 +12,7 @@
 #include "undo.h"
 #include "commands.h"
 #include "userinterface.h"
+#include "application/game/particleentity.h"
 
 namespace ParticleEditor
 {
@@ -36,6 +37,10 @@ private:
 	bool shutdown;
 
 	std::shared_ptr<UserInterface> UI;
+
+	std::shared_ptr<Game::ParticleEntity> billboard;
+
+	Util::Array<Ptr<Game::ParticleEmitter>> particleList;
 
 	/// ImGui functions
 	void RenderUI();

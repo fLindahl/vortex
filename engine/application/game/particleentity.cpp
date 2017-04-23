@@ -8,7 +8,7 @@ namespace Game
 __ImplementClass(Game::ParticleEntity, 'PAEN', Game::Entity)
 ParticleEntity::ParticleEntity()
 {
-	this->emitters.Append(Ptr<Game::ParticleEmitter>());
+	this->emitters.Append(Game::ParticleEmitter::Create());
 }
 
 ParticleEntity::~ParticleEntity()
@@ -42,7 +42,7 @@ void ParticleEntity::LoadEmitters(Util::String path)
 	for (size_t i = 0; i < set.Size(); i++)
 	{
 		if (i != 0)
-			this->emitters.Append(Ptr<Game::ParticleEmitter>());
+			this->emitters.Append(Game::ParticleEmitter::Create());
 
 		Activate();
 		this->emitters[i]->CreateEmitter(set[i]);

@@ -34,6 +34,8 @@ public:
 
 	void DrawEmitter();
 
+	bool GetDummy() const { return dummy; }
+
 	EmitterValues ev;
 	Particles::ParticleUISettings settings;
 

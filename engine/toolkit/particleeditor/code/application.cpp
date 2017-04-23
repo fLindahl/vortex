@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "IO/console.h"
 #include "ImGUIExtra.h"
+#include "application/basegamefeature/managers/scenemanager.h"
 
 using namespace Display;
 
@@ -44,19 +45,30 @@ Application::Open()
 	IO::Console::Instance()->Show();
 	IO::Console::Instance()->OpenNativeConsole();
 #endif
-	
 
 	//Always call app::open _AFTER_ initializing a glfwwindow
 	if (this->window->Open() && App::Open())
 	{
 		keyhandler = BaseGameFeature::KeyHandler::Instance();
 		keyhandler->Init(this->window);
+	
+		Render::RenderDevice::Instance()->Initialize();
 		
 		UI = std::make_shared<UserInterface>(std::shared_ptr<ParticleEditor::Application>(this));
 
 		//Never set resolution before initializing rendering and framepasses
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Particle Editor");
+
+		this->billboard = std::make_shared<Game::ParticleEntity>();
+		this->billboard->SetTransform(Math::mat4::translation(0.f, 0.f, 0.f));
+		this->billboard->LoadEmitters("resources/particles/Fire.particle");
+		this->billboard->Activate();
+
+		for (size_t i = 0; i < this->billboard->GetEmitters().Size(); i++)
+		{
+			this->particleList.Append(this->billboard->GetEmitters()[i]);
+		}
 
 		ImGui::SetupImGuiStyle(true, 1.0f);
 
@@ -106,9 +118,10 @@ Application::Run()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
-       	
+		BaseGameFeature::EntityManager::Instance()->Update();
 		//Application loop
 
+		Render::RenderDevice::Instance()->Render(false);
 		this->window->SwapBuffers();
 	}
 
