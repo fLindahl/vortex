@@ -9,6 +9,7 @@
 #include "IO/console.h"
 #include "ImGUIExtra.h"
 #include "application/basegamefeature/managers/scenemanager.h"
+#include "render/server/resourceserver.h"
 
 using namespace Display;
 
@@ -53,6 +54,7 @@ Application::Open()
 		keyhandler->Init(this->window);
 	
 		Render::RenderDevice::Instance()->Initialize();
+		Render::RenderDevice::Instance()->SetRenderResolution({ 1920, 1200 });
 		
 		UI = std::make_shared<UserInterface>(std::shared_ptr<ParticleEditor::Application>(this));
 
@@ -60,9 +62,15 @@ Application::Open()
 		this->window->SetSize(1920, 1020);
 		this->window->SetTitle("Particle Editor");
 
-		this->billboard = std::make_shared<Game::ParticleEntity>();
-		this->billboard->SetTransform(Math::mat4::translation(0.f, 0.f, 0.f));
-		this->billboard->LoadEmitters("resources/particles/Fire.particle");
+		//spawn in a cube somewhere
+		this->wall1 = Game::ModelEntity::Create();
+		this->wall1->SetModel(Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+		this->wall1->Activate();
+		this->wall1->SetTransform(Math::mat4::translation(0.0f, 10.5f, -1.0f));
+
+		this->billboard = Game::ParticleEntity::Create();
+		this->billboard->SetTransform(Math::mat4::translation(0.f, 0.f, -2.f));
+		this->billboard->LoadEmitters("resources/particles/wisp.particle");
 		this->billboard->Activate();
 
 		for (size_t i = 0; i < this->billboard->GetEmitters().Size(); i++)
@@ -76,11 +84,6 @@ Application::Open()
 		this->window->SetUiRender([this]()
 		  {
 			  this->RenderUI();
-		  });
-
-		this->window->SetNanoVGRender([this](NVGcontext * vg)
-		  {
-			  this->RenderNano(vg);
 		  });
 		
 		return true;
@@ -98,12 +101,6 @@ void Application::RenderUI()
 		//Imgui code goes here!
 		UI->Run();
 	}
-}
-
-void Application::RenderNano(NVGcontext * vg)
-{
-	nvgSave(vg);
-	nvgRestore(vg);
 }
 
 //------------------------------------------------------------------------------

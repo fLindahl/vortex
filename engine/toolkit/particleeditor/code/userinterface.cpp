@@ -438,8 +438,11 @@ void UserInterface::DrawEmitters()
 	}
 	ImGui::EndChild();
 
-	ImVec2 dockSize(ImGui::GetContentRegionAvailWidth() - 20, ImGui::GetContentRegionAvailWidth() - 20);
+	ImGui::NewLine();
+	ImGui::SameLine(40);
+	ImVec2 dockSize(ImGui::GetContentRegionAvailWidth() - 30, ImGui::GetContentRegionAvailWidth() - 30);
 	ImGui::Image((void*)Render::RenderDevice::Instance()->GetFinalColorBuffer(), dockSize);
+
 }
 
 void UserInterface::DrawRender()

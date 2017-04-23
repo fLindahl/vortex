@@ -38,15 +38,13 @@ private:
 
 	std::shared_ptr<UserInterface> UI;
 
-	std::shared_ptr<Game::ParticleEntity> billboard;
+	Ptr<Game::ModelEntity> wall1;
+	Ptr<Game::ParticleEntity> billboard;
 
 	Util::Array<Ptr<Game::ParticleEmitter>> particleList;
 
 	/// ImGui functions
 	void RenderUI();
-
-	// show some nanovg stuff
-	void RenderNano(NVGcontext * vg);
 	
 	//Input handler
 	BaseGameFeature::KeyHandler* keyhandler;

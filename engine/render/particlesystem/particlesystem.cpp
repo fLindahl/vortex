@@ -162,9 +162,15 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Game::Particl
 			this->particleArray[i].color = settings.color;
 		}
 
-		this->particleArray[i].size = settings.size[0];
-		this->particleArray[i].startSize = settings.size[0];
-		this->particleArray[i].endSize = settings.size[1];
+		this->particleArray[i].size[0] = settings.size[0];
+		this->particleArray[i].size[1] = settings.size[0];
+		this->particleArray[i].size[2] = settings.size[0];
+		this->particleArray[i].startSize[0] = settings.size[0];
+		this->particleArray[i].startSize[1] = settings.size[0];
+		this->particleArray[i].startSize[2] = settings.size[0];
+		this->particleArray[i].endSize[0] = settings.size[1];
+		this->particleArray[i].endSize[1] = settings.size[1];
+		this->particleArray[i].endSize[2] = settings.size[1];
 
 	}
 
