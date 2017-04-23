@@ -7,6 +7,7 @@ namespace Property
 
 FreeCamera::FreeCamera()
 {
+	
 
 }
 

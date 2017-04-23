@@ -41,6 +41,8 @@ SET(files_application_game
 	game/geometryproxyentity.cpp
 	game/pointlightentity.cpp 
 	game/pointlightentity.h
+	game/attribute.h
+	game/attribute.cpp
 	)
 	
 SET(files_application_properties

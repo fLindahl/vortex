@@ -21,7 +21,7 @@ uint EntityManager::GetNewEntityID()
 
 void EntityManager::RegisterEntity(Ptr<Game::Entity> entity)
 {
-	this->EntityList.insert(std::pair<int, Ptr<Game::Entity>>(entity->getID(), entity));
+	this->EntityList.insert(std::pair<int, Ptr<Game::Entity>>(entity->GetID(), entity));
 }
 
 void EntityManager::UnregisterEntity(const int& ID)
