@@ -48,6 +48,8 @@ public:
     static String ToString(const FourCC& f);
     /// convert string to fourcc
     static FourCC FromString(const String& s);
+	/// return a 32-bit hash code for the string
+	index_t HashCode() const;
 
 private:
     uint fourCC;
@@ -205,6 +207,15 @@ FourCC::FromString(const String& s)
 {
     _assert(s.IsValid() && (s.Length() == 4));
     return FourCC(uint(s[3] | s[2]<<8 | s[1]<<16 | s[0]<<24));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline index_t
+FourCC::HashCode() const
+{
+	return this->fourCC;
 }
 
 } // namespace Util

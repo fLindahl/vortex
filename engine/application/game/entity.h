@@ -51,7 +51,7 @@ public:
 	///Shortcut for setting this entitys transform
 	virtual void SetTransform(const Math::mat4& nTransform);
 
-	virtual void Serialize();
+	//virtual void Serialize();
 
 protected:
 	///Set to true when Activate is called. Set to false when Deactivat is called.

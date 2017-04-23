@@ -9,6 +9,7 @@
 #include "render/server/renderdevice.h"
 #include "application/game/modelentity.h"
 #include "render/server/resourceserver.h"
+#include "render/properties/graphicsproperty.h"
 
 namespace Example
 {
@@ -136,6 +137,7 @@ ExampleApp::Run()
 	IO::Console::Instance()->Print("This is a warning!", IO::WARNING);
 	IO::Console::Instance()->Print("This is an error!", IO::ERROR);
 	IO::Console::Instance()->Print("This is an exception!", IO::EXCEPTION);
+
 
 	while (this->window->IsOpen())
 	{

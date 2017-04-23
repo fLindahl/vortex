@@ -72,7 +72,7 @@ void PickingPass::Execute()
 
 					for (GraphicsProperty* graphicsProperty : modelNode->modelInstance->GetGraphicsProperties())
 					{
-						glUniform1ui(glGetUniformLocation(shader->GetProgram(), "ID"), (GLuint)graphicsProperty->GetOwner()->getID());
+						glUniform1ui(glGetUniformLocation(shader->GetProgram(), "ID"), (GLuint)graphicsProperty->GetOwner()->GetID());
 						shader->setModelMatrix(graphicsProperty->getModelMatrix());
 						modelNode->modelInstance->GetMesh()->Draw(modelNode->primitiveGroup);
 					}
