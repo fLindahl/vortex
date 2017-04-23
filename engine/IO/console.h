@@ -66,6 +66,7 @@ public:
 	void PrintfError(const char* msg, ...);
 	
 	///Shows the console as an ImGui Window. Accepts user input.
+	///Note: This can eat performance if the log is abnormally large. In those cases it might be better to use the native console, as it does not require rendering...
 	void Show();
 	///Hides the console ImGui Window
 	void Hide();
@@ -101,7 +102,7 @@ private:
 	///integer is HashCode and double is time when the message will be removed
 	Util::Array<Util::Pair<int, double>> recentMessages;
 
-	const char* LogEntryTypeAsCharPtr(const LogMessageType& type);
+	const char* LogEntryTypeAsCharPtr(const LogMessageType& type) const;
 };
 
 }

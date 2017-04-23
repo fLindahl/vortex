@@ -70,9 +70,6 @@ private:
 	/// ImGui functions
 	void RenderUI();
 
-	// show some nanovg stuff
-	void RenderNano(NVGcontext * vg);
-	
 	Ptr<Render::ModelInstance> modelInstance;
 	Ptr<Render::ModelInstance> modelInstanceScene;
 	

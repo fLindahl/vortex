@@ -67,7 +67,7 @@ layout(std430, binding = 12) writeonly buffer VisibleSpotLightIndicesBuffer
 
 // Uniforms
 uniform sampler2D depthMap;
-layout (rgba32f) uniform writeonly image2D lightImage;
+//layout (rgba32f) uniform writeonly image2D lightImage;
 
 // Shared values between all the threads a group
 shared uint minDepthInt;
@@ -262,9 +262,9 @@ void main()
 	}
 	
 	/// Debug Light ///
-	barrier();
-	//float c = float(visiblePointLightCount) / float(visiblePointLightCount);
-	float c = float(visibleSpotLightCount) / float(visibleSpotLightCount);
-	imageStore(lightImage, location, vec4(c,c,c,1.0f));
-	//imageStore(lightImage, location, vec4(0,0,0,1.0f));
+	//barrier();
+	////float c = float(visiblePointLightCount) / float(visiblePointLightCount);
+	//float c = float(visibleSpotLightCount) / float(visibleSpotLightCount);
+	//imageStore(lightImage, location, vec4(c,c,c,1.0f));
+	////imageStore(lightImage, location, vec4(0,0,0,1.0f));
 }

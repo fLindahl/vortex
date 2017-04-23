@@ -51,6 +51,7 @@ namespace Toolkit
 		//Setup ImGui Stuff
 		SetupImGuiStyle();
 		ImGui::LoadDock("engine/toolkit/leveleditor/layout/default.layout");
+
 	}
 
 	UserInterface::~UserInterface()

@@ -38,7 +38,7 @@ App::~App()
 bool
 App::Open()
 {
-	assert(!this->isOpen);
+	_assert(!this->isOpen);
 	this->isOpen = true;
 
 	return true;
@@ -59,7 +59,7 @@ App::Run()
 void
 App::Close()
 {
-	assert(this->isOpen);
+	_assert(this->isOpen);
 	this->isOpen = false;
 }
 

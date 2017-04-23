@@ -10,7 +10,7 @@ namespace Render
 
 class TextureResource : public Core::RefCounted
 {
-__DeclareClass(TextureResource);
+__DeclareClass(TextureResource)
 public:
 	TextureResource();
 	~TextureResource();

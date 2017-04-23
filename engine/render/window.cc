@@ -6,9 +6,6 @@
 #include "window.h"
 #include <imgui.h>
 #include "imgui_impl_glfw_gl3.h"
-#include <nanovg.h>
-#define NANOVG_GL3_IMPLEMENTATION 1
-#include "nanovg_gl.h"
 #include "IO/console.h"
 
 namespace Display
@@ -68,7 +65,6 @@ namespace Display
 */
 	Window::Window() :
 			window(nullptr),
-			vg(nullptr),
 			width(1024),
 			height(1024),
 			title("Vortex Engine")
@@ -153,7 +149,6 @@ namespace Display
 	Window::StaticWindowResizeCallback(GLFWwindow* win, int32 x, int32 y)
 	{
 		Window* window = (Window*)glfwGetWindowUserPointer(win);
-		Render::RenderDevice::Instance()->SetWindowResolution(x, y);
 		window->width = x;
 		window->height = y;
 		window->Resize();
@@ -254,9 +249,6 @@ namespace Display
 		ImGui_ImplGlfwGL3_Init(this->window, false);
 		glfwSetCharCallback(window, ImGui_ImplGlfwGL3_CharCallback);
 
-		// setup nanovg
-		this->vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-
 		// increase window count and return result
 		Window::WindowCount++;
 		return this->window != nullptr;
@@ -304,17 +296,6 @@ namespace Display
 	{
 		if (this->window)
 		{
-			//Render::RenderDevice::Instance()->Render();
-			if (nullptr != this->nanoFunc)
-			{
-				int32 fbWidth, fbHeight;
-				glClear(GL_STENCIL_BUFFER_BIT);
-				glfwGetWindowSize(this->window, &this->width, &this->height);
-				glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-				nvgBeginFrame(this->vg, this->width, this->height, (float)fbWidth / (float) this->width);
-				this->nanoFunc(this->vg);
-				nvgEndFrame(this->vg);
-			}
 			if (nullptr != this->uiFunc)
 			{
 				ImGui_ImplGlfwGL3_NewFrame();

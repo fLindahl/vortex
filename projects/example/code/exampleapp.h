@@ -42,8 +42,8 @@ private:
 	/// show some ui things
 	void RenderUI();
 
-	// show some nanovg stuff
-	void RenderNano(NVGcontext * vg);
+	/// Resize window callback
+	void ResizeWindow(int32, int32);
 
 	BaseGameFeature::KeyHandler* keyhandler;
 	

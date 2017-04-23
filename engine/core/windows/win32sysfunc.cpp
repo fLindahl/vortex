@@ -105,7 +105,7 @@ SysFunc::Exception(const char* error)
 		Callstack
 	*/
 	//Util::Array<Util::String> stacktrace = Win32StackTrace::GenerateStackTrace();
-	Util::String format;
+	Util::String format = "Stack trace not implemented! :D";
 	//for (int i = 7; i < Math::min(17,stacktrace.Size()); i++)
 	//{
 	//	format.Append(stacktrace[i]);
@@ -113,11 +113,13 @@ SysFunc::Exception(const char* error)
 	//}
 	format.Format("%s\nCallstack:\n%s", error, format.AsCharPtr());
 
-	format.Append("\nMore information can be found in the generated .log file.\n");
+	IO::Console::Instance()->Print(format, IO::EXCEPTION);
+	IO::Console::Instance()->SaveLog("dump.log");
+
+	format.Append("\nMore information can be found in the generated dump.log file.\n");
 
 	MessageBox(NULL, format.AsCharPtr(), "VORTEX SYSTEM ERROR", MB_OK | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
 
-	IO::Console::Instance()->Print(error, IO::EXCEPTION);
     abort();
 }
 

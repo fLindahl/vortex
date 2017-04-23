@@ -1,40 +1,13 @@
 #pragma once
 #include "core/refcounted.h"
+#include "message.h"
 #include <ctime>
 #include <string>
 #include <vector>
 #include <queue>
 
-namespace BaseGameFeature
+namespace Messaging
 {
-
-enum MsgType
-{
-	GOIDLE,
-	HARVESTWOOD,
-	UPGRADE_EXPLORER,
-	UPGRADE_BUILDER,
-	UPGRADE_COALWORKER,
-	FOUNDWOOD,
-	NEEDBUILDER,
-	NEEDCOALWORKER
-};
-
-class Msg : public Core::RefCounted
-{
-	__DeclareClass(Msg)
-public:
-	Msg() { timeStamp = clock(); }
-	~Msg() {}
-
-	MsgType message;
-	int recipientID;
-	int senderID;
-	float delay; // seconds to delay this message
-	clock_t timeStamp;
-	bool operator==(const Msg &RHS);
-	bool operator<(const Msg &RHS) const;
-};
 
 class MsgHandler
 {
@@ -50,8 +23,8 @@ public:
 	MsgHandler(MsgHandler const &) = delete;
 	void operator=(MsgHandler const &) = delete;
 
-	void RecvMsg(Msg msg);
-	void SendMsg(Msg msg);
+	void RecvMsg(Message msg);
+	void SendMsg(Message msg);
 	void Update();
 
 private:
@@ -60,7 +33,7 @@ private:
 	MsgHandler() {}
 
 	// Sorted list of all current messages
-	std::priority_queue<Msg> msgQueue;
+	std::priority_queue<Message> msgQueue;
 
 };
 

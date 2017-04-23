@@ -9,8 +9,6 @@
 #include <functional>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <nanovg.h>
-#include "render/server/renderdevice.h"
 #include "core/types.h"
 
 namespace Display
@@ -58,8 +56,6 @@ namespace Display
 
 		/// set optional UI render function
 		void SetUiRender(const std::function<void()>& func);
-		/// set optional nanovg render function
-		void SetNanoVGRender(const std::function<void(NVGcontext *)> & func);
 
 		GLFWwindow* GetGLFWWindow() { return this->window; }
 
@@ -102,15 +98,11 @@ namespace Display
 		std::function<void(int32, int32)> windowResizeCallback;
 		/// function for ui rendering callback
 		std::function<void()> uiFunc;
-		/// function for nanovg rendering callback
-		std::function<void(NVGcontext *)> nanoFunc;
-
 
 		int32 width;
 		int32 height;
 		std::string title;
 		GLFWwindow* window;
-		NVGcontext * vg;
 	};
 
 //------------------------------------------------------------------------------
@@ -119,8 +111,6 @@ namespace Display
 	inline void
 	Window::SetSize(int32 width, int32 height)
 	{
-		//Render::RenderDevice::Instance()->SetRenderResolution(width, height);
-		//Render::RenderDevice::Instance()->SetWindowResolution(width, height);
 		this->width = width;
 		this->height = height;
 		if (nullptr != this->window) this->Resize();
@@ -207,16 +197,6 @@ namespace Display
 	{
 		this->uiFunc = func;
 	}
-
-//------------------------------------------------------------------------------
-/**
-*/
-	inline void
-	Window::SetNanoVGRender(const std::function<void(NVGcontext *)> & func)
-	{
-		this->nanoFunc = func;
-	}
-
 
 
 

@@ -2,9 +2,9 @@
 //------------------------------------------------------------------------------
 /**
 	Base class for applications, override this class
-	and use it as an entry point for your lab.
+	and use it as an entry point for your game.
 	
-	(C) 2015 Individual contributors, see AUTHORS file
+	@copyright	See LICENSE file
 */
 //------------------------------------------------------------------------------
 #include <GL/glew.h>

@@ -17,6 +17,8 @@ SET(files_application_basegamefeature
 SET(files_application_game
 	game/entity.h
 	game/entity.cpp
+	game/entitymessages.h
+	game/entitymessages.cpp
 	game/modelentity.h
 	game/modelentity.cpp
 	game/baseproperty.h

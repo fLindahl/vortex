@@ -27,9 +27,6 @@ SET(files_foundation_util
 	util/variable.h
 	util/string.h
 	util/string.cpp
-	util/linkedlist.h
-	util/queue.h
-	util/stack.h
 	util/hashtable.h
 	util/dictionary.h
 	util/pair.h
@@ -40,6 +37,9 @@ SET(files_foundation_util
 SET(files_foundation_messaging
 	messaging/messagehandler.h
 	messaging/messagehandler.cpp
+	messaging/message.h
+	messaging/message.cpp
+	messaging/messagetype.h
 	)
 
 IF(WIN32)

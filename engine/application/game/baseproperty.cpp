@@ -7,4 +7,6 @@ namespace Game
 
 __ImplementClass(Game::BaseProperty, 'bpro', Core::RefCounted)
 
+
+
 }

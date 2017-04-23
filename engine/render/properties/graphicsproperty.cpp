@@ -87,4 +87,13 @@ void GraphicsProperty::Deactivate()
 	}
 }
 
+void GraphicsProperty::HandleMessage(const Ptr<Messaging::Message>& msg)
+{
+	//Handle set transform message
+	if (msg->GetType() == Msg::SetTransform::Type)
+	{
+		this->setModelMatrix(msg.cast<Msg::SetTransform>()->Get());
+	}
+}
+
 }

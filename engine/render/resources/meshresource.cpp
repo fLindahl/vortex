@@ -1,3 +1,4 @@
+#include "meshresource.h"
 #include "config.h"
 #include <algorithm>
 #include <sstream>
@@ -506,7 +507,7 @@ namespace Render
 	{
 		return this->indices;
 	}
-	
+
 	void MeshResource::Bind()
 	{
 		glBindVertexArray(vao[0]); // Bind our Vertex Array Object 

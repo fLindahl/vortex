@@ -98,7 +98,7 @@ namespace Render
 			assert(drawpass != nullptr);
 
 			drawpass->AddMaterial(this);
-			this->framepasses.insert(std::make_pair(pass, ShaderServer::Instance()->LoadShader(std::string(shader.AsCharPtr()))));
+			this->framepasses.insert(std::make_pair(pass, ShaderServer::Instance()->LoadShader(shader)));
 		}
 		else
 		{

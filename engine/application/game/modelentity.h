@@ -23,11 +23,10 @@ public:
 	void Activate();
 	void Deactivate();
 
-	void SetTransform(const Math::mat4& t);
 
-    Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty; }
+    Render::GraphicsProperty* GetGraphicsProperty() { return this->gProperty.get_unsafe(); }
 
 protected:
-	Render::GraphicsProperty* gProperty;
+	Ptr<Render::GraphicsProperty> gProperty;
 };
 }
