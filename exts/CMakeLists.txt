@@ -24,13 +24,20 @@ ADD_SUBDIRECTORY(assimp-3.3.1)
 SET_TARGET_PROPERTIES(assimp PROPERTIES FOLDER "exts/assimp")
 TARGET_INCLUDE_DIRECTORIES(exts INTERFACE assimp-3.3.1/include)
 
-ADD_LIBRARY(imgui STATIC imgui/imconfig.h imgui/imgui.cpp imgui/imgui_demo.cpp imgui/imgui_draw.cpp 
-			imgui/imgui.h imgui/imgui_internal.h 
-			imgui/stb_rect_pack.h imgui/stb_textedit.h imgui/stb_truetype.h 
+ADD_LIBRARY(imgui STATIC 
+			imgui/imconfig.h 
+			imgui/imgui.cpp 
+			imgui/imgui_demo.cpp 
+			imgui/imgui_draw.cpp 
+			imgui/imgui.h 
+			imgui/imgui_internal.h 
+			imgui/stb_rect_pack.h 
+			imgui/stb_textedit.h 
+			imgui/stb_truetype.h 
 			imgui/examples/opengl3_example/imgui_impl_glfw_gl3.h
 			imgui/examples/opengl3_example/imgui_impl_glfw_gl3.cpp			
 			imgui/imgui_dock.h
-			imgui/imgui_dock.inl
+			imgui/imgui_dock.cpp
 			imgui/imgui_user.h
 			imgui/imgui_user.inl
 			)
@@ -39,7 +46,8 @@ TARGET_LINK_LIBRARIES(imgui PUBLIC exts)
 TARGET_INCLUDE_DIRECTORIES(imgui PUBLIC imgui imgui/examples/opengl3_example)
 SET_TARGET_PROPERTIES(imgui PROPERTIES FOLDER "exts/imgui")
 
-IF(CMAKE_COMPILER_IS_GNUCXX)
+
+IF(CMAKE_COMPILER_IS_GNUCXX)	
 
 	# Use the package PkgConfig to detect GTK+ headers/library files
 	find_package(PkgConfig REQUIRED)

@@ -321,7 +321,7 @@ namespace Toolkit
 
 		ImGui::RootDock(ImVec2(toolbarWidth, 16.0f), ImVec2((float)application->window->GetWidth() - toolbarWidth, (float)application->window->GetHeight() - 16));
 		{
-			ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			if(ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 			{
 				ImVec2 dockSize = ImGui::GetWindowSize();
 				ImGui::Image((void*)Render::RenderDevice::Instance()->GetFinalColorBuffer(), dockSize);
@@ -378,7 +378,7 @@ namespace Toolkit
 			//ImGui::BeginDock("Front View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
 			//ImGui::EndDock();
 
-			ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings);
+			if(ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings))
 			{
 				if (application->hit.object != nullptr)
 				{
@@ -499,7 +499,7 @@ namespace Toolkit
 			}
 			ImGui::EndDock();
 
-			ImGui::BeginDock("Particle Settings", NULL, ImGuiWindowFlags_NoSavedSettings);
+			if(ImGui::BeginDock("Particle Settings", NULL, ImGuiWindowFlags_NoSavedSettings))
 			{
 				this->particleCount = 0;
 				if (ImGui::Button("Save"))
@@ -521,7 +521,7 @@ namespace Toolkit
 			}
 			ImGui::EndDock();
 
-			ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings);
+			if(ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings))
 			{
 				//Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->GetSSRSettings();
 				//
@@ -537,7 +537,7 @@ namespace Toolkit
 			}
 			ImGui::EndDock();
 			
-			ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings);
+			if(ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings))
 			if (ImGui::Button("Add CubeMap", { 100, 40 }))
 			{
 				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
@@ -707,7 +707,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().colorRand);
 				ImGui::Text("Min"); ImGui::SameLine(100);
 				id = "##c1" + std::to_string(particleCount);
-				if (ImGui::ColorEdit4(id.c_str(), (float*)&emitter->GetParticleUISettings().color, ImGuiColorEditFlags_Alpha))
+				if (ImGui::ColorEdit4(id.c_str(), (float*)&emitter->GetParticleUISettings().color, true))
 				{
 					if (Math::vec4::greater3_all(emitter->GetParticleUISettings().color, emitter->GetParticleUISettings().color2))
 					{
@@ -721,7 +721,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 				{
 					ImGui::Text("Max"); ImGui::SameLine(100);
 					id = "##c2" + std::to_string(particleCount);
-					if (ImGui::ColorEdit4(id.c_str(), (float*)&emitter->GetParticleUISettings().color2, ImGuiColorEditFlags_Alpha))
+					if (ImGui::ColorEdit4(id.c_str(), (float*)&emitter->GetParticleUISettings().color2, true))
 					{
 						if (Math::vec4::greater3_all(emitter->GetParticleUISettings().color, emitter->GetParticleUISettings().color2))
 						{

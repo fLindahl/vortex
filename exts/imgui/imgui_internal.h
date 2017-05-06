@@ -3,7 +3,7 @@
 
 // You may use this file to debug, understand or extend ImGui features but we don't provide any guarantee of forward compatibility!
 // Implement maths operators for ImVec2 (disabled by default to not collide with using IM_VEC2_CLASS_EXTRA along with your own math types+operators)
-//   #define IMGUI_DEFINE_MATH_OPERATORS
+#define IMGUI_DEFINE_MATH_OPERATORS
 
 #pragma once
 
@@ -88,10 +88,10 @@ IMGUI_API int           ImTextCountUtf8BytesFromStr(const ImWchar* in_text, cons
 
 // Helpers: Misc
 IMGUI_API ImU32         ImHash(const void* data, int data_size, ImU32 seed = 0);    // Pass data_size==0 for zero-terminated strings
-IMGUI_API void*         ImLoadFileToMemory(const char* filename, const char* file_open_mode, int* out_file_size = NULL, int padding_bytes = 0);
+IMGUI_API void*         ImFileLoadToMemory(const char* filename, const char* file_open_mode, int* out_file_size = NULL, int padding_bytes = 0);
+IMGUI_API FILE*         ImFileOpen(const char* filename, const char* file_open_mode);         
 IMGUI_API bool          ImIsPointInTriangle(const ImVec2& p, const ImVec2& a, const ImVec2& b, const ImVec2& c);
 static inline bool      ImCharIsSpace(int c)            { return c == ' ' || c == '\t' || c == 0x3000; }
-static inline bool      ImIsPowerOfTwo(int v)           { return v != 0 && (v & (v - 1)) == 0; }
 static inline int       ImUpperPowerOfTwo(int v)        { v--; v |= v >> 1; v |= v >> 2; v |= v >> 4; v |= v >> 8; v |= v >> 16; v++; return v; }
 
 // Helpers: String
@@ -563,6 +563,7 @@ struct IMGUI_API ImGuiDrawContext
     ImVector<bool>          AllowKeyboardFocusStack;
     ImVector<bool>          ButtonRepeatStack;
     ImVector<ImGuiGroupData>GroupStack;
+    ImGuiColorEditMode      ColorEditMode;
     int                     StackSizesBackup[6];    // Store size of various stacks for asserting
 
     float                   IndentX;                // Indentation / start position from left of window (increased by TreePush/TreePop, etc.)
@@ -597,6 +598,7 @@ struct IMGUI_API ImGuiDrawContext
         ButtonRepeat = false;
         AllowKeyboardFocus = true;
         TextWrapPos = -1.0f;
+        ColorEditMode = ImGuiColorEditMode_RGB;
         memset(StackSizesBackup, 0, sizeof(StackSizesBackup));
 
         IndentX = 0.0f;
@@ -708,6 +710,7 @@ namespace ImGui
     IMGUI_API void          EndFrame();                 // Ends the ImGui frame. Automatically called by Render()! you most likely don't need to ever call that yourself directly. If you don't need to render you can call EndFrame() but you'll have wasted CPU already. If you don't need to render, don't create any windows instead!
 
     IMGUI_API void          SetActiveID(ImGuiID id, ImGuiWindow* window);
+	IMGUI_API void          ClearActiveID();
     IMGUI_API void          SetHoveredID(ImGuiID id);
     IMGUI_API void          KeepAliveID(ImGuiID id);
 

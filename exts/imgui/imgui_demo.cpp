@@ -1,9 +1,11 @@
 // dear imgui, v1.50 WIP
 // (demo code)
 
-// Don't remove this file from your project! It is useful reference code that you can execute.
-// You can call ImGui::ShowTestWindow() in your code to learn about various features of ImGui.
+// Message to the person tempted to delete this file when integrating ImGui into their code base:
+// Do NOT remove this file from your project! It is useful reference code that you and other users will want to refer to.
 // Everything in this file will be stripped out by the linker if you don't call ImGui::ShowTestWindow().
+// During development, you can call ImGui::ShowTestWindow() in your code to learn about various features of ImGui.
+// Removing this file from your project is hindering your access to documentation, likely leading you to poorer usage of the library.
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
@@ -362,7 +364,7 @@ void ImGui::ShowTestWindow(bool* p_open)
             ImVec2 pos = ImGui::GetCursorScreenPos();
             ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(pos.x + wrap_width, pos.y), ImVec2(pos.x + wrap_width + 10, pos.y + ImGui::GetTextLineHeight()), IM_COL32(255,0,255,255));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
-            ImGui::Text("lazy dog. This paragraph is made to fit within %.0f pixels. The quick brown fox jumps over the lazy dog.", wrap_width);
+            ImGui::Text("The lazy dog is a good dog. This paragraph is made to fit within %.0f pixels. Testing a 1 character word. The quick brown fox jumps over the lazy dog.", wrap_width);
             ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255,255,0,255));
             ImGui::PopTextWrapPos();
 
@@ -370,7 +372,7 @@ void ImGui::ShowTestWindow(bool* p_open)
             pos = ImGui::GetCursorScreenPos();
             ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(pos.x + wrap_width, pos.y), ImVec2(pos.x + wrap_width + 10, pos.y + ImGui::GetTextLineHeight()), IM_COL32(255,0,255,255));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
-            ImGui::Text("aaaaaaaa bbbbbbbb, cccccccc,dddddddd. eeeeeeee   ffffffff. gggggggg!hhhhhhhh");
+            ImGui::Text("aaaaaaaa bbbbbbbb, c cccccccc,dddddddd. d eeeeeeee   ffffffff. gggggggg!hhhhhhhh");
             ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255,255,0,255));
             ImGui::PopTextWrapPos();
 
@@ -1123,7 +1125,8 @@ void ImGui::ShowTestWindow(bool* p_open)
             ImGui::BeginChild("scrolling", ImVec2(0, ImGui::GetItemsLineHeightWithSpacing()*7 + 30), true, ImGuiWindowFlags_HorizontalScrollbar);
             for (int line = 0; line < lines; line++)
             {
-                // Display random stuff
+                // Display random stuff (for the sake of this trivial demo we are using basic Button+SameLine. If you want to create your own time line for a real application you may be better off 
+                // manipulating the cursor position yourself, aka using SetCursorPos/SetCursorScreenPos to position the widgets yourself. You may also want to use the lower-level ImDrawList API)
                 int num_buttons = 10 + ((line & 1) ? line * 9 : line * 3);
                 for (int n = 0; n < num_buttons; n++)
                 {
@@ -1181,6 +1184,8 @@ void ImGui::ShowTestWindow(bool* p_open)
             const char* names[] = { "Bream", "Haddock", "Mackerel", "Pollock", "Tilefish" };
             static bool toggles[] = { true, false, false, false, false };
 
+            // Simple selection popup
+            // (If you want to show the current selection inside the Button itself, you may want to build a string using the "###" operator to preserve a constant ID with a variable label)
             if (ImGui::Button("Select.."))
                 ImGui::OpenPopup("select");
             ImGui::SameLine();
@@ -1195,6 +1200,7 @@ void ImGui::ShowTestWindow(bool* p_open)
                 ImGui::EndPopup();
             }
 
+            // Showing a menu with toggles
             if (ImGui::Button("Toggle.."))
                 ImGui::OpenPopup("toggle");
             if (ImGui::BeginPopup("toggle"))
@@ -1229,8 +1235,8 @@ void ImGui::ShowTestWindow(bool* p_open)
             }
 
             if (ImGui::Button("Popup Menu.."))
-                ImGui::OpenPopup("popup from button");
-            if (ImGui::BeginPopup("popup from button"))
+                ImGui::OpenPopup("FilePopup");
+            if (ImGui::BeginPopup("FilePopup"))
             {
                 ShowExampleMenuFile();
                 ImGui::EndPopup();
@@ -1687,6 +1693,12 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
         ImGui::SameLine(); ImGui::PushItemWidth(120); ImGui::Combo("##output_type", &output_dest, "To Clipboard\0To TTY\0"); ImGui::PopItemWidth();
         ImGui::SameLine(); ImGui::Checkbox("Only Modified Fields", &output_only_modified);
 
+        static ImGuiColorEditMode edit_mode = ImGuiColorEditMode_RGB;
+        ImGui::RadioButton("RGB", &edit_mode, ImGuiColorEditMode_RGB);
+        ImGui::SameLine();
+        ImGui::RadioButton("HSV", &edit_mode, ImGuiColorEditMode_HSV);
+        ImGui::SameLine();
+        ImGui::RadioButton("HEX", &edit_mode, ImGuiColorEditMode_HEX);
         //ImGui::Text("Tip: Click on colored square to change edit mode.");
 
         static ImGuiTextFilter filter;
@@ -1694,6 +1706,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
 
         ImGui::BeginChild("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
         ImGui::PushItemWidth(-160);
+        ImGui::ColorEditMode(edit_mode);
         for (int i = 0; i < ImGuiCol_COUNT; i++)
         {
             const char* name = ImGui::GetStyleColName(i);
@@ -1739,10 +1752,11 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
                 ImGui::SameLine(); ShowHelpMarker("Note than the default embedded font is NOT meant to be scaled.\n\nFont are currently rendered into bitmaps at a given size at the time of building the atlas. You may oversample them to get some flexibility with scaling. You can also render at multiple sizes and select which one to use at runtime.\n\n(Glimmer of hope: the atlas system should hopefully be rewritten in the future to make scaling more natural and automatic.)");
                 ImGui::Text("Ascent: %f, Descent: %f, Height: %f", font->Ascent, font->Descent, font->Ascent - font->Descent);
                 ImGui::Text("Fallback character: '%c' (%d)", font->FallbackChar, font->FallbackChar);
+                ImGui::Text("Texture surface: %d pixels (approx)", font->MetricsTotalSurface);
                 for (int config_i = 0; config_i < font->ConfigDataCount; config_i++)
                 {
                     ImFontConfig* cfg = &font->ConfigData[config_i];
-                    ImGui::BulletText("Input %d: \'%s\'\nOversample: (%d,%d), PixelSnapH: %d", config_i, cfg->Name, cfg->OversampleH, cfg->OversampleV, cfg->PixelSnapH);
+                    ImGui::BulletText("Input %d: \'%s\', Oversample: (%d,%d), PixelSnapH: %d", config_i, cfg->Name, cfg->OversampleH, cfg->OversampleV, cfg->PixelSnapH);
                 }
                 if (ImGui::TreeNode("Glyphs", "Glyphs (%d)", font->Glyphs.Size))
                 {
@@ -2305,7 +2319,7 @@ struct ExampleAppConsole
                         for (int i = 0; i < candidates.Size && all_candidates_matches; i++)
                             if (i == 0)
                                 c = toupper(candidates[i][match_len]);
-                            else if (c != toupper(candidates[i][match_len]))
+                            else if (c == 0 || c != toupper(candidates[i][match_len]))
                                 all_candidates_matches = false;
                         if (!all_candidates_matches)
                             break;

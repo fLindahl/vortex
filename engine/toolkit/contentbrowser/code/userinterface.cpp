@@ -171,7 +171,7 @@ namespace Toolkit
 	{		
 		ImGui::RootDock(ImVec2(0.0f, 16.0f), ImVec2((float)application->window->GetWidth(), (float)application->window->GetHeight() - 16.0f));
 		{
-			ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			if(ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 			{
 				ImVec2 dockSize = ImGui::GetWindowSize();
 				ImGui::Image((void*)Render::FrameServer::Instance()->GetFlatGeometryLitPass()->GetBuffer(), dockSize);
@@ -183,7 +183,7 @@ namespace Toolkit
 			}
 			ImGui::EndDock();
 
-			ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings);
+			if(ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings))
 			{
 				if (this->application->loadedModel != nullptr)
 				{
