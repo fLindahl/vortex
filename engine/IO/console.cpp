@@ -10,6 +10,7 @@
 #include "core/sysfunc.h"
 //#include <iomanip>
 #include <ctime>
+#include <fstream>
 
 #define RECENTMESSAGESCAPACITY 24
 #define MAXLIFETIME 60.0

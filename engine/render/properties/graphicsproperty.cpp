@@ -9,11 +9,7 @@ __ImplementClass(Render::GraphicsProperty, 'GPPR', Game::BaseProperty);
 
 GraphicsProperty::GraphicsProperty()
 {
-	//__SerializeAttribute(size, 'SIZE')
-	
-	Game::Attribute attr(&size);	
-	this->size_FourCC = 'SIZE';		
-	this->attributeList.Add(this->size_FourCC, attr);	
+
 }
 
 GraphicsProperty::~GraphicsProperty()

@@ -36,8 +36,6 @@ public:
 	Math::bbox& getbbox() { return this->bbox; }
 
 private:
-	__Attribute(float, size)
-
 	Math::bbox bbox;
 
 	Ptr<Render::ModelInstance> modelInstance;

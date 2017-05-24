@@ -5,6 +5,7 @@
 #include "config.h"
 #include "exampleapp.h"
 #include "imgui.h"
+#include "imgui_dock.h"
 #include "IO/console.h"
 #include "render/server/renderdevice.h"
 #include "application/game/modelentity.h"
@@ -90,6 +91,24 @@ void ExampleApp::RenderUI()
 {
 	if (this->window->IsOpen())
 	{
+		ImGui::RootDock(ImVec2(0, 0), ImVec2(window->GetWidth(), window->GetHeight()));
+		{
+			if(ImGui::BeginDock("TestDock1", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+			{
+				ImGui::Text("Testing Dock 1");
+
+			}
+			ImGui::EndDock();
+
+			if(ImGui::BeginDock("TestDock2", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+			{
+				ImGui::Text("Testing Dock 2");
+
+			}
+			ImGui::EndDock();
+
+		}
+		
 		//Updates the console. Always do this first!
 		IO::Console::Instance()->Update();
 	}

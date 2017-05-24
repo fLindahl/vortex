@@ -36,14 +36,13 @@ void EmittersUI::DrawEmitter()
 {
 	if (!dummy)
 	{
-		
+		ImVec2 cursorBegin = ImGui::GetCursorPos();
 		std::string n = "##emitterframe" + std::to_string(id);
 		ImGui::BeginChild(n.c_str(), ImVec2(ImGui::GetWindowContentRegionWidth(), 40), true);
 		{
-		
-			if (ev.active)
-			{
 			
+			if (ev.active)
+			{			
 				ImGui::ImageButton((void*)activeIcon->GetHandle(), ImVec2(15, 15));
 			}
 			else
@@ -91,8 +90,18 @@ void EmittersUI::DrawEmitter()
 				ui->RemoveEmitter(this->id);
 			}
 			ui->Tooltip("Delete this emitter");
+
+			ImGui::SameLine(1);
+			n = "drag" + std::to_string(id);
+		
+			if (ImGui::InvisibleButton(n.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth()-1, 30) && ImGui::IsMouseDoubleClicked(0)))
+			{
+				ev.active = true;
+				ui->UpdateActiveEmitter(this->id);
+			}
 		}
 		ImGui::EndChild();
+
 	}
 }
 
