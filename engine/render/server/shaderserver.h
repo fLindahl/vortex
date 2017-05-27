@@ -32,13 +32,16 @@ public:
 	///Retrieves a shaderobject by name. NOTE: This is not very efficient.
 	Ptr<ShaderObject> LoadShader(const Util::String& shader);
 
-	///Loads and compiles a vertex shader program and thenbinds it to the GPU.
+	///Loads and compiles a vertex shader program and then binds it to the GPU.
 	GLuint LoadVertexShader(const Util::String& file);
 	
-	///Loads and compiles a fragment shader program and thenbinds it to the GPU.
+	///Loads and compiles a fragment shader program and then binds it to the GPU.
 	GLuint LoadFragmentShader(const Util::String& file);
 	
-	///Loads and compiles a compute shader program and thenbinds it to the GPU.
+	///Loads and compiles a geometry shader program and then binds it to the GPU.
+	GLuint LoadGeometryShader(const Util::String& file);
+
+	///Loads and compiles a compute shader program and then binds it to the GPU.
 	GLuint LoadComputeShader(const Util::String& file);
 
 	///Loads renderstate from a renderstate file or from existing list of states

@@ -119,6 +119,7 @@ bool ShaderServer::SetupShaders(const Util::String& file)
 				shd->type = ShaderObjectType::VERTEX_FRAGMENT;
 
 				const tinyxml2::XMLElement* vertexshader = shader->FirstChildElement("VertexShader");
+				const tinyxml2::XMLElement* geometryshader = shader->FirstChildElement("GeometryShader");
 				const tinyxml2::XMLElement* fragmentshader = shader->FirstChildElement("FragmentShader");
 				const tinyxml2::XMLElement* renderstate = shader->FirstChildElement("RenderState");
 
@@ -126,6 +127,11 @@ bool ShaderServer::SetupShaders(const Util::String& file)
 				GLuint frag = this->LoadFragmentShader(fragmentshader->FirstAttribute()->Value());
 
 				shd->AddShader(vert);
+
+				//Load Geometry shader if defined
+				if (geometryshader != nullptr)
+					shd->AddShader(this->LoadGeometryShader(geometryshader->FirstAttribute()->Value()));
+
 				shd->AddShader(frag);
 
 				Render::RenderState states = LoadRenderState(renderstate->FirstAttribute()->Value());
@@ -471,6 +477,61 @@ GLuint ShaderServer::LoadFragmentShader(const Util::String& file)
 	}
 }
 
+GLuint ShaderServer::LoadGeometryShader(const Util::String & file)
+{
+	//Make sure we've not already loaded this shader
+	if (!this->HasShaderProgramLoaded(file))
+	{
+		if (!file.CheckFileExtension("geom"))
+		{
+			_error("[SHADER LOAD ERROR]: File is not a .geom file!");
+			return false;
+		}
+
+		Util::String content = ReadFromFile(file);
+		if (content.IsEmpty())
+		{
+			return false;
+		}
+
+		//Attach Header
+		content = ShaderHeader + content;
+
+		const char* fs = content.AsCharPtr();
+
+		// setup fragment shader
+		GLuint shader = glCreateShader(GL_GEOMETRY_SHADER);
+		GLint length = (GLint)content.Length();
+		glShaderSource(shader, 1, &fs, &length);
+		glCompileShader(shader);
+
+		// get error log
+		GLint shaderLogSize;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &shaderLogSize);
+		if (shaderLogSize > 0)
+		{
+			char* buf = new char[shaderLogSize];
+			glGetShaderInfoLog(shader, shaderLogSize, NULL, buf);
+			_error("[FRAGMENT SHADER COMPILE ERROR]: %s", buf);
+			delete[] buf;
+
+#ifdef _DEBUG
+			_assert(false);
+#endif
+		}
+
+		//Insert to our shader list
+		this->shaders.Add(file, shader);
+
+		return shader;
+	}
+	else
+	{
+		//Shader is already loaded so we can just return it.
+		return this->shaders[file];
+	}
+}
+
 GLuint ShaderServer::LoadComputeShader(const Util::String& file)
 {
 	//Make sure we've not already loaded this shader
@@ -561,6 +622,10 @@ void ShaderServer::ReloadShaders()
 		{
 			_printf("[VERTEX SHADER RELOAD]: %s", fileName.AsCharPtr());
 			content = VertexShaderHeader + content;
+		}
+		else if (extension == "geom")
+		{
+			_printf("[GEOMETRY SHADER RELOAD]: %s", fileName.AsCharPtr());
 		}
 		else if (extension == "frag")
 		{

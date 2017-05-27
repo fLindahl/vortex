@@ -20,6 +20,13 @@
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		
+		<Shader name="geometryTest" desc="Testing Geometry Shaderss">            
+			<VertexShader name="resources/shaders/vertex/static.vert"/>
+			<GeometryShader name="resources/shaders/geometry/test.geom"/>
+			<FragmentShader name="resources/shaders/fragment/pbr.frag"/>
+			<RenderState name="resources/shaders/states/opaque.state"/>
+		</Shader>
+		
 		<Shader name="defaultLitAlphaCutout" desc="Default shader for rendering Cutout lit geometry">            
 			<VertexShader name="resources/shaders/vertex/static.vert"/>
 			<FragmentShader name="resources/shaders/fragment/pbr.frag"/>
