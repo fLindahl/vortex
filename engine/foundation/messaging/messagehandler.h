@@ -4,7 +4,7 @@
 #include <ctime>
 #include <string>
 #include <vector>
-#include <queue>
+//#include "foundation/util/list.h"
 
 namespace Messaging
 {
@@ -33,7 +33,7 @@ private:
 	MsgHandler() {}
 
 	// Sorted list of all current messages
-	std::priority_queue<Message> msgQueue;
+	//Util::List<Message> msgQueue;
 
 };
 

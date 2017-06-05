@@ -1,4 +1,3 @@
-#pragma once
 /**
 	@class		IO::Console
 	@copyright	See LICENCE file
@@ -11,6 +10,8 @@
 //#include <iomanip>
 #include <ctime>
 #include <fstream>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 #define RECENTMESSAGESCAPACITY 24
 #define MAXLIFETIME 60.0

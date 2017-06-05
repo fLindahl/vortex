@@ -92,7 +92,7 @@ namespace Toolkit
 			{
 				if (ImGui::BeginMenu("Show"))
 				{
-					if (ImGui::MenuItem("GUI Console", NULL, NULL)) { IO::Console::Instance()->Show(); }
+					if (ImGui::MenuItem("GUI Console", NULL, false)) { IO::Console::Instance()->Show(); }
 					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
 					if (ImGui::MenuItem("Shader Debugger", NULL, &showShaderDebugger)) {}
 					ImGui::EndMenu();

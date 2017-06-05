@@ -16,6 +16,9 @@
 #elif __GNUC__
 #define __forceinline inline
 #define VORTEX_ALIGN16 __attribute__((aligned(16)))
+#define __cdecl //define to nothing
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
 #else
 #define VORTEX_ALIGN16
 #endif

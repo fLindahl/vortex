@@ -1,34 +1,23 @@
 //------------------------------------------------------------------------------
-//  sysfunc.cc
-//  (C) 2006 Radon Labs GmbH
-//  (C) 2013 Individual contributors, see AUTHORS file
+//  sysfunc.cpp
+//  
+//  @copyright  See LICENSE file
 //------------------------------------------------------------------------------
-#include "stdneb.h"
-#include "core/posix/posixsysfunc.h"
+#include "config.h"
+#include <unistd.h>
+#include <ctime>
+#include "linuxsysfunc.h"
 #include "core/refcounted.h"
-#include "debug/minidump.h"
-#include "util/blob.h"
-#include "util/guid.h"
-#include "net/socket/socket.h"
-#include "debug/minidump.h"
-#include "threading/thread.h"
-#include "util/globalstringatomtable.h"
-#include "util/localstringatomtable.h"  
-#include "system/systeminfo.h"
 #include <errno.h>
+#include "IO/console.h"
 
-namespace Posix
+namespace Linux
 {
 using namespace Util;
 
 bool volatile SysFunc::SetupCalled = false;
 const Core::ExitHandler* SysFunc::ExitHandlers = 0;
-System::SystemInfo SysFunc::systemInfo;
-
-Util::GlobalStringAtomTable* globalStringAtomTable = 0;
-#if NEBULA3_ENABLE_THREADLOCAL_STRINGATOM_TABLES
-    Util::LocalStringAtomTable* localStringAtomTable = 0;
-#endif
+//System::SystemInfo SysFunc::systemInfo;
     
 //------------------------------------------------------------------------------
 /**
@@ -43,21 +32,6 @@ SysFunc::Setup()
     if (!SetupCalled)
     {
          SetupCalled = true;
-        #if !__MAYA__
-        //Threading::Thread::SetMyThreadName("MainThread");
-        #endif
-        Memory::SetupHeaps();
-        Memory::Heap::Setup();
-        Blob::Setup();
-        #if !__MAYA__
-        Net::Socket::InitNetwork();
-        #endif   
-
-        globalStringAtomTable = n_new(Util::GlobalStringAtomTable);
-        #if NEBULA3_ENABLE_THREADLOCAL_STRINGATOM_TABLES
-            localStringAtomTable = n_new(Util::LocalStringAtomTable);
-        #endif    
-
     }
 }
 
@@ -72,13 +46,9 @@ SysFunc::Setup()
 void
 SysFunc::Exit(int exitCode)
 {
-    // delete string atom tables
-    n_delete(globalStringAtomTable);
-    #if NEBULA3_ENABLE_THREADLOCAL_STRINGATOM_TABLES
-        n_delete(localStringAtomTable);
-    #endif
+   
     // first produce a RefCount leak report
-    #if NEBULA3_DEBUG
+    #if _DEBUG
     Core::RefCounted::DumpRefCountingLeaks();
     #endif
 
@@ -91,19 +61,13 @@ SysFunc::Exit(int exitCode)
     }
 
     // call static shutdown methods
-    Blob::Shutdown();
+    //Blob::Shutdown();
 
     // shutdown global factory object
     Core::Factory::Destroy();
 
-    // delete the memory pools
-    #if NEBULA3_OBJECTS_USE_MEMORYPOOL        
-    n_delete(Memory::ObjectPoolAllocator);
-    Memory::ObjectPoolAllocator = 0;
-    #endif
-
     // report mem leaks
-    #if NEBULA3_MEMORY_ADVANCED_DEBUGGING
+    #if VORTEX_MEMORY_ADVANCED_DEBUGGING
     Memory::DumpMemoryLeaks();
     #endif   
 
@@ -115,9 +79,11 @@ SysFunc::Exit(int exitCode)
 /**
 */
 void
-SysFunc::Error(const char* error)
-{                
+SysFunc::Exception(const char* error)
+{
+    IO::Console::Instance()->Print(error, IO::EXCEPTION);
     fprintf(stderr, error);
+	IO::Console::Instance()->SaveLog("dump.log");
     abort();
 }
 
@@ -125,7 +91,7 @@ SysFunc::Error(const char* error)
 /**
 */
 void
-Posix::SysFunc::MessageBox(const char* msg)
+SysFunc::MessageWindow(const char* msg)
 {
     // don't do anything except write message to console
     fprintf(stdout, msg);
@@ -143,6 +109,44 @@ SysFunc::Sleep(double sec)
     usleep(milliSecs);
 }
 
+//------------------------------------------------------------------------------
+/**
+*/
+Util::String SysFunc::GetTimeFormatted()
+{
+	Util::String str;
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+	
+	if (tm.tm_hour >= 10)
+		str.AppendInt(tm.tm_hour);
+	else
+	{
+		str.AppendInt(0);
+		str.AppendInt(tm.tm_hour);
+	}
+	str.Append(":");
+	
+	if (tm.tm_min >= 10)
+		str.AppendInt(tm.tm_min);
+	else
+	{
+		str.AppendInt(0);
+		str.AppendInt(tm.tm_min);
+	}
+	str.Append(":");
+
+	if (tm.tm_sec >= 10)
+		str.AppendInt(tm.tm_sec);
+	else
+	{
+		str.AppendInt(0);
+		str.AppendInt(tm.tm_sec);
+	}
+
+	return str;
+}
+
 
 //------------------------------------------------------------------------------
 /**
@@ -151,17 +155,18 @@ SysFunc::Sleep(double sec)
 void
 SysFunc::DebugOut(const char* msg)
 {
-    fprintf(stderr, msg);
+    //fprintf(stderr, msg);
+    IO::Console::Instance()->Print(msg);
 }
 
 //------------------------------------------------------------------------------
 /**
 */
-const System::SystemInfo*
-SysFunc::GetSystemInfo()
-{
-    return &SysFunc::systemInfo;
-}
+//const System::SystemInfo*
+//SysFunc::GetSystemInfo()
+//{
+//    return &SysFunc::systemInfo;
+//}
 
 //------------------------------------------------------------------------------
 /**

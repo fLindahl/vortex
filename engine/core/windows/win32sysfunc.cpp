@@ -60,7 +60,7 @@ SysFunc::Exit(int exitCode)
 {
     // first produce a RefCount leak report
     #if _DEBUG
-		Core::RefCounted::DumpRefCountingLeaks();
+	Core::RefCounted::DumpRefCountingLeaks();
     #endif
 
     // call exit handlers
@@ -83,7 +83,7 @@ SysFunc::Exit(int exitCode)
 
     // report mem leaks
     #if VORTEX_MEMORY_ADVANCED_DEBUGGING
-		Memory::DumpMemoryLeaks();
+	Memory::DumpMemoryLeaks();
     #endif   
 
     // finally terminate the process

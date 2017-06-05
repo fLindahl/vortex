@@ -1,6 +1,4 @@
 #pragma once
-#ifndef CORE_POSIXSINGLETON_H
-#define CORE_POSIXSINGLETON_H
 //------------------------------------------------------------------------------
 /**
     @file core/posix/posixsingleton.h
@@ -23,36 +21,11 @@
 
 //------------------------------------------------------------------------------
 #define __DeclareSingleton(type) \
+private: \
+	type(); \
 public: \
-    static ThreadLocal type * Singleton; \
-    static type * Instance() { n_assert(0 != Singleton); return Singleton; }; \
-    static bool HasInstance() { return 0 != Singleton; }; \
+	static type* Instance() { static type instance; return &instance; }\
+	type(const type&) = delete; \
+	void operator=(const type&) = delete; \
 private:
-
-#define __DeclareInterfaceSingleton(type) \
-public: \
-    static type * Singleton; \
-    static type * Instance() { n_assert(0 != Singleton); return Singleton; }; \
-    static bool HasInstance() { return 0 != Singleton; }; \
-private:
-
-#define __ImplementSingleton(type) \
-    ThreadLocal type * type::Singleton = 0;
-
-#define __ImplementInterfaceSingleton(type) \
-    type * type::Singleton = 0;
-
-#define __ConstructSingleton \
-    n_assert(0 == Singleton); Singleton = this;
-
-#define __ConstructInterfaceSingleton \
-    n_assert(0 == Singleton); Singleton = this;
-
-#define __DestructSingleton \
-    n_assert(Singleton); Singleton = 0;
-
-#define __DestructInterfaceSingleton \
-    n_assert(Singleton); Singleton = 0;
 //------------------------------------------------------------------------------
-#endif
-

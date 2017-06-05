@@ -238,7 +238,7 @@ Ptr<Physics::BaseCollider> PhysicsServer::LoadCollider(const std::string& meshNa
 			Ptr<SurfaceCollider> coll = SurfaceCollider::Create();
 			coll->SetShape(shape);
 			coll->CookMeshData(Render::ResourceServer::Instance()->LoadMesh(meshName.c_str()));
-			return coll;
+			return coll.downcast<BaseCollider>();
 		}
 		else
 		{

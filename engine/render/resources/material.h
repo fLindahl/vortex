@@ -12,15 +12,6 @@
 namespace Render
 {
 
-//TODO: This should also denote location in shader, but isn't currently. We assume everything is in this order in the material list.
-enum TextureType
-{
-	AlbedoMap = 0,
-	NormalMap = 1,
-	SpecularMap = 2,
-	RoughnessMap = 3
-};
-
 struct MaterialParameter
 {
 	Util::String name;

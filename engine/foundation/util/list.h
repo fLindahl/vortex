@@ -476,7 +476,7 @@ template<class TYPE>
 typename List<TYPE>::Iterator
 List<TYPE>::AddAfter(Iterator iter, const TYPE& e)
 {
-    Node* node = new(Node(e));
+    Node* node = new Node(e);
     if (0 == iter.GetNode())
     {
         #if VORTEX_BOUNDSCHECKS
@@ -509,7 +509,7 @@ template<class TYPE>
 typename List<TYPE>::Iterator
 List<TYPE>::AddBefore(Iterator iter, const TYPE& e)
 {
-    Node *node = new(Node(e));
+    Node *node = new Node(e);
     if (0 == iter.GetNode())
     {
         #if VORTEX_BOUNDSCHECKS

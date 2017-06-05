@@ -1,6 +1,6 @@
 #include "config.h"
 #include "entity.h"
-#include "application\game\baseproperty.h"
+#include "application/game/baseproperty.h"
 
 namespace Game
 {

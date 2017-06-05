@@ -1,24 +1,23 @@
-
-#ifndef POSIX_SYSFUNC_H
-#define POSIX_SYSFUNC_H
+#pragma once
 //------------------------------------------------------------------------------
 /**
     @class Posix::SysFunc
     
     Provides Posix specific helper functions.
     
-    (C) 2006 Radon Labs GmbH
-    (C) 2013 Individual contributors, see AUTHORS file
+    @copyright  See LICENSE file
 */
 #include "core/types.h"
 #include "core/exithandler.h"
+#include "foundation/util/string.h"
+
 namespace System
 {
     class SystemInfo;
 }
 
 //------------------------------------------------------------------------------
-namespace Posix
+namespace Linux
 {
 
 class SysFunc
@@ -29,15 +28,17 @@ public:
     /// exit process, and to proper cleanup, memleak reporting, etc...
     static void Exit(int exitCode);
     /// display an error message box
-    static void Error(const char* error);
+    static void Exception(const char* error);
     /// print a message on the debug console
     static void DebugOut(const char* msg);
     /// display a message box which needs to be confirmed by the user
-    static void MessageBox(const char* msg);
+    static void MessageWindow(const char* msg);
     /// sleep for a specified amount of seconds
     static void Sleep(double sec);
     /// get system information
-    static const System::SystemInfo* GetSystemInfo();
+    //static const System::SystemInfo* GetSystemInfo();
+    /// get system time as a string with format "hh:mm:ss"
+	static Util::String GetTimeFormatted();
 
 private:    
     friend class Core::ExitHandler;
@@ -46,9 +47,8 @@ private:
 
     static bool volatile SetupCalled;
     static const Core::ExitHandler* ExitHandlers;     // forward linked list of exit handlers
-    static System::SystemInfo systemInfo;
+    //static System::SystemInfo systemInfo;
 };
 
 };
 //------------------------------------------------------------------------------
-#endif

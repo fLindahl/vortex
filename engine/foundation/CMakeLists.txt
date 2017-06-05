@@ -50,7 +50,7 @@ IF(WIN32)
 		)
 ELSE(WIN32)
 	SET(files_foundation_memory_OS
-		m1emory/linux/linuxmemory.h
+		memory/linux/linuxmemory.h
 		memory/linux/linuxmemoryconfig.h
 		memory/linux/linuxmemoryconfig.cpp
 		)

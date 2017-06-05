@@ -5,7 +5,15 @@
 namespace Render
 {
 	struct MaterialParameter;
-	enum TextureType;
+	
+	//TODO: This should also denote location in shader, but isn't currently. We assume everything is in this order in the material list.
+	enum TextureType
+	{
+		AlbedoMap = 0,
+		NormalMap = 1,
+		SpecularMap = 2,
+		RoughnessMap = 3
+	};
 
 	class Surface : public Core::RefCounted
 	{
@@ -51,7 +59,7 @@ namespace Render
 
 		
 		/// loaded textures
-		std::map<Render::TextureType, Ptr<TextureResource>> texturesByType;
+		std::map<TextureType, Ptr<TextureResource>> texturesByType;
 		Util::Array<Ptr<TextureResource>> textures;
 
 		std::map<Util::String, MaterialParameter*> parametersByName;
