@@ -157,6 +157,16 @@ ExampleApp::Run()
 	IO::Console::Instance()->Print("This is an error!", IO::ERROR);
 	IO::Console::Instance()->Print("This is an exception!", IO::EXCEPTION);
 
+	Ptr<Render::GraphicsProperty> gp = Render::GraphicsProperty::Create();
+
+	IO::Stream* stream = new IO::Stream();
+
+	gp->Serialize(stream);
+	gp->Serialize(stream);
+
+	gp->integerAttr.value = 10;
+
+	gp->Serialize(stream);
 
 	while (this->window->IsOpen())
 	{

@@ -35,6 +35,8 @@ public:
 
 	Math::bbox& getbbox() { return this->bbox; }
 
+	void Serialize(IO::Stream* stream);
+
 private:
 	Math::bbox bbox;
 

@@ -96,4 +96,10 @@ void GraphicsProperty::HandleMessage(const Ptr<Messaging::Message>& msg)
 	}
 }
 
+void GraphicsProperty::Serialize(IO::Stream* stream)
+{
+	
+
+}
+
 }

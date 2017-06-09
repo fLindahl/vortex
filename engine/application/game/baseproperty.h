@@ -2,6 +2,7 @@
 #include "core/refcounted.h"
 #include "foundation/messaging/messagehandler.h"
 #include "entity.h"
+#include "IO/serialization.h"
 
 //---------------------------------------
 /**
@@ -30,14 +31,15 @@ public:
 	void SetOwner(Ptr<Entity> o) { this->owner = o; }
 	const Ptr<Entity>& GetOwner() { return this->owner; }
 
-	//void Serialize(IO::Serializer* serializer);
-
+	///Override in subclass. Call this function with you favorite stream write/reader.
+	virtual void Serialize(IO::Stream* serializer);
+	
 protected:
 	bool active = false;
     friend class Entity;
 
 	///The owner entity of this property
-    Ptr<Entity> owner;
+    Ptr<Entity> owner;	
 };
 
 }

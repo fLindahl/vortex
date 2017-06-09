@@ -12,6 +12,17 @@
 #include "tinyxml2.h"
 #include <fstream>
 
+template<class TYPE>
+class Attr
+{
+public:
+	Attr() {}
+	~Attr() {}
+
+	Util::String varName;
+	TYPE value;
+};
+
 namespace IO
 {
 	class Stream
@@ -24,32 +35,10 @@ namespace IO
 		void Close();
 
 		void operator<<(int);
+		void operator<<(const Attr<int>& attr);
 
 	private:
 		std::ofstream outFile;
 
 	};
-
-	Stream::Stream()
-	{
-	}
-
-	Stream::~Stream()
-	{
-	}
-
-	inline void Stream::Open(const char * filename)
-	{
-		this->outFile.open(filename);
-	}
-
-	inline void Stream::Close()
-	{
-		this->outFile.close();
-	}
-
-	inline void Stream::operator<<(int i)
-	{
-		outFile << i;
-	}
 }
