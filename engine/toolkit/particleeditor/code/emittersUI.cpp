@@ -94,7 +94,7 @@ void EmittersUI::DrawEmitter()
 			ImGui::SameLine(1);
 			n = "drag" + std::to_string(id);
 		
-			if (ImGui::InvisibleButton(n.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth()-1, 30) && ImGui::IsMouseDoubleClicked(0)))
+			if (ImGui::InvisibleButton(n.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth() - 1, 30)) && ImGui::IsMouseDoubleClicked(0))
 			{
 				ev.active = true;
 				ui->UpdateActiveEmitter(this->id);

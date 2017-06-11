@@ -32,6 +32,8 @@ SET(files_foundation_util
 	util/pair.h
 	util/fourcc.h
 	util/list.h
+	util/threadpool.h
+	util/threadpool.cpp
 	)
 
 SET(files_foundation_messaging

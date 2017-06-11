@@ -66,10 +66,10 @@ Application::Open()
 		this->wall1 = Game::ModelEntity::Create();
 		this->wall1->SetModel(Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 		this->wall1->Activate();
-		this->wall1->SetTransform(Math::mat4::translation(0.0f, 10.5f, -1.0f));
+		this->wall1->SetTransform(Math::mat4::translation(0.0f, 0.0f, -2.0f));
 
 		this->billboard = Game::ParticleEntity::Create();
-		this->billboard->SetTransform(Math::mat4::translation(0.f, 0.f, -2.f));
+		this->billboard->SetTransform(Math::mat4::translation(0.f, -0.1f, -1.f));
 		this->billboard->LoadEmitters("resources/particles/wisp.particle");
 		this->billboard->Activate();
 
