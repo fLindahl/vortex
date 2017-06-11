@@ -6,6 +6,7 @@
 #include "render/frame/drawpass.h"
 #include "render/frame/lightcullingpass.h"
 #include "render/frame/flatgeometrylitpass.h"
+#include "render/frame/voxelizepass.h"
 //#include "render/frame/pickingpass.h"
 //#include "render/frame/reflectionpass.h"
 //#include "render/frame/shadowmap.h"
@@ -22,6 +23,13 @@ namespace Render
 	{
 		//Setup the common frame passes. 
 		//TODO: these should be moved to a loader and their own xml list like everything else.
+
+		//Voxelization of dynamic objects.
+		Ptr<Render::VoxelizePass> voxelPass = VoxelizePass::Create();
+		voxelPass->name = "Voxelize";
+		voxelPass->Setup();
+		this->framePassByName.Add(voxelPass->name, voxelPass.upcast<Render::FramePass>());
+		this->framePasses.Append(voxelPass.downcast<Render::FramePass>());
 
 		// depth pre-pass
 		this->Depth = DepthPass::Create();

@@ -9,6 +9,7 @@
 			<Pass name="ShadowMap" shader="shadowMap"/>
 			-->
 			
+			<Pass name="Voxelize" shader="voxelize"/>
 			<Pass name="Picking" shader="picking"/>
 			<Pass name="Depth" shader="depthStatic"/>
 			<Pass name="FlatGeometryLit" shader="defaultLit"/>

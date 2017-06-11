@@ -20,10 +20,10 @@
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		
-		<Shader name="geometryTest" desc="Testing Geometry Shaderss">            
-			<VertexShader name="resources/shaders/vertex/static.vert"/>
-			<GeometryShader name="resources/shaders/geometry/test.geom"/>
-			<FragmentShader name="resources/shaders/fragment/pbr.frag"/>
+		<Shader name="voxelize" desc="Voxelizes an object">            
+			<VertexShader name="resources/shaders/vertex/voxelize.vert"/>
+			<GeometryShader name="resources/shaders/geometry/voxelize.geom"/>
+			<FragmentShader name="resources/shaders/fragment/voxelize.frag"/>
 			<RenderState name="resources/shaders/states/opaque.state"/>
 		</Shader>
 		
