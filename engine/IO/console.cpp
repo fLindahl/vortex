@@ -120,29 +120,36 @@ void Console::Update()
 			ImGui::PopStyleVar();
 			ImGui::EndChild();
 			ImGui::Separator();
+		
+			// Command-line / Input ----------------------------------------------------
 
+			auto callback = [](ImGuiTextEditCallbackData* data) { return 1; };
+
+			if (ImGui::InputText("|", inputBuf, INPUTBUFSIZE * sizeof(char), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory, callback, (void*)this))
+			{
+				char* input_end = inputBuf + strlen(inputBuf);
+				while (input_end > inputBuf && input_end[-1] == ' ') input_end--; *input_end = 0;
+				if (inputBuf[0])
+				{
+					this->Print(inputBuf, IO::LogMessageType::INPUT);
+
+					//TODO: ExecCommand Functionality
+					//ExecCommand(inputBuf);
+				}
+				strcpy(inputBuf, "");
+			}
+			
+			//keeping auto focus on the input box
+			if (ImGui::IsItemHovered() || (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
+				ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+
+			ImGui::SameLine();
+			ImGui::PushItemWidth(-140);
 			if (ImGui::SmallButton("Auto Scroll"))
 				ScrollToBottom = (ScrollToBottom ? false : true);
 
+			ImGui::PopItemWidth();
 			ImGui::Separator();
-
-			// Command-line
-			//TODO: Implement me!!!
-
-			//if (ImGui::InputText(">>", inputBuf, INPUTBUFSIZE * sizeof(char), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory, TEXTEDITCALLBACKFUNCTION, (void*)this))
-			//{
-			//	char* input_end =inputBuf + strlen(inputBuf);
-			//	while (input_end > inputBuf && input_end[-1] == ' ') input_end--; *input_end = 0;
-			//	if (inputBuf[0])
-			//		//TODO: ExecCommand Functionality
-			//		//ExecCommand(inputBuf);
-			//	strcpy(inputBuf, "");
-			//}
-			//
-			//// Demonstrate keeping auto focus on the input box
-			//if (ImGui::IsItemHovered() || (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
-			//	ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
-
 		} 
 		ImGui::End();
 	}
