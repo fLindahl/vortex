@@ -9,7 +9,7 @@
 
 namespace Particles
 {
-
+	__ImplementClass(Particles::ParticleSystem, 'PASY', Core::RefCounted)
 
 ParticleSystem::ParticleSystem() : particleBuffer(0)
 {
@@ -23,10 +23,10 @@ ParticleSystem::~ParticleSystem()
 {
 }
 
-EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::ParticleEmitter& owner)
+EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Game::ParticleEmitter& owner)
 {
 
-	emitters.Insert(emitters.Size(), &owner);
+	emitters.Append(&owner);
 	//Create a "buffer" for an emitter
 	EmitterBuffer buf;
 	buf.startIndex = particleArray.Size();
@@ -35,8 +35,6 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 	buf.endIndex = particleArray.Size();
 	buf.arr = &particleArray;
 	buf.startArr = &particleStartSettings;
-
-	owner.GetNumberOfParticles() = buf.endIndex - buf.startIndex;
 
 	index_t numPart = particleArray.Size();
 	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
@@ -48,7 +46,7 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 		particleArray[i].accLife[2] =  Math::randFloat(-0.5f, 1.0f);
 		particleArray[i].accLife[1] =  Math::randFloat(-9.82f, -7.82f);
 		particleArray[i].accLife[0] =  Math::randFloat(-0.5f, 1.0f);
-		particleArray[i].pos = owner.GetModelMatrix().get_position()+(pos*1.0f);
+		particleArray[i].pos = owner.GetModelMatrix().get_position() + (pos*1.0f);
 		particleArray[i].vel = pos * Math::randFloat(1.0f, 2.5f);
 		particleArray[i].vel[3] = 1.0f;
 	}
@@ -62,17 +60,139 @@ EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Property::Par
 
 	// Bind particle buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleStartBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	return buf;
 }
 
-void ParticleSystem::GetEmitterBuffer(index_t bufferSize, Ptr<Property::ParticleEmitter> owner, EmitterBuffer& eBuff)
+EmitterBuffer ParticleSystem::GetEmitterBuffer(index_t bufferSize, Game::ParticleEmitter& owner, ParticleUISettings& settings)
+{
+	this->emitters.Append(&owner);
+	//Create a "buffer" for an emitter
+	EmitterBuffer buf;
+	buf.startIndex = particleArray.Size();
+	this->particleArray.Reserve(bufferSize);
+	this->particleArray.Fill(buf.startIndex, bufferSize, owner.GetState());
+	buf.endIndex = particleArray.Size();
+	buf.arr = &particleArray;
+	buf.startArr = &particleStartSettings;
+
+	index_t numPart = particleArray.Size();
+	float x, y;
+	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
+	{
+		//Velocity
+		if (settings.shapes == CONE)
+		{
+			Math::vec4 pos(0.0f, 2.0f, 0.0f, 1.0f);
+			Math::RandomPointInCircle(settings.radius, x, y);
+			pos.set_x(x);
+			pos.set_z(y);
+			particleArray[i].pos = owner.GetModelMatrix().get_position();
+			if (settings.velRand)
+			{
+				particleArray[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - particleArray[i].pos)*Math::randFloat(settings.vel, settings.vel2);
+			}
+			else
+			{
+				particleArray[i].vel = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - particleArray[i].pos)*settings.vel;
+			}
+			particleArray[i].vel[3] = 1.0f;
+		}
+		else if (settings.shapes == SPHERE)
+		{
+			Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+			Math::RandomPointInSphere(settings.radius, pos, (float)PI * 2);
+			pos = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - owner.GetModelMatrix().get_position());
+			this->particleArray[i].pos = owner.GetModelMatrix().get_position() + (pos*settings.radius);
+			if (settings.velRand)
+			{
+				this->particleArray[i].vel = pos*Math::randFloat(settings.vel, settings.vel2);
+			}
+			else
+			{
+				this->particleArray[i].vel = pos*settings.vel;
+			}
+			this->particleArray[i].vel[3] = 1.0f;
+		}
+		else if (settings.shapes == HEMISPHERE)
+		{
+			Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+			Math::RandomPointInSphere(settings.radius, pos, (float)PI);
+			pos = Math::vec4::normalize(Math::mat4::transform(pos, owner.GetModelMatrix()) - owner.GetModelMatrix().get_position());
+			this->particleArray[i].pos = owner.GetModelMatrix().get_position() + (pos*settings.radius);
+			if (settings.velRand)
+			{
+				this->particleArray[i].vel = pos*Math::randFloat(settings.vel, settings.vel2);
+			}
+			else
+			{
+				this->particleArray[i].vel = pos*settings.vel;
+			}
+			this->particleArray[i].vel[3] = 1.0f;
+		}
+		//Acceleration
+		if (settings.accRand)
+		{
+			this->particleArray[i].accLife[0] = Math::randFloat(settings.acc[0], settings.acc2[0]);
+			this->particleArray[i].accLife[1] = Math::randFloat(settings.acc[1], settings.acc2[1]);
+			this->particleArray[i].accLife[2] = Math::randFloat(settings.acc[2], settings.acc2[2]);
+		}
+		else
+		{
+			this->particleArray[i].accLife[0] = settings.acc[0];
+			this->particleArray[i].accLife[1] = settings.acc[1];
+			this->particleArray[i].accLife[2] = settings.acc[2];
+		}
+		//Lifetime
+		this->particleArray[i].accLife[3] = Math::randFloat(0.0f, settings.acc2[3]);
+
+		//Color
+		if (settings.colorRand)
+		{
+			this->particleArray[i].color = Math::vec4::lerp(settings.color, settings.color2, Math::randFloat());
+		}
+		else
+		{
+			this->particleArray[i].color = settings.color;
+		}
+
+		this->particleArray[i].size[0] = settings.size[0];
+		this->particleArray[i].size[1] = settings.size[0];
+		this->particleArray[i].size[2] = settings.size[0];
+		this->particleArray[i].startSize[0] = settings.size[0];
+		this->particleArray[i].startSize[1] = settings.size[0];
+		this->particleArray[i].startSize[2] = settings.size[0];
+		this->particleArray[i].endSize[0] = settings.size[1];
+		this->particleArray[i].endSize[1] = settings.size[1];
+		this->particleArray[i].endSize[2] = settings.size[1];
+
+	}
+
+	this->particleStartSettings = this->particleArray;
+	for (size_t i = buf.startIndex; i < buf.endIndex; i++)
+	{
+		this->particleStartSettings[i].accLife[3] = Math::randFloat(settings.acc[3], settings.acc2[3]);
+	}
+
+	// Bind particle buffer
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleStartBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	return buf;
+}
+
+void ParticleSystem::GetEmitterBuffer(index_t bufferSize, Ptr<Game::ParticleEmitter> owner, EmitterBuffer& eBuff)
 {
 	Util::Array<ParticleState> arr;
 	arr.Reserve(this->particleArray.Size() - (eBuff.endIndex - eBuff.startIndex) + bufferSize);
@@ -135,11 +255,11 @@ void ParticleSystem::GetEmitterBuffer(index_t bufferSize, Ptr<Property::Particle
 
 	// Bind particle buffer
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleArray[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->particleStartBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_STATIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numPart * sizeof(ParticleState), &this->particleStartSettings[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	
@@ -149,15 +269,10 @@ void ParticleSystem::GetEmitterBuffer(index_t bufferSize, Ptr<Property::Particle
 void ParticleSystem::DrawParticleSystem()
 {
 	Render::FrameServer::Instance()->GetFlatGeometryLitPass()->BindFrameBuffer();
-	//Because we're using the old depthbuffer from the depth prepass, we need to allow equal depth values, or clear the depth buffer. clearing would mean redundant work however.
-	//glDepthFunc(GL_LEQUAL);
+
 	glUseProgram(sh->GetProgram());
 
 	sh->EnableRenderState();
-
-	//glDepthMask(GL_FALSE);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	this->mesh->Bind();
 	for (size_t i = 0; i < GetParticleEmitters().Size(); i++)
@@ -165,20 +280,19 @@ void ParticleSystem::DrawParticleSystem()
 		GetParticleEmitters()[i]->GetEmitterTexture()->BindTexture(0);
 		GetParticleEmitters()[i]->BindUniformBuffer();
 		GLuint num = GetParticleEmitters()[i]->GetNumberOfParticles();
+		sh->setModelMatrix(GetParticleEmitters()[i]->GetModelMatrix());
 		glDrawElementsInstanced(GL_TRIANGLES, this->mesh->getNumIndices(), GL_UNSIGNED_INT, NULL, num);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	//glDisable(GL_BLEND);
-	//glDepthMask(GL_TRUE);
 	this->mesh->Unbind();
 	//glActiveTexture(GL_TEXTURE4);
 	//glBindTexture(GL_TEXTURE_2D, 0);
-	//glDepthFunc(GL_LESS);
+
 	glUseProgram(0);
 }
 
-void ParticleSystem::UpdateParticlePosition(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticlePosition(Ptr<Game::ParticleEmitter> owner, Math::vec4 min, float radius, EmitterShapes shape)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -191,29 +305,37 @@ void ParticleSystem::UpdateParticlePosition(Ptr<Property::ParticleEmitter> owner
 		printf("Size is: %i", size / sizeof(ParticleState));
 		printf("Error: %i", glGetError());
 	}
-	
-	if (random)
+	Math::vec4 calcPos(0.0f, 0.0f, 0.0f, 1.0f);
+	for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
 	{
-		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
+		if (shape == CONE)
 		{
-			
-			particles[i].pos = Math::vec4(Math::randFloat(min[0], max[0]), Math::randFloat(min[1], max[1]), Math::randFloat(min[2], max[2]), 1.0f);
+			calcPos = min;
 		}
-	}
-	else
-	{
-		for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
+		else if (shape == SPHERE)
 		{
-			particles[i].pos = min;
+			Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+			Math::RandomPointInSphere(radius, pos, (float)PI * 2);
+			pos = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - min);
+			calcPos = min + (pos*radius);
 		}
+		else if (shape == HEMISPHERE)
+		{
+			Math::vec4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+			Math::RandomPointInSphere(radius, pos, (float)PI);
+			pos = Math::vec4::normalize(Math::mat4::transform(pos, owner->GetModelMatrix()) - min);
+			calcPos = min + (pos*radius);
+		}
+		particles[i].pos = calcPos;
 	}
-	owner->GetState().pos = min;
+
+	owner->GetState().pos = calcPos;
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 }
 
-void ParticleSystem::UpdateParticleVelocity(Ptr<Property::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random)
+void ParticleSystem::UpdateParticleVelocity(Ptr<Game::ParticleEmitter> owner, float min, float max, float radius, EmitterShapes shape, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -304,7 +426,7 @@ void ParticleSystem::UpdateParticleVelocity(Ptr<Property::ParticleEmitter> owner
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void ParticleSystem::UpdateParticleRotation(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticleRotation(Ptr<Game::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -338,7 +460,7 @@ void ParticleSystem::UpdateParticleRotation(Ptr<Property::ParticleEmitter> owner
 
 }
 
-void ParticleSystem::UpdateParticleAcceleration(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticleAcceleration(Ptr<Game::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -378,7 +500,7 @@ void ParticleSystem::UpdateParticleAcceleration(Ptr<Property::ParticleEmitter> o
 
 }
 
-void ParticleSystem::UpdateParticleLifetime(Ptr<Property::ParticleEmitter> owner, float min, float max, bool random)
+void ParticleSystem::UpdateParticleLifetime(Ptr<Game::ParticleEmitter> owner, float min, float max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -412,7 +534,7 @@ void ParticleSystem::UpdateParticleLifetime(Ptr<Property::ParticleEmitter> owner
 
 }
 
-void ParticleSystem::UpdateParticleColor(Ptr<Property::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
+void ParticleSystem::UpdateParticleColor(Ptr<Game::ParticleEmitter> owner, Math::vec4 min, Math::vec4 max, bool random)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
 	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
@@ -447,13 +569,33 @@ void ParticleSystem::UpdateParticleColor(Ptr<Property::ParticleEmitter> owner, M
 	
 }
 
-void ParticleSystem::UpdateParticleSize(Ptr<Property::ParticleEmitter> owner, float start, float end)
+void ParticleSystem::UpdateParticleSize(Ptr<Game::ParticleEmitter> owner, float start, float end)
 {
-	owner->GetRenderBuffer().startSize = Math::vec4(start);
-	owner->GetRenderBuffer().endSize = Math::vec4(end);
-	glBindBuffer(GL_UNIFORM_BUFFER, owner->GetUniformBuffer()[0]);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 3, owner->GetUniformBuffer()[0]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(owner->GetRenderBuffer()), &owner->GetRenderBuffer(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, GetParticleStartBuffer());
+	GLbitfield bufferMask = GL_MAP_WRITE_BIT;
+	ParticleState* particles = (ParticleState*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, owner->GetEmitterBuffer().startIndex * sizeof(ParticleState), (owner->GetEmitterBuffer().endIndex - owner->GetEmitterBuffer().startIndex) * sizeof(ParticleState), bufferMask);
+
+	if (particles == NULL)
+	{
+		GLint size;
+		glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, &size);
+		printf("Size is: %i", size / sizeof(ParticleState));
+		printf("Error: %i", glGetError());
+	}
+
+	for (size_t i = 0; i < owner->GetNumberOfParticles(); ++i)
+	{
+		particles[i].startSize = Math::vec4(start);
+		particles[i].endSize = Math::vec4(end);
+	}
+
+
+	owner->GetState().startSize = Math::vec4(start);
+	owner->GetState().endSize = Math::vec4(end);
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 }
 
 Ptr<Render::ShaderObject> ParticleSystem::GetParticleShaderObject()

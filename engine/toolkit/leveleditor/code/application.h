@@ -98,7 +98,7 @@ private:
 	Ptr<Game::ModelEntity> floor;
 	Ptr<Game::ModelEntity> ceiling;
 	
-	Util::Array<Ptr<Game::ParticleEntity>> particleList;
+	Util::Array<Ptr<Game::ParticleEmitter>> particleList;
 
 	//Particles::ParticleSettings pSettings;
 

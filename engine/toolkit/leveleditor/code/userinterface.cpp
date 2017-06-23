@@ -514,7 +514,7 @@ namespace Toolkit
 				}
 				for (int i = 0; i < application->particleList.Size(); ++i)
 				{
-					ParticlesSettings(application->particleList[i]->GetEmitter());
+					//ParticlesSettings(application->particleList[i]->GetEmitters());
 					this->particleCount++;
 				}
 				
@@ -560,12 +560,11 @@ namespace Toolkit
 	}
 
 
-void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
+void UserInterface::ParticlesSettings(Ptr<Game::ParticleEmitter> emitter)
 {
 	std::string id = "Particle "+std::to_string(particleCount);
 	if (ImGui::CollapsingHeader(id.c_str()))
-	{
-		
+	{	
 		id = "Append Emitter##" + std::to_string(particleCount);
 		if (ImGui::Button(id.c_str()))
 		{
@@ -598,7 +597,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 			{
 				ImGui::Text("Randomize"); ImGui::SameLine(120);
 				id = "##vb" + std::to_string(particleCount);
-				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().vecRand);
+				ImGui::Checkbox(id.c_str(), &emitter->GetParticleUISettings().velRand);
 				ImGui::Text("Min"); ImGui::SameLine(100);
 				id = "##v1" + std::to_string(particleCount);
 				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().vel, 0, 30, "%.3f", 5))
@@ -609,9 +608,9 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 						emitter->GetParticleUISettings().vel = emitter->GetParticleUISettings().vel2;
 						emitter->GetParticleUISettings().vel2 = emitter->GetParticleUISettings().vel;
 					}
-					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().velRand);
 				}
-				if (emitter->GetParticleUISettings().vecRand)
+				if (emitter->GetParticleUISettings().velRand)
 				{
 					ImGui::Text("Max"); ImGui::SameLine(100);
 					id = "##v2" + std::to_string(particleCount);
@@ -623,7 +622,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 							emitter->GetParticleUISettings().vel = emitter->GetParticleUISettings().vel2;
 							emitter->GetParticleUISettings().vel2 = emitter->GetParticleUISettings().vel;
 						}
-						Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
+						Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().velRand);
 					}
 				}
 				ImGui::TreePop();
@@ -740,16 +739,16 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 			{
 				ImGui::Text("Start"); ImGui::SameLine(100);
 				id = "##s1" + std::to_string(particleCount);
-				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().startSize, 0, 20, "%.3f", 5))
+				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().size[0], 0, 20, "%.3f", 5))
 				{
 
-					Particles::ParticleSystem::Instance()->UpdateParticleSize(emitter, emitter->GetParticleUISettings().startSize, emitter->GetParticleUISettings().endSize);
+					Particles::ParticleSystem::Instance()->UpdateParticleSize(emitter, emitter->GetParticleUISettings().size[0], emitter->GetParticleUISettings().size[1]);
 				}
 				ImGui::Text("End"); ImGui::SameLine(100);
 				id = "##s2" + std::to_string(particleCount);
-				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().endSize, 0, 20, "%.3f", 5))
+				if (ImGui::SliderFloat(id.c_str(), (float*)&emitter->GetParticleUISettings().size[1], 0, 20, "%.3f", 5))
 				{
-					Particles::ParticleSystem::Instance()->UpdateParticleSize(emitter, emitter->GetParticleUISettings().startSize, emitter->GetParticleUISettings().endSize);
+					Particles::ParticleSystem::Instance()->UpdateParticleSize(emitter, emitter->GetParticleUISettings().size[0], emitter->GetParticleUISettings().size[1]);
 				}
 
 				ImGui::TreePop();
@@ -784,7 +783,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 				ImGui::PushItemWidth(150);
 				if (ImGui::SliderFloat(id.c_str(), &emitter->GetParticleUISettings().radius, 0.001, 10, "%.3f", 5))
 				{
-					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().velRand);
 				}
 				ImGui::PopItemWidth();
 			}
@@ -795,7 +794,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 				ImGui::PushItemWidth(150);
 				if (ImGui::SliderFloat(id.c_str(), &emitter->GetParticleUISettings().radius, 0.001, 10, "%.3f", 5))
 				{
-					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().velRand);
 				}
 				ImGui::PopItemWidth();
 			}
@@ -806,7 +805,7 @@ void UserInterface::ParticlesSettings(Ptr<Property::ParticleEmitter> emitter)
 				ImGui::PushItemWidth(150);
 				if (ImGui::SliderFloat(id.c_str(), &emitter->GetParticleUISettings().radius, 0.001, 10, "%.3f", 5))
 				{
-					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().vecRand);
+					Particles::ParticleSystem::Instance()->UpdateParticleVelocity(emitter, emitter->GetParticleUISettings().vel, emitter->GetParticleUISettings().vel2, emitter->GetParticleUISettings().radius, emitter->GetParticleUISettings().shapes, emitter->GetParticleUISettings().velRand);
 				}
 				ImGui::PopItemWidth();
 			}

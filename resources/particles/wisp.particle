@@ -1,0 +1,16 @@
+<Vortex>
+    <ParticleSystem>
+        <ParticleEmitter name="wisp">
+            <Texture path="resources/textures/particles/particle_spritesheet_shockwave2-light-shards.tga" framesPerRow="8" numberOfFrames="64" spritesheet="true"/>
+            <Velocity vel="0.093000002" vel2="0.127" random="true"/>
+            <Acceleration acc="0.000000 0.867000 0.000000" acc2="0.000000 0.561000 0.000000" random="true"/>
+            <Lifetime life="1.4950001" life2="1.9900001" random="true"/>
+            <Color color="0.018878 0.425940 0.480349 0.659389" color2="0.080939 0.035240 0.244541 0.593886" random="true"/>
+            <Size startSize="0.94500005" endSize="0.20700002"/>
+            <ParticleAmount num="200"/>
+            <EmitterShapes shape="1">
+                <Radius radius="0.11100001"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+    </ParticleSystem>
+</Vortex>

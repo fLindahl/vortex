@@ -1,0 +1,16 @@
+<Vortex>
+    <ParticleSystem>
+        <ParticleEmitter name="Sparks">
+            <Texture path="resources/textures/particles/capsule2.tga" framesPerRow="0" numberOfFrames="0" spritesheet="false"/>
+            <Velocity vel="1.011" vel2="1.353" random="true"/>
+            <Acceleration acc="0.000000 -1.874000 0.000000" acc2="0.000000 1.000000 0.000000" random="false"/>
+            <Lifetime life="2.2210002" life2="3.2050002" random="true"/>
+            <Color color="0.917031 0.627255 0.008009 0.694323" color2="0.960699 0.176198 0.000000 0.672489" random="true"/>
+            <Size startSize="0.037" endSize="0.052000001"/>
+            <ParticleAmount num="4096"/>
+            <EmitterShapes shape="0">
+                <Radius radius="0.57800001"/>
+            </EmitterShapes>
+        </ParticleEmitter>
+    </ParticleSystem>
+</Vortex>

@@ -135,6 +135,15 @@ Application::Open()
 		//this->ceiling->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
 		//
 
+		this->billboard = Game::ParticleEntity::Create();
+		this->billboard->SetTransform(Math::mat4::translation(0.f, 0.f, -2.f));
+		this->billboard->LoadEmitters("resources/particles/wisp.particle");
+		this->billboard->Activate();
+
+		for (size_t i = 0; i < this->billboard->GetEmitters().Size(); i++)
+		{
+			this->particleList.Append(this->billboard->GetEmitters()[i]);
+		}
 
 		//billboard = std::make_shared<Game::ParticleEntity>();
 		//billboard->SetTransform(Math::mat4::translation(11.18f, -1.0f, 4.02f));

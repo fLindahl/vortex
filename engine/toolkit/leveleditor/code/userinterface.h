@@ -40,7 +40,7 @@ namespace Toolkit
 		void ExecShortCuts();
 		void ShowFileMenu();
 
-		void ParticlesSettings(Ptr<Property::ParticleEmitter> emitter);
+		void ParticlesSettings(Ptr<Game::ParticleEmitter> emitter);
 		
 		double prevFPSTime;
 		double currentFPS;
