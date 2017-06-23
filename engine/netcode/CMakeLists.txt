@@ -2,11 +2,23 @@
 # netcode
 #--------------------------------------------------------------------------
 
+
+IF(WIN32)
+	SET(files_netcode_OS
+		windows/winsockethandler.h
+		windows/winsockethandler.cpp
+		)
+ELSE(WIN32)
+	SET(files_netcode_OS
+		linux/linuxsockethandler.h
+		linux/linuxsockethandler.cpp
+		)
+ENDIF(WIN32)
+
 SET(files_netcode_global
-	netcode.h
-	netcode.cpp
-	netdata.h
-	)
+	constants.h
+	${files_netcode_OS}
+)
 
 SOURCE_GROUP("netcode" FILES ${files_netcode_global})
 
