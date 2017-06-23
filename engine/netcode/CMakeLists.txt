@@ -2,7 +2,6 @@
 # netcode
 #--------------------------------------------------------------------------
 
-
 IF(WIN32)
 	SET(files_netcode_OS
 		windows/winsockethandler.h
@@ -17,6 +16,7 @@ ENDIF(WIN32)
 
 SET(files_netcode_global
 	constants.h
+	sockethandler.h
 	${files_netcode_OS}
 )
 
@@ -30,5 +30,5 @@ SET(files_pch ../config.h ../config.cc)
 SOURCE_GROUP("pch" FILES ${files_pch})
 ADD_LIBRARY(netcode STATIC ${files_netcode} ${files_pch})
 TARGET_PCH(netcode ../)	
-ADD_DEPENDENCIES(netcode application core foundation glew glfw misc)
-TARGET_LINK_LIBRARIES(netcode PUBLIC application core foundation exts glew glfw ${OPENGL_LIBS} misc)
+ADD_DEPENDENCIES(netcode core foundation misc)
+TARGET_LINK_LIBRARIES(netcode PUBLIC core foundation misc)
