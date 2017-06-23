@@ -2,7 +2,7 @@
 #pragma comment(lib,"Ws2_32.lib")
 
 #define WIN32_LEAN_AND_MEAN
-#include "netdata.h"
+#include "netcode/constants.h"
 #include <winsock2.h>
 #include <string>
 

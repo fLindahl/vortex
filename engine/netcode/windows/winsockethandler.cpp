@@ -1,5 +1,5 @@
 #include "config.h"
-#include "netcode.h"
+#include "winsockethandler.h"
 #include <windows.h>
 #include <ws2tcpip.h>
 #include <string>
@@ -140,6 +140,9 @@ bool SocketHandler::sendData(const char* sendbuf, size_t size)
 
 	// Send buffer
 	iResult = send(this->ConnectSocket, buf, size, 0);
+
+	//free memory
+	delete[] buf;
 
 	if (iResult == SOCKET_ERROR) 
 	{

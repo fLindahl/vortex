@@ -89,10 +89,15 @@ namespace Netcode
 		if (send(this->mSocket, buf, size, 0) == -1)
 		{
 			_warning("Send failed!");
+			delete[] buf;
 			close(this->mSocket);
 			return false;
 		}
+		
 		_printf("Bytes Sent: %ld", iResult);
+		
+		delete[] buf;
+		
 		return true;
 	}
 
