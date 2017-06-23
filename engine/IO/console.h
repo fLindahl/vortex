@@ -24,15 +24,15 @@ namespace IO
 	enum LogMessageType
 	{
 		///Just plain white text. Adds [Message] prefix to the log message.
-		MESSAGE,	
+		MESSAGE = 0,
 		///User Input text. Appends nothing to the message.
-		INPUT,		
+		INPUT = 1,
 		///Warning text. Adds [Warning] to the message.
-		WARNING,	
+		WARNING = 2,
 		///Error message. Adds [Error] to the message.
-		ERROR,		
+		ERROR = 3,
 		///Exception. Adds [FATAL ERROR] to the messsage. These are only used when the application encounters an assertion and needs to abort
-		EXCEPTION	
+		EXCEPTION = 4
 	};
 
 class Console

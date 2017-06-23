@@ -297,3 +297,12 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+/projects/heathen
+/projects/heathen/code/main.cpp
+/projects/heathen/code/client.h
+/projects/heathen/code/client.cpp
+/projects/heathen/code/chat_netdata.h
+/projects/heathen/code/chat.h
+/projects/heathen/code/chat.cpp
+/projects/heathen/code/application.h
+/projects/heathen/code/application.cpp
