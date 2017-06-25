@@ -10,11 +10,8 @@
 #include "render/server/frameserver.h"
 #include "application/game/cubemapentity.h"
 #include "render/server/lightserver.h"
-
 #include "basetool.h"
-#include "selecttool.h"
-#include "translatetool.h"
-#include "rotatetool.h"
+
 #include "render/debugrender/debugrenderer.h"
 #include "imgui_internal.h"
 #include "render/particlesystem/particlefile.h"
@@ -22,6 +19,8 @@
 #include "application/basegamefeature/managers/scenemanager.h"
 
 #include "IO/console.h"
+
+#include "interfacemanager.h"
 
 #define CONSOLE_BUFFER_SIZE 8096
 
@@ -31,10 +30,9 @@ namespace Toolkit
 	{
 		this->application = app;
 
-		this->selectTool = new Tools::SelectTool();
-		this->translateTool = new Tools::TranslateTool();
-		this->rotateTool = new Tools::RotateTool();
-		this->currentTool = this->selectTool;
+		Interface::InterfaceManager::Instance()->RegisterInterface("Interface::SceneView", "3D View");
+		Interface::InterfaceManager::Instance()->RegisterInterface("Interface::Inspector", "Inspector");
+		
 
 		//Load textures
 		this->selectToolTextureHandle = Render::ResourceServer::Instance()->LoadTexture("engine/toolkit/leveleditor/resources/textures/cursor.png")->GetHandle();
@@ -56,9 +54,7 @@ namespace Toolkit
 
 	UserInterface::~UserInterface()
 	{
-		delete this->selectTool;
-		delete this->translateTool;
-		delete this->rotateTool;
+		
 	}
 
 	void UserInterface::Run()
@@ -228,28 +224,28 @@ namespace Toolkit
 			bool switched = false;
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_Q)))
 			{
-				this->currentTool = selectTool;
+				Tools::ToolHandler::Instance()->SetSelectTool();
 				switched = true;
 			}
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_W)))
 			{
-				this->currentTool = translateTool;
+				Tools::ToolHandler::Instance()->SetTranslateTool();
 				switched = true;
 			}
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_E)))
 			{
-				this->currentTool = rotateTool;
+				Tools::ToolHandler::Instance()->SetRotateTool();
 				switched = true;
 			}
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_::ImGuiKey_R)))
 			{
-				//this->currentTool = scaleTool;
+				//Tools::ToolHandler::Instance()->SetScaleTool();
 				switched = true;
 			}
 
 			if (switched && application->hit.object != nullptr)
 			{
-				this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+				Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(application->hit.object->GetTransform());
 			}
 		}
 	}
@@ -275,17 +271,17 @@ namespace Toolkit
 			bool switched = false;
 			if (ImGui::ImageButton((void*)this->selectToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
-				this->currentTool = selectTool;
+				Tools::ToolHandler::Instance()->SetSelectTool();
 				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->translateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
-				this->currentTool = translateTool;
+				Tools::ToolHandler::Instance()->SetTranslateTool();
 				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->rotateToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
 			{
-				this->currentTool = rotateTool;
+				Tools::ToolHandler::Instance()->SetRotateTool();
 				switched = true;
 			}
 			if (ImGui::ImageButton((void*)this->scaleToolTextureHandle, ImVec2(toolButtonSize, toolButtonSize)))
@@ -311,7 +307,7 @@ namespace Toolkit
 
 			if (switched && application->hit.object != nullptr)
 			{
-				this->currentTool->UpdateTransform(application->hit.object->GetTransform());
+				Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(application->hit.object->GetTransform());
 			}
 
 			ImGui::End();
@@ -321,53 +317,7 @@ namespace Toolkit
 
 		ImGui::RootDock(ImVec2(toolbarWidth, 16.0f), ImVec2((float)application->window->GetWidth() - toolbarWidth, (float)application->window->GetHeight() - 16));
 		{
-			if(ImGui::BeginDock("3D View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
-			{
-				ImVec2 dockSize = ImGui::GetWindowSize();
-				ImGui::Image((void*)Render::RenderDevice::Instance()->GetFinalColorBuffer(), dockSize);
-
-				this->currentTool->UpdateHandlePositions();
-				this->currentTool->Render();
-
-				if (ImGui::IsItemHovered())
-				{
-					if (application->hit.object != nullptr)
-					{
-						if (ImGui::GetIO().MouseClicked[0])
-						{
-							this->currentTool->LeftDown();
-							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
-							if (this->currentTool->GetCurrentHandle() == Tools::TransformHandle::NONE)
-							{
-								application->DoPicking();
-							}
-						}
-						if (ImGui::GetIO().MouseReleased[0])
-						{
-							this->currentTool->LeftUp();
-						}
-						if (ImGui::GetIO().MouseDown[0])
-						{
-							this->currentTool->Drag();
-
-							delta = this->currentTool->GetDeltaMatrix();
-							Math::mat4 objTransform = this->application->hit.object->GetTransform();
-							
-							this->application->hit.object->SetTransform(Math::mat4::multiply(delta, objTransform));
-							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
-						}
-					}
-					else
-					{
-						application->DoPicking();
-						if (application->hit.object != nullptr)
-						{
-							this->currentTool->UpdateTransform(application->hit.object->GetTransform());
-						}
-					}
-				}
-			}
-			ImGui::EndDock();
+			Interface::InterfaceManager::Instance()->RunAll();
 
 			//ImGui::BeginDock("Top View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
 			//ImGui::EndDock();
@@ -378,126 +328,7 @@ namespace Toolkit
 			//ImGui::BeginDock("Front View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
 			//ImGui::EndDock();
 
-			if(ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings))
-			{
-				if (application->hit.object != nullptr)
-				{
-					ImGui::Text("Transform:");
-					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(0).x(), application->hit.object->GetTransform().getrow(0).y(), application->hit.object->GetTransform().getrow(0).z(), application->hit.object->GetTransform().getrow(0).w());
-					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(1).x(), application->hit.object->GetTransform().getrow(1).y(), application->hit.object->GetTransform().getrow(1).z(), application->hit.object->GetTransform().getrow(1).w());
-					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(2).x(), application->hit.object->GetTransform().getrow(2).y(), application->hit.object->GetTransform().getrow(2).z(), application->hit.object->GetTransform().getrow(2).w());
-					ImGui::Text("%f | %f | %f | %f", application->hit.object->GetTransform().getrow(3).x(), application->hit.object->GetTransform().getrow(3).y(), application->hit.object->GetTransform().getrow(3).z(), application->hit.object->GetTransform().getrow(3).w());
-					
-					ImGui::Text("Rotate:");
-
-					float xRot = 0;	float yRot = 0;	float zRot = 0;
-
-					ImGui::SliderFloat("X", &xRot, -0.05f, 0.05f, "%.3f", 1.0f);
-					ImGui::SliderFloat("Y", &yRot, -0.05f, 0.05f, "%.3f", 1.0f);
-					ImGui::SliderFloat("Z", &zRot, -0.05f, 0.05f, "%.3f", 1.0f);
-
-					Math::mat4 transform = Math::mat4::multiply(Math::mat4::rotationyawpitchroll(yRot, xRot, zRot), application->hit.object->GetTransform());
-					application->hit.object->SetTransform(transform);
-
-					float yaw = atan2(-transform.getrow0().z(), transform.getrow0().x());
-					float pitch = asin(transform.getrow0().y());
-					float roll = atan2(-transform.getrow2().y(), transform.getrow1().y());
-
-					ImGui::Text("Pitch : %f | Yaw : %f | Roll : %f", pitch, yaw, roll);
-					ImGui::Separator();
-
-					// CUBEMAPS --------------------------------------------
-					Game::CubeMapEntity* cm = dynamic_cast<Game::CubeMapEntity*>(application->hit.object);
-
-					if (cm != nullptr)
-					{
-						ImGui::SliderFloat("InnerRange", &cm->GetCubeMapNode()->InnerScale().x(), 0.00001f, 100.0f, "%.3f", 2.0f);
-						ImGui::SliderFloat("OuterRange", &cm->GetCubeMapNode()->OuterScale().x(), 0.00001f, 100.0f, "%.3f", 2.0f);
-					}
-
-					Game::GeometryProxyEntity* gpe = dynamic_cast<Game::GeometryProxyEntity*>(application->hit.object);
-
-					if (gpe != nullptr)
-					{
-						Math::vec4 scale = gpe->GetScale();
-
-						ImGui::SliderFloat("Scale X", &scale.x(), 1.0f, 100.0f, "%.3f", 3.0f);
-						ImGui::SliderFloat("Scale Y", &scale.y(), 1.0f, 100.0f, "%.3f", 3.0f);
-						ImGui::SliderFloat("Scale Z", &scale.z(), 1.0f, 100.0f, "%.3f", 3.0f);
-
-						gpe->SetScale(scale);
-
-						if (ImGui::Button("Add CubeMap To Proxy", { 100, 40 }))
-						{
-							std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
-							commandManager->DoCommand(command);
-							command->entity->SetGeometryProxy(gpe->GetGeometryProxy());
-						}
-					}
-
-					//LIGHTS --------------------------------------------------
-
-					Game::ModelEntitySpotLight* aa = dynamic_cast<Game::ModelEntitySpotLight*>(this->application->hit.object);
-					Game::PointLightEntity* bb = dynamic_cast<Game::PointLightEntity*>(this->application->hit.object);
-
-					if (aa != nullptr)
-					{
-						ImGui::Text("Spot Light");
-
-						float angle = aa->GetSpotLightAngle();
-						if (ImGui::SliderFloat("Angle", &angle, 1.0f, 90.0f, "%.1f"))
-						{
-							aa->SetSpotLightAngle(angle);
-						}
-						float length = aa->GetSpotLightLength();
-						if (ImGui::SliderFloat("Length", &length, 1.0f, 50.0f, "%.1f"))
-						{
-							aa->SetSpotLightLength(length);
-						}
-
-						Math::vec4 color = aa->GetSpotLightColor();
-						if (ImGui::SliderFloat("Red", &color.x(), 0.0f, 1.0f, "%.01f"))
-						{
-							aa->SetSpotLightColor(color);
-						}
-						if (ImGui::SliderFloat("Green", &color.y(), 0.0f, 1.0f, "%.01f"))
-						{
-							aa->SetSpotLightColor(color);
-						}
-						if (ImGui::SliderFloat("Blue", &color.z(), 0.0f, 1.0f, "%.01f"))
-						{
-							aa->SetSpotLightColor(color);
-						}
-
-					}
-					if (bb != nullptr)
-					{
-						ImGui::Text("Point Light");
-
-						float radius = bb->GetPointLightRadius();
-						if (ImGui::SliderFloat("Radius", &radius, 1.0f, 50.0f, "%.1f"))
-						{
-							bb->SetPointLightRadius(radius);
-						}
-
-						Math::vec4 color = bb->GetPointLightColor();
-						if (ImGui::SliderFloat("Red", &color.x(), 0.0f, 1.0f, "%.01f"))
-						{
-							bb->SetPointLightColor(color);
-						}
-						if (ImGui::SliderFloat("Green", &color.y(), 0.0f, 1.0f, "%.01f"))
-						{
-							bb->SetPointLightColor(color);
-						}
-						if (ImGui::SliderFloat("Blue", &color.z(), 0.0f, 1.0f, "%.01f"))
-						{
-							bb->SetPointLightColor(color);
-						}
-					}
-
-				}
-			}
-			ImGui::EndDock();
+			
 
 			if(ImGui::BeginDock("Particle Settings", NULL, ImGuiWindowFlags_NoSavedSettings))
 			{

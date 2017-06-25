@@ -1,13 +1,16 @@
 #pragma once
 #include "foundation/util/string.h"
+#include "core/refcounted.h"
 
 namespace Interface
 {
-	class InterfaceBase
+	class InterfaceBase : public Core::RefCounted
 	{
+		__DeclareClass(InterfaceBase)
 	public:
+		InterfaceBase();
 		InterfaceBase(Util::String name);
-		virtual ~InterfaceBase() = 0;
+		virtual ~InterfaceBase();
 		
 		const Util::String& GetName() const;
 		void SetName(const char* name);
@@ -15,7 +18,10 @@ namespace Interface
 		//Get and set so that ImGui can access it
 		bool& Open();
 
-	private:
+		//Runs and renders the interface once.
+		virtual void Run();
+
+	protected:
 		Util::String name;
 		bool open;
 	};

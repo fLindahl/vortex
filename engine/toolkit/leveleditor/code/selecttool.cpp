@@ -12,4 +12,8 @@ namespace Tools
 	{
 	}
 
+	const Ptr<Game::Entity>& SelectTool::GetSelectedEntity()
+	{
+		return this->selectedEntity;
+	}
 }

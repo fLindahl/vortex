@@ -1,22 +1,43 @@
 #include "interface.h"
 
-Interface::InterfaceBase::InterfaceBase(Util::String name) :
-	name(name),
-	open(false)
+namespace Interface
 {
-}
+	__ImplementClass(Interface::InterfaceBase, 'IfBs', Core::RefCounted)
 
-const Util::String & Interface::InterfaceBase::GetName() const
-{
-	return this->name;
-}
+	InterfaceBase::InterfaceBase() :
+		name("NAME NOT SET"),
+		open(false)
+	{		
+	}
 
-void Interface::InterfaceBase::SetName(const char * name)
-{
-	this->name = name;
-}
+	InterfaceBase::InterfaceBase(Util::String name) :
+		name(name),
+		open(false)
+	{
+	}
 
-bool & Interface::InterfaceBase::Open()
-{
-	return this->open;
+	InterfaceBase::~InterfaceBase()
+	{
+	}
+
+	const Util::String & InterfaceBase::GetName() const
+	{
+		return this->name;
+	}
+
+	void InterfaceBase::SetName(const char * name)
+	{
+		this->name = name;
+	}
+
+	bool & InterfaceBase::Open()
+	{
+		return this->open;
+	}
+
+	void InterfaceBase::Run()
+	{
+		return;
+	}
+
 }

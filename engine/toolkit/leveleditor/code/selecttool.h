@@ -6,6 +6,7 @@ Used for selecting objects
 
 #pragma once
 #include "basetool.h"
+#include "application/game/entity.h"
 
 namespace Tools
 {
@@ -15,7 +16,9 @@ namespace Tools
 		SelectTool();
 		~SelectTool();
 
-	private:
+		const Ptr<Game::Entity>& GetSelectedEntity();
 
+	private:
+		Ptr<Game::Entity> selectedEntity;
 	};
 }

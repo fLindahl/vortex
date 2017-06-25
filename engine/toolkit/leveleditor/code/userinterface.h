@@ -9,15 +9,13 @@
 #include "foundation/math/point.h"
 #include "undo.h"
 #include "application/properties/particleemitter.h"
+#include "toolhandler.h"
 
 namespace LevelEditor { class Application; }
 
-namespace Tools 
+namespace Interface
 {
-	class BaseTool;
-	class SelectTool;
-	class TranslateTool;
-	class RotateTool;
+	class InterfaceManager;
 }
 
 namespace Toolkit
@@ -44,16 +42,9 @@ namespace Toolkit
 		
 		double prevFPSTime;
 		double currentFPS;
-
+		
 		std::string consoleBuffer;
 		std::string a;
-		
-		//Tools
-		Tools::BaseTool* currentTool;
-		
-		Tools::SelectTool* selectTool;
-		Tools::TranslateTool* translateTool;
-		Tools::RotateTool* rotateTool;
 
 		///Texture Handles
 		//Toolbar
