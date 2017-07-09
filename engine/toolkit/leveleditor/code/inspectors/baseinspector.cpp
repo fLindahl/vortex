@@ -11,6 +11,10 @@ namespace LevelEditor
 	{
 	}
 
+	void BaseInspector::DrawGUI()
+	{
+	}
+
 	void BaseInspector::Update()
 	{
 
