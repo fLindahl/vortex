@@ -33,7 +33,9 @@ public:
 
 	///Override in subclass. Call this function with you favorite stream write/reader.
 	virtual void Serialize(IO::Stream* serializer);
-	
+
+	///List in inspector
+	virtual void Inspect();
 protected:
 	bool active = false;
     friend class Entity;

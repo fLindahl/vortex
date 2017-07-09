@@ -70,7 +70,7 @@ void GraphicsProperty::Activate()
 		}
 		else
 		{
-			printf("ERROR: GraphicsProperty::Activate() >> No ModelInstance found!\n");
+			_printf("ERROR: GraphicsProperty::Activate() >> No ModelInstance found!");
 			assert(false);
 		}
 
@@ -98,7 +98,6 @@ void GraphicsProperty::HandleMessage(const Ptr<Messaging::Message>& msg)
 
 void GraphicsProperty::Serialize(IO::Stream* stream)
 {
-	
 
 }
 

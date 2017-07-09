@@ -14,7 +14,7 @@ class ShaderObject;
 
 class GraphicsProperty : public Game::BaseProperty
 {
-__DeclareClass(GraphicsProperty);
+__DeclareClass(GraphicsProperty)
 public:
 	GraphicsProperty();
 	~GraphicsProperty();
