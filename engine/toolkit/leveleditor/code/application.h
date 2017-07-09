@@ -69,38 +69,8 @@ private:
 	
 	/// ImGui functions
 	void RenderUI();
-
-	Ptr<Render::ModelInstance> modelInstance;
-	Ptr<Render::ModelInstance> modelInstanceScene;
-	
-	Ptr<Game::RigidBodyEntity> rigidBodyEntity1;
-	Ptr<Game::RigidBodyEntity> rigidBodyEntity2;
-	Ptr<Game::RigidBodyEntity> rigidBodyEntity3;
-	Ptr<Game::RigidBodyEntity> rigidBodyEntity4;
-	Ptr<Game::RigidBodyEntity> rigidBodyEntity5;
-
-	Ptr<Game::StaticEntity> SceneEntity1;
-    Ptr<Game::StaticEntity> SceneEntity2;
-    Ptr<Game::StaticEntity> SceneEntity3;
-    Ptr<Game::StaticEntity> SceneEntity4;
-    Ptr<Game::StaticEntity> SceneEntity5;
-    Ptr<Game::StaticEntity> SceneEntity6;
-	Ptr<Game::StaticEntity> SceneEntity7;
-
-	Ptr<Game::ModelEntity> sponza;
-	Ptr<Game::ParticleEntity> billboard;
-	Ptr<Game::ParticleEntity> billboard2;
-
-	Ptr<Game::ModelEntity> wall1;
-	Ptr<Game::ModelEntity> wall2;
-	Ptr<Game::ModelEntity> wall3;
-	Ptr<Game::ModelEntity> wall4;
-	Ptr<Game::ModelEntity> floor;
-	Ptr<Game::ModelEntity> ceiling;
 	
 	Util::Array<Ptr<Game::ParticleEmitter>> particleList;
-
-	//Particles::ParticleSettings pSettings;
 
 	BaseGameFeature::KeyHandler* keyhandler;
 	
@@ -109,7 +79,5 @@ private:
 	Display::Window* window;
 
 	GLuint* pickingPixels;
-
-    //Render::LightCullingPass ls;
 };
 } // namespace LevelEditor

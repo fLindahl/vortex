@@ -88,123 +88,6 @@ Application::Open()
 		//this->rayStart = Math::vec4::zerovector();
 		//this->rayEnd = Math::vec4::zerovector();
 		
-		//Load Sponza
-		this->sponza = Game::ModelEntity::Create();
-		this->sponza->SetModel(ResourceServer::Instance()->LoadModel("resources/models/sponza.mdl"));
-		this->sponza->Activate();
-		Math::mat4 sTransform = Math::mat4::scaling(0.1f, 0.1f, 0.1f);
-		sTransform.translate(Math::vector(0.0f, -2.0f, 0.0f));
-		this->sponza->SetTransform(sTransform);
-		
-		//LOAD XML file
-		BaseGameFeature::SceneManager::Instance()->LoadXMLScene("resources/scenes/sponza.xml");
-
-		//spawn in a cube somewhere
-		this->wall1 = Game::ModelEntity::Create();
-		this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
-		this->wall1->Activate();
-		this->wall1->SetTransform(Math::mat4::translation(-1.0f, 0.5f, 0.0f));
-
-		
-		//this->wall1 = std::make_shared<Game::ModelEntity>();
-		//this->wall2 = std::make_shared<Game::ModelEntity>();
-		//this->wall3 = std::make_shared<Game::ModelEntity>();
-		//this->wall4 = std::make_shared<Game::ModelEntity>();
-		//this->floor = std::make_shared<Game::ModelEntity>();
-		//this->ceiling = std::make_shared<Game::ModelEntity>();
-		//
-		//this->wall1->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		//this->wall2->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		//this->wall3->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		//this->wall4->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		//this->floor->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		//this->ceiling->SetModel(ResourceServer::Instance()->LoadModel("resources/models/groundfloor.mdl"));
-		//
-		//this->wall1->Activate();
-		//this->wall2->Activate();
-		//this->wall3->Activate();
-		//this->wall4->Activate();
-		//this->floor->Activate();
-		//this->ceiling->Activate();
-		//
-		//this->floor->SetTransform(Math::mat4::translation(0.0f, -2.0f, 0.0f));
-		//this->wall2->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(10.0f, 8.0f, 0.0f)));
-		//this->wall3->SetTransform(Math::mat4::multiply(Math::mat4::rotationz(1.57f), Math::mat4::translation(-10.0f, 8.0f, 0.0f)));
-		//this->wall4->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, 10.0f)));
-		//this->wall1->SetTransform(Math::mat4::multiply(Math::mat4::rotationx(1.57f), Math::mat4::translation(0.0f, 8.0f, -10.0f)));
-		//this->ceiling->SetTransform(Math::mat4::translation(0.0f, 18.0f, 0.0f));
-		//
-
-		this->billboard = Game::ParticleEntity::Create();
-		this->billboard->SetTransform(Math::mat4::translation(0.f, 0.f, -2.f));
-		this->billboard->LoadEmitters("resources/particles/wisp.particle");
-		this->billboard->Activate();
-
-		for (size_t i = 0; i < this->billboard->GetEmitters().Size(); i++)
-		{
-			this->particleList.Append(this->billboard->GetEmitters()[i]);
-		}
-
-		//billboard = std::make_shared<Game::ParticleEntity>();
-		//billboard->SetTransform(Math::mat4::translation(11.18f, -1.0f, 4.02f));
-		//billboard->Activate();
-		//billboard->GetEmitter()->CreateEmitter(1000, "resources/textures/particles/sprite_rapids2.tga");
-		//
-		//billboard2 = std::make_shared<Game::ParticleEntity>();
-		//billboard2->SetTransform(Math::mat4::translation(0.0f, 5.5f, 0.0f));
-		//billboard2->Activate();
-		//billboard2->GetEmitter()->CreateEmitter(20000, "resources/textures/particles/fireparticle3.tga");
-		//
-		//particleList.Append(billboard);
-		//particleList.Append(billboard2);
-
-
-		LightServer::PointLight pLight;
-		pLight.position = Math::vec4(-3.0f, 0.0f, -2.5f, 1.0f);
-		pLight.color = Math::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		pLight.radiusAndPadding.set_x(50.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-		
-		pLight.position = Math::vec4(-6.0f, 0.0f, 2.5f, 1.0f);
-		pLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-		
-		pLight.position = Math::vec4(2.0f, -1.0f, -0.0f, 1.0f);
-		pLight.color = Math::vec4(0.3f, 0.5f, 0.7f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-		
-		pLight.position = Math::vec4(0.0f, -1.5f, 0.0f, 1.0f);
-		pLight.color = Math::vec4(0.1f, 0.5f, 0.1f, 1.0f);
-		LightServer::Instance()->AddPointLight(pLight);
-
-     	/*Render::LightServer::SpotLight sLight;
-	    sLight.position = Math::vec4(-1.0f, 2.0f, 0.0f, 1.0f);
-		sLight.color = Math::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
-		sLight.length = 10.0f;
-        sLight.angle = 30.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
-
-	    sLight.position = Math::vec4(4.0f, 3.5f, 0.0f, 1.0f);
-		sLight.color = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		sLight.length = 15.0f;
-		sLight.angle = 25.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
-
-     	sLight.position = Math::vec4(-2.1f, 0.0f, 3.0f, 1.0f);
-		sLight.color = Math::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-        sLight.length = 15.0f;
-		LightServer::Instance()->AddSpotLight(sLight);
-
-		sLight.position = Math::vec4(-2.1f, 15.0f, -6.0f, 1.0f);
-		sLight.color = Math::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-		sLight.coneDirection = Math::vec4(0.0f, -1.0f, 0.0f, 1.0f);
-		sLight.length = 18.0f;
-		sLight.angle = 5.0f;
-		LightServer::Instance()->AddSpotLight(sLight);*/
-
 		// set ui rendering function
 		this->window->SetUiRender([this]()
 		  {
@@ -262,12 +145,6 @@ Application::Run()
 		{
 			BaseGameFeature::EnvManager::Instance()->RenderGeometryProxies();
 		}
-
-		Math::mat4 t = this->wall1->GetTransform();
-		a += 0.01f;
-		t.translate(Math::vector(0.0f, sin(a) * 0.01f, 0.0f));
-
-		this->wall1->SetTransform(t);
 
 		RenderDevice::Instance()->Render(false);
 
