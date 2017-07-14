@@ -135,7 +135,7 @@ void Application::DoPicking()
 
 		//glBindTexture(GL_TEXTURE_2D, texture);
 		//GLuint frame = Render::FrameServer::Instance()->GetPickingPass()->GetFrameBufferObject();
-
+//
 		//glBindFramebuffer(GL_READ_FRAMEBUFFER, frame);
 		//glReadPixels(pixelx, pixely, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, (GLvoid*)&SelectedID);
 		//glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);

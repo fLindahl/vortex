@@ -87,5 +87,18 @@ void Entity::Deactivate()
 	BaseGameFeature::EntityManager::Instance()->UnregisterEntity(this->ID);
 	this->active = false;
 }
+
+size_t Entity::GetNumProperties()
+{
+	return this->properties.Size();
+}
+
+Ptr<BaseProperty>& Entity::Property(uint index)
+{
+	_assert(index < this->properties.Size());
+	
+	return this->properties[index];
+}
+
 }
 

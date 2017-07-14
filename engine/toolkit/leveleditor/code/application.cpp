@@ -17,6 +17,7 @@
 #include "application/basegamefeature/keyhandler.h"
 #include "application/basegamefeature/managers/envmanager.h"
 #include "IO/console.h"
+#include "selecttool.h"
 
 using namespace Display;
 using namespace Render;
@@ -84,6 +85,7 @@ Application::Open()
 		this->window->SetTitle("Vortex Level Editor");
 
 		RenderDevice::Instance()->SetRenderResolution(1920, 1020);
+		_printf("Render Resolution is %i*%i.", RenderDevice::Instance()->GetRenderResolution().x, RenderDevice::Instance()->GetRenderResolution().y);
 
 		//this->rayStart = Math::vec4::zerovector();
 		//this->rayEnd = Math::vec4::zerovector();
@@ -118,6 +120,13 @@ Application::Run()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     float a = 0.0f;
+
+	Ptr<Game::Entity> entity = Game::Entity::Create();
+	Ptr<Render::GraphicsProperty> gProperty = Render::GraphicsProperty::Create();
+	entity->AddProperty(gProperty.upcast<Game::BaseProperty>());
+
+	Tools::ToolHandler::Instance()->SelectTool()->SetSelectedEntity(entity);
+
 	while (this->window->IsOpen() && !this->shutdown)
 	{
 		double time = glfwGetTime();

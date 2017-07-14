@@ -1,4 +1,4 @@
-#include "UserInterface.h"
+#include "userinterface.h"
 #include "application.h"
 #include "IO/console.h"
 #include "nfd.h"
@@ -78,7 +78,7 @@ void UserInterface::Run()
 		{
 			if (ImGui::BeginMenu("Show"))
 			{
-				if (ImGui::MenuItem("GUI Console", NULL, NULL)) { IO::Console::Instance()->Show(); }
+				if (ImGui::MenuItem("GUI Console", NULL)) { IO::Console::Instance()->Show(); }
 				//if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
 				//if (ImGui::MenuItem("Shader Debugger", NULL, &showShaderDebugger)) {}
 				ImGui::EndMenu();

@@ -46,10 +46,16 @@ public:
 	///Note: This calls the propertys destructor!
 	void RemoveProperty(const Ptr<Game::BaseProperty>& p);
 
+	///Returns the property located at index
+	Ptr<Game::BaseProperty>& Property(uint index);
+
 	///Shortcut for getting this entitys transform
 	virtual Math::mat4 GetTransform();
 	///Shortcut for setting this entitys transform
 	virtual void SetTransform(const Math::mat4& nTransform);
+
+	///Returns the number of properties that this entity contains
+	size_t GetNumProperties();
 
 	//virtual void Serialize();
 

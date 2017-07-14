@@ -1,4 +1,5 @@
 #pragma once
+#include "application/game/baseproperty.h"
 
 namespace LevelEditor
 {
@@ -9,16 +10,29 @@ namespace LevelEditor
 		~BaseInspector();
 
 		///Draw the GUI
-		void DrawGUI();
+		virtual void DrawGUI();
 
 		///Update the inspector and check for changes
-		void Update();
+		virtual void Update();
+
+		virtual void SetProperty(const Ptr<Game::BaseProperty>& property);
 
 		///Returns whether the object has been modified within the inspectors
 		bool IsModified() const;
 
-	private:
+		const Util::String& GetName() const;
+
+	protected:
+		///Name of the property. Is shown on the property tab. Set in constructor of derived class
+		Util::String name;
+		///Set to true if any property has been modified.
 		bool isModified;
+
+		///Adds an attribute to the drawing list. Remember to call EndAttribute too!
+		void BeginAttribute(const char* variableName);
+
+		///Ends and attribute entry
+		void EndAttribute();
 
 	};
 

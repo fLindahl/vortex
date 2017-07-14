@@ -10,18 +10,66 @@ namespace Interface
 {
 	__ImplementClass(Interface::Inspector, 'Ispc', Interface::InterfaceBase)
 
+	Inspector::Inspector()
+	{
+		this->graphicsPropertyInspector = new LevelEditor::GraphicsPropertyInspector();
+	}
+
 	Inspector::~Inspector()
 	{
 	}
 
 	void Inspector::Run()
 	{
+
+
 		if (ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings))
 		{
-			Ptr<Game::Entity> selectedEntity = Tools::ToolHandler::Instance()->SelectTool()->GetSelectedEntity();
+			const Ptr<Game::Entity>& selectedEntity = Tools::ToolHandler::Instance()->SelectTool()->GetSelectedEntity();
 
 			if (selectedEntity != nullptr)
 			{
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2,2));
+				ImGui::Columns(1);
+				ImGui::Separator();
+
+				// Iterate dummy objects with dummy members (all the same data)
+				for (uint i = 0; i < selectedEntity->GetNumProperties(); i++)
+				{	
+					Ptr<Game::BaseProperty> property = selectedEntity->Property(i);
+
+					this->graphicsPropertyInspector->SetProperty(property);
+
+					//use the object pointer as a base ID.
+					size_t uid = (size_t)property.get_unsafe();
+					ImGui::PushID(uid);
+
+					// Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
+					ImGui::AlignFirstTextHeightToWidgets();  
+					bool node_open = ImGui::TreeNode("Object", "%s", this->graphicsPropertyInspector->GetName().AsCharPtr(), uid);
+					ImGui::Columns(2);
+					ImGui::NextColumn();
+					if(node_open)
+					{
+						ImGui::PushID(i); // Use field index as identifier.
+        				{
+							this->graphicsPropertyInspector->DrawGUI();
+						}
+						ImGui::PopID();
+
+						ImGui::TreePop();
+					}
+					ImGui::PopID();
+					ImGui::Separator();
+				}
+
+				ImGui::Columns(1);
+				ImGui::Separator();
+				ImGui::PopStyleVar();
+
+
+
+				/*
 				ImGui::Text("Transform:");
 				ImGui::Text("%f | %f | %f | %f", selectedEntity->GetTransform().getrow(0).x(), selectedEntity->GetTransform().getrow(0).y(), selectedEntity->GetTransform().getrow(0).z(), selectedEntity->GetTransform().getrow(0).w());
 				ImGui::Text("%f | %f | %f | %f", selectedEntity->GetTransform().getrow(1).x(), selectedEntity->GetTransform().getrow(1).y(), selectedEntity->GetTransform().getrow(1).z(), selectedEntity->GetTransform().getrow(1).w());
@@ -45,6 +93,8 @@ namespace Interface
 
 				ImGui::Text("Pitch : %f | Yaw : %f | Roll : %f", pitch, yaw, roll);
 				ImGui::Separator();
+				*/
+
 
 				/*
 				// CUBEMAPS --------------------------------------------
