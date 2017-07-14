@@ -191,8 +191,6 @@ public:
 
     /// return contents as character pointer
     const char* AsCharPtr() const;
-    /// *** OBSOLETE *** only Nebula2 compatibility
-    const char* Get() const;
     /// return contents as integer
     int AsInt() const;
     /// return contents as float
@@ -547,15 +545,6 @@ String::AsCharPtr() const
     {
         return this->localBuffer;
     }
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-inline const char*
-String::Get() const
-{
-    return this->AsCharPtr();
 }
 
 //------------------------------------------------------------------------------

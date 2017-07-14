@@ -1,6 +1,8 @@
 #include "config.h"
 #include "graphicspropertyinspector.h"
 #include "imgui.h"
+#include "render/resources/modelinstance.h"
+#include "render/server/resourceserver.h"
 
 namespace LevelEditor
 {
@@ -13,7 +15,7 @@ namespace LevelEditor
     {
         //Empty
     }
-
+	
     void GraphicsPropertyInspector::DrawGUI()
     {
         if(this->property == nullptr)
@@ -29,15 +31,39 @@ namespace LevelEditor
 
         BeginAttribute("Model");
         {
-            static float var = 0.0f;
-            ImGui::InputFloat("##value", &var, 1.0f);
+			//Lambda
+			//auto SetModel = []() 
+			//{
+			//};
+
+			if (ImGui::InputText("##mdlBuf", this->mdlInputBuf, ((int)(sizeof(this->mdlInputBuf) / sizeof(*this->mdlInputBuf))), ImGuiInputTextFlags_EnterReturnsTrue, nullptr, (void*)this))
+			{
+				auto mdl = Render::ResourceServer::Instance()->LoadModel(this->mdlInputBuf);
+
+				if (mdl.isvalid())
+				{
+					this->property->setModelInstance(mdl);
+				}
+				else
+				{
+					//Reset input text to the selected model.
+					if (this->property->getModelInstance() != nullptr)
+						this->property->getModelInstance()->GetName().CopyToBuffer(this->mdlInputBuf, 128);
+					else
+						this->mdlInputBuf[0] = '\0'; //null-terminated
+				}
+			}
+			if (ImGui::IsItemHovered() && (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && ImGui::IsMouseClicked(0)))
+				ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+
+			
         }
         EndAttribute();
 
         BeginAttribute("Floating point");
         {
             static float var = 0.2f;
-            ImGui::InputFloat("##value", &var, 1.0f);
+            ImGui::InputFloat("##floatP", &var, 1.0f);
         }
         EndAttribute();
 
@@ -55,9 +81,17 @@ namespace LevelEditor
     {
         this->property = property.downcast<Render::GraphicsProperty>();
 
-        if(this->property == nullptr)
+        if(this->property != nullptr)
         {
-            _warning("Could not set inspector property to GraphicsProperty in GraphicsPropertyInspector::SetProperty!");
+			//set input text to the selected model.
+			if (this->property->getModelInstance() != nullptr)
+				this->property->getModelInstance()->GetName().CopyToBuffer(this->mdlInputBuf, 128);
+			else
+				this->mdlInputBuf[0] = '\0'; //null-terminated
         }
+		else
+		{
+            _warning("Could not set inspector property to GraphicsProperty in GraphicsPropertyInspector::SetProperty!");
+		}
     }
 }

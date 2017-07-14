@@ -57,12 +57,12 @@ public:
 
 	Util::Array<GraphicsProperty*>& GetGraphicsProperties();
 
-	std::string GetName() { return this->name; }
+	const Util::String& GetName() const { return this->name; }
 
 private:
 	friend class ResourceServer;
 
-	std::string name;
+	Util::String name;
 
 	Util::Array<ModelNode*> modelNodes;
 

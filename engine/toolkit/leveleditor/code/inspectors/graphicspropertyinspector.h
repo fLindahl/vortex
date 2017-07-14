@@ -16,7 +16,8 @@ namespace LevelEditor
             
     private:
         Ptr<Render::GraphicsProperty> property;
-
+		
+		char mdlInputBuf[128];
 
     };
 }

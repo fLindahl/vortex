@@ -124,6 +124,11 @@ Application::Run()
 	Ptr<Game::Entity> entity = Game::Entity::Create();
 	Ptr<Render::GraphicsProperty> gProperty = Render::GraphicsProperty::Create();
 	entity->AddProperty(gProperty.upcast<Game::BaseProperty>());
+	gProperty->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/sponza.mdl"));
+	
+	entity->Activate();
+
+	LightServer::Instance()->CreatePointLight(Math::point(1, 1, 1), Math::point(0, 0, 3), 15.0f);
 
 	Tools::ToolHandler::Instance()->SelectTool()->SetSelectedEntity(entity);
 

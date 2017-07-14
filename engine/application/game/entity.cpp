@@ -45,7 +45,6 @@ void Entity::HandleMessage(const Ptr<Messaging::Message>& msg)
 		auto prop = this->properties[i];
 		prop->HandleMessage(msg);
 	}
-
 	
 }
 
@@ -79,6 +78,12 @@ void Entity::RemoveProperty(const Ptr<Game::BaseProperty>& p)
 void Entity::Activate()
 {
 	BaseGameFeature::EntityManager::Instance()->RegisterEntity(this);
+	
+	for (auto& property : this->properties)
+	{
+		property->Activate();
+	}
+
 	this->active = true;
 }
 

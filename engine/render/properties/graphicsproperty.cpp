@@ -33,6 +33,11 @@ void GraphicsProperty::setModelInstance(const Ptr<Render::ModelInstance>& inMode
 	}
 
 	this->modelInstance = inModelInstance;
+
+	if (this->active)
+	{
+		this->modelInstance->AddGraphicsProperty(this);
+	}
 }
 
 const Math::mat4& GraphicsProperty::getModelMatrix() const

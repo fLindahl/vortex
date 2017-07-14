@@ -279,13 +279,9 @@ Ptr<ModelInstance> ResourceServer::LoadModel(const Util::String& filepath)
 
 	if (result != 0)
 	{
-		printf("ERROR: Could not load .mdl file!");
+		_error("Could not load .mdl file called %s!", filepath.AsCharPtr());
 
-#ifdef DEBUG
-		_assert(false);
-#endif // DEBUG
-
-		return false;
+		return nullptr;
 	}
 
 	tinyxml2::XMLElement* model = data.RootElement()->FirstChildElement();
