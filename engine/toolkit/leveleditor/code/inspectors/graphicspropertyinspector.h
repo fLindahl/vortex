@@ -14,10 +14,12 @@ namespace LevelEditor
         void Update();
         void SetProperty(const Ptr<Game::BaseProperty>& property);
             
+		
     private:
         Ptr<Render::GraphicsProperty> property;
 		
 		char mdlInputBuf[128];
-
+		void UpdateModelInputBuffer();
+		
     };
 }

@@ -60,7 +60,7 @@ namespace Toolkit
 	void UserInterface::Run()
 	{
 		static bool showStatistics = false;
-		static bool showShaderDebugger = true;
+		static bool showShaderDebugger = false;
 
 		RenderDocks();
 

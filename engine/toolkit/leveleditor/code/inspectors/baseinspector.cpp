@@ -12,21 +12,6 @@ namespace LevelEditor
 	{
 	}
 
-	void BaseInspector::DrawGUI()
-	{
-		
-	}
-
-	void BaseInspector::Update()
-	{
-
-	}
-
-	void BaseInspector::SetProperty(const Ptr<Game::BaseProperty>& property)
-	{
-		//Override in subclass
-	}
-
 	bool BaseInspector::IsModified() const
 	{
 		return isModified;

@@ -46,11 +46,7 @@ namespace LevelEditor
 				}
 				else
 				{
-					//Reset input text to the selected model.
-					if (this->property->getModelInstance() != nullptr)
-						this->property->getModelInstance()->GetName().CopyToBuffer(this->mdlInputBuf, 128);
-					else
-						this->mdlInputBuf[0] = '\0'; //null-terminated
+					this->UpdateModelInputBuffer();
 				}
 			}
 			if (ImGui::IsItemHovered() && (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && ImGui::IsMouseClicked(0)))
@@ -83,15 +79,20 @@ namespace LevelEditor
 
         if(this->property != nullptr)
         {
-			//set input text to the selected model.
-			if (this->property->getModelInstance() != nullptr)
-				this->property->getModelInstance()->GetName().CopyToBuffer(this->mdlInputBuf, 128);
-			else
-				this->mdlInputBuf[0] = '\0'; //null-terminated
+			this->UpdateModelInputBuffer();
         }
 		else
 		{
             _warning("Could not set inspector property to GraphicsProperty in GraphicsPropertyInspector::SetProperty!");
 		}
     }
+
+	void GraphicsPropertyInspector::UpdateModelInputBuffer()
+	{
+		//set input text to the selected model.
+		if (this->property->getModelInstance() != nullptr)
+			this->property->getModelInstance()->GetName().CopyToBuffer(this->mdlInputBuf, 128);
+		else
+			this->mdlInputBuf[0] = '\0'; //null-terminated
+	}
 }

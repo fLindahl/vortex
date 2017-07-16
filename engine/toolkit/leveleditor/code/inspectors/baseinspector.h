@@ -10,12 +10,12 @@ namespace LevelEditor
 		~BaseInspector();
 
 		///Draw the GUI
-		virtual void DrawGUI();
+		virtual void DrawGUI() = 0;
 
 		///Update the inspector and check for changes
-		virtual void Update();
+		virtual void Update() = 0;
 
-		virtual void SetProperty(const Ptr<Game::BaseProperty>& property);
+		virtual void SetProperty(const Ptr<Game::BaseProperty>& property) = 0;
 
 		///Returns whether the object has been modified within the inspectors
 		bool IsModified() const;

@@ -17,6 +17,7 @@ namespace Interface
 
 	Inspector::~Inspector()
 	{
+		delete this->graphicsPropertyInspector;
 	}
 
 	void Inspector::Run()
@@ -37,8 +38,9 @@ namespace Interface
 				for (uint i = 0; i < selectedEntity->GetNumProperties(); i++)
 				{	
 					Ptr<Game::BaseProperty> property = selectedEntity->Property(i);
-
-					this->graphicsPropertyInspector->SetProperty(property);
+					_assert(property.isvalid());
+					
+					SetCurrentPropertyInspector(property);
 
 					//use the object pointer as a base ID.
 					size_t uid = (size_t)property.get_unsafe();
@@ -46,7 +48,7 @@ namespace Interface
 
 					// Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
 					ImGui::AlignFirstTextHeightToWidgets();  
-					bool node_open = ImGui::TreeNode("Object", "%s", this->graphicsPropertyInspector->GetName().AsCharPtr(), uid);
+					bool node_open = ImGui::TreeNode("Object", "%s", this->currentInspector->GetName().AsCharPtr(), uid);
 					ImGui::Columns(2);
 					ImGui::NextColumn();
 					if(node_open)
@@ -189,6 +191,26 @@ namespace Interface
 			}
 		}
 		ImGui::EndDock();
+	}
+
+
+	void Inspector::SetCurrentPropertyInspector(Ptr<Game::BaseProperty>& property)
+	{
+		if (property->IsA(Render::GraphicsProperty::RTTI))
+		{
+			this->currentInspector = graphicsPropertyInspector;
+		}
+		//else if(property->IsA(SOMEPROPERTY::RTTI))
+		//{
+		//}
+		else
+		{
+			_warning("Could not find inspector for property called \"%s\"", property->GetClassName().AsCharPtr());
+			return;
+		}
+
+		this->currentInspector->SetProperty(property);
+		return;
 	}
 }
 
