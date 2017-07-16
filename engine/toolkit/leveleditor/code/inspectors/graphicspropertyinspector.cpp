@@ -31,27 +31,57 @@ namespace LevelEditor
 
         BeginAttribute("Model");
         {
-			//Lambda
-			//auto SetModel = []() 
-			//{
-			//};
-
+			if (ImGui::SmallButton("..."))
+			{
+				//Select Material for surface
+			}
+			ImGui::SameLine();
 			if (ImGui::InputText("##mdlBuf", this->mdlInputBuf, ((int)(sizeof(this->mdlInputBuf) / sizeof(*this->mdlInputBuf))), ImGuiInputTextFlags_EnterReturnsTrue, nullptr, (void*)this))
 			{
 				auto mdl = Render::ResourceServer::Instance()->LoadModel(this->mdlInputBuf);
-
 				if (mdl.isvalid())
-				{
 					this->property->setModelInstance(mdl);
-				}
 				else
-				{
 					this->UpdateModelInputBuffer();
-				}
 			}
+			
+			// keep focus previous widget if pressed
 			if (ImGui::IsItemHovered() && (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && ImGui::IsMouseClicked(0)))
-				ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+				ImGui::SetKeyboardFocusHere(-1); 
+			
+			/* List mesh nodes!
+			ImGui::BeginChild("ModelNodes", ImVec2(0, 0), true);
+			{
+				//Unique identifier
+				uint i = 2014235;
+				for (auto node : mdl->GetModelNodes())
+				{
+					ImGui::BeginGroup();
+					{
+						std::string nodeName = mdl->GetMesh()->getPrimitiveGroup(node->primitiveGroup).name;
 
+						ImGui::Text("Node: %s", nodeName.c_str());
+
+						ImGui::Text("Surface: %s", node->surface->GetPath().AsCharPtr());
+						ImGui::SameLine();
+						ImGui::PushID(i++);
+						if (ImGui::SmallButton("..."))
+						{
+							//Select Material for surface
+						}
+						ImGui::PopID();
+						ImGui::Separator();
+					}
+					ImGui::EndGroup();
+					
+					if (ImGui::IsItemClicked())
+					{
+
+					}
+				}
+				ImGui::EndChild();
+			}
+			*/
 			
         }
         EndAttribute();
@@ -62,6 +92,17 @@ namespace LevelEditor
             ImGui::InputFloat("##floatP", &var, 1.0f);
         }
         EndAttribute();
+
+		BeginAttribute("Cast Shadows");
+		{
+			bool cast = this->property->GetCastShadows();
+
+			if (ImGui::Checkbox("##castShdws", &cast))
+			{
+				this->property->SetCastShadows(cast);
+			}
+		}
+		EndAttribute();
 
         
         ImGui::NextColumn();

@@ -326,7 +326,7 @@ Ptr<ModelInstance> ResourceServer::LoadModel(const Util::String& filepath)
 
 bool ResourceServer::HasModelNamed(const Util::String &nName)
 {
-	if (this->surfaces.Contains(nName))
+	if (this->modelInstances.Contains(nName))
 		return true;
 	else
 		return false;

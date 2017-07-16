@@ -23,7 +23,7 @@ RigidBody::~RigidBody()
 	this->initialized = false;
 }
 
-void RigidBody::initialize(const float &mass, const Math::mat4 &bodyInertiaTensor, Game::RigidBodyEntity* entity)
+void RigidBody::Initialize(const float &mass, const Math::mat4 &bodyInertiaTensor, Game::RigidBodyEntity* entity)
 {
 	this->initialized = true;
     this->owner = entity;

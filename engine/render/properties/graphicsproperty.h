@@ -33,6 +33,9 @@ public:
 	const Math::mat4& getInvModelMatrix() const;
 	void setModelMatrix(const Math::mat4 &mat);
 
+	bool GetCastShadows() const;
+	void SetCastShadows(const bool& value);
+
 	Math::bbox& getbbox() { return this->bbox; }
 
 	void Serialize(IO::Stream* stream);
@@ -43,6 +46,8 @@ private:
 	Ptr<Render::ModelInstance> modelInstance;
 	Math::mat4 modelMat;
 	Math::mat4 invMat;
+
+	bool castShadows;
 };
 
 }

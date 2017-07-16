@@ -13,6 +13,10 @@ SET(files_fysik_fysik
 	surfacecollider.cpp
     rigidbody.h 
 	rigidbody.cpp
+	rigidbodyproperty.h
+	rigidbodyproperty.cpp
+	staticphysicsproperty.h
+	staticphysicsproperty.cpp
 	)
 
 SOURCE_GROUP("fysik" FILES ${files_fysik})

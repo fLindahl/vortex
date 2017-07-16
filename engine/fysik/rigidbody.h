@@ -1,6 +1,7 @@
 #pragma once
 #include "core/refcounted.h"
 #include "application/game/rigidbodyentity.h"
+#include "fysik/physicsproperty.h"
 #include "application/game/baseproperty.h"
 #include "surfacecollider.h"
 
@@ -28,7 +29,7 @@ struct BodyState
 
 class RigidBody : public Core::RefCounted
 {
-__DeclareClass(RigidBody);
+__DeclareClass(RigidBody)
 public:
     RigidBody();
     ~RigidBody();
@@ -54,12 +55,14 @@ public:
 	BodyState Integrate(const BodyState& state, const double& frameTime);
 	BodyState Evaluate(const BodyState& state, const double& frameTime, const BodyState& derivative);
 
+	bool IsInitialized() const { return this->initialized; }
+	void Initialize(const float& mass, const Math::mat4& bodyInertiaTensor, Game::RigidBodyEntity* entity);
+
 private:
     friend class PhysicsDevice;
-    friend class Game::RigidBodyEntity;
 
 	bool initialized;
-    void initialize(const float& mass, const Math::mat4& bodyInertiaTensor, Game::RigidBodyEntity* entity);
+    
 
     void update(const double& frameTime);
     bool collide();

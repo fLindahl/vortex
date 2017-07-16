@@ -9,7 +9,7 @@ __ImplementClass(Render::GraphicsProperty, 'GPPR', Game::BaseProperty);
 
 GraphicsProperty::GraphicsProperty()
 {
-
+	castShadows = true;
 }
 
 GraphicsProperty::~GraphicsProperty()
@@ -58,6 +58,16 @@ void GraphicsProperty::setModelMatrix(const Math::mat4 &mat)
 	this->bbox.transform(this->modelMat);
 }
 
+bool GraphicsProperty::GetCastShadows() const
+{
+	return this->castShadows;
+}
+
+void GraphicsProperty::SetCastShadows(const bool & value)
+{
+	this->castShadows = value;
+}
+
 void GraphicsProperty::Update()
 {
 	this->Game::BaseProperty::Update();
@@ -75,7 +85,7 @@ void GraphicsProperty::Activate()
 		}
 		else
 		{
-			_printf("ERROR: GraphicsProperty::Activate() >> No ModelInstance found!");
+			_error("GraphicsProperty::Activate() >> No ModelInstance found!");
 			assert(false);
 		}
 
