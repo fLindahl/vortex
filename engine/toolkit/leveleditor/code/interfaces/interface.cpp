@@ -5,6 +5,7 @@ namespace Interface
 	__ImplementClass(Interface::InterfaceBase, 'IfBs', Core::RefCounted)
 
 	InterfaceBase::InterfaceBase() :
+		additionalFlags((ImGuiWindowFlags_)0),
 		name("NAME NOT SET"),
 		open(false)
 	{		
@@ -38,6 +39,11 @@ namespace Interface
 	void InterfaceBase::Run()
 	{
 		return;
+	}
+
+	const ImGuiWindowFlags_ & InterfaceBase::GetAdditionalFlags() const
+	{
+		return this->additionalFlags;
 	}
 
 }

@@ -1,13 +1,14 @@
 <Vortex>
     <Docks>
-        <Dock index="0" label="3D View" x="52" y="16" location="" size_x="1406" size_y="759" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="8"/>
-        <Dock index="1" label="Inspector" x="1458" y="16" location="" size_x="462" size_y="376" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="6"/>
-        <Dock index="2" label="Layers" x="1458" y="679" location="" size_x="462" size_y="341" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="7"/>
-        <Dock index="3" label="Content Browser" x="52" y="775" location="" size_x="1406" size_y="245" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="8"/>
-        <Dock index="4" label="" x="52" y="16" location="" size_x="1868" size_y="1004" status="0" active="1" opened="0" prev="-1" next="-1" child0="8" child1="6" parent="-1"/>
-        <Dock index="5" label="Particle Settings" x="1458" y="392" location="" size_x="462" size_y="287" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="7"/>
-        <Dock index="6" label="" x="1458" y="16" location="" size_x="462" size_y="1004" status="0" active="1" opened="0" prev="-1" next="-1" child0="1" child1="7" parent="4"/>
-        <Dock index="7" label="" x="1458" y="392" location="" size_x="462" size_y="628" status="0" active="1" opened="0" prev="-1" next="-1" child0="5" child1="2" parent="6"/>
-        <Dock index="8" label="" x="52" y="16" location="" size_x="1406" size_y="1004" status="0" active="1" opened="0" prev="-1" next="-1" child0="0" child1="3" parent="4"/>
+        <Dock index="0" label="3D View" x="180" y="16" location="" size_x="1251" size_y="759" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="7"/>
+        <Dock index="1" label="Inspector" x="1431" y="16" location="" size_x="489" size_y="758" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="6"/>
+        <Dock index="2" label="Layers" x="1431" y="774" location="" size_x="489" size_y="246" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="6"/>
+        <Dock index="3" label="Content Browser" x="180" y="775" location="" size_x="1251" size_y="245" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="7"/>
+        <Dock index="4" label="" x="180" y="16" location="" size_x="1740" size_y="1004" status="0" active="1" opened="0" prev="-1" next="-1" child0="7" child1="6" parent="9"/>
+        <Dock index="5" label="Particle Settings" x="1431" y="392" location="2300" size_x="489" size_y="287" status="1" active="0" opened="0" prev="-1" next="-1" child0="-1" child1="-1" parent="-1"/>
+        <Dock index="6" label="" x="1431" y="16" location="" size_x="489" size_y="1004" status="0" active="1" opened="0" prev="-1" next="-1" child0="1" child1="2" parent="4"/>
+        <Dock index="7" label="" x="180" y="16" location="" size_x="1251" size_y="1004" status="0" active="1" opened="0" prev="-1" next="-1" child0="0" child1="3" parent="4"/>
+        <Dock index="8" label="Hierarchy" x="52" y="16" location="" size_x="128" size_y="1004" status="0" active="1" opened="1" prev="-1" next="-1" child0="-1" child1="-1" parent="9"/>
+        <Dock index="9" label="" x="52" y="16" location="" size_x="1868" size_y="1004" status="0" active="1" opened="0" prev="-1" next="-1" child0="8" child1="4" parent="-1"/>
     </Docks>
 </Vortex>

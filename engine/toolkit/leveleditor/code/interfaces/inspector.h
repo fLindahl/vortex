@@ -15,10 +15,16 @@ namespace Interface
 		void Run();
 
 	private:
+		///Opens any modal windows if necessary
+		void ModalWindows();
+
 		///this is set by SetCurrentPropertynspector
 		LevelEditor::BaseInspector* currentInspector;
 
 		LevelEditor::GraphicsPropertyInspector* graphicsPropertyInspector;
+
 		void SetCurrentPropertyInspector(Ptr<Game::BaseProperty>& property);
+
+		bool openModalAddProperty;
 	};
 }

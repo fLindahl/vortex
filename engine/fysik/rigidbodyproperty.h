@@ -6,6 +6,7 @@
 #include "fysik/rigidbody.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
+#include "application/game/baseproperty.h"
 
 namespace Property
 {

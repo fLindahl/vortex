@@ -1,5 +1,8 @@
 #include "config.h"
 #include "interfacemanager.h"
+#include "imgui.h"
+#include "imgui_dock.h"
+#include "IO/console.h"
 
 namespace Interface
 {
@@ -10,9 +13,37 @@ namespace Interface
 
 	void InterfaceManager::RunAll()
 	{
+		//List all interfaces in windows menu
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("Window"))
+			{
+				if (ImGui::BeginMenu("Show"))
+				{
+					ImGui::MenuItem("Console", NULL, &IO::Console::Instance()->OpenRef());
+
+					for (auto it : this->interfaces)
+					{
+						ImGui::MenuItem(it->GetName().AsCharPtr(), NULL, &it->Open());
+					}
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
+
+
+
+		//------------------------------------------------------
+		//Run all interfaces
 		for (auto it : this->interfaces)
 		{
-			it->Run();
+			if (ImGui::BeginDock(it->GetName().AsCharPtr(), &it->Open(), ImGuiWindowFlags_NoSavedSettings | it->GetAdditionalFlags()))
+			{
+				it->Run();
+			}
+			ImGui::EndDock();
 		}
 	}
 

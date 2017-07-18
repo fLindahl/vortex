@@ -35,9 +35,9 @@ void RigidBodyEntity::Activate()
 {
 	if (!this->active)
 	{
-		if (!this->rigidBody->initialized)
+		if (!this->rigidBody->IsInitialized())
 		{
-			this->rigidBody->initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider.downcast<Physics::BaseCollider>(), 1.0f), this);
+			this->rigidBody->Initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider.downcast<Physics::BaseCollider>(), 1.0f), this);
 		}
 		Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
 		PhysicsEntity::Activate();

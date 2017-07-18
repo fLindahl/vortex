@@ -105,5 +105,10 @@ Ptr<BaseProperty>& Entity::Property(uint index)
 	return this->properties[index];
 }
 
+const bool& Entity::IsActive() const
+{
+	return this->active;
+}
+
 }
 

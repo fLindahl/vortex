@@ -32,6 +32,10 @@ namespace Toolkit
 
 		Interface::InterfaceManager::Instance()->RegisterInterface("Interface::SceneView", "3D View");
 		Interface::InterfaceManager::Instance()->RegisterInterface("Interface::Inspector", "Inspector");
+		Interface::InterfaceManager::Instance()->RegisterInterface("Interface::Browser", "Content Browser");
+		Interface::InterfaceManager::Instance()->RegisterInterface("Interface::Layers", "Layers");
+		Interface::InterfaceManager::Instance()->RegisterInterface("Interface::ParticleSettings", "Particle Settings");
+		Interface::InterfaceManager::Instance()->RegisterInterface("Interface::Hierarchy", "Hierarchy");
 		
 
 		//Load textures
@@ -62,8 +66,6 @@ namespace Toolkit
 		static bool showStatistics = false;
 		static bool showShaderDebugger = false;
 
-		RenderDocks();
-
 		//TODO: Make sure we're not editing a textbox before querying for shortcuts
 		ExecShortCuts();
 
@@ -82,17 +84,6 @@ namespace Toolkit
 				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
 				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
 				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Window"))
-			{
-				if (ImGui::BeginMenu("Show"))
-				{
-					if (ImGui::MenuItem("GUI Console", NULL, false)) { IO::Console::Instance()->Show(); }
-					if (ImGui::MenuItem("Statistics", NULL, &showStatistics)) {}
-					if (ImGui::MenuItem("Shader Debugger", NULL, &showShaderDebugger)) {}
-					ImGui::EndMenu();
-				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Map"))
@@ -121,6 +112,8 @@ namespace Toolkit
 
 			ImGui::EndMainMenuBar();
 		}
+
+		RenderDocks();
 		
 		Debug::DebugServer::Instance()->ImGuiDebugBar();
 
@@ -141,7 +134,7 @@ namespace Toolkit
 
 		if (showShaderDebugger)
 		{
-			ImGui::Begin("Shader Debugger", &showShaderDebugger, ImGuiWindowFlags_ShowBorders);
+			ImGui::Begin("Shader Debugger", &showShaderDebugger, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_ShowBorders);
 
 			ImGui::SetWindowSize(ImVec2(200.0f, 210.0f), ImGuiSetCond_::ImGuiSetCond_Once);
 			ImGui::SetWindowPos(ImVec2(1700.0f, 60.0f), ImGuiSetCond_::ImGuiSetCond_Once);
@@ -326,67 +319,7 @@ namespace Toolkit
 			//ImGui::EndDock();
 
 			//ImGui::BeginDock("Front View", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |	ImGuiWindowFlags_NoScrollWithMouse);
-			//ImGui::EndDock();
-
-			
-
-			if(ImGui::BeginDock("Particle Settings", NULL, ImGuiWindowFlags_NoSavedSettings))
-			{
-				this->particleCount = 0;
-				if (ImGui::Button("Save"))
-				{
-					Particles::ParticleFile::Instance()->SaveParticle("testParticle");
-				}
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::BeginTooltip();
-					ImGui::Text("Saves the current particles.\nSaves all the currently appended emitters\nthen removes them from the list");
-					ImGui::EndTooltip();
-				}
-				for (int i = 0; i < application->particleList.Size(); ++i)
-				{
-					//ParticlesSettings(application->particleList[i]->GetEmitters());
-					this->particleCount++;
-				}
-				
-			}
-			ImGui::EndDock();
-
-			if(ImGui::BeginDock("Layers", NULL, ImGuiWindowFlags_NoSavedSettings))
-			{
-				//Render::ReflectionPass::SSRSettings& settings = Render::FrameServer::Instance()->GetReflectionPass()->GetSSRSettings();
-				//
-				//ImGui::SliderFloat("zThickness", &settings.zThickness, 0.00001f, 1000.0f, "%.3f", 4.0f);
-				//ImGui::InputFloat("Stride (int)", &settings.stride, 1.0f, 100.0f, 0);
-				//ImGui::SliderFloat("Jitter", &settings.jitter, 0.0f, 1.0f, "%.3f");
-				//ImGui::SliderFloat("Max Steps", &settings.maxSteps, 1.0f, 1000.0f, "%.3f", 4.0f);
-				//ImGui::SliderFloat("Max Distance", &settings.maxDistance, 0.001f, 10000.0f, "%.3f", 4.0f);
-				//
-				//const char* items[] = { "ULTRA", "HIGH", "MEDIUM", "LOW"};
-				//
-				//ImGui::Combo("Reflection Quality", (int*)&Render::FrameServer::Instance()->GetReflectionPass()->GetReflectionQuality(), items, 4);
-			}
-			ImGui::EndDock();
-			
-			if(ImGui::BeginDock("Content Browser", NULL, ImGuiWindowFlags_NoSavedSettings))
-			if (ImGui::Button("Add CubeMap", { 100, 40 }))
-			{
-				std::shared_ptr<Edit::AddEntity> command = std::make_shared<Edit::AddEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
-				commandManager->DoCommand(command);
-			}
-
-			if (ImGui::Button("Add Spotlight", { 125, 40 }))
-			{
-				std::shared_ptr<Edit::AddSpotlightEntity> command = std::make_shared<Edit::AddSpotlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
-				commandManager->DoCommand(command);
-			}
-
-            if (ImGui::Button("Add Point Light", { 125, 40 }))
-            {
-				std::shared_ptr<Edit::AddPointlightEntity> command = std::make_shared<Edit::AddPointlightEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/cubemap_icon.mdl"));
-                commandManager->DoCommand(command);
-            }
-			ImGui::EndDock();
+			//ImGui::EndDock();		
 		}
 	}
 

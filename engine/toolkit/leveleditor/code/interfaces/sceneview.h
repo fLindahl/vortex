@@ -7,11 +7,11 @@ namespace Interface
 	{
 	__DeclareClass(SceneView)
 	public:
+		SceneView();
 		~SceneView();
 
 		void Run();
 
 	private:
-
 	};
 }

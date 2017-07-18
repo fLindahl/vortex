@@ -1,6 +1,7 @@
 #pragma once
 #include "foundation/util/string.h"
 #include "core/refcounted.h"
+#include "imgui.h"
 
 namespace Interface
 {
@@ -21,7 +22,10 @@ namespace Interface
 		//Runs and renders the interface once.
 		virtual void Run();
 
+		const ImGuiWindowFlags_& GetAdditionalFlags() const;
+
 	protected:
+		ImGuiWindowFlags_ additionalFlags;
 		Util::String name;
 		bool open;
 	};

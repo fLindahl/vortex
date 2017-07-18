@@ -70,6 +70,8 @@ public:
 	void Show();
 	///Hides the console ImGui Window
 	void Hide();
+	///Reference access to GUI console. For easy intergration with menues
+	bool& OpenRef() { return this->GUIConsoleOpen; }
 
 	///Brings up an native platform external window console (ex. CMD, terminal). This console does not accept input.
 	///This is very useful when stepping through an application because it writes directly to the console when a

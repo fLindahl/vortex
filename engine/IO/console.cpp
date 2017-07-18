@@ -29,12 +29,11 @@ Console::Console() :
 }
 
 void Console::Update()
-{
+{		
+	static bool ScrollToBottom = true;
+
 	if (this->GUIConsoleOpen)
 	{
-		ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiSetCond_FirstUseEver);
-
-		static bool ScrollToBottom = true;
 
 		ImGui::Begin("Console", &this->GUIConsoleOpen, 0);
 		{
@@ -120,7 +119,7 @@ void Console::Update()
 			ImGui::PopStyleVar();
 			ImGui::EndChild();
 			ImGui::Separator();
-		
+
 			// Command-line / Input ----------------------------------------------------
 
 			auto callback = [](ImGuiTextEditCallbackData* data) { return 1; };
@@ -138,7 +137,7 @@ void Console::Update()
 				}
 				strcpy(inputBuf, "");
 			}
-			
+
 			//keeping auto focus on the input box
 			if (ImGui::IsItemHovered() || (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
 				ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
@@ -150,7 +149,7 @@ void Console::Update()
 
 			ImGui::PopItemWidth();
 			ImGui::Separator();
-		} 
+		}
 		ImGui::End();
 	}
 }

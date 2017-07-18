@@ -24,7 +24,7 @@ public:
 	Entity();
 	~Entity();
 
-	uint GetID() { return ID; };
+	const uint& GetID() const { return ID; };
 	//void SetID(const int id) { ID = id; };
 
 	///Activates this entity and all it's properties
@@ -58,6 +58,8 @@ public:
 	size_t GetNumProperties();
 
 	//virtual void Serialize();
+
+	const bool& IsActive() const;
 
 protected:
 	///Set to true when Activate is called. Set to false when Deactivat is called.

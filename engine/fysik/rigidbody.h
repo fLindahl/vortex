@@ -1,7 +1,7 @@
 #pragma once
 #include "core/refcounted.h"
 #include "application/game/rigidbodyentity.h"
-#include "fysik/physicsproperty.h"
+#include "fysik/rigidbodyproperty.h"
 #include "application/game/baseproperty.h"
 #include "surfacecollider.h"
 
