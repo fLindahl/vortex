@@ -166,13 +166,24 @@ namespace Toolkit
 			ImGui::MenuItem("example3.map");
 			ImGui::EndMenu();
 		}
-		if (ImGui::MenuItem("Save", "Ctrl+S")) {}
-		if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S")) {}
 
-		if (ImGui::MenuItem("Save to sponza.xml")) 
+		if (ImGui::MenuItem("Save", "Ctrl+S")) 
 		{
-			BaseGameFeature::SceneManager::Instance()->SaveXMLScene("resources/scenes/sponza.xml");
+			BaseGameFeature::SceneManager::Instance()->SaveJSONScene("resources/scenes/temp.json");
 		}
+
+		if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S")) 
+		{
+
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::MenuItem("Compile Scene", "Ctrl+Shift+B"))
+		{
+			BaseGameFeature::SceneManager::Instance()->SaveJSONScene("resources/scenes/temp.json");
+		}
+
 		ImGui::Separator();
 
 		if (ImGui::BeginMenu("Layout"))
