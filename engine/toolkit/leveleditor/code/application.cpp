@@ -44,7 +44,6 @@ Application::Application()
 	this->reflectEnd = Math::vec4::zerovector();
 	hit.object = nullptr;
 
-	this->pickingPixels = new GLuint[1920 * 1020];
 }
 
 //------------------------------------------------------------------------------

@@ -15,8 +15,6 @@ SET(files_fysik_fysik
 	rigidbody.cpp
 	rigidbodyproperty.h
 	rigidbodyproperty.cpp
-	staticphysicsproperty.h
-	staticphysicsproperty.cpp
 	)
 
 SOURCE_GROUP("fysik" FILES ${files_fysik})

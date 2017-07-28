@@ -90,7 +90,7 @@ void Application::DoPicking()
 
 	//-------------------
 	// Physics 
-
+	/*
 	if (ImGui::GetIO().MouseDown[1])
 	{
 		Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
@@ -120,33 +120,13 @@ void Application::DoPicking()
 		}
 				
 	}
-	
+	*/
 
 
 	//---------------------
 	// Picking
 	
-	if (ImGui::GetIO().MouseDown[0])
-	{		
-		GLuint SelectedID = 0;
-
-		int pixelx = (mouse_pos_in_dock.x / dockSize.x) * Render::RenderDevice::Instance()->GetRenderResolution().x;
-		int pixely = (mouse_pos_in_dock.y / dockSize.y) * Render::RenderDevice::Instance()->GetRenderResolution().y;
-
-		//glBindTexture(GL_TEXTURE_2D, texture);
-		//GLuint frame = Render::FrameServer::Instance()->GetPickingPass()->GetFrameBufferObject();
-//
-		//glBindFramebuffer(GL_READ_FRAMEBUFFER, frame);
-		//glReadPixels(pixelx, pixely, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, (GLvoid*)&SelectedID);
-		//glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-
-		if (SelectedID != 0)
-		{
-			hit.object = BaseGameFeature::EntityManager::Instance()->GetEntityByID(SelectedID).get();
-		}
-
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
+	
 	
 }
 

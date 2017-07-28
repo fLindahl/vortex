@@ -4,6 +4,7 @@
 #include "../basetool.h"
 #include "../toolhandler.h"
 #include "render/server/renderdevice.h"
+#include "../selecttool.h"
 
 namespace Interface
 {
@@ -26,18 +27,19 @@ namespace Interface
 		Tools::ToolHandler::Instance()->CurrentTool()->UpdateHandlePositions();
 		Tools::ToolHandler::Instance()->CurrentTool()->Render();
 
+		auto* selectTool = Tools::ToolHandler::Instance()->SelectTool();
+
 		if (ImGui::IsItemHovered())
 		{
-			/*
-			if (application->hit.object != nullptr)
+			if (selectTool->GetSelectedEntity().isvalid())
 			{
 				if (ImGui::GetIO().MouseClicked[0])
 				{
 					Tools::ToolHandler::Instance()->CurrentTool()->LeftDown();
-					Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(application->hit.object->GetTransform());
+					Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(selectTool->GetSelectedEntity()->GetTransform());
 					if (Tools::ToolHandler::Instance()->CurrentTool()->GetCurrentHandle() == Tools::TransformHandle::NONE)
 					{
-						application->DoPicking();
+						selectTool->Pick();
 					}
 				}
 				if (ImGui::GetIO().MouseReleased[0])
@@ -48,22 +50,21 @@ namespace Interface
 				{
 					Tools::ToolHandler::Instance()->CurrentTool()->Drag();
 
-					delta = Tools::ToolHandler::Instance()->CurrentTool()->GetDeltaMatrix();
-					Math::mat4 objTransform = this->application->hit.object->GetTransform();
+					const auto& delta = Tools::ToolHandler::Instance()->CurrentTool()->GetDeltaMatrix();
+					Math::mat4 objTransform = selectTool->GetSelectedEntity()->GetTransform();
 
-					this->application->hit.object->SetTransform(Math::mat4::multiply(delta, objTransform));
-					Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(application->hit.object->GetTransform());
+					selectTool->GetSelectedEntity()->SetTransform(Math::mat4::multiply(delta, objTransform));
+					Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(selectTool->GetSelectedEntity()->GetTransform());
 				}
 			}
 			else
 			{
-				application->DoPicking();
-				if (application->hit.object != nullptr)
+				selectTool->Pick();
+				if (selectTool->GetSelectedEntity().isvalid())
 				{
-					Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(application->hit.object->GetTransform());
+					Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(selectTool->GetSelectedEntity()->GetTransform());
 				}
 			}
-			*/
 		}	
 	}
 }
