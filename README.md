@@ -1,13 +1,13 @@
 # Vortex Engine         {#mainpage}
-A 3D Game Engine developed to implement/test a game engine from scratch.
+A 3D Game Engine built upon work done during the Game Development Bachelor Programme at Luleå University of Technology.
 
 ## Disclaimer
 Vortex is currently under heavy development and will most likely not be fully operational/buildable at this moment. 
 
 ## Requirements
 1. CMake 3.0+.
-2. Compiler with support for C++11.
-3. GPU supporting OGL 4.0+
+2. Compiler with support for C++17.
+3. GPU supporting OGL 4.3+
 4. OS: Windows or Linux (so far)
 
 ## Build Instructions
