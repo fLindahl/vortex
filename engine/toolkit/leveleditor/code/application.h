@@ -76,7 +76,5 @@ private:
 	Edit::CommandManager* commandManager;
 
 	Display::Window* window;
-
-	GLuint* pickingPixels;
 };
 } // namespace LevelEditor

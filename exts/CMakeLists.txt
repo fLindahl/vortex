@@ -24,6 +24,13 @@ ADD_SUBDIRECTORY(assimp-3.3.1)
 SET_TARGET_PROPERTIES(assimp PROPERTIES FOLDER "exts/assimp")
 TARGET_INCLUDE_DIRECTORIES(exts INTERFACE assimp-3.3.1/include)
 
+ADD_LIBRARY(json INTERFACE)
+
+TARGET_LINK_LIBRARIES(json INTERFACE exts)
+TARGET_INCLUDE_DIRECTORIES(json INTERFACE json/src)
+#SET_TARGET_PROPERTIES(json PROPERTIES FOLDER "exts/json")
+TARGET_LINK_LIBRARIES(exts INTERFACE json)
+
 ADD_LIBRARY(imgui STATIC 
 			imgui/imconfig.h 
 			imgui/imgui.cpp 
@@ -47,7 +54,7 @@ ADD_LIBRARY(imgui STATIC
 TARGET_LINK_LIBRARIES(imgui PUBLIC exts)
 TARGET_INCLUDE_DIRECTORIES(imgui PUBLIC imgui imgui/examples/opengl3_example)
 SET_TARGET_PROPERTIES(imgui PROPERTIES FOLDER "exts/imgui")
-
+TARGET_LINK_LIBRARIES(exts INTERFACE imgui)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)	
 
@@ -81,4 +88,4 @@ TARGET_LINK_LIBRARIES(nativefiledialog PUBLIC exts ${GTK3_LIBRARIES})
 TARGET_INCLUDE_DIRECTORIES(nativefiledialog PUBLIC nativefiledialog nativefiledialog/src/include)
 SET_TARGET_PROPERTIES(nativefiledialog PROPERTIES FOLDER "exts/nativefiledialog")
 			
-TARGET_LINK_LIBRARIES(exts INTERFACE imgui)
+

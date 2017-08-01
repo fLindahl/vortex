@@ -7,6 +7,7 @@
 #include <assimp/postprocess.h>
 #include "render/resources/surface.h"
 #include "tinyxml2.h"
+#include "json.hpp"
 #include "envmanager.h"
 #include "render/resources/geometryproxy.h"
 #include "entitymanager.h"
@@ -158,6 +159,16 @@ bool SceneManager::SaveXMLScene(const char* filename)
 	assert(!eResult);
 	*/
 	return true;
+}
+
+bool SceneManager::LoadJSONScene(const char* filename)
+{
+	return false;
+}
+
+bool SceneManager::SaveJSONScene(const char* filename)
+{
+	return false;
 }
 
 }

@@ -16,6 +16,8 @@ namespace Tools
 		SelectTool();
 		~SelectTool();
 
+		void Pick();
+
 		void SetSelectedEntity(const Ptr<Game::Entity>& entity);
 		const Ptr<Game::Entity>& GetSelectedEntity();
 
