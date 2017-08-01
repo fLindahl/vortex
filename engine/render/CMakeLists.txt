@@ -37,6 +37,8 @@ SET(files_render_character
 SET(files_render_properties
 	properties/graphicsproperty.h
 	properties/graphicsproperty.cpp
+	properties/rendermessages.h
+	properties/rendermessages.cpp
 	)
 
 SET(files_render_frame

@@ -6,6 +6,7 @@
 #include "foundation/messaging/messagehandler.h"
 #include "foundation/math/vector4.h"
 #include "entitymessages.h"
+#include "foundation/math/bbox.h"
 
 namespace Game
 {
@@ -49,6 +50,10 @@ public:
 	///Returns the property located at index
 	Ptr<Game::BaseProperty>& Property(uint index);
 
+	///Return the given property template if it exists. Remember to check if ptr is valid before using retrieved property!
+	///This should be used sparingly since it's slow.
+	template<class PROPERTY> const Ptr<PROPERTY>& FindProperty() const;
+
 	///Shortcut for getting this entitys transform
 	virtual Math::mat4 GetTransform();
 	///Shortcut for setting this entitys transform
@@ -59,6 +64,10 @@ public:
 
 	//virtual void Serialize();
 
+	Math::bbox& GetBBox() { return this->bbox; }
+	const Math::bbox& GetBaseBBox() { return *this->baseBBox; }
+	void SetBaseBBox(const Math::bbox* box);
+
 	const bool& IsActive() const;
 
 protected:
@@ -67,12 +76,35 @@ protected:
 
 	///This entitys transform
     Math::mat4 transform;
+	///This entitys axis-aligned bounding box
+	Math::bbox bbox;
+	///Constant pointer to the bounding box in identity space. This is a direct pointer to the mesh base bbox.
+	const Math::bbox* baseBBox;
 
 	///Unique ID for this entity.
 	uint ID;
 
 	///List of all this netitys properties.
 	Util::Array<Ptr<Game::BaseProperty>> properties;
+
+private:
+	///Updates the bounding box bounds based on this entitys transform
+	void UpdateBBox();
 };
+
+template<class PROPERTY>
+const Ptr<PROPERTY>& Entity::FindProperty() const
+{	
+	Core::Rtti rtti = PROPERTY::RTTI;
+	for (auto it : this->properties)
+	{
+		if (it->IsA(rtti))
+		{
+			return it.downcast<PROPERTY>();
+		}
+	}
+
+	return nullptr;
+}
 
 }

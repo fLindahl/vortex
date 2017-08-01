@@ -8,7 +8,7 @@
 #include "render/debugrender/debugserver.h"
 #include "render/frame/reflectionpass.h"
 #include "render/server/frameserver.h"
-#include "application/game/cubemapentity.h"
+//#include "application/game/cubemapentity.h"
 #include "render/server/lightserver.h"
 #include "basetool.h"
 
@@ -101,8 +101,8 @@ namespace Toolkit
 					if (ImGui::MenuItem("Show Geometry Proxies", NULL, &this->application->renderGeoProxies)) {}
 					if (ImGui::MenuItem("New Geometry Proxy", NULL)) 
 					{
-						std::shared_ptr<Edit::AddGeometryProxyEntity> command = std::make_shared<Edit::AddGeometryProxyEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/geometryproxy_icon.mdl"));
-						commandManager->DoCommand(command);
+						//std::shared_ptr<Edit::AddGeometryProxyEntity> command = std::make_shared<Edit::AddGeometryProxyEntity>(Graphics::MainCamera::Instance()->GetPosition(), Render::ResourceServer::Instance()->LoadModel("resources/models/geometryproxy_icon.mdl"));
+						//commandManager->DoCommand(command);
 					}
 					
 					ImGui::EndMenu();

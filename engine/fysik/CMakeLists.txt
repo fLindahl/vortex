@@ -11,12 +11,14 @@ SET(files_fysik_fysik
 	basecollider.cpp
 	surfacecollider.h
 	surfacecollider.cpp
+	boxcollider.h
+	boxcollider.cpp
     rigidbody.h 
 	rigidbody.cpp
 	rigidbodyproperty.h
 	rigidbodyproperty.cpp
-	staticphysicsproperty.h
-	staticphysicsproperty.cpp
+	colliderproperty.h
+	colliderproperty.cpp
 	)
 
 SOURCE_GROUP("fysik" FILES ${files_fysik})

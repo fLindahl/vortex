@@ -66,29 +66,32 @@ namespace Interface
 				Ptr<Game::BaseProperty> property = selectedEntity->Property(i);
 				_assert(property.isvalid());
 					
-				SetCurrentPropertyInspector(property);
+				bool validInspector = SetCurrentPropertyInspector(property);
 
-				//use the object pointer as a base ID.
-				size_t uid = (size_t)property.get_unsafe();
-				ImGui::PushID(uid);
-
-				// Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
-				ImGui::AlignFirstTextHeightToWidgets();  
-				bool node_open = ImGui::TreeNode("Object", "%s", this->currentInspector->GetName().AsCharPtr(), uid);
-				ImGui::Columns(2);
-				ImGui::NextColumn();
-				if(node_open)
+				if (validInspector)
 				{
-					ImGui::PushID(i); // Use field index as identifier.
-        			{
-						this->graphicsPropertyInspector->DrawGUI();
+					//use the object pointer as a base ID.
+					size_t uid = (size_t)property.get_unsafe();
+					ImGui::PushID(uid);
+
+					// Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
+					ImGui::AlignFirstTextHeightToWidgets();
+					bool node_open = ImGui::TreeNode("Object", "%s", this->currentInspector->GetName().AsCharPtr(), uid);
+					ImGui::Columns(2);
+					ImGui::NextColumn();
+					if (node_open)
+					{
+						ImGui::PushID(i); // Use field index as identifier.
+						{
+							this->graphicsPropertyInspector->DrawGUI();
+						}
+						ImGui::PopID();
+
+						ImGui::TreePop();
 					}
 					ImGui::PopID();
-
-					ImGui::TreePop();
+					ImGui::Separator();
 				}
-				ImGui::PopID();
-				ImGui::Separator();
 			}
 
 			ImGui::Columns(1);
@@ -217,7 +220,7 @@ namespace Interface
 		}
 	}
 
-	void Inspector::SetCurrentPropertyInspector(Ptr<Game::BaseProperty>& property)
+	bool Inspector::SetCurrentPropertyInspector(Ptr<Game::BaseProperty>& property)
 	{
 		if (property->IsA(Render::GraphicsProperty::RTTI))
 		{
@@ -229,11 +232,11 @@ namespace Interface
 		else
 		{
 			_warning("Could not find inspector for property called \"%s\"", property->GetClassName().AsCharPtr());
-			return;
+			return false;
 		}
 
 		this->currentInspector->SetProperty(property);
-		return;
+		return true;
 	}
 
 	void Inspector::ModalWindows()

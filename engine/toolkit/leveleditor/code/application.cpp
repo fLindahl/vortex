@@ -128,9 +128,18 @@ Application::Run()
 	
 	entity->Activate();
 
+	Ptr<Game::Entity> physicsEntity = Game::Entity::Create();
+	Ptr<Property::Rigidbody> rbp = Property::Rigidbody::Create();
+	physicsEntity->AddProperty(rbp.upcast<Game::BaseProperty>());
+	Ptr<Render::GraphicsProperty> gProperty2 = Render::GraphicsProperty::Create();
+	physicsEntity->AddProperty(gProperty2.upcast<Game::BaseProperty>());
+	gProperty2->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+	
+	physicsEntity->Activate();
+
 	LightServer::Instance()->CreatePointLight(Math::point(1, 1, 1), Math::point(0, 0, 3), 15.0f);
 
-	Tools::ToolHandler::Instance()->SelectTool()->SetSelectedEntity(entity);
+	Tools::ToolHandler::Instance()->SelectTool()->SetSelectedEntity(physicsEntity);
 
 	while (this->window->IsOpen() && !this->shutdown)
 	{
@@ -148,10 +157,10 @@ Application::Run()
 
 		if (this->hit.object != nullptr)
 		{
-			Game::PhysicsEntity* e = dynamic_cast<Game::PhysicsEntity*>(hit.object);
-			if (e != nullptr)
+			Ptr<Render::GraphicsProperty> gp = this->hit.object->FindProperty<Render::GraphicsProperty>();
+			if (gp.isvalid())
 			{
-				Debug::DebugRenderer::Instance()->DrawMesh(e->GetGraphicsProperty()->getModelInstance()->GetMesh(), e->GetTransform(), Math::vec4(1.0f, 1.0f, 1.0f, 1.0f), Debug::RenderMode::WireFrame, -1, 2.0f);
+				Debug::DebugRenderer::Instance()->DrawMesh(gp->getModelInstance()->GetMesh(), this->hit.object->GetTransform(), Math::vec4(1.0f, 1.0f, 1.0f, 1.0f), Debug::RenderMode::WireFrame, -1, 2.0f);
 			}
 		}
 

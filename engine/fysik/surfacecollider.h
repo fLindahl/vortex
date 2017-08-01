@@ -7,33 +7,31 @@
 
 namespace Physics
 {
-	
+struct ColliderFace
+{
+	//TODO: Can we use pointers here? Are we sure that the meshdata is 16-byte aligned?
+	Math::point p0;
+	Math::point p1;
+	Math::point p2;
+	//Math::plane plane;
+};
 
 class SurfaceCollider : public BaseCollider
 {	
 __DeclareClass(SurfaceCollider);
 public:
-	struct ColliderFace
-	{
-		//TODO: Can we use pointers here? Are we sure that the meshdata is 16-byte aligned?
-		Math::point p0;
-		Math::point p1;
-		Math::point p2;
-		//Math::plane plane;
-	};
-
 	SurfaceCollider();
 	~SurfaceCollider();
 
 	/// Cook a physics surface collider from mesh data.
 	void CookMeshData(const Ptr<Render::MeshResource> mesh);
 
-	Util::Array<ColliderFace>& GetFaceList() { return this->faces; }
-
-	void debugDraw();
+	Util::Array<ColliderFace>& GetFaceList();
+	
+	const Ptr<Render::MeshResource>& GetMesh() const;
 
 private:
-
+	Ptr<Render::MeshResource> baseMesh;
 	Util::Array<ColliderFace> faces;
 };
 

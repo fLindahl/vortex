@@ -34,6 +34,13 @@ void GraphicsProperty::setModelInstance(const Ptr<Render::ModelInstance>& inMode
 
 	this->modelInstance = inModelInstance;
 
+	//Make sure all other properties can react on change of mesh.
+	Ptr<Msg::SetMesh> setMeshMsg = Msg::SetMesh::Create();
+	setMeshMsg->Set(this->modelInstance->GetMesh());
+	__SendMsg(this->owner, setMeshMsg);
+
+	this->owner->SetBaseBBox(&this->modelInstance->GetMesh()->getBaseBBox());
+
 	if (this->active)
 	{
 		this->modelInstance->AddGraphicsProperty(this);
@@ -54,8 +61,8 @@ void GraphicsProperty::setModelMatrix(const Math::mat4 &mat)
 {
 	this->modelMat = mat;
 	this->invMat = Math::mat4::inverse(this->modelMat);
-	this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
-	this->bbox.transform(this->modelMat);
+	this->owner->GetBBox() = this->modelInstance->GetMesh()->getBaseBBox();
+	this->owner->GetBBox().transform(this->getModelMatrix());
 }
 
 bool GraphicsProperty::GetCastShadows() const
@@ -80,8 +87,8 @@ void GraphicsProperty::Activate()
 		if (this->modelInstance != nullptr)
 		{
 			this->modelInstance->AddGraphicsProperty(this);
-			this->bbox = this->modelInstance->GetMesh()->getBaseBBox();
-			this->bbox.transform(this->getModelMatrix());
+			this->owner->GetBBox() = this->modelInstance->GetMesh()->getBaseBBox();
+			this->owner->GetBBox().transform(this->getModelMatrix());
 		}
 		else
 		{

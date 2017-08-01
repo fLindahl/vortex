@@ -19,28 +19,28 @@ SET(files_application_game
 	game/entity.cpp
 	game/entitymessages.h
 	game/entitymessages.cpp
-	game/modelentity.h
-	game/modelentity.cpp
+	#game/modelentity.h
+	#game/modelentity.cpp
 	game/baseproperty.h
 	game/baseproperty.cpp
-	game/rigidbodyentity.h
-	game/staticentity.h
-	game/rigidbodyentity.cpp
-	game/physicsentity.h
-	game/staticentity.cpp 
-	game/physicsentity.cpp
-	game/cubemapentity.h
-	game/cubemapentity.cpp
-	game/modelentityWithSpotlight.h
-	game/modelentityWithSpotlight.cpp
+	#game/rigidbodyentity.h
+	#game/staticentity.h
+	#game/rigidbodyentity.cpp
+	#game/physicsentity.h
+	#game/staticentity.cpp 
+	#game/physicsentity.cpp
+	#game/cubemapentity.h
+	#game/cubemapentity.cpp
+	#game/modelentityWithSpotlight.h
+	#game/modelentityWithSpotlight.cpp
 	game/particleentity.h
 	game/particleentity.cpp
-	game/staticentity.cpp 
-	game/physicsentity.cpp
-	game/geometryproxyentity.h
-	game/geometryproxyentity.cpp
-	game/pointlightentity.cpp 
-	game/pointlightentity.h
+	#game/staticentity.cpp 
+	#game/physicsentity.cpp
+	#game/geometryproxyentity.h
+	#game/geometryproxyentity.cpp
+	#game/pointlightentity.cpp 
+	#game/pointlightentity.h
 	game/attribute.h
 	game/attribute.cpp
 	)

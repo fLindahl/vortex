@@ -69,7 +69,7 @@ public:
 	uint getNumPrimitiveGroups() { return (uint)this->primitiveGroups.Size(); }
 
 	///Returns the base bbox for this entity.
-	Math::bbox getBaseBBox() { return this->bbox; }
+	const Math::bbox& getBaseBBox() { return this->bbox; }
 
 	std::string GetName() { return this->name; }
 	std::string GetPath() { return this->filePath; }

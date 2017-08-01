@@ -23,7 +23,7 @@ namespace Interface
 
 		LevelEditor::GraphicsPropertyInspector* graphicsPropertyInspector;
 
-		void SetCurrentPropertyInspector(Ptr<Game::BaseProperty>& property);
+		bool SetCurrentPropertyInspector(Ptr<Game::BaseProperty>& property);
 
 		bool openModalAddProperty;
 	};

@@ -23,13 +23,14 @@ RigidBody::~RigidBody()
 	this->initialized = false;
 }
 
-void RigidBody::Initialize(const float &mass, const Math::mat4 &bodyInertiaTensor, Game::RigidBodyEntity* entity)
+void RigidBody::Initialize(const float &mass, const Math::mat4 &bodyInertiaTensor, Game::Entity* entity)
 {
 	this->initialized = true;
     this->owner = entity;
-    this->collider = this->owner->GetCollider();
-
-    this->massCenter = (this->collider->getbbox().maxPoint + this->collider->getbbox().minPoint) * 0.5f;
+    //this->collider = this->owner->FindProperty<Property::Collider>()->GetCollider();
+	
+	const Math::bbox& baseBBox = this->owner->GetBaseBBox();
+    this->massCenter = (baseBBox.maxPoint + baseBBox.minPoint) * 0.5f;
 	this->currentState.position = entity->GetTransform().get_position() + this->massCenter;
 	this->currentState.orientation = Math::mat4::rotationmatrix(entity->GetTransform());
 
@@ -45,7 +46,7 @@ void RigidBody::Initialize(const float &mass, const Math::mat4 &bodyInertiaTenso
 
 void RigidBody::setCollider(Ptr<Physics::SurfaceCollider> coll)
 {
-    this->collider = coll;
+	//this->collider = coll;
 }
 
 void RigidBody::applyForce(const Math::vec4 &dir, const float &magnitude)

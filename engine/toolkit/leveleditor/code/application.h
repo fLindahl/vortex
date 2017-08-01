@@ -19,13 +19,12 @@
 #include <fysik/surfacecollider.h>
 #include <fysik/rigidbody.h>
 #include <fysik/physicsserver.h>
-#include <application/game/staticentity.h>
+//#include <application/game/staticentity.h>
 #include "userinterface.h"
 #include "imgui_dock.h"
 #include "undo.h"
 #include "commands.h"
 #include "userinterface.h"
-#include "application/game/modelentity.h"
 #include "render/frame/lightcullingpass.h"
 #include "application/game/particleentity.h"
 

@@ -6,6 +6,7 @@
 #include "fysik/rigidbody.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
+#include "rendermessages.h"
 
 namespace Render
 {
@@ -36,13 +37,9 @@ public:
 	bool GetCastShadows() const;
 	void SetCastShadows(const bool& value);
 
-	Math::bbox& getbbox() { return this->bbox; }
-
 	void Serialize(IO::Stream* stream);
 
 private:
-	Math::bbox bbox;
-
 	Ptr<Render::ModelInstance> modelInstance;
 	Math::mat4 modelMat;
 	Math::mat4 invMat;

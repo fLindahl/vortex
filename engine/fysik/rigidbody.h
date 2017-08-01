@@ -1,9 +1,8 @@
 #pragma once
 #include "core/refcounted.h"
-#include "application/game/rigidbodyentity.h"
-#include "fysik/rigidbodyproperty.h"
+#include "basecollider.h"
 #include "application/game/baseproperty.h"
-#include "surfacecollider.h"
+#include "fysik/surfacecollider.h"
 
 namespace Render
 {
@@ -56,7 +55,7 @@ public:
 	BodyState Evaluate(const BodyState& state, const double& frameTime, const BodyState& derivative);
 
 	bool IsInitialized() const { return this->initialized; }
-	void Initialize(const float& mass, const Math::mat4& bodyInertiaTensor, Game::RigidBodyEntity* entity);
+	void Initialize(const float& mass, const Math::mat4& bodyInertiaTensor, Game::Entity* entity);
 
 private:
     friend class PhysicsDevice;
@@ -95,8 +94,8 @@ private:
     //Math::vector force;
     //Math::vector torque;
 
-    Game::RigidBodyEntity* owner;
-    Ptr<Physics::BaseCollider> collider;
+    Game::Entity* owner;
+    //Ptr<Physics::BaseCollider> collider;
 };
 
 }

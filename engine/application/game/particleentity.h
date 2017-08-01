@@ -1,8 +1,6 @@
 #pragma once
 #include "entity.h"
 #include "foundation/util/string.h"
-#include "modelentity.h"
-
 
 namespace Game{ class ParticleEmitter; }
 

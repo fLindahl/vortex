@@ -106,9 +106,9 @@ void Application::DoPicking()
 
 			hit = newHit;
 
-			Game::RigidBodyEntity* rbe = dynamic_cast<Game::RigidBodyEntity*>(hit.object);
+			Ptr<Property::Rigidbody> rbe = hit.object->FindProperty<Property::Rigidbody>();
 
-			if (rbe != nullptr)
+			if (rbe.isvalid())
 				rbe->GetRigidBody()->applyForceAtPoint(Math::vec4::normalize(rayLine.vec()), .1f, hit.point);
 			
 			this->rayEnd = hit.point;

@@ -51,6 +51,7 @@ void Entity::HandleMessage(const Ptr<Messaging::Message>& msg)
 void Entity::SetTransform(const Math::mat4& nTransform)
 {
     this->transform = nTransform;
+	this->UpdateBBox();
 
 	Ptr<Msg::SetTransform> setMsg = Msg::SetTransform::Create();
 	setMsg->Set(this->transform);
@@ -108,6 +109,18 @@ Ptr<BaseProperty>& Entity::Property(uint index)
 const bool& Entity::IsActive() const
 {
 	return this->active;
+}
+
+void Entity::SetBaseBBox(const Math::bbox* box)
+{
+	this->baseBBox = box;
+	this->UpdateBBox();
+}
+
+void Entity::UpdateBBox()
+{
+	this->bbox = *this->baseBBox;
+	this->bbox.transform(this->transform);
 }
 
 }

@@ -18,5 +18,4 @@ namespace Msg
 		const Math::mat4* transform;
 
 	};
-
 }

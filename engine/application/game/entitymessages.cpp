@@ -24,6 +24,4 @@ namespace Msg
 		_assert2(this->transform != nullptr, "Transform not set!");
 		return *this->transform;
 	}
-
-
 }

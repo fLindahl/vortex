@@ -1,8 +1,10 @@
 #pragma once
 #include "core/refcounted.h"
-#include "rigidbody.h"
 #include "foundation/util/array.h"
 #include <map>
+#include "surfacecollider.h"
+#include "physicsserver.h"
+
 namespace Physics
 {
 
@@ -43,7 +45,6 @@ struct Edge {
     }
 };
 
-
 class PhysicsDevice
 {
 private:
@@ -82,26 +83,34 @@ private:
     double time;
     double frameTime;
 
-    Math::point Support(const Math::point& dir, Game::PhysicsEntity* entity);
-	bool CheckForCollision(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, PhysicsCollision& collisionData);
+    Math::point Support(const Math::point& dir, const Ptr<Physics::SurfaceCollider>& entity);
+	bool CheckForCollision(PhysicsEntity* E1, PhysicsEntity* E2, PhysicsCollision& collisionData);
 
-	bool GJK(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex);
-	PhysicsCollision EPA(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, Util::Array<SupportPoint>& simplex);
+	bool GJK(PhysicsEntity* E1, PhysicsEntity* E2, Util::Array<SupportPoint>& simplex);
+	PhysicsCollision EPA(PhysicsEntity* E1, PhysicsEntity* E2, Util::Array<SupportPoint>& simplex);
 
     void BroadPhase();
     void NarrowPhase();
 
-	void CollideEntities(Game::PhysicsEntity* E1, Game::PhysicsEntity* E2, const PhysicsCollision& collData);
+	void CollideEntities(PhysicsEntity* E1, PhysicsEntity* E2, const PhysicsCollision& collData);
 
     Util::Array<Ptr<RigidBody>> rigidBodies;
 
     // Potentially Colliding Entities
-    Util::Array<std::pair<Game::PhysicsEntity*, Game::PhysicsEntity*>> PCEntities;
+    Util::Array<std::pair<PhysicsEntity*, PhysicsEntity*>> PCEntities;
 
 
     int DoSimplex(Util::Array<SupportPoint> &points, Math::point &D);
 
     //Used for broad phase sorting
     int sortAxis;
+
+	//This is used in both GJK and EPA so we save it temporarily as a member for quick access.
+	Math::mat4 invRotE1;
+	Math::mat4 invRotE2;
+	Math::mat4 transformE1;
+	Math::mat4 transformE2;
+	Ptr<Physics::SurfaceCollider> E1Collider;
+	Ptr<Physics::SurfaceCollider> E2Collider;
 };
 }

@@ -18,6 +18,8 @@ SurfaceCollider::~SurfaceCollider()
 
 void SurfaceCollider::CookMeshData(const Ptr<Render::MeshResource> mesh)
 {
+	this->faces.Clear();
+
 	float* vertDataBase = (float*)mesh->getMesh();
 	const uint vWidth = mesh->getVertexWidth();
 
@@ -41,28 +43,14 @@ void SurfaceCollider::CookMeshData(const Ptr<Render::MeshResource> mesh)
 	this->colliderbbox = mesh->getBaseBBox();
 }
 
-void SurfaceCollider::debugDraw()
+Util::Array<ColliderFace>& SurfaceCollider::GetFaceList()
 {
-	glUseProgram(0);
+	return this->faces;
+}
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getView().mat.m[0][0]);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf((GLfloat*)&Graphics::MainCamera::Instance()->getProjection().mat.m[0][0]);
-
-	glBegin(GL_POINTS);
-
-	glColor3f(0.5f, 0.5f, 0.5f);
-
-	for(auto face : faces)
-	{
-		glVertex4f(face.p0[0], face.p0[1], face.p0[2], face.p0[3]);
-		glVertex4f(face.p1[0], face.p1[1], face.p1[2], face.p1[3]);
-		glVertex4f(face.p2[0], face.p2[1], face.p2[2], face.p2[3]);
-	}
-
-	glEnd();
+const Ptr<Render::MeshResource>& SurfaceCollider::GetMesh() const
+{
+	return this->baseMesh;
 }
 
 }

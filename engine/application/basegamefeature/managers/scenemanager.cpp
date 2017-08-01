@@ -7,8 +7,6 @@
 #include <assimp/postprocess.h>
 #include "render/resources/surface.h"
 #include "tinyxml2.h"
-#include "application/game/geometryproxyentity.h"
-#include "application/game/cubemapentity.h"
 #include "envmanager.h"
 #include "render/resources/geometryproxy.h"
 #include "entitymanager.h"
@@ -38,6 +36,7 @@ Ptr<Render::ModelInstance> SceneManager::LoadOBJScene(const char* filename, cons
 
 bool SceneManager::LoadXMLScene(const char* filename)
 {
+	/*
 	tinyxml2::XMLDocument data;
 	int result = data.LoadFile(filename);
 
@@ -102,13 +101,14 @@ bool SceneManager::LoadXMLScene(const char* filename)
 
 		proxy = proxy->NextSiblingElement("GeometryProxy");
 	}
-
+	*/
 	return true;
 
 }
 
 bool SceneManager::SaveXMLScene(const char* filename)
 {
+	/*
 	tinyxml2::XMLDocument data;
 				
 	tinyxml2::XMLNode* pRoot = data.NewElement("Vortex");
@@ -156,7 +156,7 @@ bool SceneManager::SaveXMLScene(const char* filename)
 
 	tinyxml2::XMLError eResult = data.SaveFile(filename);
 	assert(!eResult);
-
+	*/
 	return true;
 }
 

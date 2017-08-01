@@ -4,13 +4,15 @@
 #include "render/resources/modelinstance.h"
 #include "fysik/physicsdevice.h"
 #include "fysik/physicsserver.h"
+#include "render/properties/rendermessages.h"
 
 namespace Property
 {
 	__ImplementClass(Property::Rigidbody, 'PrRB', Game::BaseProperty)
 
-	Rigidbody::Rigidbody() : 
-		isKinematic(false)
+	Rigidbody::Rigidbody() :
+		isKinematic(false),
+		isDebris(false)
 	{
 		this->rigidBody = Physics::RigidBody::Create();
 	}
@@ -37,12 +39,10 @@ namespace Property
 		{
 			if (!this->rigidBody->IsInitialized())
 			{
-				//TODO: this
-				//this->rigidBody->Initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider.downcast<Physics::BaseCollider>(), 1.0f), this->owner);
+				this->rigidBody->Initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider.upcast<Physics::BaseCollider>(), 1.0f), this->owner);
 			}
 			Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
-			//TODO: this
-			//Physics::PhysicsServer::Instance()->AddPhysicsEntity(this->owner);
+			Physics::PhysicsServer::Instance()->AddDynamicEntity(this);
 			BaseProperty::Activate();
 		}
 	}
@@ -52,8 +52,7 @@ namespace Property
 		if (this->active)
 		{
 			Physics::PhysicsDevice::Instance()->RemoveRigidBody(this->rigidBody);
-			//TODO: this
-			//Physics::PhysicsServer::Instance()->removePhysicsEntity(this->owner);
+			Physics::PhysicsServer::Instance()->RemoveDynamicEntity(this);
 			BaseProperty::Deactivate();
 		}
 	}
@@ -63,6 +62,20 @@ namespace Property
 		//Handle set transform message
 		if (msg->GetType() == Msg::SetTransform::Type)
 		{
+			//this->setTransform(msg.cast<Msg::SetTransform>()->Get());
+		}
+		else if (msg->GetType() == Msg::SetMesh::Type)
+		{
+			if (this->active)
+			{
+				this->Deactivate();
+				this->collider = Physics::PhysicsServer::Instance()->LoadCollider(msg.cast<Msg::SetMesh>()->Get()->GetName(), Physics::ColliderShape::SURFACE).downcast<Physics::SurfaceCollider>();
+				this->Activate();
+			}
+			else
+			{
+				this->collider = Physics::PhysicsServer::Instance()->LoadCollider(msg.cast<Msg::SetMesh>()->Get()->GetName(), Physics::ColliderShape::SURFACE).downcast<Physics::SurfaceCollider>();
+			}
 			//this->setTransform(msg.cast<Msg::SetTransform>()->Get());
 		}
 	}
