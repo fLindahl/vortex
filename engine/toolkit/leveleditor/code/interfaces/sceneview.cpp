@@ -6,6 +6,14 @@
 #include "render/server/renderdevice.h"
 #include "../selecttool.h"
 
+
+//------------
+// PHYSICS
+#include "foundation/math/line.h"
+#include "application/basegamefeature/managers/envmanager.h"
+#include "fysik/physicsserver.h"
+#include "fysik/rigidbodyproperty.h"
+
 namespace Interface
 {
 	__ImplementClass(Interface::SceneView, 'ScnV', Interface::InterfaceBase)
@@ -65,6 +73,37 @@ namespace Interface
 					Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(selectTool->GetSelectedEntity()->GetTransform());
 				}
 			}
+
+
+			//------------------------
+			// PHYSICS
+			if (ImGui::GetIO().MouseDown[1])
+			{
+				ImVec2 dockPos = ImGui::GetWindowPos();
+
+				ImGuiStyle& style = ImGui::GetStyle();
+				dockPos.x += style.WindowPadding.x;
+				dockPos.y += style.WindowPadding.y;
+
+				ImVec2 dockSize = ImGui::GetWindowSize();
+				ImVec2 mouse_pos_in_dock = ImVec2(ImGui::GetIO().MousePos.x - dockPos.x, ImGui::GetIO().MousePos.y - dockPos.y);
+
+				Math::mat4 invView = Graphics::MainCamera::Instance()->getInvView();
+
+				Math::line rayLine = BaseGameFeature::EnvManager::Instance()->ComputeMouseWorldRay(mouse_pos_in_dock.x, mouse_pos_in_dock.y, 5000.0f, dockSize.x, dockSize.y);
+
+				Physics::PhysicsHit newHit;
+				if (Physics::PhysicsServer::Instance()->Raycast(newHit, rayLine))
+				{
+					_printf("--- Hit object! ---");
+
+					Ptr<Property::Rigidbody> rbe = newHit.object->FindProperty<Property::Rigidbody>();
+
+					if (rbe.isvalid())
+						rbe->GetRigidBody()->applyForceAtPoint(Math::vec4::normalize(rayLine.vec()), .1f, newHit.point);
+				}
+			}
+
 		}	
 	}
 }

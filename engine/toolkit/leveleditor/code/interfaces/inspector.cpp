@@ -5,6 +5,7 @@
 #include "../toolhandler.h"
 #include "application/game/entity.h"
 #include "../selecttool.h"
+#include "IO/console.h"
 
 namespace Interface
 {
@@ -231,7 +232,9 @@ namespace Interface
 		//}
 		else
 		{
-			_warning("Could not find inspector for property called \"%s\"", property->GetClassName().AsCharPtr());
+			Util::String msg;
+			msg.Format("Could not find inspector for property called \"%s\"", property->GetClassName().AsCharPtr());
+			IO::Console::Instance()->Print(msg, IO::WARNING, true);
 			return false;
 		}
 
