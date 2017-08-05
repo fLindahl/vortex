@@ -43,7 +43,7 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::line& ray)
 		if(ray.IntersectAABB(entity.property->GetOwner()->GetBBox()))
         {
 			//TODO: This needs to be different per collider type!
-            Util::Array<Physics::ColliderFace>& faces = entity.property->GetOwner()->FindProperty<Property::Collider>()->GetCollider()->GetFaceList();
+            Util::Array<Physics::ColliderFace>& faces = entity.property.downcast<Property::Collider>()->GetCollider()->GetFaceList();
 
             Math::line modelSpaceRay = ray;
             Math::mat4 invModel = Math::mat4::inverse(entity.property->GetOwner()->GetTransform());

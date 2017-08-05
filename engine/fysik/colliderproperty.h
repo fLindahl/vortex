@@ -25,7 +25,7 @@ namespace Property
 		void Serialize(IO::Stream* stream);
 
 		const Ptr<Physics::SurfaceCollider>& GetCollider() const { return this->collider; }
-	private:
+	protected:
 
 		Ptr<Physics::SurfaceCollider> collider;
 	};

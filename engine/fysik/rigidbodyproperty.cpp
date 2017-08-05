@@ -8,7 +8,7 @@
 
 namespace Property
 {
-	__ImplementClass(Property::Rigidbody, 'PrRB', Game::BaseProperty)
+	__ImplementClass(Property::Rigidbody, 'PrRB', Property::Collider)
 
 	Rigidbody::Rigidbody() :
 		isKinematic(false),

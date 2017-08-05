@@ -95,12 +95,13 @@ private:
 template<class PROPERTY>
 const Ptr<PROPERTY>& Entity::FindProperty() const
 {	
-	Core::Rtti rtti = PROPERTY::RTTI;
-	for (auto it : this->properties)
+	Core::Rtti* rtti = &PROPERTY::RTTI;
+	for (int i = 0; i < this->properties.Size(); i++)
 	{
-		if (it->IsA(rtti))
+		Core::Rtti* pRtti = this->properties[i]->GetRtti();
+		if (pRtti == rtti)
 		{
-			return it.downcast<PROPERTY>();
+			return this->properties[i].downcast<PROPERTY>();
 		}
 	}
 

@@ -23,12 +23,18 @@ Entity::~Entity()
 	
 void Entity::FixedUpdate()
 {
-
+	for (int i = 0; i < this->properties.Size(); i++)
+	{
+		this->properties[i]->FixedUpdate();
+	}
 }
 
 void Entity::Update()
 {
-
+	for (int i = 0; i < this->properties.Size(); i++)
+	{
+		this->properties[i]->Update();
+	}
 }
 
 void Entity::HandleMessage(const Ptr<Messaging::Message>& msg)

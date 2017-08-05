@@ -5,11 +5,11 @@
 #include "fysik/rigidbody.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
-#include "application/game/baseproperty.h"
+#include "colliderproperty.h"
 
 namespace Property
 {
-	class Rigidbody : public Game::BaseProperty
+	class Rigidbody : public Property::Collider
 	{
 		__DeclareClass(Rigidbody)
 	public:
@@ -27,7 +27,7 @@ namespace Property
 
 		const Ptr<Physics::RigidBody>& GetRigidBody() const { return this->rigidBody; }
 
-		const Ptr<Physics::SurfaceCollider>& GetCollider() const { return this->collider; }
+		//const Ptr<Physics::SurfaceCollider>& GetCollider() const { return this->collider; }
 	private:
 		///This entity won't be affected by physics forces but is still affected by collisions
 		bool isKinematic;
@@ -35,7 +35,7 @@ namespace Property
 		bool isDebris;
 
 		Ptr<Physics::RigidBody> rigidBody;
-		Ptr<Physics::SurfaceCollider> collider;
+		//Ptr<Physics::SurfaceCollider> collider;
 	};
 
 }

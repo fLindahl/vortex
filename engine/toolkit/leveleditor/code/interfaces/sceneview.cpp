@@ -97,7 +97,7 @@ namespace Interface
 				{
 					_printf("--- Hit object! ---");
 
-					Ptr<Property::Rigidbody> rbe = newHit.object->FindProperty<Property::Rigidbody>();
+					const Ptr<Property::Rigidbody>& rbe = newHit.object->FindProperty<Property::Rigidbody>();
 
 					if (rbe.isvalid())
 						rbe->GetRigidBody()->applyForceAtPoint(Math::vec4::normalize(rayLine.vec()), .1f, newHit.point);

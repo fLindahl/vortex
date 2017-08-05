@@ -136,6 +136,17 @@ Application::Run()
 	
 	physicsEntity->Activate();
 
+	Ptr<Game::Entity> physicsEntity2 = Game::Entity::Create();
+	Ptr<Property::Collider> rbp2 = Property::Collider::Create();
+	physicsEntity2->AddProperty(rbp2.upcast<Game::BaseProperty>());
+	Ptr<Render::GraphicsProperty> gProperty3 = Render::GraphicsProperty::Create();
+	physicsEntity2->AddProperty(gProperty3.upcast<Game::BaseProperty>());
+	gProperty3->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
+
+	physicsEntity2->SetTransform(Math::mat4::translation(0, 0, 3));
+
+	physicsEntity2->Activate();
+
 	LightServer::Instance()->CreatePointLight(Math::point(1, 1, 1), Math::point(0, 0, 3), 15.0f);
 
 	Tools::ToolHandler::Instance()->SelectTool()->SetSelectedEntity(physicsEntity);

@@ -796,8 +796,8 @@ Math::point PhysicsDevice::Support(const Math::point &dir, const Ptr<Physics::Su
 int cmpAABBs(const void* a, const void* b)
 {
     const int axis = PhysicsDevice::Instance()->GetCurrentAABBSortAxis();
-    float minA = (*(PhysicsEntity**)a)->property->GetOwner()->GetBBox().minPoint[axis];
-    float minB = (*(PhysicsEntity**)b)->property->GetOwner()->GetBBox().minPoint[axis];
+    float minA = (*(PhysicsEntity*)a).property->GetOwner()->GetBBox().minPoint[axis];
+    float minB = (*(PhysicsEntity*)b).property->GetOwner()->GetBBox().minPoint[axis];
 
     if(minA < minB) return -1;
     if(minA > minB) return 1;

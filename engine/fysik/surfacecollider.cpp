@@ -18,6 +18,7 @@ SurfaceCollider::~SurfaceCollider()
 
 void SurfaceCollider::CookMeshData(const Ptr<Render::MeshResource> mesh)
 {
+	this->baseMesh = mesh;
 	this->faces.Clear();
 
 	float* vertDataBase = (float*)mesh->getMesh();

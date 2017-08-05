@@ -94,7 +94,7 @@ BodyState RigidBody::Integrate(const BodyState& oldState, const double& frameTim
 		newState = Evaluate(oldState, frameTime, newState);
 	};
 
-	RK4(frameTime);
+	Euler(frameTime);
 
 	return newState;
 
@@ -129,7 +129,7 @@ BodyState RigidBody::Evaluate(const BodyState& oldState, const double& frameTime
 
 void RigidBody::update(const double& frameTime)
 {
-    assert(frameTime > 0.0);
+    _assert(frameTime > 0.0);
 	
 	this->previousState = this->currentState;
 	this->currentState = Integrate(this->previousState, frameTime);
