@@ -84,4 +84,35 @@ namespace Property
 	{
 
 	}
+
+	bool Rigidbody::IsKinematic() const
+	{
+		return this->isKinematic;
+	}
+
+	void Rigidbody::SetKinematic(bool value)
+	{
+		this->isKinematic = value;
+	}
+
+	bool Rigidbody::IsDebris() const
+	{
+		return this->isDebris;
+	}
+
+	void Rigidbody::SetIsDebris(bool value)
+	{
+		this->isDebris = value;
+	}
+
+	void Rigidbody::SetMass(const float & newMass)
+	{
+		//TODO: Fix this
+	}
+
+	float Rigidbody::GetMass() const
+	{
+		//TODO: Fix this
+		return 0.0f;
+	}
 }

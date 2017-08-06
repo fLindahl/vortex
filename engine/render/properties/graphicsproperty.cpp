@@ -2,6 +2,7 @@
 #include "graphicsproperty.h"
 #include "render/resources/meshresource.h"
 #include "render/resources/modelinstance.h"
+#include "render/server/resourceserver.h"
 
 namespace Render
 {
@@ -84,18 +85,17 @@ void GraphicsProperty::Activate()
 {
 	if (!this->active)
 	{
-		if (this->modelInstance != nullptr)
+		if (this->modelInstance == nullptr)
 		{
-			this->modelInstance->AddGraphicsProperty(this);
-			this->owner->GetBBox() = this->modelInstance->GetMesh()->getBaseBBox();
-			this->owner->GetBBox().transform(this->getModelMatrix());
+			//_error("GraphicsProperty::Activate() >> No ModelInstance found!");
+			//assert(false);
+			this->setModelInstance(Render::ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 		}
-		else
-		{
-			_error("GraphicsProperty::Activate() >> No ModelInstance found!");
-			assert(false);
-		}
-
+		
+		this->modelInstance->AddGraphicsProperty(this);
+		this->owner->GetBBox() = this->modelInstance->GetMesh()->getBaseBBox();
+		this->owner->GetBBox().transform(this->getModelMatrix());
+		
 		BaseProperty::Activate();
 	}
 }

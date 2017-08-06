@@ -2,6 +2,7 @@
 #include "interface.h"
 #include "../inspectors/baseinspector.h"
 #include "../inspectors/graphicspropertyinspector.h"
+#include "../inspectors/rigidbodyinspector.h"
 
 namespace Interface
 {
@@ -22,6 +23,9 @@ namespace Interface
 		LevelEditor::BaseInspector* currentInspector;
 
 		LevelEditor::GraphicsPropertyInspector* graphicsPropertyInspector;
+		LevelEditor::RigidbodyInspector* rigidbodyInspector;
+
+		Util::Array<LevelEditor::BaseInspector*> inspectors;
 
 		bool SetCurrentPropertyInspector(Ptr<Game::BaseProperty>& property);
 

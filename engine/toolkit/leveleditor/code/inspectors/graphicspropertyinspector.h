@@ -13,8 +13,9 @@ namespace LevelEditor
         void DrawGUI();
         void Update();
         void SetProperty(const Ptr<Game::BaseProperty>& property);
-            
-		
+        
+		Ptr<Game::BaseProperty> CreateNewProperty();
+
     private:
         Ptr<Render::GraphicsProperty> property;
 		

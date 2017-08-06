@@ -128,6 +128,12 @@ namespace LevelEditor
 		}
     }
 
+	Ptr<Game::BaseProperty> GraphicsPropertyInspector::CreateNewProperty()
+	{
+		Ptr<Render::GraphicsProperty> p = Render::GraphicsProperty::Create();
+		return p;
+	}
+
 	void GraphicsPropertyInspector::UpdateModelInputBuffer()
 	{
 		//set input text to the selected model.

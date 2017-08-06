@@ -14,6 +14,7 @@ Entity::Entity()
 	//GraphicsServer::getInstance()->addGraphicsProperty(this->graphics);
 
 	this->ID = BaseGameFeature::EntityManager::Instance()->GetNewEntityID();
+	this->baseBBox = NULL;
 }
 
 Entity::~Entity()
@@ -125,6 +126,9 @@ void Entity::SetBaseBBox(const Math::bbox* box)
 
 void Entity::UpdateBBox()
 {
+	if (this->baseBBox == NULL)
+		return;
+
 	this->bbox = *this->baseBBox;
 	this->bbox.transform(this->transform);
 }

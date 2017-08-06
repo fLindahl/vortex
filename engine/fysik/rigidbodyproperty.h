@@ -21,21 +21,37 @@ namespace Property
 		void Activate();
 		void Deactivate();
 
+		///Handle messages
 		void HandleMessage(const Ptr<Messaging::Message>& msg);
-
+		
+		///Serialize property
 		void Serialize(IO::Stream* stream);
 
+		///Return the Physics::Rigidbody pointed to by this property
 		const Ptr<Physics::RigidBody>& GetRigidBody() const { return this->rigidBody; }
 
-		//const Ptr<Physics::SurfaceCollider>& GetCollider() const { return this->collider; }
+		///Get for isKinematic
+		bool IsKinematic() const;
+		void SetKinematic(bool value);
+
+		///Get for isDebris
+		bool IsDebris() const;
+		void SetIsDebris(bool value);
+
+		///Update mass to new value
+		void SetMass(const float& newMass);
+		
+		///Returns this rigidbody's mass
+		float GetMass() const;
+		
 	private:
 		///This entity won't be affected by physics forces but is still affected by collisions
 		bool isKinematic;
 		///This makes the rigidbody only collide with static objects. This is a lot less precise than "non-debris" physics and therefor less expensive.
 		bool isDebris;
 
+		///The physics-side rigidbody
 		Ptr<Physics::RigidBody> rigidBody;
-		//Ptr<Physics::SurfaceCollider> collider;
 	};
 
 }

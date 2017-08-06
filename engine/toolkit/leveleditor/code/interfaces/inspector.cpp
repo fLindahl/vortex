@@ -14,7 +14,15 @@ namespace Interface
 	Inspector::Inspector() :
 		openModalAddProperty(false)
 	{
+		//Do this for every inspector!
+		//-----
 		this->graphicsPropertyInspector = new LevelEditor::GraphicsPropertyInspector();
+		this->inspectors.Append(this->graphicsPropertyInspector);
+		//-----
+		this->rigidbodyInspector = new LevelEditor::RigidbodyInspector();
+		this->inspectors.Append(this->rigidbodyInspector);
+		//-----
+
 	}
 
 	Inspector::~Inspector()
@@ -59,9 +67,7 @@ namespace Interface
 			}
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2,2));
-			ImGui::Columns(1);
-			ImGui::Separator();
-
+			
 			for (uint i = 0; i < selectedEntity->GetNumProperties(); i++)
 			{	
 				Ptr<Game::BaseProperty> property = selectedEntity->Property(i);
@@ -71,6 +77,8 @@ namespace Interface
 
 				if (validInspector)
 				{
+					ImGui::Columns(1);
+					ImGui::Separator();
 					//use the object pointer as a base ID.
 					size_t uid = (size_t)property.get_unsafe();
 					ImGui::PushID(uid);
@@ -84,7 +92,7 @@ namespace Interface
 					{
 						ImGui::PushID(i); // Use field index as identifier.
 						{
-							this->graphicsPropertyInspector->DrawGUI();
+							this->currentInspector->DrawGUI();
 						}
 						ImGui::PopID();
 
@@ -227,9 +235,10 @@ namespace Interface
 		{
 			this->currentInspector = graphicsPropertyInspector;
 		}
-		//else if(property->IsA(SOMEPROPERTY::RTTI))
-		//{
-		//}
+		else if(property->IsA(Property::Rigidbody::RTTI))
+		{
+			this->currentInspector = rigidbodyInspector;
+		}
 		else
 		{
 			Util::String msg;
@@ -246,17 +255,17 @@ namespace Interface
 	{
 		if (ImGui::BeginPopupModal("Add Property", &this->openModalAddProperty, ImGuiWindowFlags_AlwaysAutoResize))
 		{
-			const char* cStrArray[] = { "Graphics Property", "Rigidbody", "Collider" };
-
-			//Util::Array<const char *> cStrArray;
-			//for (auto it : Inspectors)
-			//{
-				//TODO: Add properties to list
-			//}
+			
+			//These will be adjacent to the inspectors. So the index chosen will be the property for the corresponding inspector to add.
+			Util::Array<const char *> cStrArray;
+			for (auto it : this->inspectors)
+			{
+				cStrArray.Append(it->GetName().AsCharPtr());
+			}
 
 			static int selected = 0;
 
-			ImGui::ListBox("##availableProperties", &selected, &cStrArray[0], 3 /*(int)cStrArray.Size()*/, 16);
+			ImGui::ListBox("##availableProperties", &selected, &cStrArray[0], (int)cStrArray.Size(), 16);
 
 			ImGui::Separator();
 
@@ -264,6 +273,17 @@ namespace Interface
 			ImGui::PushID(194522);
 			if (ImGui::Button("Add Selected", ImVec2(120, 0)))
 			{
+				const Ptr<Game::Entity>& selectedEntity = Tools::ToolHandler::Instance()->SelectTool()->GetSelectedEntity();
+				if (selectedEntity != nullptr)
+				{
+					Ptr<Game::BaseProperty> property = this->inspectors[selected]->CreateNewProperty();
+					selectedEntity->AddProperty(property);
+					if (selectedEntity->IsActive())
+					{
+						property->Activate();
+					}
+				}
+				
 				this->openModalAddProperty = false;
 			}
 			ImGui::PopID();

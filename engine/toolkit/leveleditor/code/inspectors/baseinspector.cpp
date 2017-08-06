@@ -22,6 +22,17 @@ namespace LevelEditor
 		return this->name;
 	}
 
+	void BaseInspector::BeginAttribute(const char* variableName, const char* toolTipText)
+	{
+		BeginAttribute(variableName);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::Text(toolTipText);
+			ImGui::EndTooltip();
+		}
+	}
+
 	void BaseInspector::BeginAttribute(const char* variableName)
 	{
 		ImGui::NextColumn();
