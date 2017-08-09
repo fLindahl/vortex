@@ -1,6 +1,4 @@
 #include "browser.h"
-#include "imgui.h"
-#include "imgui_dock.h"
 
 namespace Interface
 {

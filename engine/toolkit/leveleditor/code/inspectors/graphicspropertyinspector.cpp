@@ -103,9 +103,6 @@ namespace LevelEditor
 			}
 		}
 		EndAttribute();
-
-        
-        ImGui::NextColumn();
     }
 
     void GraphicsPropertyInspector::Update()

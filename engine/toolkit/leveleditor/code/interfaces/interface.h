@@ -2,6 +2,7 @@
 #include "foundation/util/string.h"
 #include "core/refcounted.h"
 #include "imgui.h"
+#include "imgui_dock.h"
 
 namespace Interface
 {

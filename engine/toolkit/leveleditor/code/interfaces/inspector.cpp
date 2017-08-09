@@ -93,6 +93,7 @@ namespace Interface
 						ImGui::PushID(i); // Use field index as identifier.
 						{
 							this->currentInspector->DrawGUI();
+							ImGui::NextColumn();
 						}
 						ImGui::PopID();
 
