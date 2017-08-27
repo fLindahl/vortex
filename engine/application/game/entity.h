@@ -47,6 +47,8 @@ public:
 	///Note: This calls the propertys destructor!
 	void RemoveProperty(const Ptr<Game::BaseProperty>& p);
 
+	bool HasProperty(const Core::Rtti& rtti);
+
 	///Returns the property located at index
 	Ptr<Game::BaseProperty>& Property(uint index);
 

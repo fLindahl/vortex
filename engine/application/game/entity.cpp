@@ -83,6 +83,18 @@ void Entity::RemoveProperty(const Ptr<Game::BaseProperty>& p)
 	this->properties.RemoveIndexSwap(index);
 }
 
+bool Entity::HasProperty(const Core::Rtti& rtti)
+{
+	for (auto it : this->properties)
+	{
+		if (it->IsA(rtti))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void Entity::Activate()
 {
 	BaseGameFeature::EntityManager::Instance()->RegisterEntity(this);

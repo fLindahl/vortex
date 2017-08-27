@@ -22,7 +22,7 @@ namespace LevelEditor
 		bool IsModified() const;
 
 		const Util::String& GetName() const;
-
+		
 		///Create a new instance of the property that this inspector is designed for. Override in subclass
 		virtual Ptr<Game::BaseProperty> CreateNewProperty() = 0;
 

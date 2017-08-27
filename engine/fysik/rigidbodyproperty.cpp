@@ -39,10 +39,26 @@ namespace Property
 		{
 			if (!this->rigidBody->IsInitialized())
 			{
-				this->rigidBody->Initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider.upcast<Physics::BaseCollider>(), 1.0f), this->owner);
+				if (this->collider.isvalid())
+				{
+					this->rigidBody->Initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider.upcast<Physics::BaseCollider>(), 1.0f), this->owner);
+				}
+				else
+				{
+					_warning("Cannot initialize Rigidbody property since no mesh has been set!");
+				}
 			}
-			Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
-			Physics::PhysicsServer::Instance()->AddDynamicEntity(this);
+
+			if (this->rigidBody->IsInitialized())
+			{
+				Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
+				Physics::PhysicsServer::Instance()->AddDynamicEntity(this);
+			}
+			else
+			{
+				_warning("Cannot register rigidbody to PhysicsDevice since it has not been initialized properly!");
+			}
+
 			BaseProperty::Activate();
 		}
 	}
@@ -51,8 +67,11 @@ namespace Property
 	{
 		if (this->active)
 		{
-			Physics::PhysicsDevice::Instance()->RemoveRigidBody(this->rigidBody);
-			Physics::PhysicsServer::Instance()->RemoveDynamicEntity(this);
+			if (this->rigidBody->IsInitialized())
+			{
+				Physics::PhysicsDevice::Instance()->RemoveRigidBody(this->rigidBody);
+				Physics::PhysicsServer::Instance()->RemoveDynamicEntity(this);
+			}
 			BaseProperty::Deactivate();
 		}
 	}

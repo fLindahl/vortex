@@ -277,11 +277,21 @@ namespace Interface
 				const Ptr<Game::Entity>& selectedEntity = Tools::ToolHandler::Instance()->SelectTool()->GetSelectedEntity();
 				if (selectedEntity != nullptr)
 				{
+
 					Ptr<Game::BaseProperty> property = this->inspectors[selected]->CreateNewProperty();
-					selectedEntity->AddProperty(property);
-					if (selectedEntity->IsActive())
+					
+					//Make sure to not add duplicate properties
+					if (!selectedEntity->HasProperty(*property->GetRtti()))
 					{
-						property->Activate();
+						selectedEntity->AddProperty(property);
+						if (selectedEntity->IsActive())
+						{
+							property->Activate();
+						}
+					}
+					else
+					{
+						_printf("An entity can't have duplicates of the same property!");
 					}
 				}
 				

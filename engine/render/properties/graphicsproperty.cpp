@@ -35,12 +35,12 @@ void GraphicsProperty::setModelInstance(const Ptr<Render::ModelInstance>& inMode
 
 	this->modelInstance = inModelInstance;
 
+	this->owner->SetBaseBBox(&this->modelInstance->GetMesh()->getBaseBBox());
+
 	//Make sure all other properties can react on change of mesh.
 	Ptr<Msg::SetMesh> setMeshMsg = Msg::SetMesh::Create();
 	setMeshMsg->Set(this->modelInstance->GetMesh());
 	__SendMsg(this->owner, setMeshMsg);
-
-	this->owner->SetBaseBBox(&this->modelInstance->GetMesh()->getBaseBBox());
 
 	if (this->active)
 	{
