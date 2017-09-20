@@ -120,12 +120,12 @@ Application::Run()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     float a = 0.0f;
 
-	Ptr<Game::Entity> entity = Game::Entity::Create();
-	Ptr<Render::GraphicsProperty> gProperty = Render::GraphicsProperty::Create();
-	entity->AddProperty(gProperty.upcast<Game::BaseProperty>());
-	gProperty->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/sponza.mdl"));
-	
-	entity->Activate();
+	//Ptr<Game::Entity> entity = Game::Entity::Create();
+	//Ptr<Render::GraphicsProperty> gProperty = Render::GraphicsProperty::Create();
+	//entity->AddProperty(gProperty.upcast<Game::BaseProperty>());
+	//gProperty->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/sponza.mdl"));
+	//
+	//entity->Activate();
 
 	Ptr<Game::Entity> physicsEntity = Game::Entity::Create();
 	Ptr<Property::Rigidbody> rbp = Property::Rigidbody::Create();
@@ -134,7 +134,11 @@ Application::Run()
 	physicsEntity->AddProperty(gProperty2.upcast<Game::BaseProperty>());
 	gProperty2->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 	
+	physicsEntity->SetTransform(Math::mat4::translation(0, 0.0f, -3));
+	
 	physicsEntity->Activate();
+
+
 
 	Ptr<Game::Entity> physicsEntity2 = Game::Entity::Create();
 	Ptr<Property::Collider> rbp2 = Property::Collider::Create();
@@ -143,9 +147,10 @@ Application::Run()
 	physicsEntity2->AddProperty(gProperty3.upcast<Game::BaseProperty>());
 	gProperty3->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 
-	physicsEntity2->SetTransform(Math::mat4::translation(0, 0, 3));
-
 	physicsEntity2->Activate();
+	physicsEntity2->SetTransform(Math::mat4::multiply(Math::mat4::translation(0, -2.0f, 0), Math::mat4::scaling(20, 0.5f, 20)));
+
+
 
 	LightServer::Instance()->CreatePointLight(Math::point(1, 1, 1), Math::point(0, 0, 3), 15.0f);
 
@@ -157,7 +162,12 @@ Application::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
        	
-		Physics::PhysicsDevice::Instance()->Solve();
+		if(ImGui::GetIO().MouseClicked[2])
+			Physics::PhysicsDevice::Instance()->Solve();
+
+		for (auto line : Physics::PhysicsDevice::Instance()->visualDebug)
+			Debug::DebugRenderer::Instance()->DrawLine(line.start(),line.end(),1.0f,Math::vec4(1,0,0,1),Math::vec4(1,0,0,0.1f), Debug::RenderMode::AlwaysOnTop);
+
 		BaseGameFeature::EntityManager::Instance()->Update();
 
 		if (ImGui::GetIO().KeyAlt)

@@ -27,7 +27,7 @@ SOURCE_GROUP("inspectors" FILES ${files_inspectors})
 
 #------------------------------
 ADD_EXECUTABLE(leveleditor ${files_base} ${files_interfaces} ${files_inspectors})
-TARGET_LINK_LIBRARIES(leveleditor core render json application fysik)
-ADD_DEPENDENCIES(leveleditor core render json application fysik)
+TARGET_LINK_LIBRARIES(leveleditor core render json application physics)
+ADD_DEPENDENCIES(leveleditor core render json application physics)
 
 SET_TARGET_PROPERTIES(leveleditor PROPERTIES FOLDER "vortex/toolkit")

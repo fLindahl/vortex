@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------
-# fysik
+# physics
 #--------------------------------------------------------------------------
 
-SET(files_fysik_fysik
+SET(files_physics_physics
 	physicsserver.h
 	physicsserver.cpp
 	physicsdevice.h
@@ -21,15 +21,15 @@ SET(files_fysik_fysik
 	colliderproperty.cpp
 	)
 
-SOURCE_GROUP("fysik" FILES ${files_fysik})
+SOURCE_GROUP("physics" FILES ${files_physics})
 
-SET(files_fysik
-	${files_fysik_fysik}
+SET(files_physics
+	${files_physics_physics}
 	)
 
 SET(files_pch ../config.h ../config.cc)
 SOURCE_GROUP("pch" FILES ${files_pch})
-ADD_LIBRARY(fysik STATIC ${files_fysik} ${files_pch})
-TARGET_PCH(fysik ../)	
-ADD_DEPENDENCIES(fysik application core foundation glew glfw misc)
-TARGET_LINK_LIBRARIES(fysik PUBLIC application core foundation exts glew glfw ${OPENGL_LIBS} misc)
+ADD_LIBRARY(physics STATIC ${files_physics} ${files_pch})
+TARGET_PCH(physics ../)	
+ADD_DEPENDENCIES(physics application core foundation glew glfw misc)
+TARGET_LINK_LIBRARIES(physics PUBLIC BULLET_LIBRARIES application core foundation exts glew glfw ${OPENGL_LIBS} misc)
