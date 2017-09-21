@@ -13,12 +13,17 @@
 #include "rigidbody.h"
 #include "application/game/baseproperty.h"
 
+
 namespace Physics
 {
 
 PhysicsDevice::PhysicsDevice()
 {
-    
+	this->collisionConfiguration = new btDefaultCollisionConfiguration();
+	this->dispatcher = new btCollisionDispatcher(this->collisionConfiguration);
+	this->overlappingPairCache = new btDbvtBroadphase();
+	this->solver = new btSequentialImpulseConstraintSolver();
+	this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher, this->overlappingPairCache, this->solver, this->collisionConfiguration);
 }
 
 void PhysicsDevice::AddRigidBody(Ptr<RigidBody> rBody)

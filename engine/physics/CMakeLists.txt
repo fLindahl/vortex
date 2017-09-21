@@ -27,9 +27,14 @@ SET(files_physics
 	${files_physics_physics}
 	)
 
+
+INCLUDE_DIRECTORIES(${vortex_engine_SOURCE_DIR}/exts/bullet/src)
+
+	
 SET(files_pch ../config.h ../config.cc)
 SOURCE_GROUP("pch" FILES ${files_pch})
+
 ADD_LIBRARY(physics STATIC ${files_physics} ${files_pch})
 TARGET_PCH(physics ../)	
-ADD_DEPENDENCIES(physics application core foundation glew glfw misc)
-TARGET_LINK_LIBRARIES(physics PUBLIC BULLET_LIBRARIES application core foundation exts glew glfw ${OPENGL_LIBS} misc)
+ADD_DEPENDENCIES(physics application core foundation glew glfw misc BulletDynamics BulletCollision LinearMath)
+TARGET_LINK_LIBRARIES(physics PUBLIC BULLET_LIBRARIES application core foundation exts glew glfw ${OPENGL_LIBS} misc BulletDynamics BulletCollision LinearMath)

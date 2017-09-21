@@ -5,8 +5,13 @@
 #include "surfacecollider.h"
 #include "physicsserver.h"
 
+#include "btBulletDynamicsCommon.h"
+
+
 namespace Physics
 {
+
+class RigidBody;
 
 class PhysicsDevice
 {
@@ -30,6 +35,19 @@ public:
 	
 private:
     Util::Array<Ptr<RigidBody>> rigidBodies;
+
+	btDefaultCollisionConfiguration* collisionConfiguration;
+
+	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+	btCollisionDispatcher* dispatcher;
+
+	///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
+	btBroadphaseInterface* overlappingPairCache;
+
+	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+	btSequentialImpulseConstraintSolver* solver;
+
+	btDiscreteDynamicsWorld* dynamicsWorld;
 
 };
 }
