@@ -9,8 +9,8 @@ SET(files_physics_physics
 	physicsdevice.cpp 
 	basecollider.h
 	basecollider.cpp
-	surfacecollider.h
-	surfacecollider.cpp
+	convexhullcollider.h
+	convexhullcollider.cpp
 	boxcollider.h
 	boxcollider.cpp
     rigidbody.h 
@@ -19,6 +19,7 @@ SET(files_physics_physics
 	rigidbodyproperty.cpp
 	colliderproperty.h
 	colliderproperty.cpp
+	bulletvortexconversion.h
 	)
 
 SOURCE_GROUP("physics" FILES ${files_physics})
@@ -37,4 +38,4 @@ SOURCE_GROUP("pch" FILES ${files_pch})
 ADD_LIBRARY(physics STATIC ${files_physics} ${files_pch})
 TARGET_PCH(physics ../)	
 ADD_DEPENDENCIES(physics application core foundation glew glfw misc BulletDynamics BulletCollision LinearMath)
-TARGET_LINK_LIBRARIES(physics PUBLIC BULLET_LIBRARIES application core foundation exts glew glfw ${OPENGL_LIBS} misc BulletDynamics BulletCollision LinearMath)
+TARGET_LINK_LIBRARIES(physics PUBLIC application core foundation exts glew glfw ${OPENGL_LIBS} misc BulletDynamics BulletCollision LinearMath)

@@ -8,9 +8,10 @@
 #include "imgui_dock.h"
 #include "IO/console.h"
 #include "render/server/renderdevice.h"
-#include "application/game/modelentity.h"
 #include "render/server/resourceserver.h"
 #include "render/properties/graphicsproperty.h"
+
+#include "physics/physicsdevice.h"
 
 namespace Example
 {
@@ -69,7 +70,7 @@ ExampleApp::Open()
 		});
 
 		//Never set resolution before initializing rendering and framepasses
-		this->window->SetSize(500, 500);
+		this->window->SetSize(1280, 900);
 		this->window->SetTitle("Vortex Engine Test Environment");
 
 		
@@ -79,8 +80,8 @@ ExampleApp::Open()
 			this->RenderUI();
 		});
 
-		Render::RenderDevice::Instance()->SetWindowResolution(500, 500);
-		Render::RenderDevice::Instance()->SetRenderResolution(800, 600);
+		Render::RenderDevice::Instance()->SetWindowResolution(1280, 900);
+		Render::RenderDevice::Instance()->SetRenderResolution(1280, 900);
 
 		return true;
 	}
@@ -91,6 +92,10 @@ void ExampleApp::RenderUI()
 {
 	if (this->window->IsOpen())
 	{
+		//Updates the console. Always do this first!
+		IO::Console::Instance()->Update();
+
+		/*
 		ImGui::RootDock(ImVec2(0, 0), ImVec2(window->GetWidth(), window->GetHeight()));
 		{
 			if(ImGui::BeginDock("TestDock1", NULL, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
@@ -106,11 +111,8 @@ void ExampleApp::RenderUI()
 
 			}
 			ImGui::EndDock();
-
 		}
-		
-		//Updates the console. Always do this first!
-		IO::Console::Instance()->Update();
+		*/
 	}
 }
 
@@ -166,6 +168,9 @@ ExampleApp::Run()
 		//This polls for events
 		this->window->Update();
 		
+		btAlignedObjectArray<btCollisionShape*> collisionShapes;
+
+
 		//Render the scene
 		Render::RenderDevice::Instance()->Render();
 

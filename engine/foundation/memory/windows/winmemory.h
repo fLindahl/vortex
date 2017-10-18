@@ -1,23 +1,25 @@
 #pragma once
-#ifndef MEMORY_LINUXMEMORY_H
-#define MEMORY_LINUXMEMORY_H
+#ifndef MEMORY_WINMEMORY_H
+#define MEMORY_WINMEMORY_H
 /**
-@file       linuxmemory.h
+@file       winmemory.h
 @date       02-03-2017
 @copyright  See LICENCE file
 
 @todo       Implement the different heaps defined in memoryconfig file.
 
-@brief      Memory subsystem for linux platform
+@brief      Memory subsystem for Windows platform
 
-@see        linuxmemoryconfig.h
+@see        winmemoryconfig.h
 */
 #include "core/types.h"
 #include "core/debug.h"
-#include "foundation/memory/linux/linuxmemoryconfig.h"
+#include "foundation/memory/windows/winmemoryconfig.h"
 #include <malloc.h>
 #include <cstdlib>
 #include <cstring>
+
+#pragma warning (disable: 4595)
 
 namespace Memory
 {

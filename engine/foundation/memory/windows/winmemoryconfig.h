@@ -1,8 +1,8 @@
 #pragma once
-#ifndef MEMORY_LINUXMEMORYCONFIG_H
-#define MEMORY_LINUXMEMORYCONFIG_H
+#ifndef MEMORY_WINMEMORYCONFIG_H
+#define MEMORY_WINMEMORYCONFIG_H
 /**
-@file       linuxmemoryconfig.h
+@file       winmemoryconfig.h
 @date       02-03-2017
 @copyright  See LICENCE file
 

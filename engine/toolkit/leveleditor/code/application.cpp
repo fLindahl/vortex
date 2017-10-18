@@ -6,7 +6,7 @@
 #include "application.h"
 #include <cstring>
 #include <render/server/renderdevice.h>
-#include <fysik/physicsdevice.h>
+#include <physics/physicsdevice.h>
 #include <render/debugrender/debugrenderer.h>
 #include "foundation/math/plane.h"
 #include "imgui.h"
@@ -42,7 +42,7 @@ Application::Application()
 	this->rayEnd = Math::vec4::zerovector();
 	this->reflectStart = Math::vec4::zerovector();
 	this->reflectEnd = Math::vec4::zerovector();
-	hit.object = nullptr;
+	//hit.object = nullptr;
 
 }
 
@@ -162,11 +162,10 @@ Application::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
        	
-		if(ImGui::GetIO().MouseClicked[2])
-			Physics::PhysicsDevice::Instance()->Solve();
+		//Physics::PhysicsDevice::Instance()->Solve();
 
-		for (auto line : Physics::PhysicsDevice::Instance()->visualDebug)
-			Debug::DebugRenderer::Instance()->DrawLine(line.start(),line.end(),1.0f,Math::vec4(1,0,0,1),Math::vec4(1,0,0,0.1f), Debug::RenderMode::AlwaysOnTop);
+		//for (auto line : Physics::PhysicsDevice::Instance()->visualDebug)
+		//	Debug::DebugRenderer::Instance()->DrawLine(line.start(),line.end(),1.0f,Math::vec4(1,0,0,1),Math::vec4(1,0,0,0.1f), Debug::RenderMode::AlwaysOnTop);
 
 		BaseGameFeature::EntityManager::Instance()->Update();
 
@@ -175,6 +174,7 @@ Application::Run()
 			CameraMovement();
 		}
 
+		/*
 		if (this->hit.object != nullptr)
 		{
 			Ptr<Render::GraphicsProperty> gp = this->hit.object->FindProperty<Render::GraphicsProperty>();
@@ -183,6 +183,7 @@ Application::Run()
 				Debug::DebugRenderer::Instance()->DrawMesh(gp->getModelInstance()->GetMesh(), this->hit.object->GetTransform(), Math::vec4(1.0f, 1.0f, 1.0f, 1.0f), Debug::RenderMode::WireFrame, -1, 2.0f);
 			}
 		}
+		*/
 
 		if (renderGeoProxies)
 		{

@@ -1,6 +1,6 @@
 #pragma once
 #include "baseinspector.h"
-#include "fysik/rigidbodyproperty.h"
+#include "physics/rigidbodyproperty.h"
 
 namespace LevelEditor
 {

@@ -6,7 +6,7 @@
 #include "application.h"
 #include <cstring>
 #include <render/server/renderdevice.h>
-#include <fysik/physicsdevice.h>
+#include <physics/physicsdevice.h>
 #include <render/debugrender/debugrenderer.h>
 #include "foundation/math/plane.h"
 #include "imgui.h"

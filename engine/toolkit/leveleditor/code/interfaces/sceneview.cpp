@@ -11,8 +11,8 @@
 // PHYSICS
 #include "foundation/math/line.h"
 #include "application/basegamefeature/managers/envmanager.h"
-#include "fysik/physicsserver.h"
-#include "fysik/rigidbodyproperty.h"
+#include "physics/physicsserver.h"
+#include "physics/rigidbodyproperty.h"
 
 namespace Interface
 {

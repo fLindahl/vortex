@@ -2,7 +2,9 @@
 #include "core/refcounted.h"
 #include "basecollider.h"
 #include "application/game/baseproperty.h"
-#include "fysik/surfacecollider.h"
+#include "physics/surfacecollider.h"
+
+#include "btBulletDynamicsCommon.h"
 
 namespace Render
 {
@@ -11,20 +13,6 @@ namespace Render
 
 namespace Physics
 {
-struct BodyState
-{
-    double dt;
-	Math::point position; //Cm on worldspace
-	Math::point acceleration;
-	Math::quaternion orientation; //q
-	Math::point linearVelocity; //v
-	Math::point angularVelocity; //w
-	Math::point force; //Force applied this frame
-	Math::point torque; //Torque applied this frame
-	Math::mat4 R; //orientation matrix
-	Math::mat4 transform;
-	Math::mat4 invInertiaTensorWorld;
-};
 
 class RigidBody : public Core::RefCounted
 {
@@ -32,70 +20,43 @@ __DeclareClass(RigidBody)
 public:
     RigidBody();
     ~RigidBody();
+	
+	bool Initialize();
+	bool Uninitialize();
+		
+	/**	Change the mass of the rigidbody.
+		If the body is activated, this will deactivate it and re-initialize + re-activate it with the new mass.
+		@note	This might perform badly since we seem to need to re-initialize the entire rigidbody. */
+	void SetMass(float m);
 
-    void applyForce(const Math::vec4& dir, const float& magnitude);
-    void applyForceAtPoint(const Math::vec4& dir, const float& magnitude, const Math::point& worldPos);
+	///Returns this rigidbody's mass.
+	float GetMass() const;
 
-    //void setGraphicsProperty(Render::GraphicsProperty* gp) {this->gProperty = gp;}
-    void setCollider(Ptr<Physics::SurfaceCollider> coll);
+	///Set this rigidbody's collider. 
+	void SetCollider(const Ptr<BaseCollider>& collider);
 
-	Math::mat4 getTransform() { return this->currentState.transform; }
-	Math::point getCenterOfMass() { return this->massCenter; }
-	Math::quaternion getOrientation() { return this->currentState.orientation; }
-	Math::point getPosition() { return this->currentState.position; }
-	Math::point getLinearVelocity() { return this->currentState.linearVelocity; }
-	Math::point getAngularVelocity() { return this->currentState.angularVelocity; }
-	Math::point getForce() { return this->currentState.force; }
-	Math::point getTorque() { return this->currentState.torque; }
-	Math::point getAcceleration() { return this->currentState.acceleration; }
-	BodyState& GetCurrentState() { return this->currentState; }
-	BodyState& GetPreviousState() { return this->previousState; }
+	///Returns this rigidbody's collider. 
+	Ptr<BaseCollider> GetCollider() const;
 
-	BodyState Integrate(const BodyState& state, const double& frameTime);
-	BodyState Evaluate(const BodyState& state, const double& frameTime, const BodyState& derivative);
-
+	void ApplyForce(const Math::vec4& dir, const float& magnitude);
+	void ApplyForceAtPoint(const Math::vec4& dir, const float& magnitude, const Math::point& worldPos);
+	
 	bool IsInitialized() const { return this->initialized; }
-	void Initialize(const float& mass, const Math::mat4& bodyInertiaTensor, Game::Entity* entity);
 
 private:
-    friend class PhysicsDevice;
+	friend class PhysicsDevice;
 
 	bool initialized;
-    
+	bool registered;
 
-    void update(const double& frameTime);
-    bool collide();
+	float mass;
 
-    void calculateDerivedQuantities(BodyState& state);
+	btRigidBody* body;
+	btDefaultMotionState* motionState;
 
-    //Constant quantities
-    float mass;
-    float massInv;
-    Math::point massCenter;
-    Math::mat4 inertiaTensor; // model coordiantes
-    Math::mat4 invInertiaTensor; // model coordiantes
+	Ptr<BaseCollider> collider;
 
-    //State Variables
-	BodyState previousState;
-	BodyState currentState;
-
-    //Math::point position; //Cm on worldspace
-    //Math::vector acceleration;
-    //Math::quaternion orientation; //q
-    //Math::vec4 linearVelocity; //v
-    //Math::vec4 angularVelocity; //w
-
-    //derived quantities
-    //Math::mat4 R; //orientation matrix
-    //Math::mat4 transform;
-    //Math::mat4 invInertiaTensorWorld;
-
-    //accumilative quantities
-    //Math::vector force;
-    //Math::vector torque;
-
-    Game::Entity* owner;
-    //Ptr<Physics::BaseCollider> collider;
+	void ReloadBtRigidBody();
 };
 
 }

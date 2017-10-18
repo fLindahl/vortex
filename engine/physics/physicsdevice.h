@@ -33,9 +33,6 @@ public:
     void AddRigidBody(Ptr<RigidBody> rBody);
 	void RemoveRigidBody(Ptr<RigidBody> rBody);
 	
-private:
-    Util::Array<Ptr<RigidBody>> rigidBodies;
-
 	btDefaultCollisionConfiguration* collisionConfiguration;
 
 	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
@@ -48,6 +45,12 @@ private:
 	btSequentialImpulseConstraintSolver* solver;
 
 	btDiscreteDynamicsWorld* dynamicsWorld;
+
+
+private:
+    Util::Array<Ptr<RigidBody>> rigidBodies;
+
+	
 
 };
 }

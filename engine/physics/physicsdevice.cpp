@@ -32,12 +32,13 @@ void PhysicsDevice::AddRigidBody(Ptr<RigidBody> rBody)
 	if (it == nullptr)
 	{
 		this->rigidBodies.Append(rBody);
+		dynamicsWorld->addRigidBody(rBody->body);
+		rBody->registered = true;
 	}
 	else
 	{
 		printf("WARNING: Rigidbody already added to PhysicsDevice!\n");
 	}
-
 }
 
 void PhysicsDevice::RemoveRigidBody(Ptr<RigidBody> rBody)
@@ -48,6 +49,8 @@ void PhysicsDevice::RemoveRigidBody(Ptr<RigidBody> rBody)
 		//Erase and move last element to this position.
 		//Destroys sorting!
 		this->rigidBodies.RemoveSwap(it);
+		dynamicsWorld->removeRigidBody(rBody->body);
+		rBody->registered = false;
 	}
 }
 

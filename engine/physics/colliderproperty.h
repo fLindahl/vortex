@@ -1,7 +1,7 @@
 #pragma once
 #include "core/refcounted.h"
 #include "foundation/math/bbox.h"
-#include "fysik/surfacecollider.h"
+#include "physics/basecollider.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 #include "application/game/baseproperty.h"
@@ -24,10 +24,10 @@ namespace Property
 
 		void Serialize(IO::Stream* stream);
 
-		const Ptr<Physics::SurfaceCollider>& GetCollider() const { return this->collider; }
+		const Ptr<Physics::BaseCollider>& GetCollider() const { return this->collider; }
 	protected:
 
-		Ptr<Physics::SurfaceCollider> collider;
+		Ptr<Physics::BaseCollider> collider;
 	};
 
 }

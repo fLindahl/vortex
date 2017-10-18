@@ -16,6 +16,9 @@ public:
 	BoxCollider();
 	~BoxCollider();
 
+	///Set the extents of the box.
+	void SetSize(const Math::vector& localSize);
+	Math::vector GetSize() const;
 
 private:
 	Math::vector size;

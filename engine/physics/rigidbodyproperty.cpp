@@ -2,8 +2,8 @@
 #include "rigidbodyproperty.h"
 #include "render/resources/meshresource.h"
 #include "render/resources/modelinstance.h"
-#include "fysik/physicsdevice.h"
-#include "fysik/physicsserver.h"
+#include "physics/physicsdevice.h"
+#include "physics/physicsserver.h"
 #include "render/properties/rendermessages.h"
 
 namespace Property

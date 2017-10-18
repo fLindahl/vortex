@@ -1,8 +1,8 @@
 #pragma once
 #include "core/refcounted.h"
 #include "foundation/math/bbox.h"
-#include "fysik/surfacecollider.h"
-#include "fysik/rigidbody.h"
+#include "physics/surfacecollider.h"
+#include "physics/rigidbody.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 #include "colliderproperty.h"

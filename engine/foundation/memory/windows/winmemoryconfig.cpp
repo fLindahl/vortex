@@ -1,5 +1,5 @@
 #include "config.h"
-#include "foundation/memory/linux/linuxmemoryconfig.h"
+#include "foundation/memory/windows/winmemoryconfig.h"
 
 namespace Memory
 {

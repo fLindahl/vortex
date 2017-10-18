@@ -1,18 +1,15 @@
 #pragma once
 #include "undo.h"
-#include "application/game/cubemapentity.h"
-#include "application/game/modelentityWithSpotlight.h"
-#include "application/game/pointlightentity.h"
-#include "application/game/geometryproxyentity.h"
 
 namespace Edit
 {
 	class AddEntity : public Command
 	{
 	public:
-		Ptr<Game::CubeMapEntity> entity;
+		//Ptr<Game::CubeMapEntity> entity;
 
 	public:
+		/*
 		AddEntity(const Math::vec4& position, Ptr<Render::ModelInstance> mdl)
 		{
 			this->entity = Game::CubeMapEntity::Create();
@@ -35,9 +32,9 @@ namespace Edit
 			this->entity->Deactivate();
 			return true;
 		}
-
+		*/
 	};
-
+/*
 	class AddGeometryProxyEntity : public Command
 	{
 	public:
@@ -128,4 +125,6 @@ namespace Edit
             return true;
         }
     };
+
+*/
 }

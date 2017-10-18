@@ -15,10 +15,10 @@
 #include "render/server/shaderserver.h"
 #include "render/graphics/camera.h"
 #include "application/basegamefeature/keyhandler.h"
-#include "fysik/basecollider.h"
-#include <fysik/surfacecollider.h>
-#include <fysik/rigidbody.h>
-#include <fysik/physicsserver.h>
+#include "physics/basecollider.h"
+#include <physics/surfacecollider.h>
+#include <physics/rigidbody.h>
+#include <physics/physicsserver.h>
 //#include <application/game/staticentity.h>
 #include "userinterface.h"
 #include "imgui_dock.h"
@@ -64,7 +64,7 @@ private:
 	Math::point rayEnd;
 	Math::point reflectStart;
 	Math::point reflectEnd;
-	Physics::PhysicsHit hit;
+	//Physics::PhysicsHit hit;
 	
 	/// ImGui functions
 	void RenderUI();

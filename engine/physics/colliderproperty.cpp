@@ -1,7 +1,7 @@
 #include "config.h"
 #include "colliderproperty.h"
-#include "fysik/physicsdevice.h"
-#include "fysik/physicsserver.h"
+#include "physics/physicsdevice.h"
+#include "physics/physicsserver.h"
 #include "render/properties/rendermessages.h"
 
 namespace Property

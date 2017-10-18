@@ -247,10 +247,12 @@ namespace Toolkit
 				switched = true;
 			}
 
+			/*
 			if (switched && application->hit.object != nullptr)
 			{
 				Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(application->hit.object->GetTransform());
 			}
+			*/
 		}
 	}
 
@@ -309,10 +311,12 @@ namespace Toolkit
 				switched = true;
 			}
 
+			/*
 			if (switched && application->hit.object != nullptr)
 			{
 				Tools::ToolHandler::Instance()->CurrentTool()->UpdateTransform(application->hit.object->GetTransform());
 			}
+			*/
 
 			ImGui::End();
 		}

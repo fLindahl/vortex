@@ -14,15 +14,13 @@
 #include "render/server/shaderserver.h"
 #include "render/graphics/camera.h"
 #include "application/basegamefeature/keyhandler.h"
-#include "fysik/basecollider.h"
-#include <fysik/surfacecollider.h>
-#include <fysik/rigidbody.h>
-#include <fysik/physicsserver.h>
-#include <application/game/staticentity.h>
+#include "physics/basecollider.h"
+#include <physics/surfacecollider.h>
+#include <physics/rigidbody.h>
+#include <physics/physicsserver.h>
 #include "userinterface.h"
 #include "imgui_dock.h"
 #include "userinterface.h"
-#include "application/game/modelentity.h"
 
 namespace ContentBrowser
 {
@@ -60,7 +58,7 @@ private:
 	/// ImGui functions
 	void RenderUI();
 
-	Ptr<Game::ModelEntity> loadedModel;
+	//Ptr<Game::ModelEntity> loadedModel;
     
 	BaseGameFeature::KeyHandler* keyhandler;
 
