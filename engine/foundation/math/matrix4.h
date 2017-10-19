@@ -213,6 +213,10 @@ namespace Math
 		/// convert to any type
 		template<typename T> T as() const;
 
+		///Prints the label + content of this matrix to the console
+		///@todo	Move this to some debug class
+		void print(const char* label);
+
 		//private:
 		friend class vec4;
 		friend class plane;

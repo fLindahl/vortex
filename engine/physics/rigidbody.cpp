@@ -9,8 +9,12 @@
 namespace Physics
 {
 
-__ImplementClass(Physics::RigidBody, 'RGBD', Core::RefCounted);
-RigidBody::RigidBody() 
+__ImplementClass(Physics::RigidBody, 'RGBD', Core::RefCounted)
+RigidBody::RigidBody() :
+	initialized(false),
+	body(nullptr),
+	registered(false),
+	mass(1.0f)
 {
 
 }
@@ -51,8 +55,10 @@ bool RigidBody::Initialize()
 	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 	this->motionState = new btDefaultMotionState(startTransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, this->collider->GetBtCollisionShape(), localInertia);
-
+	
 	this->body = new btRigidBody(rbInfo);
+
+	this->initialized = true;
 
 	return true;
 }
@@ -69,6 +75,10 @@ bool RigidBody::Uninitialize()
 
 	delete this->motionState;
 	delete this->body;
+
+	this->body = nullptr;
+
+	this->initialized = false;
 
 	return true;
 }
@@ -93,13 +103,26 @@ void RigidBody::SetCollider(const Ptr<BaseCollider>& collider)
 	//Make sure to re-register if necessary
 	bool reg = this->registered;
 
-	this->Uninitialize();
-	this->Initialize();
+	if (initialized)
+	{
+		this->Uninitialize();
+		this->Initialize();
+	}
 
 	if (reg)
 	{
 		PhysicsDevice::Instance()->AddRigidBody(this);
 	}
+}
+
+Math::mat4 RigidBody::GetStateTransform() const
+{
+	return Bt2VortexTransform(this->body->getWorldTransform());
+}
+
+void RigidBody::SetStateTransform(const Math::mat4 & m)
+{
+	this->body->setWorldTransform(Vortex2BtTransform(m));
 }
 
 Ptr<BaseCollider> RigidBody::GetCollider() const

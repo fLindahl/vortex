@@ -4,7 +4,8 @@
 #include "basecollider.h"
 #include "foundation/math/point.h"
 #include "render/resources/meshresource.h"
-#include "BulletCollision\CollisionShapes\btShapeHull.h"
+
+class btShapeHull;
 
 namespace Physics
 {

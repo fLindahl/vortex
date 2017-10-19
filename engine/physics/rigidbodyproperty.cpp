@@ -5,10 +5,11 @@
 #include "physics/physicsdevice.h"
 #include "physics/physicsserver.h"
 #include "render/properties/rendermessages.h"
+#include "colliderproperty.h"
 
 namespace Property
 {
-	__ImplementClass(Property::Rigidbody, 'PrRB', Property::Collider)
+	__ImplementClass(Property::Rigidbody, 'PrRB', Game::BaseProperty)
 
 	Rigidbody::Rigidbody() :
 		isKinematic(false),
@@ -28,8 +29,8 @@ namespace Property
 			return;
 
 		//TODO: This should be a message, sent by the rigidbody
-		this->owner->SetTransform(Math::mat4::multiply(Math::mat4::translation(this->rigidBody->getCenterOfMass() * -1.0f), this->rigidBody->getTransform()));
-
+		this->owner->SetTransform(this->rigidBody->GetStateTransform());
+		
 		this->Game::BaseProperty::Update();
 	}
 
@@ -39,13 +40,17 @@ namespace Property
 		{
 			if (!this->rigidBody->IsInitialized())
 			{
-				if (this->collider.isvalid())
+				// Make sure this entity has a colliderproperty of some kind since we need it to initialize our rigidbody.
+				const Ptr<Collider>& collider = this->owner->FindProperty<Property::Collider>();
+				
+				if (collider.isvalid())
 				{
-					this->rigidBody->Initialize(1.0f, Physics::PhysicsServer::CalculateInertiaTensor(this->collider.upcast<Physics::BaseCollider>(), 1.0f), this->owner);
+					this->rigidBody->SetCollider(collider->GetCollider());
+					this->rigidBody->Initialize();
 				}
 				else
 				{
-					_warning("Cannot initialize Rigidbody property since no mesh has been set!");
+					_warning("Cannot initialize Rigidbody property since it has no collider!");
 				}
 			}
 
@@ -81,21 +86,11 @@ namespace Property
 		//Handle set transform message
 		if (msg->GetType() == Msg::SetTransform::Type)
 		{
-			//this->setTransform(msg.cast<Msg::SetTransform>()->Get());
+			//this->rigidBody->SetStateTransform(msg.cast<Msg::SetTransform>()->Get());
 		}
 		else if (msg->GetType() == Msg::SetMesh::Type)
 		{
-			if (this->active)
-			{
-				this->Deactivate();
-				this->collider = Physics::PhysicsServer::Instance()->LoadCollider(msg.cast<Msg::SetMesh>()->Get()->GetName(), Physics::ColliderShape::SURFACE).downcast<Physics::SurfaceCollider>();
-				this->Activate();
-			}
-			else
-			{
-				this->collider = Physics::PhysicsServer::Instance()->LoadCollider(msg.cast<Msg::SetMesh>()->Get()->GetName(), Physics::ColliderShape::SURFACE).downcast<Physics::SurfaceCollider>();
-			}
-			//this->setTransform(msg.cast<Msg::SetTransform>()->Get());
+			
 		}
 	}
 
@@ -126,12 +121,11 @@ namespace Property
 
 	void Rigidbody::SetMass(const float & newMass)
 	{
-		//TODO: Fix this
+		this->rigidBody->SetMass(newMass);
 	}
 
 	float Rigidbody::GetMass() const
 	{
-		//TODO: Fix this
-		return 0.0f;
+		return this->rigidBody->GetMass();
 	}
 }

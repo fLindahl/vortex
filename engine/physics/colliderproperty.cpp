@@ -3,6 +3,7 @@
 #include "physics/physicsdevice.h"
 #include "physics/physicsserver.h"
 #include "render/properties/rendermessages.h"
+#include "render/resources/meshresource.h"
 
 namespace Property
 {
@@ -27,11 +28,7 @@ namespace Property
 
 	void Collider::Activate()
 	{
-		if (!this->active)
-		{
-			Physics::PhysicsServer::Instance()->AddStaticEntity(this);
-			BaseProperty::Activate();
-		}
+		BaseProperty::Activate();
 	}
 
 	void Collider::Deactivate()
@@ -45,12 +42,7 @@ namespace Property
 
 	void Collider::HandleMessage(const Ptr<Messaging::Message>& msg)
 	{
-		//Handle set transform message
-		if (msg->GetType() == Msg::SetMesh::Type)
-		{
-			Ptr<Render::MeshResource> mesh = msg.cast<Msg::SetMesh>()->Get();
-			this->collider = Physics::PhysicsServer::Instance()->LoadCollider(mesh->GetName(), Physics::ColliderShape::SURFACE).downcast<Physics::SurfaceCollider>();
-		}
+		
 	}
 
 	void Collider::Serialize(IO::Stream* stream)

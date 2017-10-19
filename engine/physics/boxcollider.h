@@ -11,7 +11,7 @@ namespace Physics
 
 class BoxCollider : public BaseCollider
 {	
-__DeclareClass(BoxCollider);
+__DeclareClass(BoxCollider)
 public:
 	BoxCollider();
 	~BoxCollider();

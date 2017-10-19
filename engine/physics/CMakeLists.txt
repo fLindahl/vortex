@@ -13,6 +13,10 @@ SET(files_physics_physics
 	convexhullcollider.cpp
 	boxcollider.h
 	boxcollider.cpp
+	boxcolliderproperty.h
+	boxcolliderproperty.cpp
+	surfacecolliderproperty.h
+	surfacecolliderproperty.cpp
     rigidbody.h 
 	rigidbody.cpp
 	rigidbodyproperty.h
@@ -20,6 +24,7 @@ SET(files_physics_physics
 	colliderproperty.h
 	colliderproperty.cpp
 	bulletvortexconversion.h
+
 	)
 
 SOURCE_GROUP("physics" FILES ${files_physics})

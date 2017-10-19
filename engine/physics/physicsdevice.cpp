@@ -12,7 +12,7 @@
 #include "rigidbodyproperty.h"
 #include "rigidbody.h"
 #include "application/game/baseproperty.h"
-
+#include "btBulletDynamicsCommon.h"
 
 namespace Physics
 {
@@ -24,6 +24,12 @@ PhysicsDevice::PhysicsDevice()
 	this->overlappingPairCache = new btDbvtBroadphase();
 	this->solver = new btSequentialImpulseConstraintSolver();
 	this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher, this->overlappingPairCache, this->solver, this->collisionConfiguration);
+	this->dynamicsWorld->setGravity(btVector3(0, -1.0f, 0));
+}
+
+void PhysicsDevice::StepSimulation(float dt)
+{
+	dynamicsWorld->stepSimulation(dt, 10);
 }
 
 void PhysicsDevice::AddRigidBody(Ptr<RigidBody> rBody)

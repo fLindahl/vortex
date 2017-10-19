@@ -11,7 +11,7 @@
 #include "colliderproperty.h"
 #include "rigidbodyproperty.h"
 #include <map>
-#include "btBulletDynamicsCommon.h"
+
 
 namespace Game
 {

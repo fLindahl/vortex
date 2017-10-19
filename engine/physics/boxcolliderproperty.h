@@ -1,33 +1,30 @@
 #pragma once
 #include "core/refcounted.h"
 #include "foundation/math/bbox.h"
-#include "physics/basecollider.h"
+#include "physics/boxcollider.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 #include "application/game/baseproperty.h"
+#include "colliderproperty.h"
 
 namespace Property
 {
-	class Collider : public Game::BaseProperty
+	class BoxCollider : public Property::Collider
 	{
-		__DeclareClass(Collider)
+		__DeclareClass(BoxCollider)
 	public:
-		Collider();
-		~Collider();
+		BoxCollider();
+		~BoxCollider();
 
 		void Update();
 
 		void Activate();
 		void Deactivate();
 
-		void HandleMessage(const Ptr<Messaging::Message>& msg);
+		void SetSize(const Math::vector& halfextents);
 
 		void Serialize(IO::Stream* stream);
 
-		const Ptr<Physics::BaseCollider>& GetCollider() const { return this->collider; }
-	protected:
-
-		Ptr<Physics::BaseCollider> collider;
 	};
 
 }

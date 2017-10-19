@@ -1,13 +1,16 @@
 #include "config.h"
 #include "convexhullcollider.h"
 #include "physicsserver.h"
+#include "BulletCollision/CollisionShapes/btShapeHull.h"
+#include "BulletCollision/CollisionShapes/btConvexHullShape.h"
 
 namespace Physics
 {
 
 __ImplementClass(Physics::ConvexHullCollider, 'CHCL', Physics::BaseCollider);
 
-ConvexHullCollider::ConvexHullCollider()
+ConvexHullCollider::ConvexHullCollider() :
+	hull(nullptr)
 {
 	this->btCollider = new btConvexHullShape();
 }
@@ -26,7 +29,8 @@ void ConvexHullCollider::CookMeshData(const Ptr<Render::MeshResource> mesh)
 	btConvexHullShape* shape = new btConvexHullShape((float*)mesh->getMesh(), mesh->getNumVertices(), mesh->getVertexWidth());
 	
 	//create a hull approximation to simplify the mesh allowing for coarser but faster calculations
-	delete this->hull;
+	if(this->hull != nullptr)
+		delete this->hull;
 	this->hull = new btShapeHull(shape);
 	btScalar margin = shape->getMargin();
 	hull->buildHull(margin);

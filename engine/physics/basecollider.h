@@ -3,7 +3,7 @@
 #include "foundation/util/array.h"
 #include "foundation/math/bbox.h"
 
-#include "btBulletDynamicsCommon.h"
+class btCollisionShape;
 
 namespace Physics
 {

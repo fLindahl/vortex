@@ -2,10 +2,14 @@
 #include "core/refcounted.h"
 #include "foundation/util/array.h"
 #include <map>
-#include "surfacecollider.h"
+#include "basecollider.h"
 #include "physicsserver.h"
 
-#include "btBulletDynamicsCommon.h"
+class btDefaultCollisionConfiguration;
+class btCollisionDispatcher;
+class btBroadphaseInterface;
+class btSequentialImpulseConstraintSolver;
+class btDiscreteDynamicsWorld;
 
 
 namespace Physics
@@ -29,6 +33,8 @@ public:
     // Delete the methods we don't want.
     PhysicsDevice(PhysicsDevice const&) = delete;
     void operator=(PhysicsDevice const&) = delete;
+
+	void StepSimulation(float dt);
 
     void AddRigidBody(Ptr<RigidBody> rBody);
 	void RemoveRigidBody(Ptr<RigidBody> rBody);

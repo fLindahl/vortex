@@ -114,6 +114,23 @@ Rtti::Create() const
 /**
 */
 bool
+Rtti::IsDerivedFrom(const Rtti* other) const
+{
+	const Rtti* cur;
+	for (cur = this; cur != 0; cur = cur->GetParent())
+	{
+		if (cur == other)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+bool
 Rtti::IsDerivedFrom(const Rtti& other) const
 {
     const Rtti* cur;

@@ -6,6 +6,7 @@
 #include "render/properties/graphicsproperty.h"
 #include "render/server/resourceserver.h"
 #include "physics/colliderproperty.h"
+#include "btBulletDynamicsCommon.h"
 
 namespace Physics
 {
@@ -170,16 +171,16 @@ Ptr<Physics::BaseCollider> PhysicsServer::LoadCollider(const std::string& meshNa
 	else
 	{
 		//We need to create a physics collider and cook the mesh
-		if (shape == Physics::ColliderShape::SURFACE)
+		if (shape == Physics::ColliderShape::CONVEXHULL)
 		{
-			Ptr<SurfaceCollider> coll = SurfaceCollider::Create();
+			Ptr<ConvexHullCollider> coll = ConvexHullCollider::Create();
 			coll->SetShape(shape);
 			coll->CookMeshData(Render::ResourceServer::Instance()->LoadMesh(meshName.c_str()));
 			return coll.downcast<BaseCollider>();
 		}
 		else
 		{
-			printf("ERROR: We only support surface colliders so far!");
+			printf("ERROR: We only support convex hull colliders so far!");
 			assert(false);
 		}
 		return nullptr;

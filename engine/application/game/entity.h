@@ -54,6 +54,7 @@ public:
 
 	///Return the given property template if it exists. Remember to check if ptr is valid before using retrieved property!
 	///This should be used sparingly since it's slow.
+	///@todo	This could be accelerated using some better datastructure for the properties
 	template<class PROPERTY> const Ptr<PROPERTY>& FindProperty() const;
 
 	///Shortcut for getting this entitys transform
@@ -101,7 +102,8 @@ const Ptr<PROPERTY>& Entity::FindProperty() const
 	for (int i = 0; i < this->properties.Size(); i++)
 	{
 		Core::Rtti* pRtti = this->properties[i]->GetRtti();
-		if (pRtti == rtti)
+		//if (pRtti == rtti)
+		if (pRtti->IsDerivedFrom(rtti))
 		{
 			return this->properties[i].downcast<PROPERTY>();
 		}

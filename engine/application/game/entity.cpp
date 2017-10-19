@@ -101,7 +101,8 @@ void Entity::Activate()
 	
 	for (auto& property : this->properties)
 	{
-		property->Activate();
+		if(!property->active)
+			property->Activate();
 	}
 
 	this->active = true;

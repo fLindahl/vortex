@@ -53,6 +53,7 @@ namespace LevelEditor
 			}
         }
         EndAttribute();
+
     }
 
     void RigidbodyInspector::Update()

@@ -2,9 +2,11 @@
 #include "core/refcounted.h"
 #include "basecollider.h"
 #include "application/game/baseproperty.h"
-#include "physics/surfacecollider.h"
+#include "physics/basecollider.h"
 
-#include "btBulletDynamicsCommon.h"
+class btDefaultMotionState;
+class btRigidBody;
+
 
 namespace Render
 {
@@ -34,6 +36,12 @@ public:
 
 	///Set this rigidbody's collider. 
 	void SetCollider(const Ptr<BaseCollider>& collider);
+
+	///Returns the bullet-rigidbody's transform in worldspace
+	Math::mat4 GetStateTransform() const;
+	
+	///Sets the bullet-rigidbody's worldspace transform
+	void SetStateTransform(const Math::mat4& m);
 
 	///Returns this rigidbody's collider. 
 	Ptr<BaseCollider> GetCollider() const;

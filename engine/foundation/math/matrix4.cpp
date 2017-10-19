@@ -1,3 +1,4 @@
+#include "matrix4.h"
 #include "config.h"
 #include "math.h"
 #include "matrix4.h"
@@ -211,4 +212,32 @@ namespace Math
 			vec4::less4_any(vec4(p1.z(), p1.w(), 0, 0),
 			vec4(-p1.w(), p1.z(), 0, 0)));
 	}
+
+	//------------------------------------------------------------------------------
+	/**
+	*/
+	void
+	mat4::print(const char* label)
+	{
+		_printf("_%s_\n|%f|%f|%f|%f|\n|%f|%f|%f|%f|\n|%f|%f|%f|%f|\n|%f|%f|%f|%f|",
+			label,
+			this->mat.m[0][0],
+			this->mat.m[0][1],
+			this->mat.m[0][2],
+			this->mat.m[0][3],
+			this->mat.m[1][0],
+			this->mat.m[1][1],
+			this->mat.m[1][2],
+			this->mat.m[1][3],
+			this->mat.m[2][0],
+			this->mat.m[2][1],
+			this->mat.m[2][2],
+			this->mat.m[2][3],
+			this->mat.m[3][0],
+			this->mat.m[3][1],
+			this->mat.m[3][2],
+			this->mat.m[3][3]
+		);
+	}
+
 } // namespace Math

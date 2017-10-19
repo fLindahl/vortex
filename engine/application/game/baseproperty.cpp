@@ -16,13 +16,5 @@ void BaseProperty::Serialize(IO::Stream* stream)
 	return;
 }
 
-//-----------------------------------
-/**
-	Called by the inspector in the level editor.
-*/
-void BaseProperty::Inspect()
-{
-	return;
-}
 
 }

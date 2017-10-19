@@ -18,6 +18,7 @@
 #include "application/basegamefeature/managers/envmanager.h"
 #include "IO/console.h"
 #include "selecttool.h"
+#include "physics/boxcolliderproperty.h"
 
 using namespace Display;
 using namespace Render;
@@ -128,21 +129,20 @@ Application::Run()
 	//entity->Activate();
 
 	Ptr<Game::Entity> physicsEntity = Game::Entity::Create();
+	Ptr<Property::BoxCollider> collider = Property::BoxCollider::Create();
+	physicsEntity->AddProperty(collider.upcast<Game::BaseProperty>());
 	Ptr<Property::Rigidbody> rbp = Property::Rigidbody::Create();
 	physicsEntity->AddProperty(rbp.upcast<Game::BaseProperty>());
 	Ptr<Render::GraphicsProperty> gProperty2 = Render::GraphicsProperty::Create();
 	physicsEntity->AddProperty(gProperty2.upcast<Game::BaseProperty>());
 	gProperty2->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
-	
-	physicsEntity->SetTransform(Math::mat4::translation(0, 0.0f, -3));
-	
+	physicsEntity->SetTransform(Math::mat4::translation(0, 0.0f, -3));	
 	physicsEntity->Activate();
 
-
-
 	Ptr<Game::Entity> physicsEntity2 = Game::Entity::Create();
-	Ptr<Property::Collider> rbp2 = Property::Collider::Create();
-	physicsEntity2->AddProperty(rbp2.upcast<Game::BaseProperty>());
+	Ptr<Property::BoxCollider> collider2 = Property::BoxCollider::Create();
+	collider2->SetSize(Math::vector(20, 0.5f, 20));
+	physicsEntity2->AddProperty(collider2.upcast<Game::BaseProperty>());
 	Ptr<Render::GraphicsProperty> gProperty3 = Render::GraphicsProperty::Create();
 	physicsEntity2->AddProperty(gProperty3.upcast<Game::BaseProperty>());
 	gProperty3->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
@@ -162,7 +162,8 @@ Application::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
        	
-		//Physics::PhysicsDevice::Instance()->Solve();
+		if (ImGui::GetIO().MouseClicked[1])
+			Physics::PhysicsDevice::Instance()->StepSimulation(1.f / 10.f);
 
 		//for (auto line : Physics::PhysicsDevice::Instance()->visualDebug)
 		//	Debug::DebugRenderer::Instance()->DrawLine(line.start(),line.end(),1.0f,Math::vec4(1,0,0,1),Math::vec4(1,0,0,0.1f), Debug::RenderMode::AlwaysOnTop);

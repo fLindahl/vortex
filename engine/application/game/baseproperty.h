@@ -25,20 +25,23 @@ public:
 
 	virtual void HandleMessage(const Ptr<Messaging::Message>& msg) {}
 
-	virtual void Activate() { active = true; }
-	virtual void Deactivate() { active = false; }
-
-	void SetOwner(Ptr<Entity> o) { this->owner = o; }
-	const Ptr<Entity>& GetOwner() { return this->owner; }
+	virtual void Activate() { this->active = true; }
+	virtual void Deactivate() { this->active = false; }
 
 	///Override in subclass. Call this function with you favorite stream write/reader.
 	virtual void Serialize(IO::Stream* serializer);
 
-	///List in inspector
-	virtual void Inspect();
+	const Ptr<Entity>& GetOwner() { return this->owner; }
+
+	bool IsActive() const { return this->active; }
+
 protected:
 	bool active = false;
     friend class Entity;
+
+	///Sets the owner of this property
+	void SetOwner(Ptr<Entity> o) { this->owner = o; }
+	
 
 	///The owner entity of this property
     Ptr<Entity> owner;	

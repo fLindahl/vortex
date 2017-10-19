@@ -13,6 +13,8 @@
 
 #include "physics/physicsdevice.h"
 
+using namespace Physics;
+
 namespace Example
 {
 	//----------------------
@@ -61,7 +63,7 @@ ExampleApp::Open()
 		
 		//Init RenderDevice
 		Render::RenderDevice::Instance()->Initialize();
-
+		
 		//Init resize callback for renderdevice.
 		//Do this before setting window size.
 		this->window->SetWindowResizeFunction([this](int32 x, int32 y)
@@ -168,7 +170,6 @@ ExampleApp::Run()
 		//This polls for events
 		this->window->Update();
 		
-		btAlignedObjectArray<btCollisionShape*> collisionShapes;
 
 
 		//Render the scene

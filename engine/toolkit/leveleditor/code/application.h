@@ -16,7 +16,7 @@
 #include "render/graphics/camera.h"
 #include "application/basegamefeature/keyhandler.h"
 #include "physics/basecollider.h"
-#include <physics/surfacecollider.h>
+#include <physics/convexhullcollider.h>
 #include <physics/rigidbody.h>
 #include <physics/physicsserver.h>
 //#include <application/game/staticentity.h>

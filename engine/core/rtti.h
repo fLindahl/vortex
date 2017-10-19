@@ -45,6 +45,8 @@ public:
     int GetInstanceSize() const;
     /// create an object of this class
     RefCounted* Create() const;
+	/// return true if this rtti is equal or derived from to other rtti
+	bool IsDerivedFrom(const Rtti* other) const;
     /// return true if this rtti is equal or derived from to other rtti
     bool IsDerivedFrom(const Rtti& other) const;
     /// return true if this rtti is equal or derived from to other rtti, by string

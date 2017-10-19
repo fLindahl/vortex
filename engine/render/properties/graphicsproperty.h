@@ -2,8 +2,7 @@
 #include "core/refcounted.h"
 #include <memory>
 #include "foundation/math/bbox.h"
-#include "physics/surfacecollider.h"
-#include "physics/rigidbody.h"
+#include "application/game/baseproperty.h"
 #include "foundation/math/matrix4.h"
 #include "foundation/math/vector4.h"
 #include "rendermessages.h"
