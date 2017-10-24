@@ -21,6 +21,7 @@ namespace Property
 		void Activate();
 		void Deactivate();
 
+		Math::vector GetSize() const;
 		void SetSize(const Math::vector& halfextents);
 
 		void Serialize(IO::Stream* stream);

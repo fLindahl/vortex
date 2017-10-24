@@ -14,6 +14,7 @@ RigidBody::RigidBody() :
 	initialized(false),
 	body(nullptr),
 	registered(false),
+	isStatic(false),
 	mass(1.0f)
 {
 
@@ -27,7 +28,7 @@ RigidBody::~RigidBody()
 	}
 }
 
-bool RigidBody::Initialize()
+bool RigidBody::Initialize(const Math::mat4& startTransform)
 {
 	if (this->initialized)
 		return true;
@@ -39,32 +40,46 @@ bool RigidBody::Initialize()
 	}
 
 	_assert2(this->body == nullptr, "btRigidBody has been instantiated but not initialized! Make sure you aren't creating a btRigidBody by not calling Initialize!");
-
-	btTransform startTransform;
-	startTransform.setIdentity();
-
+	
 	//rigidbody is dynamic if and only if mass is non zero, otherwise static
-	bool isDynamic = (this->mass != 0.f);
+	bool staticBody = (this->mass == 0.f) || this->isStatic;
+
+	float m = this->mass;
 
 	btVector3 localInertia(0, 0, 0);
-	if (isDynamic)
+	if (!staticBody)
+	{
 		this->collider->GetBtCollisionShape()->calculateLocalInertia(mass, localInertia);
+	}
+	else
+	{
+		m = 0.0f;
+	}
 
-	//startTransform.setOrigin(btVector3(2, 10, 0));
-
+	//Remove the scale since this is handled by local scale in bullet
+	Math::mat4 t = startTransform;
+	Math::vec4 scale;
+	t.get_scale(scale);
+	t.scale(Math::vec4(1 / scale.x(), 1 / scale.y(), 1 / scale.z(), 1));
+	
 	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-	this->motionState = new btDefaultMotionState(startTransform);
-	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, this->collider->GetBtCollisionShape(), localInertia);
+	this->motionState = new btDefaultMotionState(Vortex2BtTransform(t));
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(m, motionState, this->collider->GetBtCollisionShape(), localInertia);
 	
 	this->body = new btRigidBody(rbInfo);
 
 	this->initialized = true;
+
+	this->collider->btCollObject = this->body;
+
+	Physics::PhysicsDevice::Instance()->AddRigidBody(this);
 
 	return true;
 }
 
 bool RigidBody::Uninitialize()
 {
+	
 	if (!this->initialized)
 		return true;
 
@@ -85,10 +100,20 @@ bool RigidBody::Uninitialize()
 
 void RigidBody::SetMass(float m)
 {
-	_assert(m < 0.0f);
+	_assert(m >= 0.0f);
 
 	this->mass = m;	
 	this->ReloadBtRigidBody();
+}
+
+bool RigidBody::IsStatic() const
+{
+	return this->isStatic;
+}
+
+void RigidBody::SetStatic(bool val)
+{
+	this->isStatic = val;
 }
 
 float RigidBody::GetMass() const
@@ -105,8 +130,9 @@ void RigidBody::SetCollider(const Ptr<BaseCollider>& collider)
 
 	if (initialized)
 	{
+		Math::mat4 t = Bt2VortexTransform(this->body->getWorldTransform());
 		this->Uninitialize();
-		this->Initialize();
+		this->Initialize(t);
 	}
 
 	if (reg)

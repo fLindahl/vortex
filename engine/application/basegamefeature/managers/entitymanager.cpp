@@ -46,14 +46,16 @@ void EntityManager::Update()
 		for (std::unordered_map<int, Ptr<Game::Entity>>::iterator it = EntityList.begin(); it != EntityList.end(); it++)
 		{
 			Ptr<Game::Entity> entity = it->second;
-			entity->FixedUpdate();
+			if (entity->IsActive())
+				entity->FixedUpdate();
 		}
 	}
 	
 	for (std::unordered_map<int, Ptr<Game::Entity>>::iterator it = this->EntityList.begin(); it != EntityList.end(); it++)
 	{
 		Ptr<Game::Entity> entity = it->second;
-		entity->Update();
+		if(entity->IsActive())
+			entity->Update();
 	}
 
 	lastTime = currentTime;

@@ -29,13 +29,24 @@ namespace Property
 	void Collider::Activate()
 	{
 		BaseProperty::Activate();
+
+		//this->collider->SetBTUserPointer(this->owner);
+
+		const Ptr<Property::Rigidbody>& rigidbody = this->owner->FindProperty<Property::Rigidbody>();
+
+		//If no rigidbody is attached to the entity, we register it as a static collision object instead.
+		if (!rigidbody.isvalid())
+		{
+			this->collider->InitializeStaticObject(this->owner->GetTransform());
+		}
 	}
 
 	void Collider::Deactivate()
 	{
 		if (this->active)
 		{
-			Physics::PhysicsServer::Instance()->RemoveStaticEntity(this);
+			//Uninitialize if static. This will do nothing if the object is not registered.
+			this->collider->UninitializeStaticObject();
 			BaseProperty::Deactivate();
 		}
 	}

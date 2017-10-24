@@ -129,6 +129,7 @@ Application::Run()
 	//entity->Activate();
 
 	Ptr<Game::Entity> physicsEntity = Game::Entity::Create();
+	physicsEntity->SetStatic(false);
 	Ptr<Property::BoxCollider> collider = Property::BoxCollider::Create();
 	physicsEntity->AddProperty(collider.upcast<Game::BaseProperty>());
 	Ptr<Property::Rigidbody> rbp = Property::Rigidbody::Create();
@@ -136,19 +137,19 @@ Application::Run()
 	Ptr<Render::GraphicsProperty> gProperty2 = Render::GraphicsProperty::Create();
 	physicsEntity->AddProperty(gProperty2.upcast<Game::BaseProperty>());
 	gProperty2->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
-	physicsEntity->SetTransform(Math::mat4::translation(0, 0.0f, -3));	
+	physicsEntity->SetTransform(Math::mat4::translation(0, 1.0f, -3));	
 	physicsEntity->Activate();
 
 	Ptr<Game::Entity> physicsEntity2 = Game::Entity::Create();
 	Ptr<Property::BoxCollider> collider2 = Property::BoxCollider::Create();
-	collider2->SetSize(Math::vector(20, 0.5f, 20));
+	collider2->SetSize(Math::vector(20, 1.0f, 20));
 	physicsEntity2->AddProperty(collider2.upcast<Game::BaseProperty>());
 	Ptr<Render::GraphicsProperty> gProperty3 = Render::GraphicsProperty::Create();
 	physicsEntity2->AddProperty(gProperty3.upcast<Game::BaseProperty>());
 	gProperty3->setModelInstance(ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl"));
 
+	physicsEntity2->SetTransform(Math::mat4::multiply(Math::mat4::scaling(20, 1.0f, 20), Math::mat4::translation(0, -2.0f, 0)));
 	physicsEntity2->Activate();
-	physicsEntity2->SetTransform(Math::mat4::multiply(Math::mat4::translation(0, -2.0f, 0), Math::mat4::scaling(20, 0.5f, 20)));
 
 
 
@@ -162,8 +163,8 @@ Application::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
        	
-		if (ImGui::GetIO().MouseClicked[1])
-			Physics::PhysicsDevice::Instance()->StepSimulation(1.f / 10.f);
+		//if (ImGui::GetIO().MouseClicked[1])
+			Physics::PhysicsDevice::Instance()->StepSimulation(1.f / 60.f);
 
 		//for (auto line : Physics::PhysicsDevice::Instance()->visualDebug)
 		//	Debug::DebugRenderer::Instance()->DrawLine(line.start(),line.end(),1.0f,Math::vec4(1,0,0,1),Math::vec4(1,0,0,0.1f), Debug::RenderMode::AlwaysOnTop);

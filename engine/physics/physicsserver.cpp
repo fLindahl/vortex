@@ -7,6 +7,9 @@
 #include "render/server/resourceserver.h"
 #include "physics/colliderproperty.h"
 #include "btBulletDynamicsCommon.h"
+#include "physicsdevice.h"
+#include "bulletvortexconversion.h"
+#include "raycallbacks.h"
 
 namespace Physics
 {
@@ -15,7 +18,7 @@ PhysicsServer::PhysicsServer()
 	
 }
 
-/*
+
 bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const Math::vec4 &direction, const float& length)
 {
 	//Create line from position, in length * direction
@@ -25,58 +28,44 @@ bool PhysicsServer::Raycast(PhysicsHit& out, const Math::vec4 &position, const M
 
 bool PhysicsServer::Raycast(PhysicsHit& out, const Math::line& ray)
 {
-    Math::plane plane;
-    Math::vec4 planeHit;
-
-    Math::point a;
-    Math::point b;
-    Math::point c;
-    Math::point d;
-
-    bool contact = false;
-    //t = 1.0f is the furthest we can hit something
-    float closestDistance = 1.0f;
-    // distance is between 0.0f -> 1.0f
-    float distance;
-
-    //for each object, check bbox for collision
-    for (auto& entity : this->physicsEntities)
-    {
-		if(ray.IntersectAABB(entity.property->GetOwner()->GetBBox()))
-        {
-			//TODO: This needs to be different per collider type!
-            Util::Array<Physics::ColliderFace>& faces = entity.property.downcast<Property::Collider>()->GetCollider()->GetFaceList();
-
-            Math::line modelSpaceRay = ray;
-            Math::mat4 invModel = Math::mat4::inverse(entity.property->GetOwner()->GetTransform());
-            modelSpaceRay.transform(invModel);
-
-            for (auto face : faces)
-            {
-                plane.constructFromPoints(face.p0, face.p1, face.p2);
-                if(modelSpaceRay.Intersect(planeHit, plane))
-                {
-                    if(isPointWithinBounds(planeHit, face.p0,face.p1,face.p2, plane.n()))
-                    {
-                        distance = planeHit.w();
-                        if(distance <= closestDistance)
-                        {
-                            closestDistance = distance;
-                            planeHit.w() = 1.0f;
-                            out.point = Math::mat4::transform(planeHit, entity.property->GetOwner()->GetTransform());
-                            out.surfaceNormal = Math::mat4::transform(plane.n(), Math::mat4::transpose(invModel));
-                            out.object = entity.property->GetOwner();
-                            contact = true;
-                        }
-                    }
-                }
-            }
-        }
-    }
+	// setup filter
+	short int filter = btBroadphaseProxy::AllFilter;
+	/*
+	short int excludes = excludeSet.GetCollideBits();
+	filter &= ~excludes;
+	*/
+	btDiscreteDynamicsWorld *world = PhysicsDevice::Instance()->dynamicsWorld;
 	
-	return contact;
+	_assert(world);
+
+	btVector3 fromBt = Vortex2BtVector3(ray.start());
+	btVector3 toBt = Vortex2BtVector3(ray.end());
+	/*
+	BulletClosestRayResultCallback cb(fromBt, toBt, excludeSet);
+	cb.m_collisionFilterMask = filter;
+	cb.m_collisionFilterGroup = btBroadphaseProxy::AllFilter;
+	world->rayTest(fromBt, toBt, cb);
+	if (cb.hasHit())
+	{
+		Math::vector v = Bt2NebVector(cb.m_hitPointWorld);
+		Math::vector n = Bt2NebVector(cb.m_hitNormalWorld);
+		Ptr<Contact> p = Contact::Create();
+		p->SetPoint(v);
+		p->SetNormalVector(n);
+		p->SetType(Contact::RayCheck);
+		PhysicsObject * obj = (PhysicsObject*)cb.m_collisionObject->getUserPointer();
+		if (obj)
+		{
+			PhysicsUserData *user = obj->GetUserData();
+			if (user)
+				p->SetCollisionObject(user->physicsObject);
+		}
+		points.Append(p);
+	}
+	*/
+	return false;
 }
-*/
+
 
 bool PhysicsServer::isPointWithinBounds(const Math::point& p,
                                         const Math::point& a,

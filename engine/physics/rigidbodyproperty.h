@@ -55,6 +55,7 @@ namespace Property
 		float GetMass() const;
 		
 	private:
+		
 		///This entity won't be affected by physics forces but is still affected by collisions
 		bool isKinematic;
 		///This makes the rigidbody only collide with static objects. This is a lot less precise than "non-debris" physics and therefor less expensive.

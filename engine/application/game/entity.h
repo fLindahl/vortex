@@ -71,11 +71,18 @@ public:
 	const Math::bbox& GetBaseBBox() { return *this->baseBBox; }
 	void SetBaseBBox(const Math::bbox* box);
 
+	///Get for isStatic
+	bool IsStatic() const;
+	void SetStatic(bool value);
+
 	const bool& IsActive() const;
 
 protected:
 	///Set to true when Activate is called. Set to false when Deactivat is called.
 	bool active = false;
+
+	///Entity is static and is not affected by gravity nor collisions. This is a classic static entity.
+	bool isStatic;
 
 	///This entitys transform
     Math::mat4 transform;

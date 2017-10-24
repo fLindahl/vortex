@@ -3,6 +3,7 @@
 #include "foundation/util/array.h"
 #include "foundation/math/bbox.h"
 
+class btCollisionObject;
 class btCollisionShape;
 
 namespace Physics
@@ -40,10 +41,21 @@ public:
 	void SetShape(const ColliderShape& s);
 	ColliderShape GetShape();
 
+	void InitializeStaticObject(const Math::mat4& startTransform);
+	void UninitializeStaticObject();
+
 protected:
+	friend class PhysicsDevice;
+	friend class RigidBody;
+
+	//void SetBTUserPointer(const Ptr<Property::Collider>& p);
+
+	bool initializedStatic;
+
 	ColliderShape shape;
 
 	btCollisionShape* btCollider;
+	btCollisionObject* btCollObject;
 };
 
 }

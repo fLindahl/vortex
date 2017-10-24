@@ -24,6 +24,7 @@ SET(files_physics_physics
 	colliderproperty.h
 	colliderproperty.cpp
 	bulletvortexconversion.h
+	raycallbacks.h
 
 	)
 

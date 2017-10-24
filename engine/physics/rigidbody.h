@@ -23,13 +23,16 @@ public:
     RigidBody();
     ~RigidBody();
 	
-	bool Initialize();
+	bool Initialize(const Math::mat4& startTransform);
 	bool Uninitialize();
 		
 	/**	Change the mass of the rigidbody.
 		If the body is activated, this will deactivate it and re-initialize + re-activate it with the new mass.
 		@note	This might perform badly since we seem to need to re-initialize the entire rigidbody. */
 	void SetMass(float m);
+
+	bool IsStatic() const;
+	void SetStatic(bool val);
 
 	///Returns this rigidbody's mass.
 	float GetMass() const;
@@ -55,6 +58,7 @@ private:
 	friend class PhysicsDevice;
 
 	bool initialized;
+	bool isStatic;
 	bool registered;
 
 	float mass;

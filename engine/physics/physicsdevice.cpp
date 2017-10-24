@@ -60,4 +60,31 @@ void PhysicsDevice::RemoveRigidBody(Ptr<RigidBody> rBody)
 	}
 }
 
+void PhysicsDevice::AddStaticObject(Ptr<BaseCollider> collider)
+{
+	auto it = this->staticObjects.Find(collider);
+	if (it == nullptr)
+	{
+		this->staticObjects.Append(collider);
+		dynamicsWorld->addCollisionObject(collider->btCollObject, short(btBroadphaseProxy::StaticFilter));
+	}
+	else
+	{
+		printf("WARNING: Rigidbody already added to PhysicsDevice!\n");
+	}
+}
+
+void PhysicsDevice::RemoveStaticObject(Ptr<BaseCollider> collider)
+{
+	auto it = this->staticObjects.Find(collider);
+	if (it != nullptr)
+	{
+		//Erase and move last element to this position.
+		//Destroys sorting!
+		this->staticObjects.RemoveSwap(it);
+		dynamicsWorld->removeCollisionObject(collider->btCollObject);
+		
+	}
+}
+
 }

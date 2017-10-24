@@ -3,6 +3,7 @@
 #include "../inspectors/baseinspector.h"
 #include "../inspectors/graphicspropertyinspector.h"
 #include "../inspectors/rigidbodyinspector.h"
+#include "../inspectors/boxcolliderinspector.h"
 
 namespace Interface
 {
@@ -24,6 +25,7 @@ namespace Interface
 
 		LevelEditor::GraphicsPropertyInspector* graphicsPropertyInspector;
 		LevelEditor::RigidbodyInspector* rigidbodyInspector;
+		LevelEditor::BoxColliderInspector* boxColliderInspector;
 
 		Util::Array<LevelEditor::BaseInspector*> inspectors;
 

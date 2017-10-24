@@ -38,7 +38,7 @@ namespace LevelEditor
 		ImGui::NextColumn();
 		ImGui::AlignFirstTextHeightToWidgets();
 		// Here we use a Selectable (instead of Text) to highlight on hover
-		ImGui::Bullet();
+		//ImGui::Bullet();
 		ImGui::Selectable(variableName);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);

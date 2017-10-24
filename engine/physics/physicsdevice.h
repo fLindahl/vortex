@@ -38,6 +38,9 @@ public:
 
     void AddRigidBody(Ptr<RigidBody> rBody);
 	void RemoveRigidBody(Ptr<RigidBody> rBody);
+
+	void AddStaticObject(Ptr<BaseCollider> collider);
+	void RemoveStaticObject(Ptr<BaseCollider> collider);
 	
 	btDefaultCollisionConfiguration* collisionConfiguration;
 
@@ -54,7 +57,8 @@ public:
 
 
 private:
-    Util::Array<Ptr<RigidBody>> rigidBodies;
+	Util::Array<Ptr<RigidBody>> rigidBodies;
+	Util::Array<Ptr<BaseCollider>> staticObjects;
 
 	
 

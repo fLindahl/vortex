@@ -22,37 +22,50 @@ namespace LevelEditor
             return;
         }
 		
-        BeginAttribute("Kinematic", "If set to true, this entity will\nnot be affected external forces such as gravity\nor collisions but will still won't pass through\ncolliders when translated.");
+		bool isStatic = this->property->GetOwner()->IsStatic();
+
+		if (isStatic)
 		{
-			bool isKinematic = this->property->IsKinematic();
-
-			if (ImGui::Checkbox("##isKinematic", &isKinematic))
+			BeginAttribute("Rigidbody is static", "A collider needs a rigidbody to be able to collide with other entities.\nNote: A static entity cannot have a dynamic rigidbody. Change the entity to\na non-static entity to have a dynamic rigidbody.");
 			{
-				this->property->SetKinematic(isKinematic);
-			}
-		}
-		EndAttribute();
 
-		BeginAttribute("Is Debris?", "If set to true, this entity will\nonly collide with static entites and use a less expensive\nintegration method for physics calculations.");
+			}
+			EndAttribute();
+		}
+		else
 		{
-			bool isDebris = this->property->IsDebris();
-
-			if (ImGui::Checkbox("##isDebris", &isDebris))
+			BeginAttribute("Kinematic", "If set to true, this entity will\nnot be affected external forces such as gravity\n but will still won't pass through\ncolliders when translated.");
 			{
-				this->property->SetIsDebris(isDebris);
+				bool isKinematic = this->property->IsKinematic();
+
+				if (ImGui::Checkbox("##isKinematic", &isKinematic))
+				{
+					this->property->SetKinematic(isKinematic);
+				}
 			}
+			EndAttribute();
+
+			BeginAttribute("Is Debris?", "If set to true, this entity will\nonly collide with static entites and use a less expensive\nintegration method for physics calculations.");
+			{
+				bool isDebris = this->property->IsDebris();
+
+				if (ImGui::Checkbox("##isDebris", &isDebris))
+				{
+					this->property->SetIsDebris(isDebris);
+				}
+			}
+			EndAttribute();
+
+			BeginAttribute("Mass");
+			{
+				static float var = this->property->GetMass();
+				if (ImGui::InputFloat("##floatP", &var, 0.05f))
+				{
+					this->property->SetMass(var);
+				}
+			}
+			EndAttribute();
 		}
-		EndAttribute();
-
-        BeginAttribute("Mass");
-        {
-            static float var = this->property->GetMass();
-			if (ImGui::InputFloat("##floatP", &var, 0.05f))
-			{
-				this->property->SetMass(var);
-			}
-        }
-        EndAttribute();
 
     }
 

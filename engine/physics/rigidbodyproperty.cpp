@@ -29,7 +29,8 @@ namespace Property
 			return;
 
 		//TODO: This should be a message, sent by the rigidbody
-		this->owner->SetTransform(this->rigidBody->GetStateTransform());
+		if(!this->owner->IsStatic() && this->rigidBody->IsInitialized())
+			this->owner->SetTransform(this->rigidBody->GetStateTransform());
 		
 		this->Game::BaseProperty::Update();
 	}
@@ -41,12 +42,19 @@ namespace Property
 			if (!this->rigidBody->IsInitialized())
 			{
 				// Make sure this entity has a colliderproperty of some kind since we need it to initialize our rigidbody.
-				const Ptr<Collider>& collider = this->owner->FindProperty<Property::Collider>();
+				const Ptr<Property::Collider>& collider = this->owner->FindProperty<Property::Collider>();
 				
 				if (collider.isvalid())
 				{
+					if (!collider->IsActive())
+					{
+						//Collider needs to be activated before the rigidbody.
+						collider->Activate();
+					}
+
+					this->rigidBody->SetStatic(this->owner->IsStatic());
 					this->rigidBody->SetCollider(collider->GetCollider());
-					this->rigidBody->Initialize();
+					this->rigidBody->Initialize(this->owner->GetTransform());
 				}
 				else
 				{
@@ -56,7 +64,6 @@ namespace Property
 
 			if (this->rigidBody->IsInitialized())
 			{
-				Physics::PhysicsDevice::Instance()->AddRigidBody(this->rigidBody);
 				Physics::PhysicsServer::Instance()->AddDynamicEntity(this);
 			}
 			else
@@ -74,7 +81,7 @@ namespace Property
 		{
 			if (this->rigidBody->IsInitialized())
 			{
-				Physics::PhysicsDevice::Instance()->RemoveRigidBody(this->rigidBody);
+				this->rigidBody->Uninitialize();
 				Physics::PhysicsServer::Instance()->RemoveDynamicEntity(this);
 			}
 			BaseProperty::Deactivate();

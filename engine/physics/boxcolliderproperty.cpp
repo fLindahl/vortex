@@ -26,6 +26,11 @@ namespace Property
 		Collider::Activate();
 	}
 
+	Math::vector BoxCollider::GetSize() const
+	{
+		return this->collider.cast<Physics::BoxCollider>()->GetSize();
+	}
+
 	void BoxCollider::SetSize(const Math::vector& halfextents)
 	{
 		this->collider.cast<Physics::BoxCollider>()->SetSize(halfextents);

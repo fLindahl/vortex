@@ -22,6 +22,9 @@ namespace Interface
 		this->rigidbodyInspector = new LevelEditor::RigidbodyInspector();
 		this->inspectors.Append(this->rigidbodyInspector);
 		//-----
+		this->boxColliderInspector = new LevelEditor::BoxColliderInspector();
+		this->inspectors.Append(this->boxColliderInspector);
+		//-----
 
 	}
 
@@ -49,15 +52,24 @@ namespace Interface
 			if(ImGui::Checkbox("##EntityEnabled", &enabled))
 			{
 				//TODO: 
-				//if (selectedEntity->IsActive())
-				//	selectedEntity->Deactivate();
-				//else
-				//	selectedEntity->Activate();
+				/*
+				if (selectedEntity->IsActive())
+					selectedEntity->Deactivate();
+				else
+					selectedEntity->Activate();
+				*/
 			}
-
+			
 			//Name on the same line as checkbox
 			ImGui::SameLine();
 			ImGui::InputText("##EntityName", name, 128);
+			
+			bool isStatic = selectedEntity->IsStatic();
+			if (ImGui::Checkbox("Static", &isStatic))
+			{
+				selectedEntity->SetStatic(isStatic);
+			}
+
 			ImGui::Separator();
 			ImGui::NewLine();
 			if (ImGui::Button("Add Property..."))
@@ -240,6 +252,10 @@ namespace Interface
 		{
 			this->currentInspector = rigidbodyInspector;
 		}
+		else if (property->IsA(Property::BoxCollider::RTTI))
+		{
+			this->currentInspector = boxColliderInspector;
+		}
 		else
 		{
 			Util::String msg;
@@ -286,7 +302,10 @@ namespace Interface
 						selectedEntity->AddProperty(property);
 						if (selectedEntity->IsActive())
 						{
-							property->Activate();
+							//property->Activate();
+							//Reactivate entity so that all properties can react to the new one.
+							selectedEntity->Deactivate();
+							selectedEntity->Activate();
 						}
 					}
 					else

@@ -6,7 +6,8 @@ namespace Game
 {
 __ImplementClass(Game::Entity, 'NTTY', Core::RefCounted);
 
-Entity::Entity()
+Entity::Entity() :
+	isStatic(true)
 {
 	//Create graphics object and add it to graphicsserver.
 	//this->graphics = std::make_shared<Render::GraphicsProperty>(this);
@@ -144,6 +145,16 @@ void Entity::UpdateBBox()
 
 	this->bbox = *this->baseBBox;
 	this->bbox.transform(this->transform);
+}
+
+bool Entity::IsStatic() const
+{
+	return this->isStatic;
+}
+
+void Entity::SetStatic(bool value)
+{
+	this->isStatic = value;
 }
 
 }
