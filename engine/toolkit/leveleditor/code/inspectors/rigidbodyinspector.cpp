@@ -73,6 +73,8 @@ namespace LevelEditor
     {
         if(this->property == nullptr)
             return;
+
+
     }
 
     void RigidbodyInspector::SetProperty(const Ptr<Game::BaseProperty>& property)

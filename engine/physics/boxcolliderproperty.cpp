@@ -26,6 +26,11 @@ namespace Property
 		Collider::Activate();
 	}
 
+	void BoxCollider::Deactivate() 
+	{
+		Collider::Deactivate();
+	}
+
 	Math::vector BoxCollider::GetSize() const
 	{
 		return this->collider.cast<Physics::BoxCollider>()->GetSize();
@@ -35,12 +40,7 @@ namespace Property
 	{
 		this->collider.cast<Physics::BoxCollider>()->SetSize(halfextents);
 	}
-
-	void BoxCollider::Deactivate()
-	{
-
-	}
-
+	
 	void BoxCollider::Serialize(IO::Stream * stream)
 	{
 

@@ -93,7 +93,8 @@ namespace Property
 		//Handle set transform message
 		if (msg->GetType() == Msg::SetTransform::Type)
 		{
-			//this->rigidBody->SetStateTransform(msg.cast<Msg::SetTransform>()->Get());
+			if(this->rigidBody->IsInitialized())
+				this->rigidBody->SetStateTransform(msg.cast<Msg::SetTransform>()->Get());
 		}
 		else if (msg->GetType() == Msg::SetMesh::Type)
 		{
@@ -108,12 +109,12 @@ namespace Property
 
 	bool Rigidbody::IsKinematic() const
 	{
-		return this->isKinematic;
+		return this->rigidBody->IsKinematic();
 	}
 
 	void Rigidbody::SetKinematic(bool value)
 	{
-		this->isKinematic = value;
+		this->rigidBody->SetKinematic(value);
 	}
 
 	bool Rigidbody::IsDebris() const

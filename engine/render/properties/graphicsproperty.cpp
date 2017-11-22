@@ -76,7 +76,7 @@ void GraphicsProperty::SetCastShadows(const bool & value)
 	this->castShadows = value;
 }
 
-void GraphicsProperty::Update()
+void GraphicsProperty::Update()	
 {
 	this->Game::BaseProperty::Update();
 }

@@ -34,6 +34,9 @@ public:
 	bool IsStatic() const;
 	void SetStatic(bool val);
 
+	void SetKinematic(bool val);
+	bool IsKinematic() const;
+
 	///Returns this rigidbody's mass.
 	float GetMass() const;
 
@@ -59,6 +62,7 @@ private:
 
 	bool initialized;
 	bool isStatic;
+	bool isKinematic;
 	bool registered;
 
 	float mass;

@@ -112,6 +112,13 @@ void Entity::Activate()
 void Entity::Deactivate()
 {
 	BaseGameFeature::EntityManager::Instance()->UnregisterEntity(this->ID);
+
+	for (auto& property : this->properties)
+	{
+		if (property->active)
+			property->Deactivate();
+	}
+
 	this->active = false;
 }
 

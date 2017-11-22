@@ -15,6 +15,7 @@ RigidBody::RigidBody() :
 	body(nullptr),
 	registered(false),
 	isStatic(false),
+	isKinematic(false),
 	mass(1.0f)
 {
 
@@ -114,6 +115,16 @@ bool RigidBody::IsStatic() const
 void RigidBody::SetStatic(bool val)
 {
 	this->isStatic = val;
+}
+
+void RigidBody::SetKinematic(bool val)
+{
+	this->isKinematic = val;
+}
+
+bool RigidBody::IsKinematic() const
+{
+	return false;
 }
 
 float RigidBody::GetMass() const

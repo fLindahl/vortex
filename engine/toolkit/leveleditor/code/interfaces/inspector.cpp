@@ -68,6 +68,11 @@ namespace Interface
 			if (ImGui::Checkbox("Static", &isStatic))
 			{
 				selectedEntity->SetStatic(isStatic);
+				if (enabled)
+				{
+					selectedEntity->Deactivate();
+					selectedEntity->Activate();
+				}
 			}
 
 			ImGui::Separator();
@@ -98,6 +103,21 @@ namespace Interface
 					// Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
 					ImGui::AlignFirstTextHeightToWidgets();
 					bool node_open = ImGui::TreeNode("Object", "%s", this->currentInspector->GetName().AsCharPtr(), uid);
+					ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 50);
+					
+					if (ImGui::Button("Remove"))
+					{
+						if (enabled)
+							selectedEntity->Deactivate();
+
+						selectedEntity->RemoveProperty(property);
+
+						if (enabled)
+							selectedEntity->Activate();
+
+						ImGui::PopID();
+						break;
+					}
 					ImGui::Columns(2);
 					ImGui::NextColumn();
 					if (node_open)
@@ -241,7 +261,7 @@ namespace Interface
 			*/
 		}
 	}
-
+	
 	bool Inspector::SetCurrentPropertyInspector(Ptr<Game::BaseProperty>& property)
 	{
 		if (property->IsA(Render::GraphicsProperty::RTTI))
