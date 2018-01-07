@@ -1,4 +1,5 @@
 #include "config.h"
+#include "application/game/entity.h"
 #include "graphicsproperty.h"
 #include "render/resources/meshresource.h"
 #include "render/resources/modelinstance.h"

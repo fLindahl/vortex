@@ -1,4 +1,5 @@
 #include "config.h"
+#include "application/game/entity.h"
 #include "render/server/frameserver.h"
 #include "pickingpass.h"
 #include "render/resources/material.h"

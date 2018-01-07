@@ -13,7 +13,7 @@
 #include "core/ptr.h"
 #include "core/refcounted.h"
 #include "core/singleton.h"
-#include "io/console.h"
+#include "IO/console.h"
 #include "foundation/util/string.h"
 
 //------------------------------------------------------------------------------

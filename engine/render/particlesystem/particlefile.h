@@ -2,6 +2,7 @@
 #include "tinyxml2.h"
 #include <string>
 #include "application/properties/particleemitter.h"
+#include <unordered_map>
 
 #ifndef XMLCheckResult
 #define XMLCheckResult(a_eResult) if (a_eResult != XML_SUCCESS) { printf("Error: %i\n", a_eResult); return false; }

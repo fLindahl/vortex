@@ -16,7 +16,7 @@ namespace Msg
 		SetMesh();
 		~SetMesh();
 
-		void Set(Ptr<Render::MeshResource>& t);
+		void Set(const Ptr<Render::MeshResource>& t);
 		const Ptr<Render::MeshResource>& Get() const;
 
 	private:

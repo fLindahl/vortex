@@ -1,4 +1,5 @@
 #include "config.h"
+#include "application/game/entity.h"
 #include "particleemitter.h"
 #include "render/properties/graphicsproperty.h"
 #include "render/server/resourceserver.h"

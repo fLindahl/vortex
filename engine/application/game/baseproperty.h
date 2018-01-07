@@ -1,7 +1,7 @@
 #pragma once
 #include "core/refcounted.h"
 #include "foundation/messaging/messagehandler.h"
-#include "entity.h"
+// #include "entity.h"
 #include "IO/serialization.h"
 
 //---------------------------------------
@@ -12,6 +12,7 @@
 */	
 namespace Game
 {
+class Entity;
 
 class BaseProperty : public Core::RefCounted
 {
@@ -31,7 +32,7 @@ public:
 	///Override in subclass. Call this function with you favorite stream write/reader.
 	virtual void Serialize(IO::Stream* serializer);
 
-	const Ptr<Entity>& GetOwner() { return this->owner; }
+	const Entity* GetOwner() const;
 
 	bool IsActive() const { return this->active; }
 
@@ -40,11 +41,12 @@ protected:
     friend class Entity;
 
 	///Sets the owner of this property
-	void SetOwner(Ptr<Entity> o) { this->owner = o; }
+	void SetOwner(Entity* o);
 	
 
 	///The owner entity of this property
-    Ptr<Entity> owner;	
+	///@note	This is an unsafe pointer.	
+    Entity* owner;	
 };
 
 }

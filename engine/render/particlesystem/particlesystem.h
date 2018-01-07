@@ -122,7 +122,7 @@ public:
 	GLuint GetParticleBuffer() const { return particleBuffer; }
 	GLuint GetParticleStartBuffer() const { return particleStartBuffer; }
 	Util::Array<Game::ParticleEmitter*>& GetParticleEmitters(){ return this->emitters; }
-	Ptr<Render::MeshResource> GetMesh() const { return this->mesh; }
+	const Ptr<Render::MeshResource>& GetMesh() const { return this->mesh; }
 	Ptr<Render::ShaderObject> GetParticleShaderObject();
 
 private:

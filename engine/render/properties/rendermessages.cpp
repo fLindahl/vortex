@@ -15,7 +15,7 @@ namespace Msg
 	{
 	}
 
-	void SetMesh::Set(Ptr<Render::MeshResource>& t)
+	void SetMesh::Set(const Ptr<Render::MeshResource>& t)
 	{
 		this->mesh = t;
 	}

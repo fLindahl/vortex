@@ -27,27 +27,42 @@ namespace Netcode
 		SocketHandler();
 		SocketHandler(const int sock);
 		~SocketHandler();
+		
+		/// Starts the socket
+		bool initSocket();
 
-		///Starts the socket
-		bool initSocket(std::string ipaddress);
+		/// Try to connect to a socket
+		bool socketConnect(const std::string& ipaddress);
 
-		///Listens for connections
-		bool socketListen();
+		/// Listens for connections
+		bool socketListen(const std::string& ipaddress);
 
-		///Closes the socket
-		void closesocket();
+		/// Closes the socket
+		void close();
+
+		/// Sends a buffer via socket.
 		bool sendData(const char* buffer, size_t size);
-		char* recieveData();
-		int& getSocket();
-		int getBufLength();
 
+		/// Checks if there's any data to read and returns any data avaliable.
+		char* read();
+
+		/// Returns the socket handle.
+		const int& getSocket() const;
+
+		/// Returns number of available bytes
+		int bytesAvailable();
+
+		/// Initializes RC4 encryption.
 		void InitRC4();
+
+		/// Encrypts or decrypts buffer based on RCState.
 		std::string CryptRC4(RCState& state, const char* in, const int& length);
 
+
+	private:
 		RCState RC4_SEND;
 		RCState RC4_RECIEVE;
 
-	private:
 		int mSocket;
 		char recvbuf[DEFAULT_BUFLEN];
 		int bufLength;
@@ -64,7 +79,4 @@ namespace Netcode
 		int iResult;
 
 	};
-
-
-	
 }

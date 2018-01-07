@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <thread>
 
 namespace Netcode
 {
@@ -23,19 +24,52 @@ namespace Netcode
 
 	SocketHandler::~SocketHandler()
 	{
-	    this->closesocket();
+	    this->close();
 	}
 
-	bool SocketHandler::initSocket(std::string ipaddress)
+	bool SocketHandler::initSocket()
 	{		
-		struct sockaddr_in serv_addr;
 		int n;
 		mSocket = socket(AF_INET, SOCK_STREAM, 0);
 		if(mSocket < 0)
 		{
-		  _error("Could not create socket!");
+		  _printf("Could not create socket!");
 		  return false;
 		}
+		
+		_printf("Socket Initialized!");
+
+		//Socket is now initialized
+		return true;
+	}
+
+	bool SocketHandler::socketConnect(const std::string& ipaddress)
+	{
+		struct sockaddr_in serv_addr;
+		bzero((char*) &serv_addr, sizeof(serv_addr));
+		
+		//std::string sargv = "192.168.1.72";
+		const char* argv = ipaddress.c_str();
+
+		_printf("Connecting to %s:%s", argv, DEFAULT_PORT);
+		
+		serv_addr.sin_family = AF_INET;
+		serv_addr.sin_addr.s_addr = inet_addr(argv);
+		serv_addr.sin_port = htons(atoi(DEFAULT_PORT));
+
+		if (connect(this->mSocket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+		{
+			_error("ERROR connecting");
+			return false;
+		}
+
+		_printf("Connected!");
+		return true;
+	}
+
+	bool SocketHandler::socketListen(const std::string& ipaddress)
+	{
+		struct sockaddr_in serv_addr;
 		bzero((char*) &serv_addr, sizeof(serv_addr));
 		
 		//std::string sargv = "192.168.1.72";
@@ -46,31 +80,31 @@ namespace Netcode
 		serv_addr.sin_family = AF_INET;
 		serv_addr.sin_addr.s_addr = inet_addr(argv);
 		serv_addr.sin_port = htons(atoi(DEFAULT_PORT));
-		
+
+		// set SO_REUSEADDR on a socket to true (1):
+		int optval = 1;
+		setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+
 		if(bind(mSocket, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) < 0)
 		{
-		  _error("Could not bind socket!");
+		  _printf("Could not bind socket!");
 		  return false;
 		}
 		
-		_printf("Socket Initialized!");
-
-		//Socket is now initialized
-		return true;
-	}
-
-	void SocketHandler::closesocket()
-	{
-		//Shutdown the socket!
-		//iResult = shutdown(this->mSocket, SD_SEND);
-		close(this->mSocket);		
-	}
-
-	bool SocketHandler::socketListen()
-	{
 		listen(mSocket, SOMAXCONN);		
 		return true;
 	}
+
+	void SocketHandler::close()
+	{
+		//Shutdown the socket!
+		if(this->mSocket != -1)
+		{
+			_printf("Thread %ld: Closed socket %i", std::this_thread::get_id() ,this->mSocket);	
+			::close(this->mSocket);
+		}
+	}
+
 
 	bool SocketHandler::sendData(const char* sendbuf, size_t size)
 	{
@@ -88,26 +122,26 @@ namespace Netcode
 		// Send a buffer
 		if (send(this->mSocket, buf, size, 0) == -1)
 		{
-			_warning("Send failed!");
+			_printf("Send failed!");
 			delete[] buf;
-			close(this->mSocket);
+			::close(this->mSocket);
 			return false;
 		}
 		
-		_printf("Bytes Sent: %ld", iResult);
+		_printf("Bytes Sent: %i", iResult);
 		
 		delete[] buf;
 		
 		return true;
 	}
 
-	char* SocketHandler::recieveData()
+	char* SocketHandler::read()
 	{
 		int recvbuflen = DEFAULT_BUFLEN;
 		
 		int iResult = recv(this->mSocket, this->recvbuf, recvbuflen, 0);
 		
-		if (iResult != -1)
+		if (iResult > 0)
 		{
 			_printf("Bytes received: %d", iResult);
 			this->bufLength = iResult;
@@ -120,28 +154,31 @@ namespace Netcode
 
 			return this->recvbuf;
 		}
-		else
+		else if(iResult == -1)
 		{
-			_printf("Connection closed");
-			return NULL;
+			_printf("Connection closed.");
+			//this->closesocket();
 		}
+	
+		return nullptr;
+	
 	}
 
-	int& SocketHandler::getSocket()
+	const int& SocketHandler::getSocket() const
 	{
 		return this->mSocket;
 	}
 
-	int SocketHandler::getBufLength()
+	int SocketHandler::bytesAvailable()
 	{
 		return this->bufLength;
 	}
 
 	void SocketHandler::swap(unsigned char *s, unsigned int i, unsigned int j)
 	{
-		unsigned char temp = s[i];
-		s[i] = s[j];
-		s[j] = temp;
+		s[i] ^= s[j];
+		s[j] ^= s[i];
+		s[i] ^= s[j];
 	}
 
 	void SocketHandler::InitRC4()
@@ -196,6 +233,3 @@ namespace Netcode
 	}
 
 }
-
-
-

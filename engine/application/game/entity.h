@@ -7,16 +7,13 @@
 #include "foundation/math/vector4.h"
 #include "entitymessages.h"
 #include "foundation/math/bbox.h"
-
-namespace Game
-{
-	class BaseProperty;
-}
+#include "baseproperty.h"
 
 #define __SendMsg(OBJ, MSG) OBJ->HandleMessage(MSG.downcast<Messaging::Message>())
 
 namespace Game
 {
+
 class Entity : public Core::RefCounted
 {
 
@@ -94,7 +91,7 @@ protected:
 	///Unique ID for this entity.
 	uint ID;
 
-	///List of all this netitys properties.
+	///List of all this entity's properties.
 	Util::Array<Ptr<Game::BaseProperty>> properties;
 
 private:
@@ -106,7 +103,7 @@ template<class PROPERTY>
 const Ptr<PROPERTY>& Entity::FindProperty() const
 {	
 	Core::Rtti* rtti = &PROPERTY::RTTI;
-	for (int i = 0; i < this->properties.Size(); i++)
+	for (size_t i = 0; i < this->properties.Size(); i++)
 	{
 		Core::Rtti* pRtti = this->properties[i]->GetRtti();
 		//if (pRtti == rtti)
