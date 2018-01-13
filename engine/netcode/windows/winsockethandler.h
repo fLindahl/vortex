@@ -27,20 +27,30 @@ public:
 	SocketHandler();
 	~SocketHandler();
 
-	bool initSocket(const char* ip);
+	bool initSocket();
+
+	bool socketConnect(const std::string& ipaddress);
+
+	bool socketListen(const std::string& ipaddress);
+
 	void close();
+
 	bool sendData(const char* buffer, size_t size);
-	char* recieveData();
+
+	char* read();
+
 	SOCKET getSocket();
-	int getBufLength();
+
+	int bytesAvailable();
 
 	void InitRC4();
+
 	std::string CryptRC4(RCState& state, const char* in, const int& length);
 
+private:
 	RCState RC4_SEND;
 	RCState RC4_RECIEVE;
 
-private:
 	SOCKET ConnectSocket;
 	char recvbuf[DEFAULT_BUFLEN];
 	int bufLength;

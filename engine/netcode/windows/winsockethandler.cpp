@@ -27,7 +27,7 @@ SocketHandler::~SocketHandler()
 //-------------------------------------------------------------------------
 /**
 */
-bool SocketHandler::initSocket(const char* ip)
+bool SocketHandler::initSocket()
 {
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -36,6 +36,12 @@ bool SocketHandler::initSocket(const char* ip)
 		_error("WSAStartup failed: %d", iResult);
 		return false;
 	}
+
+	return true;
+}
+
+bool SocketHandler::socketConnect(const std::string& ipaddress)
+{
 	struct addrinfo *result = NULL, *ptr = NULL, hints;
 
 	ZeroMemory(&hints, sizeof(hints));
@@ -43,10 +49,7 @@ bool SocketHandler::initSocket(const char* ip)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 
-	//std::string sargv = "127.0.0.1";
-	//const char* argv = sargv.c_str();
-
-	iResult = getaddrinfo(ip, DEFAULT_PORT, &hints, &result);
+	iResult = getaddrinfo(ipaddress.c_str(), DEFAULT_PORT, &hints, &result);
 	if (iResult != 0)
 	{
 		_error("getaddrinfo failed: %d", iResult);
@@ -56,7 +59,7 @@ bool SocketHandler::initSocket(const char* ip)
 
 	ptr = result;
 
-	// Create a SOCKET for connecting to server
+	// Create a SOCKET
 	this->ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
 
 	if (this->ConnectSocket == INVALID_SOCKET)
@@ -73,7 +76,7 @@ bool SocketHandler::initSocket(const char* ip)
 	{
 		_error("Unable to connect to server! %ld", WSAGetLastError());
 		closesocket(this->ConnectSocket);
-		this->ConnectSocket = INVALID_SOCKET;			
+		this->ConnectSocket = INVALID_SOCKET;
 	}
 
 	freeaddrinfo(result);
@@ -109,6 +112,12 @@ bool SocketHandler::initSocket(const char* ip)
 	}
 
 	return true;
+}
+
+bool SocketHandler::socketListen(const std::string& ipaddress)
+{
+	_assert2(false, "Socket Listen is not implemented on windows yet!");
+	return false;
 }
 
 //-------------------------------------------------------------------------
@@ -158,7 +167,7 @@ bool SocketHandler::sendData(const char* sendbuf, size_t size)
 //-------------------------------------------------------------------------
 /**
 */
-char* SocketHandler::recieveData()
+char* SocketHandler::read()
 {
 	int recvbuflen = DEFAULT_BUFLEN;
 
@@ -199,7 +208,7 @@ SOCKET SocketHandler::getSocket()
 //-------------------------------------------------------------------------
 /**
 */
-int SocketHandler::getBufLength()
+int SocketHandler::bytesAvailable()
 {
 	return this->bufLength;
 }
