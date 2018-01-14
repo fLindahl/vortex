@@ -21,7 +21,7 @@ SocketHandler::SocketHandler()
 */
 SocketHandler::~SocketHandler()
 {
-	
+	WSACleanup();
 }
 
 //-------------------------------------------------------------------------
@@ -37,11 +37,21 @@ bool SocketHandler::initSocket()
 		return false;
 	}
 
+	this->initialized = true;
+
+	_printf("Started TCP socket.");
+
 	return true;
 }
 
 bool SocketHandler::socketConnect(const std::string& ipaddress)
 {
+	if (!this->initialized)
+	{
+		_error("SocketHandler::socketConnect >> Socket not yet initialized!");
+		return false;
+	}
+
 	struct addrinfo *result = NULL, *ptr = NULL, hints;
 
 	ZeroMemory(&hints, sizeof(hints));
@@ -54,6 +64,7 @@ bool SocketHandler::socketConnect(const std::string& ipaddress)
 	{
 		_error("getaddrinfo failed: %d", iResult);
 		WSACleanup();
+		this->initialized = false;
 		return false;
 	}
 
@@ -65,8 +76,7 @@ bool SocketHandler::socketConnect(const std::string& ipaddress)
 	if (this->ConnectSocket == INVALID_SOCKET)
 	{
 		_error("Error at socket(): %ld", WSAGetLastError());
-		freeaddrinfo(result);
-		WSACleanup();
+		this->close();
 		return false;
 	}
 
@@ -75,7 +85,7 @@ bool SocketHandler::socketConnect(const std::string& ipaddress)
 	if (iResult == SOCKET_ERROR)
 	{
 		_error("Unable to connect to server! %ld", WSAGetLastError());
-		closesocket(this->ConnectSocket);
+		this->close();
 		this->ConnectSocket = INVALID_SOCKET;
 	}
 
@@ -83,6 +93,7 @@ bool SocketHandler::socketConnect(const std::string& ipaddress)
 
 	if (this->ConnectSocket == INVALID_SOCKET) {
 		WSACleanup();
+		this->initialized = false;
 		return false;
 	}
 
@@ -90,26 +101,13 @@ bool SocketHandler::socketConnect(const std::string& ipaddress)
 	u_long iMode = 1;
 	ioctlsocket(ConnectSocket, FIONBIO, &iMode);
 
-	JoinMsg join;
-	char sendbuf[sizeof(join)];
-
-	//filling join message
-	join.head.id = 0;
-	join.head.length = sizeof(join);
-	join.head.type = Join;
-
-	//copying join message to sendbuf
-	memcpy((void*)sendbuf, (void*)&join, sizeof(join));
-
-	// Send an initial buffer
-	this->sendData(sendbuf, sizeof(sendbuf));
-
 	if (iResult == SOCKET_ERROR) {
-		_error("Socket shutdown failed: %d", WSAGetLastError());
-		closesocket(this->ConnectSocket);
-		WSACleanup();
+		_error("Socket failed: %d", WSAGetLastError());
+		this->close();
 		return false;
 	}
+
+	this->connected = true;
 
 	return true;
 }
@@ -128,14 +126,15 @@ void SocketHandler::close()
 	//Shutdown the socket!
 	iResult = shutdown(this->ConnectSocket, SD_SEND);
 	closesocket(this->ConnectSocket);
-	WSACleanup();
+	this->connected = false;
 }
 
 //-------------------------------------------------------------------------
 /**
 */
-bool SocketHandler::sendData(const char* sendbuf, size_t size)
+bool SocketHandler::sendData(const byte* sendbuf, size_t size)
 {
+	/*
 	char* buf = new char[size];
 	if (RC4ENABLED)
 	{
@@ -146,20 +145,21 @@ bool SocketHandler::sendData(const char* sendbuf, size_t size)
 	{
 		memcpy((void*)buf, (void*)sendbuf, size);
 	}
+	*/
 
 	// Send buffer
-	iResult = send(this->ConnectSocket, buf, size, 0);
+	this->iResult = send(this->ConnectSocket, reinterpret_cast<const char*>(sendbuf), size, 0);
 
 	//free memory
-	delete[] buf;
+	//delete[] buf;
 
-	if (iResult == SOCKET_ERROR) 
+	if (this->iResult == SOCKET_ERROR)
 	{
 		_warning("Packet Send failed: %d", WSAGetLastError());
-		closesocket(this->ConnectSocket);
-		WSACleanup();
+		this->close();
 		return false;
 	}
+
 	_printf("Bytes Sent: %ld\n", iResult);
 	return true;
 }
@@ -195,6 +195,16 @@ char* SocketHandler::read()
 		//printf("recv failed: %d\n", WSAGetLastError());
 		return NULL;
 	}
+}
+
+bool SocketHandler::isConnected() const
+{
+	return this->connected;
+}
+
+bool SocketHandler::isInitialized() const
+{
+	return this->initialized;
 }
 
 //-------------------------------------------------------------------------

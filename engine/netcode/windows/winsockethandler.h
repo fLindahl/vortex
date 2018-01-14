@@ -35,9 +35,13 @@ public:
 
 	void close();
 
-	bool sendData(const char* buffer, size_t size);
+	bool sendData(const byte* buffer, size_t size);
 
 	char* read();
+
+	bool isConnected() const;
+
+	bool isInitialized() const;
 
 	SOCKET getSocket();
 
@@ -50,6 +54,10 @@ public:
 private:
 	RCState RC4_SEND;
 	RCState RC4_RECIEVE;
+
+	bool connected = false;
+
+	bool initialized = false;
 
 	SOCKET ConnectSocket;
 	char recvbuf[DEFAULT_BUFLEN];

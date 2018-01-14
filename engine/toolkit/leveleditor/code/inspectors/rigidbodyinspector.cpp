@@ -1,6 +1,7 @@
 #include "config.h"
 #include "rigidbodyinspector.h"
 #include "imgui.h"
+#include "application/game/entity.h"
 
 namespace LevelEditor
 {
