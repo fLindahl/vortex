@@ -8,6 +8,11 @@
 #include "render/resources/surface.h"
 #include <dirent.h>
 #include "render/frame/flatgeometrylitpass.h"
+#include "render/properties/graphicsproperty.h"
+#include "render/resources/modelinstance.h"
+#include "application/game/entity.h"
+
+using namespace Render;
 
 namespace Toolkit
 {
@@ -185,10 +190,10 @@ namespace Toolkit
 
 			if(ImGui::BeginDock("Inspector", NULL, ImGuiWindowFlags_NoSavedSettings))
 			{
-				if (this->application->loadedModel != nullptr)
+				if (this->application->entity != nullptr)
 				{
-					ImGui::Text("Model: %s", this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetName().c_str());
-					ImGui::Text("Mesh: %s", this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetPath().c_str());
+					ImGui::Text("Model: %s", this->application->entity->FindProperty<GraphicsProperty>()->getModelInstance()->GetName().AsCharPtr());
+					ImGui::Text("Mesh: %s", this->application->entity->FindProperty<GraphicsProperty>()->getModelInstance()->GetMesh()->GetPath().c_str());
 					
 					ImGui::SameLine();
 
@@ -205,11 +210,11 @@ namespace Toolkit
 					{
 						//Unique identifier
 						uint i = 2014235;
-						for (auto node : this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetModelNodes())
+						for (auto node : this->application->entity->FindProperty<GraphicsProperty>()->getModelInstance()->GetModelNodes())
 						{
 							ImGui::BeginGroup();
 							{
-								std::string nodeName = this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh()->getPrimitiveGroup(node->primitiveGroup).name;
+								std::string nodeName = this->application->entity->FindProperty<GraphicsProperty>()->getModelInstance()->GetMesh()->getPrimitiveGroup(node->primitiveGroup).name;
 
 								ImGui::Text("Node: %s", nodeName.c_str());
 								
@@ -263,16 +268,19 @@ namespace Toolkit
 			if (result == NFD_OKAY)
 			{
 				printf("path: %s\n", outpath);
-				if (this->application->loadedModel != nullptr)
+				if (this->application->entity != nullptr)
 				{
-					this->application->loadedModel->Deactivate();
+					this->application->entity->Deactivate();
 				}
 				this->selectedNode = nullptr;
 
-				this->application->loadedModel = Game::ModelEntity::Create();
-				this->application->loadedModel->SetModel(Render::ResourceServer::Instance()->LoadModel(outpath));
-				this->application->loadedModel->SetTransform(Math::mat4::scaling(0.01f, 0.01f, 0.01f));
-				this->application->loadedModel->Activate();
+				this->application->entity = Game::Entity::Create();
+				Ptr<GraphicsProperty> gp = GraphicsProperty::Create();
+				this->application->entity->AddProperty(gp.downcast<Game::BaseProperty>());
+				auto mdl = Render::ResourceServer::Instance()->LoadModel(outpath);
+				gp->setModelInstance(mdl);
+				//this->application->entity->SetTransform(Math::mat4::scaling(0.01f, 0.01f, 0.01f));
+				this->application->entity->Activate();
 
 				this->openFilePopup = false;
 				free(outpath);
@@ -299,7 +307,7 @@ namespace Toolkit
 			if (result == NFD_OKAY)
 			{
 				printf("path: %s\n", outpath);
-				if (this->application->loadedModel != nullptr)
+				if (this->application->entity != nullptr)
 				{
 					//EMPTY
 				}
@@ -400,9 +408,9 @@ namespace Toolkit
 
 				this->selectedNode = nullptr;
 
-				this->application->loadedModel->Deactivate();
-				this->application->loadedModel->GetGraphicsProperty()->getModelInstance()->SetMesh(path.c_str());
-				this->application->loadedModel->Activate();
+				this->application->entity->Deactivate();
+				this->application->entity->FindProperty<GraphicsProperty>()->getModelInstance()->SetMesh(path.c_str());
+				this->application->entity->Activate();
 
 				this->meshBrowserPopup = false;
 			}
@@ -421,7 +429,7 @@ namespace Toolkit
 
 	void UserInterface::NewModel()
 	{
-		if (this->application->loadedModel != nullptr)
+		if (this->application->entity != nullptr)
 		{
 			this->confirmNewModelPopup = true;
 		}

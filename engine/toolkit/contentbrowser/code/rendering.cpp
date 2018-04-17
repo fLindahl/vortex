@@ -108,7 +108,7 @@ void Application::DoPicking()
 		Math::vec4 rayDirection = rayWorldPos - invView.get_position();
 		rayDirection = Math::vec4::normalize(rayDirection);
 
-		Physics::PhysicsHit newHit;
+		/*Physics::PhysicsHit newHit;
 		if (Physics::PhysicsServer::Instance()->Raycast(newHit, rayWorldPos, rayDirection, 400.0f))
 		{
 			printf("--- Hit object! ---\n");
@@ -117,7 +117,7 @@ void Application::DoPicking()
 		else
 		{
 
-		}
+		}*/
 				
 	}
 

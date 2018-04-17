@@ -66,8 +66,10 @@ Application::Open()
 		this->UI = new UserInterface(this);
 
 		//Never set resolution before initializing rendering and framepasses
-		this->window->SetSize(1920, 1020);
+		this->window->SetSize(2320, 1080);
 		this->window->SetTitle("Vortex Content Browser");
+
+		Render::RenderDevice::Instance()->SetRenderResolution(1920, 1080);
 
 		LightServer::PointLight pLight;
 		pLight.position = Math::vec4(3.0f, 2.0f, 1.0f, 1.0f);
@@ -120,7 +122,7 @@ Application::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
        	
-		Physics::PhysicsDevice::Instance()->Solve();
+		//Physics::PhysicsDevice::Instance()->Solve();
 		BaseGameFeature::EntityManager::Instance()->Update();
 
 		if (ImGui::GetIO().KeyAlt)
@@ -132,7 +134,7 @@ Application::Run()
 
 		if (this->UI->selectedNode != nullptr)
 		{
-			Debug::DebugRenderer::Instance()->DrawMesh(this->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh(), this->loadedModel->GetTransform(), Math::vec4(0.5f, 0.5f, 0.0f, 0.5f), (Debug::RenderMode)(Debug::RenderMode::WireFrame | Debug::RenderMode::AlwaysOnTop), this->UI->selectedNode->primitiveGroup, 1.0f);
+			Debug::DebugRenderer::Instance()->DrawMesh(this->entity->FindProperty<GraphicsProperty>()->getModelInstance()->GetMesh(), this->entity->GetTransform(), Math::vec4(0.5f, 0.5f, 0.0f, 0.5f), (Debug::RenderMode)(Debug::RenderMode::WireFrame | Debug::RenderMode::AlwaysOnTop), this->UI->selectedNode->primitiveGroup, 1.0f);
 		}
 
 		this->window->SwapBuffers();
@@ -143,44 +145,48 @@ Application::Run()
 
 void Application::NewModel()
 {
-	if (this->loadedModel != nullptr)
+	if (this->entity != nullptr)
 	{
-		this->loadedModel->Deactivate();
+		this->entity->Deactivate();
 	}
 
-	this->loadedModel = Game::ModelEntity::Create();
+	this->entity = Game::Entity::Create();
+	Ptr<GraphicsProperty> gp = GraphicsProperty::Create();
+	this->entity->AddProperty(gp.downcast<Game::BaseProperty>());
 
 	//Ptr<Render::ModelInstance> mdlInst = std::make_shared<Render::ModelInstance>();
 	//mdlInst->SetMesh("resources/meshes/cube.obj");
 
 	auto mdlInst = ResourceServer::Instance()->LoadModel("resources/models/placeholdercube.mdl");
 
-	this->loadedModel->SetModel(mdlInst);
+	gp->setModelInstance(mdlInst);
 
-	this->loadedModel->Activate();
+	this->entity->Activate();
 }
 
 void Application::SaveModel(const char* filepath)
 {
-	if (this->loadedModel != nullptr)
+	if (this->entity != nullptr)
 	{
 		tinyxml2::XMLDocument data;
 
 		tinyxml2::XMLNode* pRoot = data.NewElement("Vortex");
 		data.InsertFirstChild(pRoot);
 
+		Ptr<GraphicsProperty> gp = this->entity->FindProperty<GraphicsProperty>();
+
 		tinyxml2::XMLNode* model = data.NewElement("Model");
-		model->ToElement()->SetAttribute("name", loadedModel->GetGraphicsProperty()->getModelInstance()->GetName().c_str());
+		model->ToElement()->SetAttribute("name", gp->getModelInstance()->GetName().AsCharPtr());
 		pRoot->InsertFirstChild(model);
 
 		tinyxml2::XMLNode* mesh = data.NewElement("Mesh");
-		mesh->ToElement()->SetAttribute("name", loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh()->GetPath().c_str());
+		mesh->ToElement()->SetAttribute("name", gp->getModelInstance()->GetMesh()->GetPath().c_str());
 		model->InsertFirstChild(mesh);
 
 		ModelNode* node;
-		for (int i = 0; i < loadedModel->GetGraphicsProperty()->getModelInstance()->GetModelNodes().Size(); ++i)
+		for (int i = 0; i < gp->getModelInstance()->GetModelNodes().Size(); ++i)
 		{
-			node = loadedModel->GetGraphicsProperty()->getModelInstance()->GetModelNodes()[i];
+			node = gp->getModelInstance()->GetModelNodes()[i];
 			tinyxml2::XMLElement* element = data.NewElement("Node");
 			element->SetAttribute("primitivegroup", node->primitiveGroup);
 			element->SetAttribute("surface", node->surface->GetPath().AsCharPtr());
@@ -197,10 +203,10 @@ void Application::SaveModel(const char* filepath)
 
 void Application::ExportMesh(const char* filepath)
 {
-	if (this->loadedModel != nullptr)
+	if (this->entity != nullptr)
 	{
-		Render::MeshBuilder::ExportMesh(this->loadedModel->GetGraphicsProperty()->getModelInstance()->GetMesh(), filepath);
-		this->loadedModel->GetGraphicsProperty()->getModelInstance()->SetMesh(filepath);
+		Render::MeshBuilder::ExportMesh(this->entity->FindProperty<GraphicsProperty>()->getModelInstance()->GetMesh(), filepath);
+		this->entity->FindProperty<GraphicsProperty>()->getModelInstance()->SetMesh(filepath);
 	}
 }
 
